@@ -1,7 +1,9 @@
-use regex::Regex;
-use reqwest;
-use scraper::{ElementRef, Html, Selector};
+use crate::utils::regex;
+use reqwest::Client;
+use scraper::html::Select;
+use scraper::{Html, Selector};
 use std::collections::HashSet;
+use std::iter::FilterMap;
 
 const USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
@@ -9,7 +11,7 @@ const USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleW
 pub struct Google {
     url: &'static str,
     domain: String,
-    client: reqwest::Client,
+    client: Client,
 }
 
 impl Google {
@@ -17,7 +19,7 @@ impl Google {
         Google {
             url: "https://www.google.com/search",
             domain: domain,
-            client: reqwest::Client::new(),
+            client: Client::new(),
         }
     }
 
@@ -26,18 +28,18 @@ impl Google {
         let mut all_results = HashSet::new();
 
         loop {
-            let req = self
+            let request = self
                 .client
                 .get(self.url)
                 .header("User-Agent", USER_AGENT)
-                .query(&[("q", query.clone()), ("num", 50.to_string())])
+                .query(&[("q", query.clone()), ("num", 100.to_string())])
                 .build()
                 .unwrap();
 
-            let response = self.client.execute(req).await.unwrap();
+            let response = self.client.execute(request).await.unwrap();
 
             if response.status() != 200 {
-                return;
+                break;
             }
 
             let content = response.text().await.unwrap();
@@ -45,28 +47,20 @@ impl Google {
             let document = Html::parse_document(&content);
             let cite_selector = Selector::parse("cite").unwrap();
 
-            let pattern = format!(
-                r"([a-zA-Z0-9.]+)\.{}$",
-                self.domain.clone().replace(".", r"\.")
-            );
-            let re = Regex::new(&pattern).unwrap();
+            let pattern = regex::generate_domain_regex(self.domain.clone()).unwrap();
 
-            let cites: Vec<ElementRef<'_>> = document.select(&cite_selector).collect();
-            let page_results: HashSet<String> = cites
-                .iter()
-                .filter_map(|item| {
-                    if let Some(matches) = re.find(&item.inner_html()) {
+            let page_results: FilterMap<Select<'_, '_>, _> =
+                document.select(&cite_selector).filter_map(|item| {
+                    if let Some(matches) = pattern.find(&item.inner_html()) {
                         Some(matches.as_str().to_string())
                     } else {
                         None
                     }
-                })
-                .collect();
+                });
 
             all_results.extend(page_results.clone());
 
             let new_queries: Vec<String> = page_results
-                .iter()
                 .filter_map(|item| {
                     let formatted = &format!(".{}", self.domain);
 
@@ -84,9 +78,9 @@ impl Google {
 
             if query == new_query {
                 break;
-            } else {
-                query = new_query;
             }
+
+            query = new_query;
         }
         println!("{:#?}\n{}", all_results, all_results.len());
     }

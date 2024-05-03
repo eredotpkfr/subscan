@@ -1,4 +1,5 @@
 mod engines;
+mod utils;
 
 use clap::Parser;
 use engines::google::Google;
