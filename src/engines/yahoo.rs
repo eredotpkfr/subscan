@@ -1,6 +1,6 @@
 use crate::utils::regex;
 use reqwest::Client;
-use scraper::{html::Select, ElementRef, Html, Selector};
+use scraper::{html::Select, Html, Selector};
 use std::collections::HashSet;
 use std::iter::FilterMap;
 
