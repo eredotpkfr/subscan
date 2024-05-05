@@ -8,16 +8,16 @@ use std::iter::FilterMap;
 const USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
 #[derive(Debug)]
-pub struct Google {
+pub struct Bing {
     url: &'static str,
     domain: String,
     client: Client,
 }
 
-impl Google {
-    pub async fn new(domain: String) -> Google {
-        Google {
-            url: "https://www.google.com/search",
+impl Bing {
+    pub async fn new(domain: String) -> Bing {
+        Bing {
+            url: "https://www.bing.com/search",
             domain: domain,
             client: Client::new(),
         }
@@ -33,7 +33,7 @@ impl Google {
                 .client
                 .get(self.url)
                 .header("User-Agent", USER_AGENT)
-                .query(&[("q", query.clone()), ("num", 100.to_string())])
+                .query(&[("q", query.clone())])
                 .build()
                 .unwrap();
 

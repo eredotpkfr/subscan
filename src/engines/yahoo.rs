@@ -1,23 +1,22 @@
 use crate::utils::regex;
 use reqwest::Client;
-use scraper::html::Select;
-use scraper::{Html, Selector};
+use scraper::{html::Select, ElementRef, Html, Selector};
 use std::collections::HashSet;
 use std::iter::FilterMap;
 
 const USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
 #[derive(Debug)]
-pub struct Google {
+pub struct Yahoo {
     url: &'static str,
     domain: String,
     client: Client,
 }
 
-impl Google {
-    pub async fn new(domain: String) -> Google {
-        Google {
-            url: "https://www.google.com/search",
+impl Yahoo {
+    pub async fn new(domain: String) -> Yahoo {
+        Yahoo {
+            url: "https://search.yahoo.com/search",
             domain: domain,
             client: Client::new(),
         }
@@ -33,7 +32,7 @@ impl Google {
                 .client
                 .get(self.url)
                 .header("User-Agent", USER_AGENT)
-                .query(&[("q", query.clone()), ("num", 100.to_string())])
+                .query(&[("p", query.clone())])
                 .build()
                 .unwrap();
 
@@ -46,13 +45,15 @@ impl Google {
             let content = response.text().await.unwrap();
 
             let document = Html::parse_document(&content);
-            let cite_selector = Selector::parse("cite").unwrap();
+            let cite_selector = Selector::parse("ol > li > div > div > h3 > a > span").unwrap();
 
             let pattern = regex::generate_domain_regex(self.domain.clone()).unwrap();
 
             let page_results: FilterMap<Select<'_, '_>, _> =
                 document.select(&cite_selector).filter_map(|item| {
-                    if let Some(matches) = pattern.find(&item.inner_html()) {
+                    let inner_text = item.inner_html().replace("<b>", "").replace("</b>", "");
+
+                    if let Some(matches) = pattern.find(&inner_text) {
                         Some(matches.as_str().to_string())
                     } else {
                         None
