@@ -1,2 +1,3 @@
+pub mod extractor;
 pub mod module;
-pub mod generic;
+pub mod requester;
