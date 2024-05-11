@@ -9,7 +9,7 @@ pub struct RegexExtractor {}
 
 impl RegexExtractor {
     pub fn new() -> Self {
-        RegexExtractor {}
+        Self {}
     }
 
     fn generate_domain_regex(&self, domain: String) -> Result<Regex, Error> {
@@ -20,7 +20,7 @@ impl RegexExtractor {
         let pattern = self.generate_domain_regex(domain).unwrap();
 
         if let Some(matches) = pattern.find(&content) {
-            Some(Subdomain::from(matches.as_str()))
+            Some(matches.as_str().to_string())
         } else {
             None
         }

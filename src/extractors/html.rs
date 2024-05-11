@@ -1,19 +1,20 @@
 use crate::extractors::regex::RegexExtractor;
 use crate::interfaces::extractor::SubdomainExtractorInterface;
 use crate::types::Subdomain;
-use scraper::html::Select;
 use scraper::{Html, Selector};
 use std::collections::HashSet;
 
 pub struct HTMLExtractor {
     selector: String,
+    removes: Vec<String>,
     regextractor: RegexExtractor,
 }
 
 impl HTMLExtractor {
-    pub fn new(selector: String) -> Self {
-        HTMLExtractor {
+    pub fn new(selector: String, removes: Vec<String>) -> Self {
+        Self {
             selector: selector,
+            removes: removes,
             regextractor: RegexExtractor::new(),
         }
     }
@@ -26,10 +27,16 @@ impl SubdomainExtractorInterface for HTMLExtractor {
 
         document
             .select(&selector)
-            .filter_map(|item| {
-                self.regextractor
-                    .extract_one(item.inner_html(), domain.clone())
+            .map(|item| {
+                let mut text = item.inner_html();
+
+                self.removes.iter().for_each(|element| {
+                    text = text.replace(element, "");
+                });
+
+                text
             })
+            .filter_map(|item| self.regextractor.extract_one(item, domain.clone()))
             .collect()
     }
 }

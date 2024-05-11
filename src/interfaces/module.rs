@@ -4,5 +4,5 @@ use async_trait::async_trait;
 #[async_trait(?Send)]
 pub trait SubscanModuleInterface {
     fn name(&self) -> String;
-    async fn run(&self, domain: String, requester: Box<dyn RequesterInterface>);
+    async fn run(&mut self, domain: String, requester: Box<dyn RequesterInterface>);
 }

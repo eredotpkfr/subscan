@@ -9,12 +9,15 @@ impl RequesterInterface for Client {
         self.request(method, url)
     }
 
-    async fn get(&self, request: Request) -> String {
-        self.execute(request)
-            .await
-            .unwrap()
-            .text()
-            .await
-            .unwrap_or_default()
+    async fn get(&self, request: Request) -> Option<String> {
+        if let Ok(response) = self.execute(request).await {
+            if let Ok(content) = response.text().await {
+                Some(content)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
     }
 }

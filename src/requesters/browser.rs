@@ -2,10 +2,9 @@ use crate::interfaces::requester::RequesterInterface;
 use async_trait::async_trait;
 use headless_chrome::browser::default_executable;
 use headless_chrome::browser::LaunchOptions;
-use headless_chrome::{Browser, Tab};
+use headless_chrome::Browser;
 use reqwest::{Client, Request, RequestBuilder};
 use reqwest::{Method, Url};
-use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct ChromeBrowser {
@@ -35,11 +34,11 @@ impl RequesterInterface for ChromeBrowser {
         self.client.request(method, url)
     }
 
-    async fn get(&self, request: Request) -> String {
+    async fn get(&self, request: Request) -> Option<String> {
         let tab = self.browser.new_tab().unwrap();
         let _ = tab.navigate_to(request.url().as_str());
-        tab.wait_until_navigated().unwrap();
 
-        tab.get_content().unwrap()
+        tab.wait_until_navigated().unwrap();
+        tab.get_content().ok()
     }
 }

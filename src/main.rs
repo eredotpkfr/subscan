@@ -1,4 +1,3 @@
-mod engines;
 mod extractors;
 mod integrations;
 mod interfaces;
@@ -8,9 +7,6 @@ mod types;
 mod utils;
 
 use clap::Parser;
-//use engines::google::Google;
-//use engines::yahoo::Yahoo;
-//use engines::bing::Bing;
 //use integrations::alienvault::AlienVault;
 //use integrations::anubis::Anubis;
 use crate::interfaces::requester::RequesterInterface;
@@ -30,15 +26,12 @@ struct Cli {
 async fn main() {
     let cli = Cli::parse();
 
-    //let instance = Google::new(cli.domain).await;
-    //let instance = Yahoo::new(cli.domain).await;
-    //let instance = Bing::new(cli.domain).await;
     //let instance = AlienVault::new(cli.domain).await;
     //let instance = Anubis::new(cli.domain).await;
     let requester = Box::new(ChromeBrowser::new());
     let hrequester = Box::new(Client::new());
 
-    for item in get_all_modules().iter() {
+    for item in get_all_modules().iter_mut() {
         let _ = item.run(cli.domain.clone(), hrequester.clone()).await;
     }
 
