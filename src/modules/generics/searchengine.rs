@@ -40,28 +40,28 @@ impl GenericSearchEngineModule {
         format!("site:{}", domain).to_string()
     }
 
+    pub fn format_for_query(&mut self, item: &Subdomain, domain: String) -> Option<String> {
+        let formatted = format!(".{}", domain);
+
+        if let Some(sub) = item.strip_suffix(&formatted) {
+            if self.query_state.insert(sub.to_string()) {
+                Some(format!("-{}", sub.to_string()))
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+
     pub async fn get_next_query(&mut self, domain: String, results: HashSet<Subdomain>) -> String {
-        let new_queries: Vec<Subdomain> = results
+        let news = results
             .iter()
-            .filter_map(|item| {
-                let formatted = &format!(".{}", domain);
+            .filter_map(|item| self.format_for_query(&item, domain.clone()))
+            .collect::<Vec<Subdomain>>()
+            .join(" ");
 
-                if let Some(sub) = item.strip_suffix(formatted) {
-                    if !self.query_state.contains::<Subdomain>(&sub.to_string()) {
-                        self.query_state.insert(sub.to_string());
-                        Some(format!("-{}", sub).to_string())
-                    } else {
-                        None
-                    }
-                } else {
-                    None
-                }
-            })
-            .collect();
-
-        format!("{} {}", self.query, new_queries.join(" "))
-            .trim()
-            .to_string()
+        format!("{} {}", self.query, news).trim().to_string()
     }
 
     pub async fn build_request(&self, requester: &Box<dyn RequesterInterface>) -> Request {
