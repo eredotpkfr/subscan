@@ -3,7 +3,7 @@ pub mod core {
 
     pub type Subdomain = String;
 
-    #[derive(Debug, Clone, PartialEq)]
+    #[derive(Debug)]
     pub struct QueryParam(pub String);
 
     impl QueryParam {
@@ -20,7 +20,7 @@ pub mod core {
         }
     }
 
-    #[derive(Debug, Clone, PartialEq)]
+    #[derive(Debug)]
     pub struct SearchQuery {
         pub param: QueryParam,
         pub prefix: String,
