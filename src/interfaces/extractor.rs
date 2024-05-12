@@ -1,8 +1,8 @@
 use crate::types::core::Subdomain;
 use async_trait::async_trait;
-use std::collections::HashSet;
+use std::collections::BTreeSet;
 
 #[async_trait]
 pub trait SubdomainExtractorInterface {
-    async fn extract(&self, content: String, domain: String) -> HashSet<Subdomain>;
+    async fn extract(&self, content: String, domain: String) -> BTreeSet<Subdomain>;
 }

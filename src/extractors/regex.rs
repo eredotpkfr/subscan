@@ -4,7 +4,7 @@ use crate::utils::regex::generate_domain_regex;
 use async_trait::async_trait;
 use core::result::Result;
 use regex::{Error, Regex};
-use std::collections::HashSet;
+use std::collections::BTreeSet;
 
 pub struct RegexExtractor {}
 
@@ -30,7 +30,7 @@ impl RegexExtractor {
 
 #[async_trait]
 impl SubdomainExtractorInterface for RegexExtractor {
-    async fn extract(&self, content: String, domain: String) -> HashSet<Subdomain> {
+    async fn extract(&self, content: String, domain: String) -> BTreeSet<Subdomain> {
         let pattern = self.generate_domain_regex(domain).unwrap();
 
         pattern

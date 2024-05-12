@@ -3,7 +3,7 @@ use crate::interfaces::extractor::SubdomainExtractorInterface;
 use crate::types::core::Subdomain;
 use async_trait::async_trait;
 use scraper::{Html, Selector};
-use std::collections::HashSet;
+use std::collections::BTreeSet;
 
 pub struct HTMLExtractor {
     selector: String,
@@ -23,7 +23,7 @@ impl HTMLExtractor {
 
 #[async_trait]
 impl SubdomainExtractorInterface for HTMLExtractor {
-    async fn extract(&self, content: String, domain: String) -> HashSet<Subdomain> {
+    async fn extract(&self, content: String, domain: String) -> BTreeSet<Subdomain> {
         let document = Html::parse_document(&content);
         let selector = Selector::parse(&self.selector).unwrap();
 
