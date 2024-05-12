@@ -5,7 +5,7 @@ use reqwest::{Method, Url};
 
 #[async_trait(?Send)]
 impl RequesterInterface for Client {
-    fn request(&self, method: Method, url: Url) -> RequestBuilder {
+    async fn request(&self, method: Method, url: Url) -> RequestBuilder {
         self.request(method, url)
     }
 

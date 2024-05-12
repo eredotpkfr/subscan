@@ -1,7 +1,7 @@
 use crate::interfaces::extractor::SubdomainExtractorInterface;
 use crate::interfaces::module::SubscanModuleInterface;
 use crate::interfaces::requester::RequesterInterface;
-use crate::types::Subdomain;
+use crate::types::core::Subdomain;
 use async_trait::async_trait;
 use reqwest::{Method, Request, Url};
 use std::collections::HashSet;
@@ -10,26 +10,29 @@ const USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleW
 
 pub struct GenericSearchEngineModule {
     pub name: String,
+    pub requester: Box<dyn RequesterInterface>,
+    pub extractor: Box<dyn SubdomainExtractorInterface>,
     pub url: Url,
     pub query_param: String,
-    pub extractor: Box<dyn SubdomainExtractorInterface>,
     pub query: String,
-    pub query_state: HashSet<Subdomain>,
+    pub query_state: HashSet<String>,
     pub all_results: HashSet<Subdomain>,
 }
 
 impl GenericSearchEngineModule {
     pub fn new(
         name: String,
+        requester: Box<dyn RequesterInterface>,
+        extractor: Box<dyn SubdomainExtractorInterface>,
         url: Url,
         query_param: String,
-        extractor: Box<dyn SubdomainExtractorInterface>,
     ) -> Box<dyn SubscanModuleInterface> {
         Box::new(Self {
             name: name,
+            requester: requester,
+            extractor: extractor,
             url: url,
             query_param: query_param,
-            extractor: extractor,
             query: String::new(),
             query_state: HashSet::new(),
             all_results: HashSet::new(),
@@ -64,8 +67,8 @@ impl GenericSearchEngineModule {
         format!("{} {}", self.query, news).trim().to_string()
     }
 
-    pub async fn build_request(&self, requester: &Box<dyn RequesterInterface>) -> Request {
-        let builder = requester.request(Method::GET, self.url.clone());
+    pub async fn build_request(&self) -> Request {
+        let builder = self.requester.request(Method::GET, self.url.clone()).await;
 
         builder
             .header("User-Agent", USER_AGENT)
@@ -80,15 +83,15 @@ impl GenericSearchEngineModule {
 
 #[async_trait(?Send)]
 impl SubscanModuleInterface for GenericSearchEngineModule {
-    fn name(&self) -> String {
+    async fn name(&self) -> String {
         self.name.clone()
     }
 
-    async fn run(&mut self, domain: String, requester: Box<dyn RequesterInterface>) {
+    async fn run(&mut self, domain: String) {
         self.query = self.get_start_query(domain.clone()).await;
 
-        while let Some(response) = requester.get(self.build_request(&requester).await).await {
-            let results = self.extractor.extract(response, domain.clone());
+        while let Some(response) = self.requester.get(self.build_request().await).await {
+            let results = self.extractor.extract(response, domain.clone()).await;
 
             self.all_results.extend(results.clone());
 

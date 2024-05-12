@@ -1,6 +1,7 @@
 use crate::interfaces::extractor::SubdomainExtractorInterface;
-use crate::types::Subdomain;
+use crate::types::core::Subdomain;
 use crate::utils::regex::generate_domain_regex;
+use async_trait::async_trait;
 use core::result::Result;
 use regex::{Error, Regex};
 use std::collections::HashSet;
@@ -27,8 +28,9 @@ impl RegexExtractor {
     }
 }
 
+#[async_trait]
 impl SubdomainExtractorInterface for RegexExtractor {
-    fn extract(&self, content: String, domain: String) -> HashSet<Subdomain> {
+    async fn extract(&self, content: String, domain: String) -> HashSet<Subdomain> {
         let pattern = self.generate_domain_regex(domain).unwrap();
 
         pattern

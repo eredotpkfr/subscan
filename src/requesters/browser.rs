@@ -30,7 +30,7 @@ impl ChromeBrowser {
 
 #[async_trait(?Send)]
 impl RequesterInterface for ChromeBrowser {
-    fn request(&self, method: Method, url: Url) -> RequestBuilder {
+    async fn request(&self, method: Method, url: Url) -> RequestBuilder {
         self.client.request(method, url)
     }
 

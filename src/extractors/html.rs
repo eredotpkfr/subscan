@@ -1,6 +1,7 @@
 use crate::extractors::regex::RegexExtractor;
 use crate::interfaces::extractor::SubdomainExtractorInterface;
-use crate::types::Subdomain;
+use crate::types::core::Subdomain;
+use async_trait::async_trait;
 use scraper::{Html, Selector};
 use std::collections::HashSet;
 
@@ -20,8 +21,9 @@ impl HTMLExtractor {
     }
 }
 
+#[async_trait]
 impl SubdomainExtractorInterface for HTMLExtractor {
-    fn extract(&self, content: String, domain: String) -> HashSet<Subdomain> {
+    async fn extract(&self, content: String, domain: String) -> HashSet<Subdomain> {
         let document = Html::parse_document(&content);
         let selector = Selector::parse(&self.selector).unwrap();
 

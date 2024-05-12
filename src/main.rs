@@ -9,11 +9,7 @@ mod utils;
 use clap::Parser;
 //use integrations::alienvault::AlienVault;
 //use integrations::anubis::Anubis;
-use crate::interfaces::requester::RequesterInterface;
-use modules::all::get_all_modules;
-use requesters::browser::ChromeBrowser;
-use reqwest::Client;
-use reqwest::{Method, Url};
+use crate::modules::all::get_all_modules;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -28,11 +24,9 @@ async fn main() {
 
     //let instance = AlienVault::new(cli.domain).await;
     //let instance = Anubis::new(cli.domain).await;
-    let requester = Box::new(ChromeBrowser::new());
-    let hrequester = Box::new(Client::new());
 
     for item in get_all_modules().iter_mut() {
-        let _ = item.run(cli.domain.clone(), hrequester.clone()).await;
+        let _ = item.run(cli.domain.clone()).await;
     }
 
     //instance.start().await;

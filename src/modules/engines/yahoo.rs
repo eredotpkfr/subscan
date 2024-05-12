@@ -1,8 +1,7 @@
 use crate::extractors::html::HTMLExtractor;
 use crate::interfaces::module::SubscanModuleInterface;
 use crate::modules::generics::searchengine::GenericSearchEngineModule;
-use reqwest::Url;
-use std::collections::HashSet;
+use reqwest::{Client, Url};
 
 const YAHOO_MODULE_NAME: &str = "Yahoo";
 const YAHOO_SEARCH_URL: &str = "https://search.yahoo.com/search";
@@ -20,7 +19,8 @@ impl Yahoo {
             String::from(YAHOO_CITE_TAG),
             vec!["<b>".to_string(), "</b>".to_string()],
         ));
+        let requester = Box::new(Client::new());
 
-        GenericSearchEngineModule::new(name, url, query_param, extractor)
+        GenericSearchEngineModule::new(name, requester, extractor, url, query_param)
     }
 }
