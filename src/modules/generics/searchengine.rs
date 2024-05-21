@@ -36,7 +36,7 @@ impl GenericSearchEngineModule {
     }
 
     pub async fn get_start_query(&self, domain: String) -> SearchQuery {
-        self.param.as_search_query(domain, "site:".to_string())
+        self.param.to_search_query(domain, "site:".to_string())
     }
 
     pub async fn build_request(&self, query: &mut SearchQuery) -> Request {
@@ -69,12 +69,11 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
 
             self.all_results.extend(results.clone());
 
-            let updated = query.update_many(results.clone());
-
-            if !updated {
+            if !query.update_many(results.clone()) {
                 break;
             }
         }
+
         println!("{:#?}\nTotal: {}", self.all_results, self.all_results.len());
     }
 }

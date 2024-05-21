@@ -3,7 +3,7 @@ pub mod core {
 
     pub type Subdomain = String;
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct QueryParam(pub String);
 
     impl QueryParam {
@@ -12,11 +12,11 @@ pub mod core {
         }
 
         pub fn as_string(&self) -> String {
-            self.0.as_str().to_string()
+            self.0.clone()
         }
 
-        pub fn as_search_query(&self, domain: String, prefix: String) -> SearchQuery {
-            SearchQuery::new(QueryParam(self.as_string()), prefix, domain)
+        pub fn to_search_query(&self, domain: String, prefix: String) -> SearchQuery {
+            SearchQuery::new(self.clone(), prefix, domain)
         }
     }
 
