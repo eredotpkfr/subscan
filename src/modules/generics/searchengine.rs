@@ -35,7 +35,7 @@ impl GenericSearchEngineModule {
         }
     }
 
-    pub async fn get_start_query(&self, domain: String) -> SearchQuery {
+    pub async fn get_search_query(&self, domain: String) -> SearchQuery {
         self.param.to_search_query(domain, "site:".to_string())
     }
 
@@ -60,7 +60,7 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
     }
 
     async fn run(&mut self, domain: String) {
-        let mut query = self.get_start_query(domain.clone()).await;
+        let mut query = self.get_search_query(domain.clone()).await;
 
         loop {
             let request = self.build_request(&mut query).await;
