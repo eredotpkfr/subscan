@@ -19,6 +19,8 @@ impl Google {
         let extractor = Box::new(HTMLExtractor::new(String::from(GOOGLE_CITE_TAG), vec![]));
         let requester = Box::new(Client::new());
 
-        GenericSearchEngineModule::new(name, url, param, requester, extractor)
+        Box::new(GenericSearchEngineModule::new(
+            name, url, param, requester, extractor,
+        ))
     }
 }

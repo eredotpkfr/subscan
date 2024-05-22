@@ -19,6 +19,8 @@ impl Bing {
         let extractor = Box::new(HTMLExtractor::new(String::from(BING_CITE_TAG), vec![]));
         let requester = Box::new(Client::new());
 
-        GenericSearchEngineModule::new(name, url, param, requester, extractor)
+        Box::new(GenericSearchEngineModule::new(
+            name, url, param, requester, extractor,
+        ))
     }
 }

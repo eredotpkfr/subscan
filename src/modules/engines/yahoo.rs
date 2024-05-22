@@ -22,6 +22,8 @@ impl Yahoo {
         ));
         let requester = Box::new(Client::new());
 
-        GenericSearchEngineModule::new(name, url, param, requester, extractor)
+        Box::new(GenericSearchEngineModule::new(
+            name, url, param, requester, extractor,
+        ))
     }
 }

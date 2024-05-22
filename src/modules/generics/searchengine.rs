@@ -24,15 +24,15 @@ impl GenericSearchEngineModule {
         param: QueryParam,
         requester: Box<dyn RequesterInterface>,
         extractor: Box<dyn SubdomainExtractorInterface>,
-    ) -> Box<dyn SubscanModuleInterface> {
-        Box::new(Self {
+    ) -> Self {
+        Self {
             name: name,
             url: url,
             param: param,
             requester: requester,
             extractor: extractor,
             all_results: BTreeSet::new(),
-        })
+        }
     }
 
     pub async fn get_start_query(&self, domain: String) -> SearchQuery {
