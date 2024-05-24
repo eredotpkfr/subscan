@@ -10,7 +10,7 @@ use clap::Parser;
 //use integrations::alienvault::AlienVault;
 //use integrations::anubis::Anubis;
 use crate::modules::all::get_all_modules;
-use crate::types::core::QueryParam;
+use crate::types::query::QueryParam;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]

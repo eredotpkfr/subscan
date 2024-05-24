@@ -1,8 +1,9 @@
 use crate::extractors::html::HTMLExtractor;
 use crate::interfaces::module::SubscanModuleInterface;
 use crate::modules::generics::searchengine::GenericSearchEngineModule;
-use crate::types::core::QueryParam;
-use reqwest::{Client, Url};
+use crate::requesters::client::HTTPClient;
+use crate::types::query::QueryParam;
+use reqwest::Url;
 
 const GOOGLE_MODULE_NAME: &str = "Google";
 const GOOGLE_SEARCH_URL: &str = "https://www.google.com/search";
@@ -17,7 +18,7 @@ impl Google {
         let url = Url::parse(GOOGLE_SEARCH_URL).expect("URL parse error!");
         let param = QueryParam::from(GOOGLE_SEARCH_PARAM);
         let extractor = Box::new(HTMLExtractor::new(String::from(GOOGLE_CITE_TAG), vec![]));
-        let requester = Box::new(Client::new());
+        let requester = Box::new(HTTPClient::new());
 
         Box::new(GenericSearchEngineModule::new(
             name, url, param, requester, extractor,

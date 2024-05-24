@@ -1,8 +1,9 @@
 use crate::extractors::html::HTMLExtractor;
 use crate::interfaces::module::SubscanModuleInterface;
 use crate::modules::generics::searchengine::GenericSearchEngineModule;
+use crate::requesters::client::HTTPClient;
 use crate::QueryParam;
-use reqwest::{Client, Url};
+use reqwest::Url;
 
 const BING_MODULE_NAME: &str = "Bing";
 const BING_SEARCH_URL: &str = "https://www.bing.com/search";
@@ -17,7 +18,7 @@ impl Bing {
         let url = Url::parse(BING_SEARCH_URL).expect("URL parse error!");
         let param = QueryParam::from(BING_SEARCH_PARAM);
         let extractor = Box::new(HTMLExtractor::new(String::from(BING_CITE_TAG), vec![]));
-        let requester = Box::new(Client::new());
+        let requester = Box::new(HTTPClient::new());
 
         Box::new(GenericSearchEngineModule::new(
             name, url, param, requester, extractor,
