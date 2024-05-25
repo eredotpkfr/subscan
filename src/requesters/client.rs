@@ -28,9 +28,9 @@ impl RequesterInterface for HTTPClient {
     }
 
     async fn configure(&mut self, config: RequesterConfig) {
-        let mut builder = Client::builder().default_headers(self.config.http_headers.clone());
+        let mut builder = Client::builder().default_headers(self.config.headers.clone());
 
-        if let Some(proxy) = &self.config.http_proxy {
+        if let Some(proxy) = &self.config.proxy {
             builder = builder.proxy(Proxy::http(proxy).expect(PROXY_PARSE_ERR));
         }
 
@@ -42,8 +42,8 @@ impl RequesterInterface for HTTPClient {
         let request = self
             .client
             .get(url)
-            .timeout(self.config.http_timeout)
-            .headers(self.config.http_headers.clone())
+            .timeout(self.config.timeout)
+            .headers(self.config.headers.clone())
             .build()
             .expect(REQUEST_BUILD_ERR);
 

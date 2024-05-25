@@ -2,7 +2,7 @@ use crate::interfaces::extractor::SubdomainExtractorInterface;
 use crate::interfaces::module::SubscanModuleInterface;
 use crate::interfaces::requester::RequesterInterface;
 use crate::types::core::Subdomain;
-use crate::types::query::{QueryParam, SearchQuery};
+use crate::types::query::{SearchQuery, SearchQueryParam};
 use async_trait::async_trait;
 use reqwest::Url;
 use std::collections::BTreeSet;
@@ -12,7 +12,7 @@ const USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleW
 pub struct GenericSearchEngineModule {
     pub name: String,
     pub url: Url,
-    pub param: QueryParam,
+    pub param: SearchQueryParam,
     pub requester: Box<dyn RequesterInterface>,
     pub extractor: Box<dyn SubdomainExtractorInterface>,
     pub all_results: BTreeSet<Subdomain>,
@@ -22,16 +22,16 @@ impl GenericSearchEngineModule {
     pub fn new(
         name: String,
         url: Url,
-        param: QueryParam,
+        param: SearchQueryParam,
         requester: Box<dyn RequesterInterface>,
         extractor: Box<dyn SubdomainExtractorInterface>,
     ) -> Self {
         Self {
-            name: name,
-            url: url,
-            param: param,
-            requester: requester,
-            extractor: extractor,
+            name,
+            url,
+            param,
+            requester,
+            extractor,
             all_results: BTreeSet::new(),
         }
     }

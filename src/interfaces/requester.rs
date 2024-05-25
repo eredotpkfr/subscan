@@ -3,10 +3,10 @@ use async_trait::async_trait;
 use reqwest::header::{HeaderName, HeaderValue};
 use reqwest::Url;
 
-const HEADER_ADD_ERR: &str = "Cannot add header";
+const HEADER_ADD_ERR: &str = "Cannot add header!";
 
 #[async_trait(?Send)]
-pub trait RequesterInterface {
+pub trait RequesterInterface: Sync + Send {
     async fn config(&self) -> RequesterConfig;
     async fn configure(&mut self, config: RequesterConfig);
     async fn add_header(&mut self, name: String, value: String) {
