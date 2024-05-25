@@ -1,7 +1,7 @@
 use crate::interfaces::extractor::SubdomainExtractorInterface;
 use crate::interfaces::module::SubscanModuleInterface;
 use crate::interfaces::requester::RequesterInterface;
-use crate::types::core::Subdomain;
+
 use crate::types::query::{SearchQuery, SearchQueryParam};
 use async_trait::async_trait;
 use reqwest::Url;
@@ -15,27 +15,9 @@ pub struct GenericSearchEngineModule {
     pub param: SearchQueryParam,
     pub requester: Box<dyn RequesterInterface>,
     pub extractor: Box<dyn SubdomainExtractorInterface>,
-    pub all_results: BTreeSet<Subdomain>,
 }
 
 impl GenericSearchEngineModule {
-    pub fn new(
-        name: String,
-        url: Url,
-        param: SearchQueryParam,
-        requester: Box<dyn RequesterInterface>,
-        extractor: Box<dyn SubdomainExtractorInterface>,
-    ) -> Self {
-        Self {
-            name,
-            url,
-            param,
-            requester,
-            extractor,
-            all_results: BTreeSet::new(),
-        }
-    }
-
     pub async fn get_search_query(&self, domain: String) -> SearchQuery {
         self.param.to_search_query(domain, "site:".to_string())
     }
@@ -48,6 +30,7 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
     }
 
     async fn run(&mut self, domain: String) {
+        let mut all_results = BTreeSet::new();
         let mut query = self.get_search_query(domain.clone()).await;
         let extra_params = [("num".to_string(), 100.to_string())];
 
@@ -56,13 +39,13 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
             let response = self.requester.get_content(url).await.unwrap_or_default();
             let results = self.extractor.extract(response, domain.clone()).await;
 
-            self.all_results.extend(results.clone());
+            all_results.extend(results.clone());
 
             if !query.update_many(results.clone()) {
                 break;
             }
         }
-
-        println!("{:#?}\nTotal: {}", self.all_results, self.all_results.len());
+        
+        println!("{:#?}\nTotal: {}", all_results, all_results.len());
     }
 }

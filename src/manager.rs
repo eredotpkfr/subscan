@@ -1,9 +1,7 @@
 use crate::enums::RequesterType;
 use crate::interfaces::module::SubscanModuleInterface;
 use crate::interfaces::requester::RequesterInterface;
-use crate::modules::engines::bing::Bing;
-use crate::modules::engines::google::Google;
-use crate::modules::engines::yahoo::Yahoo;
+use crate::modules::engines::{bing, google, yahoo};
 use crate::requesters::browser::ChromeBrowser;
 use crate::requesters::client::HTTPClient;
 use crate::types::config::RequesterConfig;
@@ -23,7 +21,11 @@ impl Manager {
     pub fn register_modules() -> &'static Vec<Box<dyn SubscanModuleInterface>> {
         MODULES.get_or_init(|| {
             println!("initialized");
-            vec![Google::new(), Yahoo::new(), Bing::new()]
+            vec![
+                Box::new(google::Google::new()),
+                Box::new(yahoo::Yahoo::new()),
+                Box::new(bing::Bing::new()),
+            ]
         })
     }
 
