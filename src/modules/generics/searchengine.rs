@@ -45,7 +45,7 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
                 break;
             }
         }
-        
+
         println!("{:#?}\nTotal: {}", all_results, all_results.len());
     }
 }
