@@ -17,8 +17,9 @@ use crate::types::query::SearchQueryParam;
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Cli {
-    /// Target domain address to be enumerated
-    domain: String,
+    /// Target domain addresses to be enumerated
+    #[arg(short, long, required = true, num_args = 0..)]
+    domains: Vec<String>,
 }
 
 #[tokio::main]
@@ -31,14 +32,14 @@ async fn main() {
     // for item in get_all_modules().iter_mut() {
     //     let _ = item.run(cli.domain.clone()).await;
     // }
+    for domain in &cli.domains {
+        for item in ALL_MODULES.iter() {
+            let module = item.lock().unwrap();
 
-    for item in ALL_MODULES.iter() {
-        let mut module = item.lock().unwrap();
+            println!("Running...{}...{}", module.name().await, domain);
 
-        println!("Running...{}", module.name().await);
-
-        module.run(cli.domain.clone()).await;
+            // module.run(domain.clone()).await;
+        }
     }
-
     //instance.start().await;
 }
