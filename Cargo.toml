@@ -14,5 +14,6 @@ reqwest = "0.12.4"
 scraper = "0.19.0"
 regex = "1.10.4"
 serde_json = "1.0.116"
-headless_chrome = { version = "1.0.10", features = ["fetch"] }
+headless_chrome = {git = "https://github.com/rust-headless-chrome/rust-headless-chrome", features = ["fetch"]}
 async-trait = "0.1.80"
+lazy_static = "1.4.0"

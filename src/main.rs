@@ -11,8 +11,7 @@ mod utils;
 use clap::Parser;
 //use integrations::alienvault::AlienVault;
 //use integrations::anubis::Anubis;
-use crate::manager::Manager;
-
+use crate::manager::ALL_MODULES;
 use crate::types::query::SearchQueryParam;
 
 #[derive(Parser, Debug)]
@@ -24,7 +23,7 @@ struct Cli {
 
 #[tokio::main]
 async fn main() {
-    let _cli = Cli::parse();
+    let cli = Cli::parse();
 
     //let instance = AlienVault::new(cli.domain).await;
     //let instance = Anubis::new(cli.domain).await;
@@ -33,16 +32,12 @@ async fn main() {
     //     let _ = item.run(cli.domain.clone()).await;
     // }
 
-    for module in Manager::register_modules() {
-        println!("{}", module.name().await);
-    }
+    for item in ALL_MODULES.iter() {
+        let mut module = item.lock().unwrap();
 
-    for module in Manager::modules() {
-        println!("{}", module.name().await);
-    }
+        println!("Running...{}", module.name().await);
 
-    for module in Manager::modules() {
-        println!("{}", module.name().await);
+        module.run(cli.domain.clone()).await;
     }
 
     //instance.start().await;
