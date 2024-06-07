@@ -1,6 +1,7 @@
+use crate::Cli;
+use reqwest::header::USER_AGENT;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use std::time::Duration;
-
 #[derive(Debug, Clone)]
 pub struct RequesterConfig {
     pub headers: HeaderMap,
@@ -14,6 +15,17 @@ impl RequesterConfig {
             headers: HeaderMap::new(),
             timeout: Duration::from_secs(10),
             proxy: None,
+        }
+    }
+
+    pub fn from_cli(cli: &Cli) -> Self {
+        Self {
+            headers: HeaderMap::from_iter([(
+                USER_AGENT,
+                HeaderValue::from_str(&cli.user_agent).unwrap(),
+            )]),
+            timeout: Duration::from_secs(cli.timeout),
+            proxy: cli.proxy.clone(),
         }
     }
 

@@ -7,8 +7,6 @@ use async_trait::async_trait;
 use reqwest::Url;
 use std::collections::BTreeSet;
 
-const USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
-
 pub struct GenericSearchEngineModule {
     pub name: String,
     pub url: Url,
