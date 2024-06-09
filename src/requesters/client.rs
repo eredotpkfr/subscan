@@ -1,12 +1,11 @@
-use crate::interfaces::requester::RequesterInterface;
 use crate::types::config::RequesterConfig;
+use crate::{enums::RequesterType, interfaces::requester::RequesterInterface};
 use async_trait::async_trait;
 use reqwest::{Client, Proxy, Url};
 
 const CLIENT_BUILD_ERR: &str = "Cannot create HTTP client!";
 const REQUEST_BUILD_ERR: &str = "Cannot build request!";
 const PROXY_PARSE_ERR: &str = "Cannot parse proxy!";
-
 pub struct HTTPClient {
     config: RequesterConfig,
     client: Client,
@@ -23,6 +22,10 @@ impl HTTPClient {
 
 #[async_trait(?Send)]
 impl RequesterInterface for HTTPClient {
+    async fn r#type(&self) -> RequesterType {
+        RequesterType::HTTPClient
+    }
+
     async fn config(&self) -> RequesterConfig {
         self.config.clone()
     }

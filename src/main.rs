@@ -1,3 +1,4 @@
+mod enums;
 mod extractors;
 mod integrations;
 mod interfaces;
@@ -10,9 +11,11 @@ mod utils;
 use clap::Parser;
 //use integrations::alienvault::AlienVault;
 //use integrations::anubis::Anubis;
+use crate::interfaces::module::SubscanModuleInterface;
+use crate::interfaces::requester::RequesterInterface;
+use crate::manager::get_requester_by_type;
 use crate::manager::{ALL_MODULES, ALL_REQUESTERS};
-use crate::types::config::RequesterConfig;
-use crate::types::query::SearchQueryParam;
+use crate::types::{config::RequesterConfig, query::SearchQueryParam};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -41,15 +44,14 @@ struct Cli {
 async fn main() {
     let cli = Cli::parse();
 
-    let config = RequesterConfig::from_cli(&cli);
+    let config: RequesterConfig = RequesterConfig::from_cli(&cli);
 
-    for item in ALL_REQUESTERS.iter() {
-        let mut requester = item.lock().unwrap();
-        let _ = requester.configure(config.clone()).await;
+    for requester in ALL_REQUESTERS.iter() {
+        let _ = requester.lock().unwrap().configure(config.clone()).await;
     }
 
-    let client = ALL_REQUESTERS[ALL_REQUESTERS.len() - 1].lock().unwrap();
-    println!("{:#?}", client.config().await);
+    // let client = ALL_REQUESTERS[ALL_REQUESTERS.len() - 1].lock().unwrap();
+    // println!("{:#?}", client.config().await);
 
     //let instance = AlienVault::new(cli.domain).await;
     //let instance = Anubis::new(cli.domain).await;
@@ -57,6 +59,21 @@ async fn main() {
     // for item in get_all_modules().iter_mut() {
     //     let _ = item.run(cli.domain.clone()).await;
     // }
+
+    for requester in ALL_REQUESTERS.iter() {
+        println!("{:#?}", requester.lock().unwrap().r#type().await);
+    }
+
+    println!(
+        "Getted target: {:#?}",
+        get_requester_by_type(enums::RequesterType::ChromeBrowser)
+            .await
+            .lock()
+            .unwrap()
+            .r#type()
+            .await
+    );
+
     for item in ALL_MODULES.iter() {
         let module = item.lock().unwrap();
 

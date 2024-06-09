@@ -1,7 +1,8 @@
-use crate::interfaces::module::SubscanModuleInterface;
-use crate::interfaces::requester::RequesterInterface;
+use crate::enums::{RequesterDispatcher, RequesterType};
+use crate::interfaces::{module::SubscanModuleInterface, requester::RequesterInterface};
 use crate::modules::engines::{bing, google, yahoo};
-use crate::requesters::{browser, client};
+use crate::requesters::{chrome, client};
+use futures::{stream, StreamExt};
 use lazy_static::lazy_static;
 use std::sync::Mutex;
 
@@ -11,8 +12,19 @@ lazy_static! {
         Mutex::new(Box::new(yahoo::Yahoo::new())),
         Mutex::new(Box::new(bing::Bing::new())),
     ];
-    pub static ref ALL_REQUESTERS: Vec<Mutex<Box<dyn RequesterInterface>>> = vec![
-        Mutex::new(Box::new(browser::ChromeBrowser::new())),
-        Mutex::new(Box::new(client::HTTPClient::new())),
+    pub static ref ALL_REQUESTERS: Vec<Mutex<RequesterDispatcher>> = vec![
+        Mutex::new(RequesterDispatcher::ChromeBrowser(
+            chrome::ChromeBrowser::new()
+        )),
+        Mutex::new(RequesterDispatcher::HTTPClient(client::HTTPClient::new())),
     ];
+}
+
+pub async fn get_requester_by_type<'a>(rtype: RequesterType) -> &'a Mutex<RequesterDispatcher> {
+    let filtered = stream::iter(ALL_REQUESTERS.iter())
+        .filter(|item| async { item.lock().unwrap().r#type().await == rtype })
+        .collect::<Vec<&Mutex<RequesterDispatcher>>>()
+        .await;
+
+    filtered.first().expect("Requester not found!")
 }

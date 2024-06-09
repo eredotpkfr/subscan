@@ -1,2 +1,2 @@
-pub mod browser;
+pub mod chrome;
 pub mod client;

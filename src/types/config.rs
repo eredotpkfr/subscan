@@ -1,6 +1,5 @@
 use crate::Cli;
-use reqwest::header::USER_AGENT;
-use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
+use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
 use std::time::Duration;
 #[derive(Debug, Clone)]
 pub struct RequesterConfig {

@@ -1,12 +1,9 @@
-use crate::interfaces::requester::RequesterInterface;
 use crate::types::config::RequesterConfig;
+use crate::{enums::RequesterType, interfaces::requester::RequesterInterface};
 use async_trait::async_trait;
-use headless_chrome::browser::default_executable;
-use headless_chrome::browser::LaunchOptions;
-use headless_chrome::Browser;
+use headless_chrome::{browser::default_executable, browser::LaunchOptions, Browser};
 use reqwest::Url;
 
-#[derive(Clone)]
 pub struct ChromeBrowser {
     config: RequesterConfig,
     browser: Browser,
@@ -30,6 +27,10 @@ impl ChromeBrowser {
 
 #[async_trait(?Send)]
 impl RequesterInterface for ChromeBrowser {
+    async fn r#type(&self) -> RequesterType {
+        RequesterType::ChromeBrowser
+    }
+
     async fn config(&self) -> RequesterConfig {
         self.config.clone()
     }
