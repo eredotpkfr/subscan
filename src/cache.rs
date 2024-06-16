@@ -32,8 +32,12 @@ lazy_static! {
 pub mod requesters {
     use tokio::sync::Mutex;
 
-    use super::{RequesterDispatcher, RequesterType, ALL_REQUESTERS};
-    use crate::{interfaces::requester::RequesterInterface, types::config::RequesterConfig};
+    use super::ALL_REQUESTERS;
+    use crate::{
+        enums::{RequesterDispatcher, RequesterType},
+        interfaces::requester::RequesterInterface,
+        types::config::RequesterConfig,
+    };
 
     pub fn get_by_type(rtype: &RequesterType) -> &Mutex<RequesterDispatcher> {
         ALL_REQUESTERS.get(rtype).expect("Requester not found!")
