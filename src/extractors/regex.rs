@@ -1,6 +1,7 @@
-use crate::interfaces::extractor::SubdomainExtractorInterface;
-use crate::types::core::Subdomain;
-use crate::utils::regex::generate_subdomain_regex;
+use crate::{
+    interfaces::extractor::SubdomainExtractorInterface, types::core::Subdomain,
+    utils::regex::generate_subdomain_regex,
+};
 use async_trait::async_trait;
 use regex::Match;
 use std::collections::BTreeSet;

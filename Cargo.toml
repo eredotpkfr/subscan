@@ -18,4 +18,3 @@ headless_chrome = {git = "https://github.com/rust-headless-chrome/rust-headless-
 async-trait = "0.1.80"
 lazy_static = "1.4.0"
 enum_dispatch = "0.3.13"
-futures = "0.3.30"

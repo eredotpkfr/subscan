@@ -1,6 +1,7 @@
-use crate::extractors::regex::RegexExtractor;
-use crate::interfaces::extractor::SubdomainExtractorInterface;
-use crate::types::core::Subdomain;
+use crate::{
+    extractors::regex::RegexExtractor, interfaces::extractor::SubdomainExtractorInterface,
+    types::core::Subdomain,
+};
 use async_trait::async_trait;
 use scraper::{ElementRef, Html, Selector};
 use std::collections::BTreeSet;
