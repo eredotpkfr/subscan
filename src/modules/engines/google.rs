@@ -11,8 +11,8 @@ const GOOGLE_CITE_TAG: &str = "cite";
 
 pub struct Google {}
 
-impl Google {
-    pub fn new() -> GenericSearchEngineModule<'static> {
+impl<'a> Google {
+    pub fn new() -> GenericSearchEngineModule<'a> {
         GenericSearchEngineModule {
             name: String::from(GOOGLE_MODULE_NAME),
             url: Url::parse(GOOGLE_SEARCH_URL).expect("URL parse error!"),

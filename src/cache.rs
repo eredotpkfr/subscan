@@ -32,17 +32,15 @@ lazy_static! {
 pub mod requesters {
     use tokio::sync::Mutex;
 
-    use crate::interfaces::requester::RequesterInterface;
-    use crate::types::config::RequesterConfig;
+    use super::{RequesterDispatcher, RequesterType, ALL_REQUESTERS};
+    use crate::{interfaces::requester::RequesterInterface, types::config::RequesterConfig};
 
-    pub fn get_by_type(rtype: &super::RequesterType) -> &Mutex<super::RequesterDispatcher> {
-        super::ALL_REQUESTERS
-            .get(rtype)
-            .expect("Requester not found!")
+    pub fn get_by_type(rtype: &RequesterType) -> &Mutex<RequesterDispatcher> {
+        ALL_REQUESTERS.get(rtype).expect("Requester not found!")
     }
 
     pub async fn configure_all(config: RequesterConfig) {
-        for requester in super::ALL_REQUESTERS.values() {
+        for requester in ALL_REQUESTERS.values() {
             requester.lock().await.configure(config.clone()).await
         }
     }

@@ -48,7 +48,11 @@ async fn main() {
     cache::requesters::configure_all(config).await;
 
     for requester in ALL_REQUESTERS.values() {
-        println!("{:#?}", requester.lock().await.config().await);
+        println!(
+            "{:#?} {:p}",
+            requester.lock().await.config().await,
+            requester
+        );
     }
 
     for item in ALL_MODULES.iter() {

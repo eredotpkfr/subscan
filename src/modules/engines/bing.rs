@@ -11,8 +11,8 @@ const BING_CITE_TAG: &str = "cite";
 
 pub struct Bing {}
 
-impl Bing {
-    pub fn new() -> GenericSearchEngineModule<'static> {
+impl<'a> Bing {
+    pub fn new() -> GenericSearchEngineModule<'a> {
         GenericSearchEngineModule {
             name: String::from(BING_MODULE_NAME),
             url: Url::parse(BING_SEARCH_URL).expect("URL parse error!"),

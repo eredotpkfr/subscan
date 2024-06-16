@@ -11,8 +11,8 @@ const YAHOO_CITE_TAG: &str = "ol > li > div > div > h3 > a > span";
 
 pub struct Yahoo {}
 
-impl Yahoo {
-    pub fn new() -> GenericSearchEngineModule<'static> {
+impl<'a> Yahoo {
+    pub fn new() -> GenericSearchEngineModule<'a> {
         GenericSearchEngineModule {
             name: String::from(YAHOO_MODULE_NAME),
             url: Url::parse(YAHOO_SEARCH_URL).expect("URL parse error!"),
