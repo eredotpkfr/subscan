@@ -29,7 +29,7 @@ impl RequesterInterface for HTTPClient {
         let mut builder = Client::builder().default_headers(config.headers.clone());
 
         if let Some(proxy) = &config.proxy {
-            builder = builder.proxy(Proxy::http(proxy).expect(PROXY_PARSE_ERR));
+            builder = builder.proxy(Proxy::all(proxy).expect(PROXY_PARSE_ERR));
         }
 
         self.config = config;

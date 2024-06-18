@@ -1,6 +1,9 @@
 use crate::{interfaces::requester::RequesterInterface, types::config::RequesterConfig};
 use async_trait::async_trait;
-use headless_chrome::{browser::default_executable, browser::LaunchOptions, Browser};
+use headless_chrome::{
+    browser::{default_executable, LaunchOptions},
+    Browser,
+};
 use reqwest::Url;
 
 pub struct ChromeBrowser {
@@ -10,17 +13,22 @@ pub struct ChromeBrowser {
 
 impl ChromeBrowser {
     pub fn new() -> Self {
-        let builder = LaunchOptions::default_builder()
-            .path(Some(default_executable().unwrap()))
-            .headless(true)
-            .sandbox(false)
-            .build()
-            .unwrap();
-
         ChromeBrowser {
             config: RequesterConfig::new(),
-            browser: Browser::new(builder).unwrap(),
+            browser: Browser::new(Self::default_options()).unwrap(),
         }
+    }
+
+    fn default_options<'a>() -> LaunchOptions<'a> {
+        let mut builder = LaunchOptions::default_builder();
+
+        builder
+            .path(default_executable().ok())
+            .headless(true)
+            .sandbox(false)
+            .enable_gpu(false);
+
+        builder.build().unwrap()
     }
 }
 
@@ -31,10 +39,29 @@ impl RequesterInterface for ChromeBrowser {
     }
 
     async fn configure(&mut self, config: RequesterConfig) {
+        let mut options = Self::default_options();
+
+        if let Some(proxy) = &config.proxy {
+            options.proxy_server = Some(proxy.as_str())
+        }
+
+        self.browser = Browser::new(options).unwrap();
         self.config = config
     }
 
-    async fn get_content(&self, _url: Url) -> Option<String> {
-        Some(String::new())
+    async fn get_content(&self, url: Url) -> Option<String> {
+        let tab = self.browser.new_tab().expect("Cannot create tab!");
+        let headers = self.config.headers_as_hashmap();
+
+        tab.set_default_timeout(self.config.timeout);
+        tab.set_extra_http_headers(headers).unwrap();
+
+        tab.navigate_to(url.to_string().as_str()).unwrap();
+        tab.wait_until_navigated().unwrap();
+
+        let content = tab.get_content().ok();
+
+        tab.close_target().unwrap();
+        content
     }
 }

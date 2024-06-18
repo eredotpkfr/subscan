@@ -56,11 +56,11 @@ async fn main() {
     }
 
     for item in ALL_MODULES.iter() {
-        let module = item.lock().await;
+        let mut module = item.lock().await;
 
         println!("Running...{}({})", module.name().await, cli.domain.clone());
 
-        // module.run(cli.domain.clone()).await;
+        module.run(cli.domain.clone()).await;
     }
     //instance.start().await;
 }
