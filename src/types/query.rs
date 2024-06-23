@@ -48,11 +48,9 @@ impl SearchQuery {
     }
 
     pub fn update_many(&mut self, subs: BTreeSet<Subdomain>) -> bool {
-        subs.into_iter()
-            .map(|item| self.update(item))
-            .collect::<Vec<bool>>()
-            .into_iter()
-            .any(|item| item == true)
+        let filter_stmt = |item: &&String| self.update(item.to_string());
+
+        subs.iter().filter(filter_stmt).count() > 0
     }
 
     pub fn as_search_str(&mut self) -> String {
