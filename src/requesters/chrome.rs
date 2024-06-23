@@ -20,15 +20,13 @@ impl ChromeBrowser {
     }
 
     fn default_options<'a>() -> LaunchOptions<'a> {
-        let mut builder = LaunchOptions::default_builder();
-
-        builder
+        LaunchOptions::default_builder()
             .path(default_executable().ok())
             .headless(true)
             .sandbox(false)
-            .enable_gpu(false);
-
-        builder.build().unwrap()
+            .enable_gpu(false)
+            .build()
+            .unwrap()
     }
 }
 
