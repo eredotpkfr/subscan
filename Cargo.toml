@@ -8,13 +8,13 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "4.5.4", features = ["derive"] }
-tokio = { version = "1.37.0", features = ["full"] }
-reqwest = "0.12.4"
-scraper = "0.19.0"
-regex = "1.10.4"
-serde_json = "1.0.116"
+clap = { version = "4.5.13", features = ["derive"] }
+tokio = { version = "1.39.2", features = ["full"] }
+reqwest = "0.12.5"
+scraper = "0.20.0"
+regex = "1.10.6"
+serde_json = "1.0.122"
 headless_chrome = {git = "https://github.com/rust-headless-chrome/rust-headless-chrome", features = ["fetch"]}
-async-trait = "0.1.80"
-lazy_static = "1.4.0"
+async-trait = "0.1.81"
+lazy_static = "1.5.0"
 enum_dispatch = "0.3.13"
