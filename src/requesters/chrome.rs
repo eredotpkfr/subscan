@@ -1,9 +1,6 @@
 use crate::{interfaces::requester::RequesterInterface, types::config::RequesterConfig};
 use async_trait::async_trait;
-use headless_chrome::{
-    browser::{default_executable, LaunchOptions},
-    Browser,
-};
+use headless_chrome::{browser::LaunchOptions, Browser};
 use reqwest::Url;
 
 pub struct ChromeBrowser {
@@ -21,7 +18,6 @@ impl ChromeBrowser {
 
     fn default_options<'a>() -> LaunchOptions<'a> {
         LaunchOptions::default_builder()
-            .path(default_executable().ok())
             .headless(true)
             .sandbox(false)
             .enable_gpu(false)

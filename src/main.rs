@@ -62,5 +62,4 @@ async fn main() {
 
         module.run(cli.domain.clone()).await;
     }
-    //instance.start().await;
 }
