@@ -1,8 +1,9 @@
-use crate::extractors::regex::RegexExtractor;
-use crate::interfaces::extractor::SubdomainExtractorInterface;
-use crate::types::core::Subdomain;
+use crate::{
+    extractors::regex::RegexExtractor, interfaces::extractor::SubdomainExtractorInterface,
+    types::core::Subdomain,
+};
 use async_trait::async_trait;
-use scraper::{Html, Selector};
+use scraper::{ElementRef, Html, Selector};
 use std::collections::BTreeSet;
 
 pub struct HTMLExtractor {
@@ -14,8 +15,8 @@ pub struct HTMLExtractor {
 impl HTMLExtractor {
     pub fn new(selector: String, removes: Vec<String>) -> Self {
         Self {
-            selector: selector,
-            removes: removes,
+            selector,
+            removes,
             regextractor: RegexExtractor::new(),
         }
     }
@@ -26,19 +27,20 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     async fn extract(&self, content: String, domain: String) -> BTreeSet<Subdomain> {
         let document = Html::parse_document(&content);
         let selector = Selector::parse(&self.selector).unwrap();
+        let selected = document.select(&selector);
 
-        document
-            .select(&selector)
-            .map(|item| {
-                let mut text = item.inner_html();
+        let remove = |item: ElementRef| {
+            let mut text = item.inner_html();
 
-                self.removes.iter().for_each(|element| {
-                    text = text.replace(element, "");
-                });
+            self.removes.iter().for_each(|element| {
+                text = text.replace(element, "");
+            });
 
-                text
-            })
-            .filter_map(|item| self.regextractor.extract_one(item, domain.clone()))
-            .collect()
+            text
+        };
+
+        let extract = |item| self.regextractor.extract_one(item, domain.clone());
+
+        selected.map(remove).filter_map(extract).collect()
     }
 }

@@ -1,8 +1,8 @@
-use crate::extractors::html::HTMLExtractor;
-use crate::interfaces::module::SubscanModuleInterface;
-use crate::modules::generics::searchengine::GenericSearchEngineModule;
-use crate::types::core::QueryParam;
-use reqwest::{Client, Url};
+use crate::{
+    cache::requesters, enums::RequesterType, extractors::html::HTMLExtractor,
+    modules::generics::searchengine::GenericSearchEngineModule, types::query::SearchQueryParam,
+};
+use reqwest::Url;
 
 const GOOGLE_MODULE_NAME: &str = "Google";
 const GOOGLE_SEARCH_URL: &str = "https://www.google.com/search";
@@ -11,16 +11,14 @@ const GOOGLE_CITE_TAG: &str = "cite";
 
 pub struct Google {}
 
-impl Google {
-    pub fn new() -> Box<dyn SubscanModuleInterface> {
-        let name = String::from(GOOGLE_MODULE_NAME);
-        let url = Url::parse(GOOGLE_SEARCH_URL).expect("URL parse error!");
-        let param = QueryParam::from(GOOGLE_SEARCH_PARAM);
-        let extractor = Box::new(HTMLExtractor::new(String::from(GOOGLE_CITE_TAG), vec![]));
-        let requester = Box::new(Client::new());
-
-        Box::new(GenericSearchEngineModule::new(
-            name, url, param, requester, extractor,
-        ))
+impl<'a> Google {
+    pub fn new() -> GenericSearchEngineModule<'a> {
+        GenericSearchEngineModule {
+            name: String::from(GOOGLE_MODULE_NAME),
+            url: Url::parse(GOOGLE_SEARCH_URL).expect("URL parse error!"),
+            param: SearchQueryParam::from(GOOGLE_SEARCH_PARAM),
+            requester: requesters::get_by_type(&RequesterType::HTTPClient),
+            extractor: Box::new(HTMLExtractor::new(String::from(GOOGLE_CITE_TAG), vec![])),
+        }
     }
 }

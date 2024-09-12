@@ -1,3 +1,5 @@
+mod cache;
+mod enums;
 mod extractors;
 mod integrations;
 mod interfaces;
@@ -9,26 +11,55 @@ mod utils;
 use clap::Parser;
 //use integrations::alienvault::AlienVault;
 //use integrations::anubis::Anubis;
-use crate::modules::all::get_all_modules;
-use crate::types::core::QueryParam;
+use crate::{
+    cache::{ALL_MODULES, ALL_REQUESTERS},
+    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
+    types::config::RequesterConfig,
+};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Cli {
     /// Target domain address to be enumerated
+    #[arg(short, long)]
     domain: String,
+    /// User-Agent header value for HTTP requests
+    #[arg(
+        short,
+        long,
+        default_value = "Mozilla/5.0 (Macintosh; \
+            Intel Mac OS X 10_15_7) AppleWebKit/537.36  \
+            (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    )]
+    user_agent: String,
+    /// HTTP timeout value as a seconds
+    #[arg(short, long, default_value_t = 10)]
+    timeout: u64,
+    /// HTTP proxy
+    #[arg(short, long, default_value = None)]
+    proxy: Option<String>,
 }
 
 #[tokio::main]
 async fn main() {
     let cli = Cli::parse();
+    let config = RequesterConfig::from_cli(&cli);
 
-    //let instance = AlienVault::new(cli.domain).await;
-    //let instance = Anubis::new(cli.domain).await;
+    cache::requesters::configure_all(config).await;
 
-    for item in get_all_modules().iter_mut() {
-        let _ = item.run(cli.domain.clone()).await;
+    for requester in ALL_REQUESTERS.values() {
+        println!(
+            "{:#?} {:p}",
+            requester.lock().await.config().await,
+            requester
+        );
     }
 
-    //instance.start().await;
+    for item in ALL_MODULES.iter() {
+        let mut module = item.lock().await;
+
+        println!("Running...{}({})", module.name().await, cli.domain.clone());
+
+        module.run(cli.domain.clone()).await;
+    }
 }

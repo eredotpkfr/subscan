@@ -1,9 +1,9 @@
-use crate::interfaces::extractor::SubdomainExtractorInterface;
-use crate::types::core::Subdomain;
-use crate::utils::regex::generate_domain_regex;
+use crate::{
+    interfaces::extractor::SubdomainExtractorInterface, types::core::Subdomain,
+    utils::regex::generate_subdomain_regex,
+};
 use async_trait::async_trait;
-use core::result::Result;
-use regex::{Error, Regex};
+use regex::Match;
 use std::collections::BTreeSet;
 
 pub struct RegexExtractor {}
@@ -13,12 +13,8 @@ impl RegexExtractor {
         Self {}
     }
 
-    fn generate_domain_regex(&self, domain: String) -> Result<Regex, Error> {
-        generate_domain_regex(domain)
-    }
-
     pub fn extract_one(&self, content: String, domain: String) -> Option<Subdomain> {
-        let pattern = self.generate_domain_regex(domain).unwrap();
+        let pattern = generate_subdomain_regex(domain).unwrap();
 
         if let Some(matches) = pattern.find(&content) {
             Some(matches.as_str().to_string())
@@ -31,11 +27,9 @@ impl RegexExtractor {
 #[async_trait]
 impl SubdomainExtractorInterface for RegexExtractor {
     async fn extract(&self, content: String, domain: String) -> BTreeSet<Subdomain> {
-        let pattern = self.generate_domain_regex(domain).unwrap();
+        let pattern = generate_subdomain_regex(domain).unwrap();
+        let to_string = |item: Match| item.as_str().parse().ok();
 
-        pattern
-            .find_iter(&content)
-            .filter_map(|item| item.as_str().parse().ok())
-            .collect()
+        pattern.find_iter(&content).filter_map(to_string).collect()
     }
 }

@@ -1,79 +1,55 @@
-use crate::interfaces::extractor::SubdomainExtractorInterface;
-use crate::interfaces::module::SubscanModuleInterface;
-use crate::interfaces::requester::RequesterInterface;
-use crate::types::core::{QueryParam, SearchQuery, Subdomain};
+use crate::{
+    enums::RequesterDispatcher,
+    interfaces::{
+        extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
+        requester::RequesterInterface,
+    },
+    types::query::{SearchQuery, SearchQueryParam},
+};
 use async_trait::async_trait;
-use reqwest::{Method, Request, Url};
+use reqwest::Url;
 use std::collections::BTreeSet;
+use tokio::sync::Mutex;
 
-const USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
-
-pub struct GenericSearchEngineModule {
+pub struct GenericSearchEngineModule<'a> {
     pub name: String,
     pub url: Url,
-    pub param: QueryParam,
-    pub requester: Box<dyn RequesterInterface>,
+    pub param: SearchQueryParam,
+    pub requester: &'a Mutex<RequesterDispatcher>,
     pub extractor: Box<dyn SubdomainExtractorInterface>,
-    pub all_results: BTreeSet<Subdomain>,
 }
 
-impl GenericSearchEngineModule {
-    pub fn new(
-        name: String,
-        url: Url,
-        param: QueryParam,
-        requester: Box<dyn RequesterInterface>,
-        extractor: Box<dyn SubdomainExtractorInterface>,
-    ) -> Self {
-        Self {
-            name: name,
-            url: url,
-            param: param,
-            requester: requester,
-            extractor: extractor,
-            all_results: BTreeSet::new(),
-        }
-    }
-
+impl<'a> GenericSearchEngineModule<'a> {
     pub async fn get_search_query(&self, domain: String) -> SearchQuery {
         self.param.to_search_query(domain, "site:".to_string())
-    }
-
-    pub async fn build_request(&self, query: &mut SearchQuery) -> Request {
-        let builder = self.requester.request(Method::GET, self.url.clone()).await;
-
-        builder
-            .header("User-Agent", USER_AGENT)
-            .query(&[
-                (self.param.as_string(), query.as_search_str()),
-                ("num".to_string(), 100.to_string()),
-            ])
-            .build()
-            .unwrap()
     }
 }
 
 #[async_trait(?Send)]
-impl SubscanModuleInterface for GenericSearchEngineModule {
+impl<'a> SubscanModuleInterface for GenericSearchEngineModule<'a> {
     async fn name(&self) -> String {
         self.name.clone()
     }
 
     async fn run(&mut self, domain: String) {
+        let requester = self.requester.lock().await;
+        let extra_params = [("num".to_string(), 100.to_string())];
+
         let mut query = self.get_search_query(domain.clone()).await;
+        let mut all_results = BTreeSet::new();
 
         loop {
-            let request = self.build_request(&mut query).await;
-            let response = self.requester.get(request).await.unwrap();
+            let url = query.as_url(self.url.clone(), &extra_params);
+            let response = requester.get_content(url).await.unwrap_or_default();
             let results = self.extractor.extract(response, domain.clone()).await;
 
-            self.all_results.extend(results.clone());
+            all_results.extend(results.clone());
 
             if !query.update_many(results.clone()) {
                 break;
             }
         }
 
-        println!("{:#?}\nTotal: {}", self.all_results, self.all_results.len());
+        println!("{:#?}\nTotal: {}", all_results, all_results.len());
     }
 }
