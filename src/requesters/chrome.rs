@@ -54,8 +54,9 @@ impl RequesterInterface for ChromeBrowser {
         tab.wait_until_navigated().unwrap();
 
         let content = tab.get_content().ok();
-
-        tab.close_target().unwrap();
+        
+        tab.close(true).unwrap();
+        
         content
     }
 }
