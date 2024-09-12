@@ -58,6 +58,10 @@ async fn main() {
     for item in ALL_MODULES.iter() {
         let mut module = item.lock().await;
 
+        if module.name().await != String::from("DuckDuckGo") {
+            continue;
+        }
+
         println!("Running...{}({})", module.name().await, cli.domain.clone());
 
         module.run(cli.domain.clone()).await;

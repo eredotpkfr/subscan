@@ -1,7 +1,7 @@
 use crate::{
     enums::{RequesterDispatcher, RequesterType},
     interfaces::module::SubscanModuleInterface,
-    modules::engines::{bing, google, yahoo},
+    modules::engines::{bing, duckduckgo, google, yahoo},
     requesters::{chrome, client},
 };
 use lazy_static::lazy_static;
@@ -13,6 +13,7 @@ lazy_static! {
         Mutex::new(Box::new(google::Google::new())),
         Mutex::new(Box::new(yahoo::Yahoo::new())),
         Mutex::new(Box::new(bing::Bing::new())),
+        Mutex::new(Box::new(duckduckgo::DuckDuckGo::new()))
     ];
     pub static ref ALL_REQUESTERS: HashMap<RequesterType, Mutex<RequesterDispatcher>> =
         HashMap::from([
