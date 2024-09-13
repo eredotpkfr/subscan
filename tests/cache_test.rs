@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod requesters {
     use reqwest::header::HeaderMap;
+    use strum::IntoEnumIterator;
     use std::time::Duration;
     use subscan::cache;
     use subscan::{
@@ -10,12 +11,10 @@ mod requesters {
 
     #[tokio::test]
     async fn get_by_type_test() {
-        let types = vec![RequesterType::ChromeBrowser, RequesterType::HTTPClient];
+        for rtype in RequesterType::iter() {
+            let requester = cache::requesters::get_by_type(&rtype).lock().await;
 
-        for rtype in types {
-            let requester = cache::requesters::get_by_type(&rtype).lock();
-
-            assert_eq!(requester.await.r#type().await, rtype);
+            assert_eq!(requester.r#type().await, rtype);
         }
     }
 
@@ -28,17 +27,13 @@ mod requesters {
         };
 
         for requester in cache::ALL_REQUESTERS.values() {
-            let rconfig = requester.lock().await.config().await;
-
-            assert_eq!(rconfig.timeout.as_secs(), 10);
+            assert_eq!(requester.lock().await.config().await.timeout.as_secs(), 10);
         }
 
         cache::requesters::configure_all(new_config).await;
 
         for requester in cache::ALL_REQUESTERS.values() {
-            let rconfig = requester.lock().await.config().await;
-
-            assert_eq!(rconfig.timeout.as_secs(), 120);
+            assert_eq!(requester.lock().await.config().await.timeout.as_secs(), 120);
         }
     }
 }
