@@ -1,6 +1,7 @@
-use crate::Cli;
+use crate::cli::Cli;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
 use std::{collections::HashMap, time::Duration};
+
 #[derive(Debug, Clone)]
 pub struct RequesterConfig {
     pub headers: HeaderMap,

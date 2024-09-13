@@ -9,12 +9,16 @@ use std::collections::HashMap;
 use tokio::sync::Mutex;
 
 lazy_static! {
+    /// All subdomain enumeration modules are stores in this in-memory [`Vec`]
+    /// as a [`SubscanModuleInterface`]
     pub static ref ALL_MODULES: Vec<Mutex<Box<dyn SubscanModuleInterface>>> = vec![
         Mutex::new(Box::new(google::Google::new())),
         Mutex::new(Box::new(yahoo::Yahoo::new())),
         Mutex::new(Box::new(bing::Bing::new())),
-        Mutex::new(Box::new(duckduckgo::DuckDuckGo::new()))
+        Mutex::new(Box::new(duckduckgo::DuckDuckGo::new())),
     ];
+    /// All HTTP requester objects are stores in this in-memory [`HashMap`]
+    /// as a [`RequesterInterface`](crate::interfaces::requester::RequesterInterface)
     pub static ref ALL_REQUESTERS: HashMap<RequesterType, Mutex<RequesterDispatcher>> =
         HashMap::from([
             (
@@ -29,7 +33,8 @@ lazy_static! {
             ),
         ]);
 }
-
+/// Module to manage in-memory requester cache, basic cache functions
+/// are listed in here
 pub mod requesters {
     use tokio::sync::Mutex;
 
