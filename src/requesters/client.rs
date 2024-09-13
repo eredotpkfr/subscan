@@ -1,4 +1,6 @@
-use crate::{interfaces::requester::RequesterInterface, types::config::RequesterConfig};
+use crate::{
+    enums::RequesterType, interfaces::requester::RequesterInterface, types::config::RequesterConfig,
+};
 use async_trait::async_trait;
 use reqwest::{Client, Proxy, Url};
 
@@ -21,6 +23,10 @@ impl HTTPClient {
 
 #[async_trait(?Send)]
 impl RequesterInterface for HTTPClient {
+    async fn r#type(&self) -> RequesterType {
+        RequesterType::HTTPClient
+    }
+
     async fn config(&self) -> RequesterConfig {
         self.config.clone()
     }
