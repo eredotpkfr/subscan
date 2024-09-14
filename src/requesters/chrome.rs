@@ -12,7 +12,7 @@ pub struct ChromeBrowser {
 
 impl ChromeBrowser {
     pub fn new() -> Self {
-        ChromeBrowser {
+        Self {
             config: RequesterConfig::new(),
             browser: Browser::new(Self::default_options()).unwrap(),
         }

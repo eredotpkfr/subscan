@@ -13,10 +13,13 @@ pub mod regex {
     ///
     /// let domain = String::from("foo.com");
     /// let subdomain = String::from("bar.foo.com");
+    /// let no_match = String::from("foo");
+    ///
     /// let regex_stmt = generate_subdomain_regex(domain).unwrap();
     ///
     /// assert_eq!(regex_stmt.as_str(), "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+(foo\\.com)");
     /// assert!(regex_stmt.find(&subdomain).is_some());
+    /// assert!(regex_stmt.find(&no_match).is_none());
     /// ```
     pub fn generate_subdomain_regex(domain: String) -> Result<Regex, Error> {
         let formatted = format!(
