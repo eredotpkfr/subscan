@@ -1,5 +1,7 @@
 use clap::Parser;
 
+/// Data structure for CLI, stores configurations to be
+/// used on run-time
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
