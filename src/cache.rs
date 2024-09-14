@@ -49,6 +49,7 @@ pub mod requesters {
     /// and returns [`RequesterDispatcher`] by given [`RequesterType`]
     ///
     /// # Panics
+    ///
     /// When the given [`RequesterType`] did not mapped any
     /// [`RequesterInterface`] instance object in [`crate::cache`]
     ///

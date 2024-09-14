@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod requesters {
     use reqwest::header::HeaderMap;
-    use strum::IntoEnumIterator;
     use std::time::Duration;
+    use strum::IntoEnumIterator;
     use subscan::cache;
     use subscan::{
         enums::RequesterType, interfaces::requester::RequesterInterface,

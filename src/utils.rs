@@ -18,6 +18,7 @@ pub mod regex {
     /// let regex_stmt = generate_subdomain_regex(domain).unwrap();
     ///
     /// assert_eq!(regex_stmt.as_str(), "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+(foo\\.com)");
+    ///
     /// assert!(regex_stmt.find(&subdomain).is_some());
     /// assert!(regex_stmt.find(&no_match).is_none());
     /// ```
