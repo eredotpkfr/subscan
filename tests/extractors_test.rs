@@ -70,7 +70,7 @@ mod regex {
     #[tokio::test]
     async fn extract_one_test() {
         let domain = String::from("foo.com");
-        let extractor = RegexExtractor::new();
+        let extractor = RegexExtractor::default();
 
         let match_content = String::from("bar.foo.com");
         let no_match_content = String::from("foobarbaz");
@@ -86,7 +86,7 @@ mod regex {
         let domain = String::from("foo.com");
         let content = String::from("bar.foo.com\nbaz.foo.com");
 
-        let extractor = RegexExtractor::new();
+        let extractor = RegexExtractor::default();
         let result = extractor.extract(content, domain).await;
 
         assert_eq!(

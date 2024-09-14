@@ -1,3 +1,4 @@
+/// Helpful regex utilities listed in this module
 pub mod regex {
     use core::result::Result;
     use regex::{Error, Regex};

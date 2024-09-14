@@ -33,7 +33,7 @@ impl HTMLExtractor {
         Self {
             selector,
             removes,
-            regextractor: RegexExtractor::new(),
+            regextractor: RegexExtractor::default(),
         }
     }
 }

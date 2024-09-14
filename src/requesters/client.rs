@@ -7,18 +7,14 @@ use reqwest::{Client, Proxy, Url};
 const CLIENT_BUILD_ERR: &str = "Cannot create HTTP client!";
 const REQUEST_BUILD_ERR: &str = "Cannot build request!";
 const PROXY_PARSE_ERR: &str = "Cannot parse proxy!";
+
+/// HTTP requester struct, send HTTP requests
+/// via [`reqwest`] client. Also its compatible
+/// with [`RequesterInterface`]
+#[derive(Default)]
 pub struct HTTPClient {
     config: RequesterConfig,
     client: Client,
-}
-
-impl HTTPClient {
-    pub fn new() -> Self {
-        Self {
-            config: RequesterConfig::new(),
-            client: Client::new(),
-        }
-    }
 }
 
 #[async_trait(?Send)]

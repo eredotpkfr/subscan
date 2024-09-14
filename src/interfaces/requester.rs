@@ -28,7 +28,7 @@ use reqwest::Url;
 ///         RequesterType::HTTPClient
 ///     }
 ///     async fn config(&self) -> RequesterConfig {
-///         RequesterConfig::new()
+///         RequesterConfig::default()
 ///     }
 ///     async fn configure(&mut self, config: RequesterConfig) {}
 ///     async fn get_content(&self, url: Url) -> Option<String> {

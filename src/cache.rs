@@ -29,7 +29,7 @@ lazy_static! {
             ),
             (
                 RequesterType::HTTPClient,
-                Mutex::new(RequesterDispatcher::HTTPClient(client::HTTPClient::new()))
+                Mutex::new(RequesterDispatcher::HTTPClient(client::HTTPClient::default()))
             ),
         ]);
 }

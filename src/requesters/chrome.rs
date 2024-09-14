@@ -5,20 +5,43 @@ use async_trait::async_trait;
 use headless_chrome::{browser::LaunchOptions, Browser};
 use reqwest::Url;
 
+/// Chrome requester struct, send HTTP requests
+/// via Chrome browser. Also its compatible
+/// with [`RequesterInterface`]
 pub struct ChromeBrowser {
     config: RequesterConfig,
     browser: Browser,
 }
 
 impl ChromeBrowser {
+    /// Returns a new [`ChromeBrowser`] instance
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use subscan::requesters::chrome::ChromeBrowser;
+    ///
+    /// let browser = ChromeBrowser::new();
+    ///
+    /// // do something with browser
+    /// ```
     pub fn new() -> Self {
         Self {
-            config: RequesterConfig::new(),
+            config: RequesterConfig::default(),
             browser: Browser::new(Self::default_options()).unwrap(),
         }
     }
 
-    fn default_options<'a>() -> LaunchOptions<'a> {
+    /// Returns default launch options as a [`LaunchOptions`]
+    /// instance, the default options are listed in the
+    /// table below
+    ///
+    /// | Property   | Default Value |
+    /// |:----------:|:-------------:|
+    /// | headless   | `true`        |
+    /// | sandbox    | `false`       |
+    /// | enable_gpu | `false`       |
+    pub fn default_options<'a>() -> LaunchOptions<'a> {
         LaunchOptions::default_builder()
             .headless(true)
             .sandbox(false)

@@ -8,24 +8,10 @@ use std::collections::BTreeSet;
 
 /// Generates subdomain pattern by given domain
 /// address and extracts subdomains
+#[derive(Default)]
 pub struct RegexExtractor {}
 
 impl RegexExtractor {
-    /// Creates a new instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::extractors::regex::RegexExtractor;
-    ///
-    /// let extractor = RegexExtractor::new();
-    ///
-    /// // do something with extractor instance
-    /// ```
-    pub fn new() -> Self {
-        Self {}
-    }
-
     /// Extract one subdomain from given [`String`] content
     ///
     /// # Panics
@@ -38,7 +24,7 @@ impl RegexExtractor {
     /// use subscan::extractors::regex::RegexExtractor;
     ///
     /// let domain = String::from("foo.com");
-    /// let extractor = RegexExtractor::new();
+    /// let extractor = RegexExtractor::default();
     ///
     /// let match_content = String::from("bar.foo.com");
     /// let no_match_content = String::from("foobarbaz");
@@ -78,7 +64,7 @@ impl SubdomainExtractorInterface for RegexExtractor {
     ///     let domain = String::from("foo.com");
     ///     let content = String::from("bar.foo.com\nbaz.foo.com");
     ///
-    ///     let extractor = RegexExtractor::new();
+    ///     let extractor = RegexExtractor::default();
     ///     let result = extractor.extract(content, domain).await;
     ///
     ///     assert_eq!(result, BTreeSet::from([
