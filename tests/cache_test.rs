@@ -5,8 +5,9 @@ mod requesters {
     use strum::IntoEnumIterator;
     use subscan::cache;
     use subscan::{
-        enums::RequesterType, interfaces::requester::RequesterInterface,
-        types::config::RequesterConfig,
+        enums::RequesterType,
+        interfaces::requester::RequesterInterface,
+        types::config::{RequesterConfig, DEFAULT_HTTP_TIMEOUT},
     };
 
     #[tokio::test]
@@ -27,13 +28,19 @@ mod requesters {
         };
 
         for requester in cache::ALL_REQUESTERS.values() {
-            assert_eq!(requester.lock().await.config().await.timeout.as_secs(), 10);
+            assert_eq!(
+                requester.lock().await.config().await.timeout,
+                DEFAULT_HTTP_TIMEOUT
+            );
         }
 
-        cache::requesters::configure_all(new_config).await;
+        cache::requesters::configure_all(new_config.clone()).await;
 
         for requester in cache::ALL_REQUESTERS.values() {
-            assert_eq!(requester.lock().await.config().await.timeout.as_secs(), 120);
+            assert_eq!(
+                requester.lock().await.config().await.timeout,
+                new_config.timeout
+            );
         }
     }
 }

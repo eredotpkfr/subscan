@@ -213,18 +213,18 @@ impl SearchQuery {
     /// let prefix = String::from("site:");
     ///
     /// let base_url = Url::parse("https://bar.com").unwrap();
-    /// let expected_url = Url::parse("https://bar.com/?s=site%3Afoo.com").unwrap();
+    /// let expected_url = Url::parse("https://bar.com/?bar=baz&s=site%3Afoo.com").unwrap();
     ///
     /// let mut query = SearchQuery::new(param, prefix, domain);
     ///
-    /// assert_eq!(query.as_url(base_url, &[]), expected_url);
+    /// assert_eq!(query.as_url(
+    ///     base_url,
+    ///     &[("bar".to_string(), "baz".to_string())],
+    /// ), expected_url);
     /// ````
     pub fn as_url(&mut self, base_url: Url, extra_params: &[(String, String)]) -> Url {
-        let params = [
-            extra_params,
-            &[(self.param.as_string(), self.as_search_str())],
-        ]
-        .concat();
+        let query_param = &[(self.param.as_string(), self.as_search_str())];
+        let params = [extra_params, query_param].concat();
 
         Url::parse_with_params(&base_url.to_string(), params).expect("URL parse error!")
     }
