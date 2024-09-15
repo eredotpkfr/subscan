@@ -27,15 +27,16 @@ use tokio::sync::Mutex;
 /// Wrapper around a [`SubscanModuleInterface`] trait object
 ///
 /// It has single field that stores [`SubscanModuleInterface`]
-/// compatible object. Allows to access every implemented method
-/// for inner object by using dynamic dispatching method during
-/// run-time
+/// compatible object. Allows to access inner object's every
+/// implemented method by using dynamic dispatching method
+/// during run-time
 ///
 /// Please follow up the [`struct@crate::cache::ALL_MODULES`]
+/// to see pre-defined `subscan` modules
 pub struct SubscanModule(Box<dyn SubscanModuleInterface>);
 
 impl SubscanModule {
-    /// Create new [`SubscanModule`] instance with a [`Mutex`]
+    /// Create new [`SubscanModule`] instance wrapped with a [`Mutex`]
     ///
     /// # Examples
     ///

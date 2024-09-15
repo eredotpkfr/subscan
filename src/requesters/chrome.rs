@@ -32,7 +32,7 @@ impl ChromeBrowser {
         }
     }
 
-    /// Returns a new [`ChromeBrowser`] instance from given [`RequesterConfig`]
+    /// Returns a new [`ChromeBrowser`] instance from given [`RequesterConfig`] object
     ///
     /// # Examples
     ///

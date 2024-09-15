@@ -5,7 +5,7 @@ use std::{collections::HashMap, time::Duration};
 /// Default HTTP timeout as a [`Duration`]
 pub const DEFAULT_HTTP_TIMEOUT: Duration = Duration::from_secs(10);
 
-/// Type definition for store [`crate::interfaces::requester::RequesterInterface`]
+/// Type definition for store [`RequesterInterface`](crate::interfaces::requester::RequesterInterface)
 /// configurations in a struct. Also it has helpfull
 /// methods to manage configs
 #[derive(Debug, Clone)]
@@ -67,7 +67,7 @@ impl RequesterConfig {
         }
     }
 
-    /// Converts [`HeaderMap`] headers to [`HashMap`] mappings
+    /// Converts [`HeaderMap`] headers to [`HashMap`] mappings and returns them
     ///
     /// # Examples
     ///

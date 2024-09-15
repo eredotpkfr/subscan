@@ -65,6 +65,6 @@ pub trait RequesterInterface: Sync + Send {
     async fn config(&self) -> RequesterConfig;
     /// Configure current requester object by using new [`RequesterConfig`] object
     async fn configure(&mut self, config: RequesterConfig);
-    /// Get page HTML source from given [`reqwest::Url`] object
+    /// Get HTML source of page from given [`reqwest::Url`] object
     async fn get_content(&self, url: Url) -> Option<String>;
 }
