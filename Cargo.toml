@@ -20,3 +20,6 @@ lazy_static = "1.5.0"
 enum_dispatch = "0.3.13"
 strum = "0.26.3"
 strum_macros = "0.26.4"
+
+[dev-dependencies]
+wiremock = "0.6.2"

@@ -32,6 +32,33 @@ impl ChromeBrowser {
         }
     }
 
+    /// Returns a new [`ChromeBrowser`] instance from given [`RequesterConfig`]
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::time::Duration;
+    /// use reqwest::header::HeaderMap;
+    /// use subscan::requesters::chrome::ChromeBrowser;
+    /// use subscan::types::config::RequesterConfig;
+    ///
+    /// let config = RequesterConfig {
+    ///     proxy: None,
+    ///     headers: HeaderMap::default(),
+    ///     timeout: Duration::from_secs(60),
+    /// };
+    ///
+    /// let browser = ChromeBrowser::with_config(config);
+    ///
+    /// // do something with browser
+    /// ```
+    pub fn with_config(config: RequesterConfig) -> Self {
+        Self {
+            config,
+            browser: Browser::new(Self::default_options()).unwrap(),
+        }
+    }
+
     /// Returns default launch options as a [`LaunchOptions`]
     /// instance, the default options are listed in the
     /// table below
@@ -41,16 +68,16 @@ impl ChromeBrowser {
     /// | headless   | `true`        |
     /// | sandbox    | `false`       |
     /// | enable_gpu | `false`       |
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```no_run
     /// use subscan::requesters::chrome::ChromeBrowser;
     /// use headless_chrome::Browser;
-    /// 
+    ///
     /// let options = ChromeBrowser::default_options();
     /// let browser = Browser::new(options).unwrap();
-    /// 
+    ///
     /// // do something with browser
     /// ```
     pub fn default_options<'a>() -> LaunchOptions<'a> {
