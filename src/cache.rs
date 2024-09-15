@@ -1,21 +1,22 @@
 use crate::{
     enums::{RequesterDispatcher, RequesterType},
-    interfaces::module::SubscanModuleInterface,
     modules::engines::{bing, duckduckgo, google, yahoo},
-    requesters::{chrome, client},
+    requesters::{chrome::ChromeBrowser, client::HTTPClient},
+    SubscanModule,
 };
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
 
 lazy_static! {
-    /// All subdomain enumeration modules are stores in this in-memory [`Vec`]
-    /// as a [`SubscanModuleInterface`]
-    pub static ref ALL_MODULES: Vec<Mutex<Box<dyn SubscanModuleInterface>>> = vec![
-        Mutex::new(Box::new(google::Google::new())),
-        Mutex::new(Box::new(yahoo::Yahoo::new())),
-        Mutex::new(Box::new(bing::Bing::new())),
-        Mutex::new(Box::new(duckduckgo::DuckDuckGo::new())),
+    /// All `subscan` modules are stores in this in-memory [`Vec`]
+    /// as a [`SubscanModule`], all modules must be compatible
+    /// with [`SubscanModuleInterface`](crate::interfaces::module::SubscanModuleInterface) trait
+    pub static ref ALL_MODULES: Vec<Mutex<SubscanModule>> = vec![
+        SubscanModule::new(google::Google::new()),
+        SubscanModule::new(yahoo::Yahoo::new()),
+        SubscanModule::new(bing::Bing::new()),
+        SubscanModule::new(duckduckgo::DuckDuckGo::new()),
     ];
     /// All HTTP requester objects are stores in this in-memory [`HashMap`]
     /// as a [`RequesterInterface`](crate::interfaces::requester::RequesterInterface)
@@ -23,17 +24,16 @@ lazy_static! {
         HashMap::from([
             (
                 RequesterType::ChromeBrowser,
-                Mutex::new(RequesterDispatcher::ChromeBrowser(
-                    chrome::ChromeBrowser::new()
-                ))
+                Mutex::new(ChromeBrowser::new().try_into().unwrap())
             ),
             (
                 RequesterType::HTTPClient,
-                Mutex::new(RequesterDispatcher::HTTPClient(client::HTTPClient::default()))
+                Mutex::new(HTTPClient::default().try_into().unwrap())
             ),
         ]);
 }
-/// Module to manage in-memory requester cache, basic cache functions
+
+/// Module to manage in-memory requester cache. Basic cache functions
 /// are listed in here
 pub mod requesters {
     use tokio::sync::Mutex;
@@ -51,7 +51,7 @@ pub mod requesters {
     /// # Panics
     ///
     /// When the given [`RequesterType`] did not mapped any
-    /// [`RequesterInterface`] instance object in [`crate::cache`]
+    /// [`RequesterDispatcher`] instance object in [`struct@crate::cache::ALL_REQUESTERS`]
     ///
     /// # Examples
     ///

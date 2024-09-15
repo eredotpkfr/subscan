@@ -6,8 +6,10 @@ use async_trait::async_trait;
 use regex::Match;
 use std::collections::BTreeSet;
 
+/// Regex extractor component
+///
 /// Generates subdomain pattern by given domain
-/// address and extracts subdomains
+/// address and extracts subdomains via this pattern
 #[derive(Default)]
 pub struct RegexExtractor {}
 

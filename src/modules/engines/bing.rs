@@ -13,12 +13,14 @@ pub struct Bing {}
 
 impl<'a> Bing {
     pub fn new() -> GenericSearchEngineModule<'a> {
+        let extractor = HTMLExtractor::new(String::from(BING_CITE_TAG), vec![]);
+
         GenericSearchEngineModule {
             name: String::from(BING_MODULE_NAME),
             url: Url::parse(BING_SEARCH_URL).expect("URL parse error!"),
             param: SearchQueryParam::from(BING_SEARCH_PARAM),
             requester: requesters::get_by_type(&RequesterType::HTTPClient),
-            extractor: Box::new(HTMLExtractor::new(String::from(BING_CITE_TAG), vec![])),
+            extractor: extractor.try_into().unwrap(),
         }
     }
 }

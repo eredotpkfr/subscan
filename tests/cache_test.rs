@@ -1,10 +1,12 @@
+use reqwest::header::HeaderMap;
+use std::time::Duration;
+use strum::IntoEnumIterator;
+
 #[cfg(test)]
 mod requesters {
-    use reqwest::header::HeaderMap;
-    use std::time::Duration;
-    use strum::IntoEnumIterator;
-    use subscan::cache;
+    use super::*;
     use subscan::{
+        cache,
         enums::RequesterType,
         interfaces::requester::RequesterInterface,
         types::config::{RequesterConfig, DEFAULT_HTTP_TIMEOUT},

@@ -17,6 +17,35 @@ pub struct HTTPClient {
     client: Client,
 }
 
+impl HTTPClient {
+    /// Returns a new [`HTTPClient`] instance from given [`RequesterConfig`]
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::time::Duration;
+    /// use reqwest::header::HeaderMap;
+    /// use subscan::requesters::client::HTTPClient;
+    /// use subscan::types::config::RequesterConfig;
+    ///
+    /// let config = RequesterConfig {
+    ///     proxy: None,
+    ///     headers: HeaderMap::default(),
+    ///     timeout: Duration::from_secs(60),
+    /// };
+    ///
+    /// let client = HTTPClient::with_config(config);
+    ///
+    /// // do something with client
+    /// ```
+    pub fn with_config(config: RequesterConfig) -> Self {
+        Self {
+            config,
+            client: Client::new(),
+        }
+    }
+}
+
 #[async_trait(?Send)]
 impl RequesterInterface for HTTPClient {
     async fn r#type(&self) -> RequesterType {

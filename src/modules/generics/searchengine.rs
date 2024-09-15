@@ -1,5 +1,5 @@
 use crate::{
-    enums::RequesterDispatcher,
+    enums::{RequesterDispatcher, SubdomainExtractorDispatcher},
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
@@ -16,7 +16,7 @@ pub struct GenericSearchEngineModule<'a> {
     pub url: Url,
     pub param: SearchQueryParam,
     pub requester: &'a Mutex<RequesterDispatcher>,
-    pub extractor: Box<dyn SubdomainExtractorInterface>,
+    pub extractor: SubdomainExtractorDispatcher,
 }
 
 impl<'a> GenericSearchEngineModule<'a> {

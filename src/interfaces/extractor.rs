@@ -1,10 +1,17 @@
+use crate::enums::SubdomainExtractorDispatcher;
+use crate::extractors::{html::HTMLExtractor, regex::RegexExtractor};
 use crate::types::core::Subdomain;
 use async_trait::async_trait;
+use enum_dispatch::enum_dispatch;
 use std::collections::BTreeSet;
 
-/// Extractor interface definiton, subscan extractors
-/// that implemented in the future must be compatible
-/// with this trait
+/// Extractor trait definiton to implement subdomain extractors
+///
+/// All subdomain extractors that implemented in the future
+/// must be compatible with this trait. Basically it has single
+/// `extract` method like a `main` method. It should extract
+/// subdomain addresses and return them from given [`String`]
+/// content
 ///
 /// # Examples
 ///
@@ -39,6 +46,7 @@ use std::collections::BTreeSet;
 /// }
 /// ```
 #[async_trait]
+#[enum_dispatch]
 pub trait SubdomainExtractorInterface: Send + Sync {
     /// Generic extract method, it should extract subdomain addresess
     /// from given [`String`] content

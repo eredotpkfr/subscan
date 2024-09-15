@@ -6,8 +6,11 @@ use async_trait::async_trait;
 use scraper::{ElementRef, Html, Selector};
 use std::collections::BTreeSet;
 
-/// Extract subdomain addresses from inner text
-/// by given XPath or CSS selector
+/// HTML extractor component to extract subdomain addresses
+///
+/// This object compatible with [`SubdomainExtractorInterface`]
+/// and it uses `extract` method to extract subdomain addresses
+/// from inner text by given `XPath` or `CSS` selector
 pub struct HTMLExtractor {
     selector: String,
     removes: Vec<String>,
@@ -15,7 +18,7 @@ pub struct HTMLExtractor {
 }
 
 impl HTMLExtractor {
-    /// Creates a [`HTMLExtractor`] instance
+    /// Creates a new [`HTMLExtractor`] instance
     ///
     /// # Examples
     ///
@@ -41,11 +44,11 @@ impl HTMLExtractor {
 #[async_trait]
 impl SubdomainExtractorInterface for HTMLExtractor {
     /// Main extraction method to extract subdomains from
-    /// given any HTML content by given XPath or CSS selectors
+    /// given any HTML content by given `XPath` or `CSS` selectors
     ///
     /// # Panics
     ///
-    /// When selector miss-configured
+    /// When selector is miss-configured
     ///
     /// # Examples
     ///

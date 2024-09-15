@@ -13,15 +13,14 @@ pub struct DuckDuckGo {}
 
 impl<'a> DuckDuckGo {
     pub fn new() -> GenericSearchEngineModule<'a> {
+        let extractor = HTMLExtractor::new(String::from(DUCKDUCKGO_CITE_TAG), vec![]);
+
         GenericSearchEngineModule {
             name: String::from(DUCKDUCKGO_MODULE_NAME),
             url: Url::parse(DUCKDUCKGO_SEARCH_URL).expect("URL parse error!"),
             param: SearchQueryParam::from(DUCKDUCKGO_SEARCH_PARAM),
             requester: requesters::get_by_type(&RequesterType::ChromeBrowser),
-            extractor: Box::new(HTMLExtractor::new(
-                String::from(DUCKDUCKGO_CITE_TAG),
-                vec![],
-            )),
+            extractor: extractor.try_into().unwrap(),
         }
     }
 }

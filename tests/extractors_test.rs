@@ -1,10 +1,10 @@
+use std::collections::BTreeSet;
+use subscan::{interfaces::extractor::SubdomainExtractorInterface, types::core::Subdomain};
+
 #[cfg(test)]
 mod html {
-    use std::collections::BTreeSet;
-    use subscan::{
-        extractors::html::HTMLExtractor, interfaces::extractor::SubdomainExtractorInterface,
-        types::core::Subdomain,
-    };
+    use super::*;
+    use subscan::extractors::html::HTMLExtractor;
 
     #[tokio::test]
     async fn extract_without_removes() {
@@ -61,11 +61,8 @@ mod html {
 
 #[cfg(test)]
 mod regex {
-    use std::collections::BTreeSet;
-    use subscan::{
-        extractors::regex::RegexExtractor, interfaces::extractor::SubdomainExtractorInterface,
-        types::core::Subdomain,
-    };
+    use super::*;
+    use subscan::extractors::regex::RegexExtractor;
 
     #[tokio::test]
     async fn extract_one_test() {

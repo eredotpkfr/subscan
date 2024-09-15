@@ -13,15 +13,17 @@ pub struct Yahoo {}
 
 impl<'a> Yahoo {
     pub fn new() -> GenericSearchEngineModule<'a> {
+        let extractor = HTMLExtractor::new(
+            String::from(YAHOO_CITE_TAG),
+            vec!["<b>".to_string(), "</b>".to_string()],
+        );
+
         GenericSearchEngineModule {
             name: String::from(YAHOO_MODULE_NAME),
             url: Url::parse(YAHOO_SEARCH_URL).expect("URL parse error!"),
             param: SearchQueryParam::from(YAHOO_SEARCH_PARAM),
             requester: requesters::get_by_type(&RequesterType::HTTPClient),
-            extractor: Box::new(HTMLExtractor::new(
-                String::from(YAHOO_CITE_TAG),
-                vec!["<b>".to_string(), "</b>".to_string()],
-            )),
+            extractor: extractor.try_into().unwrap(),
         }
     }
 }

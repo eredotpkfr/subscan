@@ -1,8 +1,21 @@
+use crate::extractors::{html::HTMLExtractor, regex::RegexExtractor};
 use crate::requesters::{chrome::ChromeBrowser, client::HTTPClient};
 use enum_dispatch::enum_dispatch;
 use strum_macros::EnumIter;
 
-/// Dispatcher enumeration to decide requester types.
+/// Dispatcher enumeration to decide extractor types
+///
+/// It allows to made static type dispatching instead of
+/// dynamic dispatch and speed up performance. For more
+/// technical details please follow up `enum_dispatch` package
+#[enum_dispatch(SubdomainExtractorInterface)]
+pub enum SubdomainExtractorDispatcher {
+    HTMLExtractor(HTMLExtractor),
+    RegexExtractor(RegexExtractor),
+}
+
+/// Dispatcher enumeration to decide requester types
+///
 /// It allows to made static type dispatching instead of
 /// dynamic dispatch and speed up performance. For more
 /// technical details please follow up `enum_dispatch` package

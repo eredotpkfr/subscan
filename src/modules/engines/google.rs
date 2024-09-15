@@ -13,12 +13,14 @@ pub struct Google {}
 
 impl<'a> Google {
     pub fn new() -> GenericSearchEngineModule<'a> {
+        let extractor = HTMLExtractor::new(String::from(GOOGLE_CITE_TAG), vec![]);
+
         GenericSearchEngineModule {
             name: String::from(GOOGLE_MODULE_NAME),
             url: Url::parse(GOOGLE_SEARCH_URL).expect("URL parse error!"),
             param: SearchQueryParam::from(GOOGLE_SEARCH_PARAM),
             requester: requesters::get_by_type(&RequesterType::HTTPClient),
-            extractor: Box::new(HTMLExtractor::new(String::from(GOOGLE_CITE_TAG), vec![])),
+            extractor: extractor.try_into().unwrap(),
         }
     }
 }

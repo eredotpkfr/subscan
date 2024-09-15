@@ -1,9 +1,13 @@
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 
-/// Generic Subscan module trait definition each module
-/// that will be implemented in the future
-/// must conform to this interface
+/// Generic `subscan` module trait definiton to implement
+/// subdomain enumeration modules
+///
+/// Each module that will be implemented in the future
+/// must conform to this interface. Summary it has
+/// single method that called `run` and it does
+/// whatever it has to do
 ///
 /// # Examples
 ///
@@ -36,7 +40,7 @@ pub trait SubscanModuleInterface: Sync + Send {
     /// Returns module name, name should clarify what does module
     async fn name(&self) -> String;
     /// Just like a `main` method, when the module
-    /// calls this `run` method will be called, so this method
-    /// should does everything
+    /// run this `run` method will be called, so this method
+    /// should do everything
     async fn run(&mut self, domain: String);
 }
