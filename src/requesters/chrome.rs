@@ -41,6 +41,18 @@ impl ChromeBrowser {
     /// | headless   | `true`        |
     /// | sandbox    | `false`       |
     /// | enable_gpu | `false`       |
+    /// 
+    /// # Examples
+    /// 
+    /// ```no_run
+    /// use subscan::requesters::chrome::ChromeBrowser;
+    /// use headless_chrome::Browser;
+    /// 
+    /// let options = ChromeBrowser::default_options();
+    /// let browser = Browser::new(options).unwrap();
+    /// 
+    /// // do something with browser
+    /// ```
     pub fn default_options<'a>() -> LaunchOptions<'a> {
         LaunchOptions::default_builder()
             .headless(true)
