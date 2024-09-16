@@ -18,7 +18,7 @@ mod searchengine {
             url: Url::parse(TEST_URL).unwrap(),
             param: SearchQueryParam::from("q"),
             requester: requesters::get_by_type(&RequesterType::HTTPClient),
-            extractor: RegexExtractor::default().try_into().unwrap(),
+            extractor: RegexExtractor::default().into(),
         };
 
         let mut query = module.get_search_query(TEST_DOMAIN.to_string()).await;
@@ -35,7 +35,7 @@ mod searchengine {
             url: Url::parse(&stubr.path("/search")).unwrap(),
             param: SearchQueryParam::from("q"),
             requester: requesters::get_by_type(&RequesterType::HTTPClient),
-            extractor: RegexExtractor::default().try_into().unwrap(),
+            extractor: RegexExtractor::default().into(),
         };
 
         let result = module.run(TEST_DOMAIN.to_string()).await;

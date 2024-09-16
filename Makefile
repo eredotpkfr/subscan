@@ -7,7 +7,8 @@ all: install-pre-commit-mac \
 	clean \
 	build \
 	doc \
-	test
+	clippy \
+	test \
 
 .PHONY: all
 
@@ -32,3 +33,5 @@ fix:
 	@cargo fix --allow-dirty --allow-staged
 build:
 	@cargo build
+clippy:
+	@cargo clippy --all --all-features --tests -- -D warnings
