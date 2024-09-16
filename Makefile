@@ -1,3 +1,5 @@
+SHELL=/bin/bash
+
 all: install-pre-commit-mac \
 	install-pre-commit-linux \
 	pre-commit-update-hooks \
