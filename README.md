@@ -1,2 +1,2 @@
 # subscan
-Next generation subdomain scanner
+Next generation subdomain enumeration tool

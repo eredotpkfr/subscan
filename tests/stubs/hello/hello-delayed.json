@@ -1,0 +1,14 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/hello-delayed"
+    },
+    "response": {
+        "body": "hello",
+        "fixedDelayMilliseconds": 1000,
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "request": {
+        "method": "GET",
+        "queryParameters": {
+            "num": {
+                "equalTo": 100
+            },
+            "q": {
+                "equalTo": "site:foo.com"
+            }
+        }
+    },
+    "response": {
+        "body": "<article><div><div><a><span>bar.foo.com</span></a></div></div></article>",
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}

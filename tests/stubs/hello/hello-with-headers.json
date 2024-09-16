@@ -1,0 +1,23 @@
+{
+    "request": {
+        "headers": {
+            "x-api-key": {
+                "equalTo": "hello-api"
+            }
+        },
+        "method": "GET",
+        "queryParameters": {
+            "search": {
+                "equalTo": "site:foo.com"
+            }
+        },
+        "urlPath": "/hello-with-headers"
+    },
+    "response": {
+        "body": "hello",
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}
