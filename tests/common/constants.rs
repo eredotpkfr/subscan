@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 pub const TEST_DOMAIN: &str = "foo.com";
 pub const TEST_BAR_SUBDOMAIN: &str = "bar.foo.com";
 pub const TEST_BAZ_SUBDOMAIN: &str = "baz.foo.com";
