@@ -1,4 +1,4 @@
-name: Rust Cargo Test
+name: Rust Linters
 
 on:
   push:
@@ -15,5 +15,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Run tests
-      run: make test
+    - name: Run rustfmt
+      run: make rustfmt-check
+
+    - name: Run clippy
+      run: make clippy
