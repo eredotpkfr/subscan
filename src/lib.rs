@@ -22,6 +22,7 @@ pub mod types;
 pub mod utils;
 
 use interfaces::module::SubscanModuleInterface;
+use std::collections::BTreeSet;
 use tokio::sync::Mutex;
 
 /// Wrapper around a [`SubscanModuleInterface`] trait object
@@ -41,6 +42,7 @@ impl SubscanModule {
     /// # Examples
     ///
     /// ```
+    /// use std::collections::BTreeSet;
     /// use subscan::SubscanModule;
     /// use subscan::interfaces::module::SubscanModuleInterface;
     /// use async_trait::async_trait;
@@ -53,7 +55,8 @@ impl SubscanModule {
     ///     async fn name(&self) -> String {
     ///         String::from("Foo")
     ///     }
-    ///     async fn run(&mut self, domain: String) {
+    ///     async fn run(&mut self, domain: String) -> BTreeSet<String> {
+    ///         BTreeSet::default()
     ///         // do something in `run` method
     ///     }
     /// }
@@ -69,8 +72,8 @@ impl SubscanModule {
     pub fn new<M: 'static + SubscanModuleInterface>(module: M) -> Mutex<Self> {
         Mutex::new(Self(Box::new(module)))
     }
-    pub async fn run(&mut self, domain: String) {
-        self.0.run(domain).await;
+    pub async fn run(&mut self, domain: String) -> BTreeSet<String> {
+        self.0.run(domain).await
     }
     pub async fn name(&self) -> String {
         self.0.name().await

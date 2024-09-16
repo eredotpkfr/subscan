@@ -30,6 +30,8 @@ async fn main() {
 
         println!("Running...{}({})", module.name().await, cli.domain.clone());
 
-        module.run(cli.domain.clone()).await;
+        let res = module.run(cli.domain.clone()).await;
+
+        println!("{:#?}\nTotal: {}", res, res.len());
     }
 }

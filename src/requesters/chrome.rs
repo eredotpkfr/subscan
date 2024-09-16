@@ -92,14 +92,72 @@ impl ChromeBrowser {
 
 #[async_trait(?Send)]
 impl RequesterInterface for ChromeBrowser {
+    /// Get requester type as a [`RequesterType`]
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use subscan::requesters::chrome::ChromeBrowser;
+    /// use subscan::enums::RequesterType;
+    /// use crate::subscan::interfaces::requester::RequesterInterface;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let browser = ChromeBrowser::new();
+    ///
+    ///     assert_eq!(browser.r#type().await, RequesterType::ChromeBrowser);
+    /// }
+    /// ```
     async fn r#type(&self) -> RequesterType {
         RequesterType::ChromeBrowser
     }
 
+    /// Get requester config object as a [`RequesterConfig`]
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::time::Duration;
+    /// use subscan::requesters::chrome::ChromeBrowser;
+    /// use subscan::interfaces::requester::RequesterInterface;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let browser = ChromeBrowser::new();
+    ///
+    ///     assert_eq!(browser.config().await.timeout, Duration::from_secs(10));
+    /// }
+    /// ```
     async fn config(&self) -> RequesterConfig {
         self.config.clone()
     }
 
+    /// Configure requester with a new config object
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::time::Duration;
+    /// use subscan::requesters::chrome::ChromeBrowser;
+    /// use subscan::types::config::RequesterConfig;
+    /// use subscan::interfaces::requester::RequesterInterface;
+    /// use reqwest::header::HeaderMap;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut browser = ChromeBrowser::new();
+    ///
+    ///     let new_config = RequesterConfig {
+    ///         timeout: Duration::from_secs(120),
+    ///         proxy: None,
+    ///         headers: HeaderMap::default(),
+    ///     };
+    ///
+    ///     browser.configure(new_config.clone()).await;
+    ///
+    ///     assert_eq!(browser.config().await.timeout, new_config.timeout);
+    /// }
+    /// ```
     async fn configure(&mut self, config: RequesterConfig) {
         let mut options = Self::default_options();
 
@@ -111,6 +169,25 @@ impl RequesterInterface for ChromeBrowser {
         self.config = config
     }
 
+    /// Get page source HTML from given [`reqwest::Url`]
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use subscan::requesters::chrome::ChromeBrowser;
+    /// use subscan::interfaces::requester::RequesterInterface;
+    /// use reqwest::Url;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let browser = ChromeBrowser::new();
+    ///     let url = Url::parse("https://foo.com").unwrap();
+    ///
+    ///     let content = browser.get_content(url).await.unwrap();
+    ///
+    ///     // do something with content
+    /// }
+    /// ```
     async fn get_content(&self, url: Url) -> Option<String> {
         let tab = self.browser.new_tab().expect("Cannot create tab!");
         let headers = self.config.headers_as_hashmap();

@@ -48,14 +48,72 @@ impl HTTPClient {
 
 #[async_trait(?Send)]
 impl RequesterInterface for HTTPClient {
+    /// Get requester type as a [`RequesterType`]
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use subscan::requesters::client::HTTPClient;
+    /// use subscan::enums::RequesterType;
+    /// use crate::subscan::interfaces::requester::RequesterInterface;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let client = HTTPClient::default();
+    ///
+    ///     assert_eq!(client.r#type().await, RequesterType::HTTPClient);
+    /// }
+    /// ```
     async fn r#type(&self) -> RequesterType {
         RequesterType::HTTPClient
     }
 
+    /// Get requester config object as a [`RequesterConfig`]
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::time::Duration;
+    /// use subscan::requesters::client::HTTPClient;
+    /// use subscan::interfaces::requester::RequesterInterface;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let client = HTTPClient::default();
+    ///
+    ///     assert_eq!(client.config().await.timeout, Duration::from_secs(10));
+    /// }
+    /// ```
     async fn config(&self) -> RequesterConfig {
         self.config.clone()
     }
 
+    /// Configure requester with a new config object
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::time::Duration;
+    /// use subscan::requesters::client::HTTPClient;
+    /// use subscan::types::config::RequesterConfig;
+    /// use subscan::interfaces::requester::RequesterInterface;
+    /// use reqwest::header::HeaderMap;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut client = HTTPClient::default();
+    ///
+    ///     let new_config = RequesterConfig {
+    ///         timeout: Duration::from_secs(120),
+    ///         proxy: None,
+    ///         headers: HeaderMap::default(),
+    ///     };
+    ///
+    ///     client.configure(new_config.clone()).await;
+    ///
+    ///     assert_eq!(client.config().await.timeout, new_config.timeout);
+    /// }
+    /// ```
     async fn configure(&mut self, config: RequesterConfig) {
         let mut builder = Client::builder().default_headers(config.headers.clone());
 
@@ -67,6 +125,25 @@ impl RequesterInterface for HTTPClient {
         self.client = builder.build().expect(CLIENT_BUILD_ERR);
     }
 
+    /// Get page source HTML from given [`reqwest::Url`]
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use subscan::requesters::client::HTTPClient;
+    /// use subscan::interfaces::requester::RequesterInterface;
+    /// use reqwest::Url;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let client = HTTPClient::default();
+    ///     let url = Url::parse("https://foo.com").unwrap();
+    ///
+    ///     let content = client.get_content(url).await.unwrap();
+    ///
+    ///     // do something with content
+    /// }
+    /// ```
     async fn get_content(&self, url: Url) -> Option<String> {
         let request = self
             .client

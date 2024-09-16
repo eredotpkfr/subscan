@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/hello"
+    },
+    "response": {
+        "status": 200,
+        "body": "hello",
+        "headers": {
+            "content-type": "text/html"
+        }
+    }
+}

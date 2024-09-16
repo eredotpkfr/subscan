@@ -33,6 +33,8 @@ impl SearchQueryParam {
     /// let param = SearchQueryParam::from("q");
     ///
     /// let as_string = param.as_string();
+    ///
+    /// // do something with string query param
     /// ```
     pub fn as_string(&self) -> String {
         self.0.clone()
@@ -213,14 +215,13 @@ impl SearchQuery {
     /// let prefix = String::from("site:");
     ///
     /// let base_url = Url::parse("https://bar.com").unwrap();
+    /// let extra_params = &[("bar".to_string(), "baz".to_string())];
+    ///
     /// let expected_url = Url::parse("https://bar.com/?bar=baz&s=site%3Afoo.com").unwrap();
     ///
     /// let mut query = SearchQuery::new(param, prefix, domain);
     ///
-    /// assert_eq!(query.as_url(
-    ///     base_url,
-    ///     &[("bar".to_string(), "baz".to_string())],
-    /// ), expected_url);
+    /// assert_eq!(query.as_url(base_url, extra_params), expected_url);
     /// ````
     pub fn as_url(&mut self, base_url: Url, extra_params: &[(String, String)]) -> Url {
         let query_param = &[(self.param.as_string(), self.as_search_str())];

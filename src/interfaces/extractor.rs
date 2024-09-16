@@ -41,7 +41,6 @@ use std::collections::BTreeSet;
 ///
 ///     let result = extractor.extract(content, domain).await;
 ///
-///     assert_eq!(result.len(), 1);
 ///     assert_eq!(result, BTreeSet::from([Subdomain::from("foo.com")]));
 /// }
 /// ```

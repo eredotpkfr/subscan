@@ -1,2 +1,2 @@
-pub mod apiintegration;
+/// Generic search engine module
 pub mod searchengine;

@@ -56,6 +56,7 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     /// use subscan::extractors::html::HTMLExtractor;
     /// use subscan::interfaces::extractor::SubdomainExtractorInterface;
     /// use subscan::types::core::Subdomain;
+    /// use std::collections::BTreeSet;
     ///
     /// #[tokio::main]
     /// async fn main() {
@@ -67,8 +68,7 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     ///
     ///     let result = extractor.extract(html, domain).await;
     ///
-    ///     assert!(result.contains(&String::from("bar.foo.com")));
-    ///     assert_eq!(result.len(), 1);
+    ///     assert_eq!(result, BTreeSet::from([String::from("bar.foo.com")]));
     /// }
     /// ```
     async fn extract(&self, content: String, domain: String) -> BTreeSet<Subdomain> {

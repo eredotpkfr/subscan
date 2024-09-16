@@ -1,0 +1,21 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/search",
+        "queryParameters": {
+            "q": {
+                "equalTo": "site:foo.com"
+            },
+            "num": {
+                "equalTo": 100
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "body": "<div><cite>bar.foo.com</cite></div>",
+        "headers": {
+            "content-type": "text/html"
+        }
+    }
+}

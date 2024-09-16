@@ -5,13 +5,38 @@ use crate::{
 use reqwest::Url;
 
 const DUCKDUCKGO_MODULE_NAME: &str = "DuckDuckGo";
-const DUCKDUCKGO_SEARCH_URL: &str = "https://duckduckgo.com/";
+const DUCKDUCKGO_SEARCH_URL: &str = "https://duckduckgo.com";
 const DUCKDUCKGO_SEARCH_PARAM: &str = "q";
 const DUCKDUCKGO_CITE_TAG: &str = "article > div > div > a > span:first-child";
 
+/// DuckDuckGo search engine enumerator
+///
+/// It uses [`GenericSearchEngineModule`] its own inner
+/// here are the configurations
+///
+/// | Property           | Value                                        |
+/// |:------------------:|:--------------------------------------------:|
+/// | Module Name        | `DuckDuckGo`                                 |
+/// | Search URL         | <https://duckduckgo.com>                    |
+/// | Search Param       | `q`                                          |
+/// | Subdomain Selector | `article > div > div > a > span:first-child` |
 pub struct DuckDuckGo {}
 
 impl<'a> DuckDuckGo {
+    /// Create a new [`DuckDuckGo`] module instance
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use subscan::modules::engines::duckduckgo;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let duckduckgo = duckduckgo::DuckDuckGo::new();
+    ///
+    ///     // do something with duckduckgo instance
+    /// }
+    /// ```
     pub fn new() -> GenericSearchEngineModule<'a> {
         let extractor = HTMLExtractor::new(String::from(DUCKDUCKGO_CITE_TAG), vec![]);
 

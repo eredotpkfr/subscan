@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
+use std::collections::BTreeSet;
 
 /// Generic `subscan` module trait definiton to implement
 /// subdomain enumeration modules
@@ -12,6 +13,7 @@ use enum_dispatch::enum_dispatch;
 /// # Examples
 ///
 /// ```
+/// use std::collections::BTreeSet;
 /// use subscan::interfaces::module::SubscanModuleInterface;
 /// use async_trait::async_trait;
 ///
@@ -22,16 +24,21 @@ use enum_dispatch::enum_dispatch;
 ///     async fn name(&self) -> String {
 ///         String::from("Foo")
 ///     }
-///     async fn run(&mut self, domain: String) {
+///     async fn run(&mut self, domain: String) -> BTreeSet<String> {
+///         BTreeSet::default()
 ///         // do something in `run` method
 ///     }
 /// }
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let foo = FooModule {};
+///     let domain = String::from("foo.com");
+///     let mut foo = FooModule {};
 ///
 ///     assert_eq!(foo.name().await, "Foo");
+///
+///     // do something with results
+///     let results = foo.run(domain).await;
 /// }
 /// ```
 #[async_trait(?Send)]
@@ -42,5 +49,5 @@ pub trait SubscanModuleInterface: Sync + Send {
     /// Just like a `main` method, when the module
     /// run this `run` method will be called, so this method
     /// should do everything
-    async fn run(&mut self, domain: String);
+    async fn run(&mut self, domain: String) -> BTreeSet<String>;
 }

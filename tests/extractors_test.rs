@@ -1,6 +1,8 @@
+mod common;
+
+use common::constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN};
 use std::collections::BTreeSet;
 use subscan::{interfaces::extractor::SubdomainExtractorInterface, types::core::Subdomain};
-
 #[cfg(test)]
 mod html {
     use super::*;
@@ -19,14 +21,15 @@ mod html {
             </article>
         "
         .to_string();
-        let domain = String::from("foo.com");
+
         let selector = String::from("article > div > a > span:first-child");
-
         let extractor = HTMLExtractor::new(selector, vec![]);
-        let result = extractor.extract(content, domain).await;
+        let result = extractor.extract(content, TEST_DOMAIN.to_string()).await;
 
-        assert_eq!(result.len(), 1);
-        assert_eq!(result, BTreeSet::from([Subdomain::from("bar.foo.com")]));
+        assert_eq!(
+            result,
+            BTreeSet::from([Subdomain::from(TEST_BAR_SUBDOMAIN)])
+        );
     }
 
     #[tokio::test]
@@ -42,18 +45,17 @@ mod html {
             </article>
         "
         .to_string();
-        let domain = String::from("foo.com");
-        let selector = String::from("article > div > a > span");
 
+        let selector = String::from("article > div > a > span");
         let extractor = HTMLExtractor::new(selector, vec!["<br>".to_string()]);
-        let result = extractor.extract(content, domain).await;
+        let result = extractor.extract(content, TEST_DOMAIN.to_string()).await;
 
         assert_eq!(result.len(), 2);
         assert_eq!(
             result,
             BTreeSet::from([
-                Subdomain::from("bar.foo.com"),
-                Subdomain::from("baz.foo.com")
+                Subdomain::from(TEST_BAR_SUBDOMAIN),
+                Subdomain::from(TEST_BAZ_SUBDOMAIN)
             ])
         );
     }
@@ -66,33 +68,33 @@ mod regex {
 
     #[tokio::test]
     async fn extract_one_test() {
-        let domain = String::from("foo.com");
         let extractor = RegexExtractor::default();
 
-        let match_content = String::from("bar.foo.com");
+        let match_content = String::from(TEST_BAR_SUBDOMAIN);
         let no_match_content = String::from("foobarbaz");
 
         assert!(extractor
-            .extract_one(match_content, domain.clone())
+            .extract_one(match_content, TEST_DOMAIN.to_string())
             .is_some());
-        assert!(extractor.extract_one(no_match_content, domain).is_none());
+        assert!(extractor
+            .extract_one(no_match_content, TEST_DOMAIN.to_string())
+            .is_none());
     }
 
     #[tokio::test]
     async fn extract_test() {
-        let domain = String::from("foo.com");
         let content = String::from("bar.foo.com\nbaz.foo.com");
 
         let extractor = RegexExtractor::default();
-        let result = extractor.extract(content, domain).await;
+        let result = extractor.extract(content, TEST_DOMAIN.to_string()).await;
 
+        assert_eq!(result.len(), 2);
         assert_eq!(
             result,
             BTreeSet::from([
-                Subdomain::from("bar.foo.com"),
-                Subdomain::from("baz.foo.com"),
+                Subdomain::from(TEST_BAR_SUBDOMAIN),
+                Subdomain::from(TEST_BAZ_SUBDOMAIN),
             ])
         );
-        assert_eq!(result.len(), 2);
     }
 }
