@@ -4,11 +4,11 @@
         "urlPath": "/hello-delayed"
     },
     "response": {
-        "status": 200,
         "body": "hello",
         "fixedDelayMilliseconds": 1000,
         "headers": {
             "content-type": "text/html"
-        }
+        },
+        "status": 200
     }
 }

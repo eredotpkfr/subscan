@@ -37,6 +37,7 @@ impl<'a> Bing {
     ///     // do something with bing instance
     /// }
     /// ```
+    #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericSearchEngineModule<'a> {
         let extractor = HTMLExtractor::new(String::from(BING_CITE_TAG), vec![]);
 
@@ -45,7 +46,7 @@ impl<'a> Bing {
             url: Url::parse(BING_SEARCH_URL).expect("URL parse error!"),
             param: SearchQueryParam::from(BING_SEARCH_PARAM),
             requester: requesters::get_by_type(&RequesterType::HTTPClient),
-            extractor: extractor.try_into().unwrap(),
+            extractor: extractor.into(),
         }
     }
 }

@@ -1,21 +1,21 @@
 {
     "request": {
         "method": "GET",
-        "urlPath": "/search",
         "queryParameters": {
-            "p": {
-                "equalTo": "site:foo.com"
-            },
             "num": {
                 "equalTo": 100
+            },
+            "p": {
+                "equalTo": "site:foo.com"
             }
-        }
+        },
+        "urlPath": "/search"
     },
     "response": {
-        "status": 200,
         "body": "<ol><li><div><div><h3><a><span>baz.foo.com</span></a></h3></div></div></li></ol>",
         "headers": {
             "content-type": "text/html"
-        }
+        },
+        "status": 200
     }
 }

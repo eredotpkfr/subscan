@@ -37,6 +37,7 @@ impl<'a> Google {
     ///     // do something with google instance
     /// }
     /// ```
+    #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericSearchEngineModule<'a> {
         let extractor = HTMLExtractor::new(String::from(GOOGLE_CITE_TAG), vec![]);
 
@@ -45,7 +46,7 @@ impl<'a> Google {
             url: Url::parse(GOOGLE_SEARCH_URL).expect("URL parse error!"),
             param: SearchQueryParam::from(GOOGLE_SEARCH_PARAM),
             requester: requesters::get_by_type(&RequesterType::HTTPClient),
-            extractor: extractor.try_into().unwrap(),
+            extractor: extractor.into(),
         }
     }
 }

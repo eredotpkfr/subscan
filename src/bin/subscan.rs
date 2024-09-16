@@ -24,7 +24,7 @@ async fn main() {
     for item in ALL_MODULES.iter() {
         let mut module = item.lock().await;
 
-        if module.name().await != String::from("DuckDuckGo") {
+        if module.name().await != *"DuckDuckGo" {
             continue;
         }
 

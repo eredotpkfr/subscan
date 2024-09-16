@@ -37,6 +37,7 @@ impl<'a> DuckDuckGo {
     ///     // do something with duckduckgo instance
     /// }
     /// ```
+    #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericSearchEngineModule<'a> {
         let extractor = HTMLExtractor::new(String::from(DUCKDUCKGO_CITE_TAG), vec![]);
 
@@ -45,7 +46,7 @@ impl<'a> DuckDuckGo {
             url: Url::parse(DUCKDUCKGO_SEARCH_URL).expect("URL parse error!"),
             param: SearchQueryParam::from(DUCKDUCKGO_SEARCH_PARAM),
             requester: requesters::get_by_type(&RequesterType::ChromeBrowser),
-            extractor: extractor.try_into().unwrap(),
+            extractor: extractor.into(),
         }
     }
 }

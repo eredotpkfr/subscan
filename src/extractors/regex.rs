@@ -37,11 +37,9 @@ impl RegexExtractor {
     pub fn extract_one(&self, content: String, domain: String) -> Option<Subdomain> {
         let pattern = generate_subdomain_regex(domain).unwrap();
 
-        if let Some(matches) = pattern.find(&content) {
-            Some(matches.as_str().to_string())
-        } else {
-            None
-        }
+        pattern
+            .find(&content)
+            .map(|matches| matches.as_str().to_string())
     }
 }
 

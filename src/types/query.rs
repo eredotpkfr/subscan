@@ -227,6 +227,6 @@ impl SearchQuery {
         let query_param = &[(self.param.as_string(), self.as_search_str())];
         let params = [extra_params, query_param].concat();
 
-        Url::parse_with_params(&base_url.to_string(), params).expect("URL parse error!")
+        Url::parse_with_params(base_url.as_ref(), params).expect("URL parse error!")
     }
 }

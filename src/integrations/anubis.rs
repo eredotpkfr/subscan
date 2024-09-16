@@ -15,7 +15,7 @@ impl Anubis {
     pub async fn new(domain: String) -> Anubis {
         Anubis {
             url: "https://jonlu.ca/anubis/subdomains/",
-            domain: domain,
+            domain,
             client: Client::new(),
         }
     }

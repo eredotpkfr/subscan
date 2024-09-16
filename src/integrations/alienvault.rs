@@ -15,7 +15,7 @@ impl AlienVault {
     pub async fn new(domain: String) -> AlienVault {
         AlienVault {
             url: "https://otx.alienvault.com/api/v1/indicators/domain/",
-            domain: domain,
+            domain,
             client: Client::new(),
         }
     }

@@ -24,11 +24,11 @@ lazy_static! {
         HashMap::from([
             (
                 RequesterType::ChromeBrowser,
-                Mutex::new(ChromeBrowser::new().try_into().unwrap())
+                Mutex::new(ChromeBrowser::new().into())
             ),
             (
                 RequesterType::HTTPClient,
-                Mutex::new(HTTPClient::default().try_into().unwrap())
+                Mutex::new(HTTPClient::default().into())
             ),
         ]);
 }

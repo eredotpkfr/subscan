@@ -37,6 +37,7 @@ impl<'a> Yahoo {
     ///     // do something with yahoo instance
     /// }
     /// ```
+    #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericSearchEngineModule<'a> {
         let extractor = HTMLExtractor::new(
             String::from(YAHOO_CITE_TAG),
@@ -48,7 +49,7 @@ impl<'a> Yahoo {
             url: Url::parse(YAHOO_SEARCH_URL).expect("URL parse error!"),
             param: SearchQueryParam::from(YAHOO_SEARCH_PARAM),
             requester: requesters::get_by_type(&RequesterType::HTTPClient),
-            extractor: extractor.try_into().unwrap(),
+            extractor: extractor.into(),
         }
     }
 }

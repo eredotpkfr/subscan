@@ -13,6 +13,12 @@ pub struct ChromeBrowser {
     browser: Browser,
 }
 
+impl Default for ChromeBrowser {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ChromeBrowser {
     /// Returns a new [`ChromeBrowser`] instance
     ///
