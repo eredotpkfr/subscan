@@ -1,8 +1,11 @@
 mod common;
 
-use common::constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN};
-use std::collections::BTreeSet;
-use subscan::{interfaces::extractor::SubdomainExtractorInterface, types::core::Subdomain};
+use common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
+    funcs::read_testdata,
+};
+use subscan::interfaces::extractor::SubdomainExtractorInterface;
+
 #[cfg(test)]
 mod html {
     use super::*;
@@ -10,53 +13,31 @@ mod html {
 
     #[tokio::test]
     async fn extract_without_removes() {
-        let content = "
-            <article>
-                <div>
-                    <a>
-                        <span>bar.foo.com</span>
-                        <span>baz.foo.com</span>
-                    </a>
-                </div>
-            </article>
-        "
-        .to_string();
+        let html = read_testdata("html/subdomains.html");
 
         let selector = String::from("article > div > a > span:first-child");
         let extractor = HTMLExtractor::new(selector, vec![]);
-        let result = extractor.extract(content, TEST_DOMAIN.to_string()).await;
+        let result = extractor.extract(html, TEST_DOMAIN.to_string()).await;
 
-        assert_eq!(
-            result,
-            BTreeSet::from([Subdomain::from(TEST_BAR_SUBDOMAIN)])
-        );
+        assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
     }
 
     #[tokio::test]
     async fn extract_with_removes() {
-        let content = "
-            <article>
-                <div>
-                    <a>
-                        <span>bar<br>.foo.com</span>
-                        <span>baz.foo.<br>com</span>
-                    </a>
-                </div>
-            </article>
-        "
-        .to_string();
+        let html = read_testdata("html/subdomains-with-removes.html");
 
         let selector = String::from("article > div > a > span");
         let extractor = HTMLExtractor::new(selector, vec!["<br>".to_string()]);
-        let result = extractor.extract(content, TEST_DOMAIN.to_string()).await;
+        let result = extractor.extract(html, TEST_DOMAIN.to_string()).await;
 
         assert_eq!(result.len(), 2);
         assert_eq!(
             result,
-            BTreeSet::from([
-                Subdomain::from(TEST_BAR_SUBDOMAIN),
-                Subdomain::from(TEST_BAZ_SUBDOMAIN)
-            ])
+            [
+                TEST_BAR_SUBDOMAIN.to_string(),
+                TEST_BAZ_SUBDOMAIN.to_string()
+            ]
+            .into()
         );
     }
 }
@@ -91,10 +72,11 @@ mod regex {
         assert_eq!(result.len(), 2);
         assert_eq!(
             result,
-            BTreeSet::from([
-                Subdomain::from(TEST_BAR_SUBDOMAIN),
-                Subdomain::from(TEST_BAZ_SUBDOMAIN),
-            ])
+            [
+                TEST_BAR_SUBDOMAIN.to_string(),
+                TEST_BAZ_SUBDOMAIN.to_string(),
+            ]
+            .into()
         );
     }
 }

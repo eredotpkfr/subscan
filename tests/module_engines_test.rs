@@ -4,7 +4,6 @@ mod common;
 mod searchengine {
     use super::common::constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN};
     use reqwest::Url;
-    use std::collections::BTreeSet;
     use subscan::{
         cache::requesters,
         enums::RequesterType,
@@ -22,7 +21,7 @@ mod searchengine {
         let result = google.run(TEST_DOMAIN.to_string()).await;
 
         assert_eq!(google.name().await, "Google");
-        assert_eq!(result, BTreeSet::from([String::from(TEST_BAR_SUBDOMAIN)]));
+        assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
     }
 
     #[tokio::test]
@@ -35,7 +34,7 @@ mod searchengine {
         let result = yahoo.run(TEST_DOMAIN.to_string()).await;
 
         assert_eq!(yahoo.name().await, "Yahoo");
-        assert_eq!(result, BTreeSet::from([String::from(TEST_BAZ_SUBDOMAIN)]));
+        assert_eq!(result, [TEST_BAZ_SUBDOMAIN.to_string()].into());
     }
 
     #[tokio::test]
@@ -48,7 +47,7 @@ mod searchengine {
         let result = bing.run(TEST_DOMAIN.to_string()).await;
 
         assert_eq!(bing.name().await, "Bing");
-        assert_eq!(result, BTreeSet::from([String::from(TEST_BAR_SUBDOMAIN)]));
+        assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
     }
 
     #[tokio::test]
@@ -62,6 +61,6 @@ mod searchengine {
         let result = duckduckgo.run(TEST_DOMAIN.to_string()).await;
 
         assert_eq!(duckduckgo.name().await, "DuckDuckGo");
-        assert_eq!(result, BTreeSet::from([String::from(TEST_BAR_SUBDOMAIN)]));
+        assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
     }
 }

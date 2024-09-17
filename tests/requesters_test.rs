@@ -28,7 +28,7 @@ mod chrome {
         let new_config = RequesterConfig {
             headers: new_headers.clone(),
             timeout: Duration::from_secs(120),
-            proxy: Some(String::from(TEST_URL)),
+            proxy: Some(TEST_URL.to_string()),
         };
 
         assert_eq!(config.timeout, DEFAULT_HTTP_TIMEOUT);
@@ -114,7 +114,7 @@ mod client {
         let new_config = RequesterConfig {
             headers: new_headers.clone(),
             timeout: Duration::from_secs(120),
-            proxy: Some(String::from(TEST_URL)),
+            proxy: Some(TEST_URL.to_string()),
         };
 
         assert_eq!(config.timeout, DEFAULT_HTTP_TIMEOUT);
