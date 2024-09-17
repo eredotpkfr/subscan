@@ -2,18 +2,23 @@ name: Rust Cargo Test
 
 on:
   push:
-    branches: [ "**" ]
+    branches: ["**"]
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
 
 env:
-  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-Dwarnings"
+  CARGO_TERM_COLOR: "always"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
+  run-tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
-    - name: Run tests
-      run: make test
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: make test
