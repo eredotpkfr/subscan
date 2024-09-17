@@ -7,7 +7,7 @@ use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use reqwest::Url;
 
-/// Generic HTTP client trait definiton to implement different
+/// Generic HTTP client trait definition to implement different
 /// HTTP requester objects with a single interface compatible
 ///
 /// Other requesters that will be implemented in the future

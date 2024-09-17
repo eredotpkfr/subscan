@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use std::collections::BTreeSet;
 
-/// Generic `subscan` module trait definiton to implement
+/// Generic `subscan` module trait definition to implement
 /// subdomain enumeration modules
 ///
 /// Each module that will be implemented in the future
