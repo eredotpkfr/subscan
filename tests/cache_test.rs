@@ -1,16 +1,23 @@
-use reqwest::header::{HeaderMap, HeaderValue, CONTENT_LENGTH, USER_AGENT};
+use reqwest::header::{HeaderMap, CONTENT_LENGTH, USER_AGENT};
 use std::time::Duration;
 use strum::IntoEnumIterator;
 
+mod constants {
+    use reqwest::header::HeaderValue;
+
+    pub const TEST_URL: &str = "http://foo.com";
+    pub const USER_AGENT_VALUE: HeaderValue = HeaderValue::from_static("x-api-key");
+    pub const CONTENT_LENGTH_VALUE: HeaderValue = HeaderValue::from_static("10000");
+}
+
 #[cfg(test)]
 mod requesters {
+    use super::constants::{CONTENT_LENGTH_VALUE, TEST_URL, USER_AGENT_VALUE};
     use super::*;
     use subscan::{
         cache, enums::RequesterType, interfaces::requester::RequesterInterface,
         types::config::RequesterConfig,
     };
-
-    const TEST_URL: &str = "http://foo.com";
 
     #[tokio::test]
     async fn get_by_type_test() {
@@ -26,8 +33,8 @@ mod requesters {
         let new_config = RequesterConfig {
             timeout: Duration::from_secs(120),
             headers: HeaderMap::from_iter([
-                (USER_AGENT, HeaderValue::from_static("x-api-key")),
-                (CONTENT_LENGTH, HeaderValue::from_static("10000")),
+                (USER_AGENT, USER_AGENT_VALUE),
+                (CONTENT_LENGTH, CONTENT_LENGTH_VALUE),
             ]),
             proxy: Some(TEST_URL.to_string()),
         };
