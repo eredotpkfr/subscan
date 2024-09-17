@@ -1,4 +1,4 @@
-name: Rust Linters
+name: Rust Security
 
 on:
   pull_request:
@@ -9,19 +9,15 @@ env:
   CARGO_TERM_COLOR: "always"
 
 jobs:
-  rust-checks:
+  rust-cargo-deny:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
 
-      - name: Run rustfmt
-        run: make rustfmt-check
-
-      - name: Run clippy
-        run: make clippy
-
-  typos:
+  rust-cargo-machete:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: crate-ci/typos@master
+      - uses: Swatinem/rust-cache@v2
+      - uses: bnjbvr/cargo-machete@v0.6.2

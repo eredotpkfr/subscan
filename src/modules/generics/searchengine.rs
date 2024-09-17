@@ -30,7 +30,7 @@ use tokio::sync::Mutex;
 /// dash (`-`) character. To be example `site:foo.com -www` dork
 /// gets `foo.com` related domain addresses but excludes `www.foo.com`
 ///
-/// According to above informations, we can concat this two
+/// According to above information, we can concat this two
 /// technique. If we search subdomains by using `site:foo.com`
 /// dork and then in the next search if we exclude all previous
 /// search results we can get new subdomain addresses. After then
