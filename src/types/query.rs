@@ -5,9 +5,9 @@ use std::collections::BTreeSet;
 /// Data type to store search URL query param
 /// for search engines like `Google`, `Yahoo`, `Bing`, etc.
 #[derive(Debug, Clone)]
-pub struct SearchQueryParam(pub String);
+pub struct SearchQueryParam(String);
 
-impl SearchQueryParam {
+impl From<&str> for SearchQueryParam {
     /// Create query param from static str
     ///
     /// # Examples
@@ -19,10 +19,13 @@ impl SearchQueryParam {
     ///
     /// // do something with param
     /// ```
-    pub fn from(param: &str) -> Self {
-        Self(param.to_string())
+    fn from(value: &str) -> Self {
+        Self(value.to_string())
     }
+}
 
+#[allow(clippy::to_string_trait_impl)]
+impl ToString for SearchQueryParam {
     /// Clones inner value and returns it as a [`String`]
     ///
     /// # Examples
@@ -32,14 +35,16 @@ impl SearchQueryParam {
     ///
     /// let param = SearchQueryParam::from("q");
     ///
-    /// let as_string = param.as_string();
+    /// let as_string = param.to_string();
     ///
     /// // do something with string query param
     /// ```
-    pub fn as_string(&self) -> String {
+    fn to_string(&self) -> String {
         self.0.clone()
     }
+}
 
+impl SearchQueryParam {
     /// Get fully [`SearchQuery`] object from [`SearchQueryParam`]
     /// configured by the given `domain` and `prefix` params
     ///
@@ -188,7 +193,7 @@ impl SearchQuery {
     ///
     /// let mut query = SearchQuery::new(param, prefix, domain);
     ///
-    /// assert_eq!(query.as_search_str(), String::from("site:foo.com"));
+    /// assert_eq!(query.as_search_str(), "site:foo.com".to_string());
     /// ````
     pub fn as_search_str(&mut self) -> String {
         let asvec = Vec::from_iter(self.state.clone());
@@ -224,7 +229,7 @@ impl SearchQuery {
     /// assert_eq!(query.as_url(base_url, extra_params), expected_url);
     /// ````
     pub fn as_url(&mut self, base_url: Url, extra_params: &[(String, String)]) -> Url {
-        let query_param = &[(self.param.as_string(), self.as_search_str())];
+        let query_param = &[(self.param.to_string(), self.as_search_str())];
         let params = [extra_params, query_param].concat();
 
         Url::parse_with_params(base_url.as_ref(), params).expect("URL parse error!")

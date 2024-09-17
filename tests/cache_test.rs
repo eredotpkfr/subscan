@@ -1,4 +1,7 @@
-use reqwest::header::HeaderMap;
+mod common;
+
+use common::constants::TEST_URL;
+use reqwest::header::{HeaderMap, HeaderValue, CONTENT_LENGTH, USER_AGENT};
 use std::time::Duration;
 use strum::IntoEnumIterator;
 
@@ -6,10 +9,8 @@ use strum::IntoEnumIterator;
 mod requesters {
     use super::*;
     use subscan::{
-        cache,
-        enums::RequesterType,
-        interfaces::requester::RequesterInterface,
-        types::config::{RequesterConfig, DEFAULT_HTTP_TIMEOUT},
+        cache, enums::RequesterType, interfaces::requester::RequesterInterface,
+        types::config::RequesterConfig,
     };
 
     #[tokio::test]
@@ -25,24 +26,23 @@ mod requesters {
     async fn configure_all_test() {
         let new_config = RequesterConfig {
             timeout: Duration::from_secs(120),
-            headers: HeaderMap::default(),
-            proxy: None,
+            headers: HeaderMap::from_iter([
+                (USER_AGENT, HeaderValue::from_static("x-api-key")),
+                (CONTENT_LENGTH, HeaderValue::from_static("10000")),
+            ]),
+            proxy: Some(TEST_URL.to_string()),
         };
 
         for requester in cache::ALL_REQUESTERS.values() {
-            assert_eq!(
-                requester.lock().await.config().await.timeout,
-                DEFAULT_HTTP_TIMEOUT
-            );
+            let requester = requester.lock().await;
+
+            assert_eq!(requester.config().await, RequesterConfig::default());
         }
 
         cache::requesters::configure_all(new_config.clone()).await;
 
         for requester in cache::ALL_REQUESTERS.values() {
-            assert_eq!(
-                requester.lock().await.config().await.timeout,
-                new_config.timeout
-            );
+            assert_eq!(requester.lock().await.config().await, new_config);
         }
     }
 }
