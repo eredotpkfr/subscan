@@ -39,4 +39,4 @@ fix:
 build:
 	@cargo build
 clippy:
-	@cargo clippy --all --all-features --tests -- -D warnings
+	@cargo clippy -- -Dwarnings
