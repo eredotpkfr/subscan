@@ -1,4 +1,4 @@
-name: Rust Linters
+name: Linters
 
 on:
   push:
