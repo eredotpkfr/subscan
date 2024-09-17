@@ -4,17 +4,14 @@ use subscan::interfaces::extractor::SubdomainExtractorInterface;
 
 #[tokio::test]
 async fn extract_one_test() {
+    let target = String::from(TEST_DOMAIN);
     let extractor = RegexExtractor::default();
 
     let matches = String::from(TEST_BAR_SUBDOMAIN);
-    let no_match = String::from("foobarbaz");
+    let no_matches = String::from("foobarbaz");
 
-    assert!(extractor
-        .extract_one(matches, TEST_DOMAIN.to_string())
-        .is_some());
-    assert!(extractor
-        .extract_one(no_match, TEST_DOMAIN.to_string())
-        .is_none());
+    assert!(extractor.extract_one(matches, target.clone()).is_some());
+    assert!(extractor.extract_one(no_matches, target).is_none());
 }
 
 #[tokio::test]
