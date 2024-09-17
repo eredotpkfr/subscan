@@ -10,6 +10,8 @@ mod requesters {
         types::config::RequesterConfig,
     };
 
+    const TEST_URL: &str = "http://foo.com";
+
     #[tokio::test]
     async fn get_by_type_test() {
         for rtype in RequesterType::iter() {
@@ -27,7 +29,7 @@ mod requesters {
                 (USER_AGENT, HeaderValue::from_static("x-api-key")),
                 (CONTENT_LENGTH, HeaderValue::from_static("10000")),
             ]),
-            proxy: Some("http://foo.com".to_string()),
+            proxy: Some(TEST_URL.to_string()),
         };
 
         for requester in cache::ALL_REQUESTERS.values() {
