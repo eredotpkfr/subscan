@@ -6,7 +6,7 @@ use std::{collections::HashMap, time::Duration};
 pub const DEFAULT_HTTP_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// Type definition for store [`RequesterInterface`](crate::interfaces::requester::RequesterInterface)
-/// configurations in a struct. Also it has helpfull
+/// configurations in a struct. Also it has helpful
 /// methods to manage configs
 #[derive(Debug, Clone)]
 pub struct RequesterConfig {

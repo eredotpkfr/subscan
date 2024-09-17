@@ -1,0 +1,24 @@
+# Configuration for https://github.com/EmbarkStudios/cargo-deny
+
+[licenses]
+confidence-threshold = 0.8
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "OpenSSL",
+    "ISC",
+    "BSD-3-Clause",
+    "GPL-3.0",
+    "BSL-1.0",
+    "Unicode-DFS-2016",
+    "MPL-2.0",
+]
+
+[[licenses.clarify]]
+crate = "ring"
+expression = "MIT AND ISC AND OpenSSL"
+
+license-files = [
+    # Each entry is a crate relative path, and the (opaque) hash of its contents
+    { path = "LICENSE", hash = 0xbd0eed23 }
+]

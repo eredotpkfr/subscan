@@ -16,7 +16,7 @@ pub mod modules;
 /// HTTP requesters listed under this module
 /// like [`requesters::chrome`], [`requesters::client`], etc.
 pub mod requesters;
-/// Porject core type definitions
+/// Project core type definitions
 pub mod types;
 /// Utilities for the handle different stuff things
 pub mod utils;

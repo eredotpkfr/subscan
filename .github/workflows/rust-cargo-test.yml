@@ -3,6 +3,7 @@ name: Rust Cargo Test
 on:
   push:
     branches: ["**"]
+
   pull_request:
     branches: ["main", "dev"]
 
