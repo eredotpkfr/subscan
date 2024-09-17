@@ -77,7 +77,7 @@ impl<'a> GenericSearchEngineModule<'a> {
     ///         url: Url::parse("https://foo.com").unwrap(),
     ///         param: SearchQueryParam::from("q"),
     ///         requester: cache::requesters::get_by_type(&RequesterType::HTTPClient),
-    ///         extractor: RegexExtractor::default().try_into().unwrap(),
+    ///         extractor: RegexExtractor::default().into(),
     ///     };
     ///
     ///     let mut query = module.get_search_query(String::from("foo.com")).await;
