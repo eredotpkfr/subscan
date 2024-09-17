@@ -22,4 +22,5 @@ strum = "0.26.3"
 strum_macros = "0.26.4"
 
 [dev-dependencies]
+automod = "1.0.14"
 stubr = "0.6.2"
