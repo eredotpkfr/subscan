@@ -1,6 +1,3 @@
-mod common;
-
-use common::constants::TEST_URL;
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_LENGTH, USER_AGENT};
 use std::time::Duration;
 use strum::IntoEnumIterator;
@@ -30,7 +27,7 @@ mod requesters {
                 (USER_AGENT, HeaderValue::from_static("x-api-key")),
                 (CONTENT_LENGTH, HeaderValue::from_static("10000")),
             ]),
-            proxy: Some(TEST_URL.to_string()),
+            proxy: Some("http://foo.com".to_string()),
         };
 
         for requester in cache::ALL_REQUESTERS.values() {

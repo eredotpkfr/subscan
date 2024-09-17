@@ -12,7 +12,7 @@
         "urlPath": "/search"
     },
     "response": {
-        "body": "<ol><li><div><div><h3><a><span>baz.foo.com</span></a></h3></div></div></li></ol>",
+        "body": "<ol><li><div><div><h3><a><span>bar.foo.com</span></a></h3></div></div></li></ol>",
         "headers": {
             "content-type": "text/html"
         },
