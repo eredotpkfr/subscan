@@ -9,7 +9,7 @@ use subscan::{
 #[tokio::main]
 async fn main() {
     let cli = Cli::parse();
-    let config = RequesterConfig::from_cli(&cli);
+    let config = RequesterConfig::from(&cli);
 
     cache::requesters::configure_all(config).await;
 

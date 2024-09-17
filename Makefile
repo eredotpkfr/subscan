@@ -26,7 +26,7 @@ pre-commit-update-hooks:
 	@pre-commit autoupdate
 rustfmt-check:
 	@cargo fmt --all -- --check
-rustfmt:
+rustfmt: fix
 	@cargo fmt --all
 test:
 	@cargo test

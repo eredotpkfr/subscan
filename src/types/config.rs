@@ -8,7 +8,7 @@ pub const DEFAULT_HTTP_TIMEOUT: Duration = Duration::from_secs(10);
 /// Type definition for store [`RequesterInterface`](crate::interfaces::requester::RequesterInterface)
 /// configurations in a struct. Also it has helpful
 /// methods to manage configs
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct RequesterConfig {
     /// Stores header values for HTTP requests as a [`HeaderMap`]
     pub headers: HeaderMap,
@@ -28,7 +28,7 @@ impl Default for RequesterConfig {
     }
 }
 
-impl RequesterConfig {
+impl From<&Cli> for RequesterConfig {
     /// Build [`RequesterConfig`] object from given
     /// [`Cli`] object
     ///
@@ -47,16 +47,14 @@ impl RequesterConfig {
     ///     proxy: None,
     /// };
     ///
-    /// let config = RequesterConfig::from_cli(&cli);
+    /// let config = RequesterConfig::from(&cli);
+    /// let user_agent = config.headers.get(USER_AGENT).unwrap();
     ///
     /// assert_eq!(config.timeout.as_secs(), cli.timeout);
     /// assert_eq!(config.proxy, cli.proxy);
-    /// assert_eq!(
-    ///     config.headers.get(USER_AGENT).unwrap().to_str().unwrap(),
-    ///     cli.user_agent
-    /// );
+    /// assert_eq!(user_agent.to_str().unwrap(), cli.user_agent);
     /// ```
-    pub fn from_cli(cli: &Cli) -> Self {
+    fn from(cli: &Cli) -> Self {
         Self {
             headers: HeaderMap::from_iter([(
                 USER_AGENT,
@@ -66,7 +64,9 @@ impl RequesterConfig {
             proxy: cli.proxy.clone(),
         }
     }
+}
 
+impl RequesterConfig {
     /// Converts [`HeaderMap`] headers to [`HashMap`] mappings and returns them
     ///
     /// # Examples
