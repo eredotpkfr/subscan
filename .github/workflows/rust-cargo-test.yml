@@ -1,4 +1,4 @@
-name: Rust Cargo Test
+name: Tests
 
 on:
   push:
@@ -12,7 +12,7 @@ env:
   CARGO_TERM_COLOR: "always"
 
 jobs:
-  run-tests:
+  rust-cargo-test:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]

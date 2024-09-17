@@ -4,7 +4,6 @@ mod common;
 mod searchengine {
     use super::common::constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_MODULE_NAME, TEST_URL};
     use reqwest::Url;
-    use std::collections::BTreeSet;
     use subscan::{
         cache::requesters, enums::RequesterType, extractors::regex::RegexExtractor,
         interfaces::module::SubscanModuleInterface,
@@ -41,6 +40,6 @@ mod searchengine {
         let result = module.run(TEST_DOMAIN.to_string()).await;
 
         assert_eq!(module.name().await, "foo-module");
-        assert_eq!(result, BTreeSet::from([String::from(TEST_BAR_SUBDOMAIN)]));
+        assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
     }
 }
