@@ -1,6 +1,6 @@
 use crate::{
-    cache::requesters, enums::RequesterType, extractors::html::HTMLExtractor,
-    modules::generics::searchengine::GenericSearchEngineModule, types::query::SearchQueryParam,
+    enums::RequesterDispatcher, extractors::html::HTMLExtractor,
+    modules::generics::searchengine::GenericSearchEngineModule, requesters::client::HTTPClient,
 };
 use reqwest::Url;
 
@@ -22,7 +22,7 @@ const BING_CITE_TAG: &str = "cite";
 /// | Subdomain Selector | `cite`                        |
 pub struct Bing {}
 
-impl<'a> Bing {
+impl Bing {
     /// Create a new [`Bing`] module instance
     ///
     /// # Examples
@@ -38,14 +38,16 @@ impl<'a> Bing {
     /// }
     /// ```
     #[allow(clippy::new_ret_no_self)]
-    pub fn new() -> GenericSearchEngineModule<'a> {
-        let extractor = HTMLExtractor::new(String::from(BING_CITE_TAG), vec![]);
+    pub fn new() -> GenericSearchEngineModule {
+        let extractor: HTMLExtractor = HTMLExtractor::new(BING_CITE_TAG.into(), vec![]);
+        let requester: RequesterDispatcher = HTTPClient::default().into();
+        let url = Url::parse(BING_SEARCH_URL);
 
         GenericSearchEngineModule {
-            name: String::from(BING_MODULE_NAME),
-            url: Url::parse(BING_SEARCH_URL).expect("URL parse error!"),
-            param: SearchQueryParam::from(BING_SEARCH_PARAM),
-            requester: requesters::get_by_type(&RequesterType::HTTPClient),
+            name: BING_MODULE_NAME.into(),
+            param: BING_SEARCH_PARAM.into(),
+            url: url.unwrap(),
+            requester: requester.into(),
             extractor: extractor.into(),
         }
     }

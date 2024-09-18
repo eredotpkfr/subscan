@@ -1,6 +1,6 @@
 use crate::{
-    cache::requesters, enums::RequesterType, extractors::html::HTMLExtractor,
-    modules::generics::searchengine::GenericSearchEngineModule, types::query::SearchQueryParam,
+    enums::RequesterDispatcher, extractors::html::HTMLExtractor,
+    modules::generics::searchengine::GenericSearchEngineModule, requesters::client::HTTPClient,
 };
 use reqwest::Url;
 
@@ -22,7 +22,7 @@ const YAHOO_CITE_TAG: &str = "ol > li > div > div > h3 > a > span";
 /// | Subdomain Selector | `ol > li > div > div > h3 > a > span` |
 pub struct Yahoo {}
 
-impl<'a> Yahoo {
+impl Yahoo {
     /// Create a new [`Yahoo`] module instance
     ///
     /// # Examples
@@ -38,17 +38,17 @@ impl<'a> Yahoo {
     /// }
     /// ```
     #[allow(clippy::new_ret_no_self)]
-    pub fn new() -> GenericSearchEngineModule<'a> {
-        let extractor = HTMLExtractor::new(
-            String::from(YAHOO_CITE_TAG),
-            vec!["<b>".to_string(), "</b>".to_string()],
-        );
+    pub fn new() -> GenericSearchEngineModule {
+        let removes: Vec<String> = vec!["<b>".into(), "</b>".into()];
+        let extractor: HTMLExtractor = HTMLExtractor::new(YAHOO_CITE_TAG.into(), removes);
+        let requester: RequesterDispatcher = HTTPClient::default().into();
+        let url = Url::parse(YAHOO_SEARCH_URL);
 
         GenericSearchEngineModule {
-            name: String::from(YAHOO_MODULE_NAME),
-            url: Url::parse(YAHOO_SEARCH_URL).expect("URL parse error!"),
-            param: SearchQueryParam::from(YAHOO_SEARCH_PARAM),
-            requester: requesters::get_by_type(&RequesterType::HTTPClient),
+            name: YAHOO_MODULE_NAME.into(),
+            param: YAHOO_SEARCH_PARAM.into(),
+            url: url.unwrap(),
+            requester: requester.into(),
             extractor: extractor.into(),
         }
     }

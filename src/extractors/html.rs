@@ -11,6 +11,7 @@ use std::collections::BTreeSet;
 /// This object compatible with [`SubdomainExtractorInterface`]
 /// and it uses `extract` method to extract subdomain addresses
 /// from inner text by given `XPath` or `CSS` selector
+#[derive(Default)]
 pub struct HTMLExtractor {
     selector: String,
     removes: Vec<String>,

@@ -1,6 +1,6 @@
 use crate::{
-    cache::requesters, enums::RequesterType, extractors::html::HTMLExtractor,
-    modules::generics::searchengine::GenericSearchEngineModule, types::query::SearchQueryParam,
+    enums::RequesterDispatcher, extractors::html::HTMLExtractor,
+    modules::generics::searchengine::GenericSearchEngineModule, requesters::client::HTTPClient,
 };
 use reqwest::Url;
 
@@ -22,7 +22,7 @@ const GOOGLE_CITE_TAG: &str = "cite";
 /// | Subdomain Selector | `cite`                          |
 pub struct Google {}
 
-impl<'a> Google {
+impl Google {
     /// Create a new [`Google`] module instance
     ///
     /// # Examples
@@ -38,14 +38,16 @@ impl<'a> Google {
     /// }
     /// ```
     #[allow(clippy::new_ret_no_self)]
-    pub fn new() -> GenericSearchEngineModule<'a> {
-        let extractor = HTMLExtractor::new(String::from(GOOGLE_CITE_TAG), vec![]);
+    pub fn new() -> GenericSearchEngineModule {
+        let extractor: HTMLExtractor = HTMLExtractor::new(GOOGLE_CITE_TAG.into(), vec![]);
+        let requester: RequesterDispatcher = HTTPClient::default().into();
+        let url = Url::parse(GOOGLE_SEARCH_URL);
 
         GenericSearchEngineModule {
-            name: String::from(GOOGLE_MODULE_NAME),
-            url: Url::parse(GOOGLE_SEARCH_URL).expect("URL parse error!"),
-            param: SearchQueryParam::from(GOOGLE_SEARCH_PARAM),
-            requester: requesters::get_by_type(&RequesterType::HTTPClient),
+            name: GOOGLE_MODULE_NAME.into(),
+            param: GOOGLE_SEARCH_PARAM.into(),
+            url: url.unwrap(),
+            requester: requester.into(),
             extractor: extractor.into(),
         }
     }
