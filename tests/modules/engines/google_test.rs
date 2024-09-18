@@ -4,7 +4,7 @@ use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::goog
 
 #[tokio::test]
 #[stubr::mock("module/engines/google.json")]
-async fn foo_test() {
+async fn google_run_test() {
     let mut google = google::Google::new();
 
     google.url = Url::parse(stubr.path("/search").as_str()).unwrap();
