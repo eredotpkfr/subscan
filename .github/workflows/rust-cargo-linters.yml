@@ -2,7 +2,7 @@ name: Linters
 
 on:
   push:
-    branches: ["**"]
+    branches: ["main", "dev"]
 
   pull_request:
     branches: ["main", "dev"]
