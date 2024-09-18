@@ -5,7 +5,6 @@ use reqwest::Url;
 use std::time::Duration;
 use subscan::requesters::client::HTTPClient;
 use subscan::{
-    enums::RequesterType,
     interfaces::requester::RequesterInterface,
     types::config::{RequesterConfig, DEFAULT_HTTP_TIMEOUT},
 };
@@ -19,6 +18,7 @@ async fn client_configure_test() {
         (USER_AGENT, HeaderValue::from_static("foo")),
         (CONTENT_LENGTH, HeaderValue::from_static("20")),
     ]);
+
     let new_config = RequesterConfig {
         headers: new_headers.clone(),
         timeout: Duration::from_secs(120),
@@ -36,8 +36,6 @@ async fn client_configure_test() {
     assert_eq!(config.headers, new_config.headers);
     assert_eq!(config.headers.len(), new_headers.len());
     assert_eq!(config.proxy, new_config.proxy);
-
-    assert_eq!(client.r#type().await, RequesterType::HTTPClient);
 }
 
 #[tokio::test]

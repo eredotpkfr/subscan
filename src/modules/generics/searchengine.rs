@@ -44,7 +44,7 @@ use tokio::sync::Mutex;
 /// | 1      | `site:foo.com`                | `www`, `api` | <https://foo.com?q=site:foo.com>                      |
 /// | 2      | `site:foo.com -www -api`      | `app`        | <https://foo.com?q=site:foo.com%20-www%20-api>        |
 /// | 3      | `site:foo.com -www -api -app` |              | <https://foo.com?q=site:foo.com%20-www%20-api%20-app> |
-pub struct GenericSearchEngineModule<'a> {
+pub struct GenericSearchEngineModule {
     /// Module name
     pub name: String,
     /// Target search URL to be visited while enumerate subdomains
@@ -52,12 +52,12 @@ pub struct GenericSearchEngineModule<'a> {
     /// Search engine search query parameter
     pub param: SearchQueryParam,
     /// Requester object instance for HTTP requests
-    pub requester: &'a Mutex<RequesterDispatcher>,
+    pub requester: Mutex<RequesterDispatcher>,
     /// Any extractor object to extract subdomain from content
     pub extractor: SubdomainExtractorDispatcher,
 }
 
-impl<'a> GenericSearchEngineModule<'a> {
+impl GenericSearchEngineModule {
     /// Converts [`SearchQueryParam`] to [`SearchQuery`]
     ///
     /// # Examples
@@ -65,22 +65,23 @@ impl<'a> GenericSearchEngineModule<'a> {
     /// ```no_run
     /// use subscan::modules::generics::searchengine::GenericSearchEngineModule;
     /// use subscan::types::query::SearchQueryParam;
-    /// use subscan::enums::RequesterType;
     /// use subscan::extractors::regex::RegexExtractor;
+    /// use subscan::requesters::client::HTTPClient;
     /// use subscan::cache;
+    /// use tokio::sync::Mutex;
     /// use reqwest::Url;
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let module = GenericSearchEngineModule {
-    ///         name: String::from("foo-module"),
+    ///         name: "foo-module".into(),
     ///         url: Url::parse("https://foo.com").unwrap(),
-    ///         param: SearchQueryParam::from("q"),
-    ///         requester: cache::requesters::get_by_type(&RequesterType::HTTPClient),
+    ///         param: "q".into(),
+    ///         requester: Mutex::new(HTTPClient::default().into()),
     ///         extractor: RegexExtractor::default().into(),
     ///     };
     ///
-    ///     let mut query = module.get_search_query(String::from("foo.com")).await;
+    ///     let mut query = module.get_search_query("foo.com".into()).await;
     ///
     ///     assert_eq!(query.as_search_str(), "site:foo.com");
     /// }
@@ -91,9 +92,17 @@ impl<'a> GenericSearchEngineModule<'a> {
 }
 
 #[async_trait(?Send)]
-impl<'a> SubscanModuleInterface for GenericSearchEngineModule<'a> {
-    async fn name(&self) -> String {
-        self.name.clone()
+impl SubscanModuleInterface for GenericSearchEngineModule {
+    async fn name(&self) -> &str {
+        &self.name
+    }
+
+    async fn requester(&self) -> Option<&Mutex<RequesterDispatcher>> {
+        Some(&self.requester)
+    }
+
+    async fn extractor(&self) -> Option<&SubdomainExtractorDispatcher> {
+        Some(&self.extractor)
     }
 
     async fn run(&mut self, domain: String) -> BTreeSet<String> {

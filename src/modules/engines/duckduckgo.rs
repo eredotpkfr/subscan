@@ -1,6 +1,6 @@
 use crate::{
-    cache::requesters, enums::RequesterType, extractors::html::HTMLExtractor,
-    modules::generics::searchengine::GenericSearchEngineModule, types::query::SearchQueryParam,
+    enums::RequesterDispatcher, extractors::html::HTMLExtractor,
+    modules::generics::searchengine::GenericSearchEngineModule, requesters::chrome::ChromeBrowser,
 };
 use reqwest::Url;
 
@@ -22,7 +22,7 @@ const DUCKDUCKGO_CITE_TAG: &str = "article > div > div > a > span:first-child";
 /// | Subdomain Selector | `article > div > div > a > span:first-child` |
 pub struct DuckDuckGo {}
 
-impl<'a> DuckDuckGo {
+impl DuckDuckGo {
     /// Create a new [`DuckDuckGo`] module instance
     ///
     /// # Examples
@@ -38,14 +38,16 @@ impl<'a> DuckDuckGo {
     /// }
     /// ```
     #[allow(clippy::new_ret_no_self)]
-    pub fn new() -> GenericSearchEngineModule<'a> {
-        let extractor = HTMLExtractor::new(String::from(DUCKDUCKGO_CITE_TAG), vec![]);
+    pub fn new() -> GenericSearchEngineModule {
+        let extractor: HTMLExtractor = HTMLExtractor::new(DUCKDUCKGO_CITE_TAG.into(), vec![]);
+        let requester: RequesterDispatcher = ChromeBrowser::default().into();
+        let url = Url::parse(DUCKDUCKGO_SEARCH_URL);
 
         GenericSearchEngineModule {
-            name: String::from(DUCKDUCKGO_MODULE_NAME),
-            url: Url::parse(DUCKDUCKGO_SEARCH_URL).expect("URL parse error!"),
-            param: SearchQueryParam::from(DUCKDUCKGO_SEARCH_PARAM),
-            requester: requesters::get_by_type(&RequesterType::ChromeBrowser),
+            name: DUCKDUCKGO_MODULE_NAME.into(),
+            param: DUCKDUCKGO_SEARCH_PARAM.into(),
+            url: url.unwrap(),
+            requester: requester.into(),
             extractor: extractor.into(),
         }
     }
