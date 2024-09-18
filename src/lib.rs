@@ -72,9 +72,11 @@ impl SubscanModule {
     pub fn new<M: 'static + SubscanModuleInterface>(module: M) -> Mutex<Self> {
         Mutex::new(Self(Box::new(module)))
     }
+
     pub async fn run(&mut self, domain: String) -> BTreeSet<String> {
         self.0.run(domain).await
     }
+
     pub async fn name(&self) -> String {
         self.0.name().await
     }
