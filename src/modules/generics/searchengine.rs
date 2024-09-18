@@ -73,7 +73,7 @@ impl<'a> GenericSearchEngineModule<'a> {
     /// #[tokio::main]
     /// async fn main() {
     ///     let module = GenericSearchEngineModule {
-    ///         name: String::from("Foo"),
+    ///         name: String::from("foo-module"),
     ///         url: Url::parse("https://foo.com").unwrap(),
     ///         param: SearchQueryParam::from("q"),
     ///         requester: cache::requesters::get_by_type(&RequesterType::HTTPClient),
