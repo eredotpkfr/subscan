@@ -17,7 +17,7 @@ const DUCKDUCKGO_CITE_TAG: &str = "article > div > div > a > span:first-child";
 /// | Property           | Value                                        |
 /// |:------------------:|:--------------------------------------------:|
 /// | Module Name        | `DuckDuckGo`                                 |
-/// | Search URL         | <https://duckduckgo.com>                    |
+/// | Search URL         | <https://duckduckgo.com>                     |
 /// | Search Param       | `q`                                          |
 /// | Subdomain Selector | `article > div > div > a > span:first-child` |
 pub struct DuckDuckGo {}
