@@ -63,7 +63,7 @@ impl GenericSearchEngineModule {
     /// # Examples
     ///
     /// ```no_run
-    /// use subscan::modules::generics::searchengine::GenericSearchEngineModule;
+    /// use subscan::modules::generics::search_engine::GenericSearchEngineModule;
     /// use subscan::types::query::SearchQueryParam;
     /// use subscan::extractors::regex::RegexExtractor;
     /// use subscan::requesters::client::HTTPClient;

@@ -1,6 +1,6 @@
 use crate::{
     enums::RequesterDispatcher, extractors::html::HTMLExtractor,
-    modules::generics::searchengine::GenericSearchEngineModule, requesters::chrome::ChromeBrowser,
+    modules::generics::search_engine::GenericSearchEngineModule, requesters::chrome::ChromeBrowser,
 };
 use reqwest::Url;
 

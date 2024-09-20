@@ -69,7 +69,7 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     ///
     ///     let result = extractor.extract(html, domain).await;
     ///
-    ///     assert_eq!(result, BTreeSet::from([String::from("bar.foo.com")]));
+    ///     assert_eq!(result, BTreeSet::from(["bar.foo.com".into()]));
     /// }
     /// ```
     async fn extract(&self, content: String, domain: String) -> BTreeSet<Subdomain> {

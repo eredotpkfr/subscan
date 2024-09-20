@@ -1,4 +1,4 @@
-use crate::extractors::{html::HTMLExtractor, regex::RegexExtractor};
+use crate::extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor};
 use crate::requesters::{chrome::ChromeBrowser, client::HTTPClient};
 use enum_dispatch::enum_dispatch;
 
@@ -11,6 +11,7 @@ use enum_dispatch::enum_dispatch;
 pub enum SubdomainExtractorDispatcher {
     HTMLExtractor(HTMLExtractor),
     RegexExtractor(RegexExtractor),
+    JSONExtractor(JSONExtractor),
 }
 
 /// Dispatcher enumeration to decide requester types

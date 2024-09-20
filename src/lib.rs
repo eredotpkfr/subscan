@@ -7,8 +7,6 @@ pub mod enums;
 /// Data extractors like
 /// [`extractors::regex`], [`extractors::html`], etc.
 pub mod extractors;
-/// Thirty party integration modules
-pub mod integrations;
 /// Trait implementations
 pub mod interfaces;
 /// All modules listed under this module, core components for subscan

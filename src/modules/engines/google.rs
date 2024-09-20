@@ -1,6 +1,6 @@
 use crate::{
     enums::RequesterDispatcher, extractors::html::HTMLExtractor,
-    modules::generics::searchengine::GenericSearchEngineModule, requesters::client::HTTPClient,
+    modules::generics::search_engine::GenericSearchEngineModule, requesters::client::HTTPClient,
 };
 use reqwest::Url;
 

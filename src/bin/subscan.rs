@@ -23,7 +23,7 @@ async fn main() {
             requester
         );
 
-        if module.name().await != "DuckDuckGo" {
+        if module.name().await != "Anubis" {
             continue;
         }
 

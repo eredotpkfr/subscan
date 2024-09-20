@@ -10,8 +10,8 @@ pub mod mocks {
     use reqwest::Url;
     use subscan::{
         enums::RequesterDispatcher, extractors::regex::RegexExtractor,
-        modules::generics::searchengine::GenericSearchEngineModule, requesters::client::HTTPClient,
-        types::query::SearchQueryParam,
+        modules::generics::search_engine::GenericSearchEngineModule,
+        requesters::client::HTTPClient, types::query::SearchQueryParam,
     };
 
     pub fn generic_search_engine(url: &str) -> GenericSearchEngineModule {

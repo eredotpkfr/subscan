@@ -1,5 +1,5 @@
 use crate::enums::SubdomainExtractorDispatcher;
-use crate::extractors::{html::HTMLExtractor, regex::RegexExtractor};
+use crate::extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor};
 use crate::types::core::Subdomain;
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
