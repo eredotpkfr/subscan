@@ -69,7 +69,7 @@ impl SubscanModule {
     ///
     ///     async fn run(&mut self, domain: String) -> BTreeSet<String> {
     ///         // do something in `run` method
-    ///         BTreeSet::default()
+    ///         BTreeSet::new()
     ///     }
     /// }
     ///

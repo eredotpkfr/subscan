@@ -78,7 +78,7 @@ impl Anubis {
     /// async fn main() {
     ///     let result = anubis::Anubis::extract(Value::default());
     ///
-    ///     assert_eq!(result, BTreeSet::default());
+    ///     assert_eq!(result, BTreeSet::new());
     /// }
     /// ```
     pub fn extract(content: Value) -> BTreeSet<Subdomain> {
@@ -87,7 +87,7 @@ impl Anubis {
 
             BTreeSet::from_iter(subs.iter().filter_map(filter))
         } else {
-            BTreeSet::default()
+            BTreeSet::new()
         }
     }
 }

@@ -56,7 +56,7 @@ impl JSONExtractor {
     /// use std::collections::BTreeSet;
     /// use serde_json::Value;
     ///
-    /// let extractor = JSONExtractor::new(Box::new(move |_: Value| BTreeSet::default()));
+    /// let extractor = JSONExtractor::new(Box::new(move |_: Value| BTreeSet::new()));
     ///
     /// // do something with extractor instance
     /// ```

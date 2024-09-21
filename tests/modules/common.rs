@@ -42,7 +42,7 @@ pub mod mocks {
 
                 BTreeSet::from_iter(subs.iter().filter_map(filter))
             } else {
-                BTreeSet::default()
+                BTreeSet::new()
             }
         };
 

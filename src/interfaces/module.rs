@@ -46,7 +46,7 @@ use tokio::sync::Mutex;
 ///     }
 ///
 ///     async fn run(&mut self, domain: String) -> BTreeSet<String> {
-///         BTreeSet::default()
+///         BTreeSet::new()
 ///         // do something in `run` method
 ///     }
 /// }

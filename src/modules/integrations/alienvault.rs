@@ -79,7 +79,7 @@ impl AlienVault {
     /// async fn main() {
     ///     let result = alienvault::AlienVault::extract(Value::default());
     ///
-    ///     assert_eq!(result, BTreeSet::default());
+    ///     assert_eq!(result, BTreeSet::new());
     /// }
     /// ```
     pub fn extract(content: Value) -> BTreeSet<Subdomain> {
@@ -88,7 +88,7 @@ impl AlienVault {
 
             BTreeSet::from_iter(passives.iter().filter_map(filter))
         } else {
-            BTreeSet::default()
+            BTreeSet::new()
         }
     }
 }
