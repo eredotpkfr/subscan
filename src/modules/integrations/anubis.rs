@@ -12,8 +12,8 @@ use std::collections::BTreeSet;
 /// here are the configurations
 pub struct Anubis {}
 
-const ANUBIS_MODULE_NAME: &str = "Anubis";
-const ANUBIS_URL: &str = "https://jonlu.ca/anubis/subdomains/";
+pub const ANUBIS_MODULE_NAME: &str = "Anubis";
+pub const ANUBIS_URL: &str = "https://jonlu.ca/anubis/subdomains/";
 
 impl Anubis {
     /// Create a new [`Anubis`] module instance
@@ -47,15 +47,15 @@ impl Anubis {
     ///
     /// # Examples
     ///
-    /// ```no_run
-    /// use subscan::modules::integrations::anubis;
+    /// ```
+    /// use subscan::modules::integrations::anubis::{self, ANUBIS_URL};
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let url = anubis::Anubis::get_query_url("foo.com".to_string());
-    ///     let expected = "https://jonlu.ca/anubis/subdomains/foo.com";
+    ///     let domain = "foo.com".to_string();
+    ///     let url = anubis::Anubis::get_query_url(domain.clone());
     ///
-    ///     assert_eq!(url, expected);
+    ///     assert_eq!(url, format!("{ANUBIS_URL}{domain}"));
     /// }
     /// ```
     pub fn get_query_url(domain: String) -> String {
@@ -66,7 +66,7 @@ impl Anubis {
     ///
     /// # Examples
     ///
-    /// ```no_run
+    /// ```
     /// use subscan::modules::integrations::anubis;
     /// use std::collections::BTreeSet;
     /// use serde_json::Value;

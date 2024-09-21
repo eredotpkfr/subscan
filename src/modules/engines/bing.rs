@@ -4,10 +4,10 @@ use crate::{
 };
 use reqwest::Url;
 
-const BING_MODULE_NAME: &str = "Bing";
-const BING_SEARCH_URL: &str = "https://www.bing.com/search";
-const BING_SEARCH_PARAM: &str = "q";
-const BING_CITE_TAG: &str = "cite";
+pub const BING_MODULE_NAME: &str = "Bing";
+pub const BING_SEARCH_URL: &str = "https://www.bing.com/search";
+pub const BING_SEARCH_PARAM: &str = "q";
+pub const BING_CITE_TAG: &str = "cite";
 
 /// Bing search engine enumerator
 ///

@@ -4,10 +4,10 @@ use crate::{
 };
 use reqwest::Url;
 
-const DUCKDUCKGO_MODULE_NAME: &str = "DuckDuckGo";
-const DUCKDUCKGO_SEARCH_URL: &str = "https://duckduckgo.com";
-const DUCKDUCKGO_SEARCH_PARAM: &str = "q";
-const DUCKDUCKGO_CITE_TAG: &str = "article > div > div > a > span:first-child";
+pub const DUCKDUCKGO_MODULE_NAME: &str = "DuckDuckGo";
+pub const DUCKDUCKGO_SEARCH_URL: &str = "https://duckduckgo.com";
+pub const DUCKDUCKGO_SEARCH_PARAM: &str = "q";
+pub const DUCKDUCKGO_CITE_TAG: &str = "article > div > div > a > span:first-child";
 
 /// DuckDuckGo search engine enumerator
 ///

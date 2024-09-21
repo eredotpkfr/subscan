@@ -4,10 +4,10 @@ use crate::{
 };
 use reqwest::Url;
 
-const GOOGLE_MODULE_NAME: &str = "Google";
-const GOOGLE_SEARCH_URL: &str = "https://www.google.com/search";
-const GOOGLE_SEARCH_PARAM: &str = "q";
-const GOOGLE_CITE_TAG: &str = "cite";
+pub const GOOGLE_MODULE_NAME: &str = "Google";
+pub const GOOGLE_SEARCH_URL: &str = "https://www.google.com/search";
+pub const GOOGLE_SEARCH_PARAM: &str = "q";
+pub const GOOGLE_CITE_TAG: &str = "cite";
 
 /// Google search engine enumerator
 ///

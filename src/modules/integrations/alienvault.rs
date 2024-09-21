@@ -13,8 +13,8 @@ use serde_json::Value;
 /// here are the configurations
 pub struct AlienVault {}
 
-const ALIENVAULT_MODULE_NAME: &str = "AlienVault";
-const ALIENVAULT_URL: &str = "https://otx.alienvault.com/api/v1/indicators/domain/";
+pub const ALIENVAULT_MODULE_NAME: &str = "AlienVault";
+pub const ALIENVAULT_URL: &str = "https://otx.alienvault.com/api/v1/indicators/domain/";
 
 impl AlienVault {
     /// Create a new [`AlienVault`] module instance
@@ -49,14 +49,14 @@ impl AlienVault {
     /// # Examples
     ///
     /// ```
-    /// use subscan::modules::integrations::alienvault;
+    /// use subscan::modules::integrations::alienvault::{self, ALIENVAULT_URL};
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let url = alienvault::AlienVault::get_query_url("foo.com".to_string());
-    ///     let expected = "https://otx.alienvault.com/api/v1/indicators/domain/foo.com/passive_dns";
+    ///     let domain = "foo.com".to_string();
+    ///     let url = alienvault::AlienVault::get_query_url(domain.clone());
     ///
-    ///     assert_eq!(url, expected);
+    ///     assert_eq!(url, format!("{ALIENVAULT_URL}{domain}/passive_dns"));
     /// }
     /// ```
     pub fn get_query_url(domain: String) -> String {
