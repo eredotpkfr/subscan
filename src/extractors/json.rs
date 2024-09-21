@@ -4,12 +4,11 @@ use async_trait::async_trait;
 use serde_json;
 use std::collections::BTreeSet;
 
-/// JSON content parser wrapper struct
-///
-/// This object compatible with [`SubdomainExtractorInterface`]
-/// and it uses `extract` method to extract subdomain addresses
-/// from JSON content. JSON parsing function must be given
-/// for this extractor
+/// JSON content parser wrapper struct. This object compatible
+/// with [`SubdomainExtractorInterface`] and it uses `extract`
+/// method to extract subdomain addresses from JSON content.
+/// JSON parsing function must be given for this extractor. Please
+/// follow up examples to learn usage techniques
 pub struct JSONExtractor {
     inner: InnerExtractMethod,
 }

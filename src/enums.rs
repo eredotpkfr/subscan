@@ -9,8 +9,23 @@ use enum_dispatch::enum_dispatch;
 /// technical details please follow up `enum_dispatch` package
 #[enum_dispatch(SubdomainExtractorInterface)]
 pub enum SubdomainExtractorDispatcher {
+    /// HTML extractor type to extract subdomain addresses
+    /// from any HTML content. See the [`HTMLExtractor`]
+    /// struct definition for examples and technical details
     HTMLExtractor(HTMLExtractor),
+    /// Regex extractor type allows to extract subdomain
+    /// addresses from string content with a regex pattern
+    /// by given domain address. See the [`RegexExtractor`]
+    /// for technical details and examples usages
     RegexExtractor(RegexExtractor),
+    /// JSON extractor type can extract subdomains from
+    /// JSON content. In this type head up point
+    /// is to know that created as a wrapper
+    /// struct to be compatible with
+    /// [`SubdomainExtractorInterface`](crate::interfaces::extractor::SubdomainExtractorInterface)
+    /// so parser method must be implemented and gave
+    /// this wrapper struct. See the [`JSONExtractor`]
+    /// examples and technical details
     JSONExtractor(JSONExtractor),
 }
 
@@ -25,17 +40,28 @@ pub enum RequesterDispatcher {
     /// On this requester type, Chrome browser will run and
     /// all HTTP requests made with browser. Has pros according
     /// to [`HTTPClient`] requester like running Js, rendering
-    /// pages, etc.
+    /// pages, etc. See the [`ChromeBrowser`] definition to learn
+    /// usage
     ChromeBrowser(ChromeBrowser),
     /// Simple HTTP client interface to make requesters, it does
     /// not allows to run Js, rendering pages or user interface.
-    /// Just send HTTP requests via [`reqwest`]
+    /// Just send HTTP requests via [`reqwest`]. See the [`HTTPClient`]
+    /// struct definition for examples and technical details
     HTTPClient(HTTPClient),
 }
 
-/// Authentication methods for API calls
+/// Authentication methods for API calls.
+/// [`GenericAPIIntegrationModule`](crate::modules::generics::api_integration::GenericAPIIntegrationModule)
+/// uses them to apply correct auth method. See the
+/// method descriptions to learn how it works
 pub enum AuthMethod {
+    /// Some APIs uses request headers to get
+    /// API key. If this auth type selected API key
+    /// will add in request headers with a given header key
     APIKeyInHeader(String),
+    /// This auth type uses when API require API
+    /// key in URL
     APIKeyInURL,
+    /// This auth type does nothing for auth
     NoAuth,
 }

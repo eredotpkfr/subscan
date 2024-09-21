@@ -3,9 +3,8 @@ use async_trait::async_trait;
 use headless_chrome::{browser::LaunchOptions, Browser};
 use reqwest::Url;
 
-/// Chrome requester struct, send HTTP requests
-/// via Chrome browser. Also its compatible
-/// with [`RequesterInterface`]
+/// Chrome requester struct, send HTTP requests via Chrome browser.
+/// Also its compatible with [`RequesterInterface`]
 pub struct ChromeBrowser {
     config: RequesterConfig,
     browser: Browser,

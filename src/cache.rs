@@ -11,10 +11,12 @@ lazy_static! {
     /// as a [`SubscanModule`], all modules must be compatible
     /// with [`SubscanModuleInterface`](crate::interfaces::module::SubscanModuleInterface) trait
     pub static ref ALL_MODULES: Vec<Mutex<SubscanModule>> = vec![
+        // Search engines
         SubscanModule::new(google::Google::new()),
         SubscanModule::new(yahoo::Yahoo::new()),
         SubscanModule::new(bing::Bing::new()),
         SubscanModule::new(duckduckgo::DuckDuckGo::new()),
+        // API integrations
         SubscanModule::new(alienvault::AlienVault::new()),
         SubscanModule::new(anubis::Anubis::new()),
         SubscanModule::new(bevigil::Bevigil::new()),
