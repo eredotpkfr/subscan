@@ -72,13 +72,13 @@ impl RequesterInterface for HTTPClient {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let client = HTTPClient::default();
+    ///     let mut client = HTTPClient::default();
     ///
     ///     assert_eq!(client.config().await.timeout, Duration::from_secs(10));
     /// }
     /// ```
-    async fn config(&self) -> RequesterConfig {
-        self.config.clone()
+    async fn config(&mut self) -> &mut RequesterConfig {
+        &mut self.config
     }
 
     /// Configure requester with a new config object
@@ -129,7 +129,7 @@ impl RequesterInterface for HTTPClient {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let client = HTTPClient::default();
+    ///     let mut client = HTTPClient::default();
     ///     let url = Url::parse("https://foo.com").unwrap();
     ///
     ///     let content = client.get_content(url).await.unwrap();

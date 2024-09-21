@@ -1,4 +1,7 @@
-use crate::enums::{RequesterDispatcher, SubdomainExtractorDispatcher};
+use crate::{
+    config::SUBSCAN_ENV_NAMESPACE,
+    enums::{RequesterDispatcher, SubdomainExtractorDispatcher},
+};
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use std::collections::BTreeSet;
@@ -78,4 +81,16 @@ pub trait SubscanModuleInterface: Sync + Send {
     /// run this `run` method will be called, so this method
     /// should do everything
     async fn run(&mut self, domain: String) -> BTreeSet<String>;
+    /// Fetches API key from system environment variables
+    /// if available. Module environment variables uses [`SUBSCAN_ENV_NAMESPACE`]
+    /// namespace with `SUBSCAN_<module_name>_APIKEY` format
+    async fn fetch_apikey(&self) -> String {
+        let key = format!(
+            "{}_{}_APIKEY",
+            SUBSCAN_ENV_NAMESPACE,
+            self.name().await.to_uppercase()
+        );
+
+        std::env::var(key).unwrap_or_default()
+    }
 }

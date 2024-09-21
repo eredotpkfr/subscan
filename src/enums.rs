@@ -32,3 +32,10 @@ pub enum RequesterDispatcher {
     /// Just send HTTP requests via [`reqwest`]
     HTTPClient(HTTPClient),
 }
+
+/// Authentication methods for API calls
+pub enum AuthMethod {
+    APIKeyInHeader(String),
+    APIKeyInURL,
+    NoAuth,
+}

@@ -12,7 +12,7 @@ pub mod mocks {
     use serde_json::Value;
     use std::collections::BTreeSet;
     use subscan::{
-        enums::RequesterDispatcher,
+        enums::{AuthMethod, RequesterDispatcher},
         extractors::{json::JSONExtractor, regex::RegexExtractor},
         modules::generics::{
             api_integration::GenericAPIIntegrationModule, search_engine::GenericSearchEngineModule,
@@ -53,6 +53,7 @@ pub mod mocks {
         GenericAPIIntegrationModule {
             name: TEST_MODULE_NAME.to_string(),
             url: Box::new(move |_| url.clone()),
+            auth: AuthMethod::NoAuth,
             requester: requester.into(),
             extractor: extractor.into(),
         }

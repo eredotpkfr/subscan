@@ -8,6 +8,8 @@ use subscan::{
 
 #[tokio::main]
 async fn main() {
+    dotenvy::dotenv().ok();
+
     let cli = Cli::parse();
     let config = RequesterConfig::from(&cli);
 
@@ -23,7 +25,7 @@ async fn main() {
             requester
         );
 
-        if module.name().await != "Anubis" {
+        if module.name().await != "Bevigil" {
             continue;
         }
 

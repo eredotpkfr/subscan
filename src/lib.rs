@@ -2,6 +2,8 @@
 pub mod cache;
 /// Includes CLI components
 pub mod cli;
+/// Project configuration utils
+pub mod config;
 /// Enumerations and project type definitions
 pub mod enums;
 /// Data extractors like

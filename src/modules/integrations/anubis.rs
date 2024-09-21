@@ -1,7 +1,9 @@
 use crate::{
-    enums::RequesterDispatcher, extractors::json::JSONExtractor,
+    enums::{AuthMethod, RequesterDispatcher},
+    extractors::json::JSONExtractor,
     modules::generics::api_integration::GenericAPIIntegrationModule,
-    requesters::client::HTTPClient, types::core::Subdomain,
+    requesters::client::HTTPClient,
+    types::core::Subdomain,
 };
 use serde_json::Value;
 use std::collections::BTreeSet;
@@ -13,7 +15,7 @@ use std::collections::BTreeSet;
 pub struct Anubis {}
 
 pub const ANUBIS_MODULE_NAME: &str = "Anubis";
-pub const ANUBIS_URL: &str = "https://jonlu.ca/anubis/subdomains/";
+pub const ANUBIS_URL: &str = "https://jonlu.ca/anubis/subdomains";
 
 impl Anubis {
     /// Create a new [`Anubis`] module instance
@@ -38,6 +40,7 @@ impl Anubis {
         GenericAPIIntegrationModule {
             name: ANUBIS_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
+            auth: AuthMethod::NoAuth,
             requester: requester.into(),
             extractor: extractor.into(),
         }
@@ -55,11 +58,11 @@ impl Anubis {
     ///     let domain = "foo.com".to_string();
     ///     let url = anubis::Anubis::get_query_url(domain.clone());
     ///
-    ///     assert_eq!(url, format!("{ANUBIS_URL}{domain}"));
+    ///     assert_eq!(url, format!("{ANUBIS_URL}/{domain}"));
     /// }
     /// ```
     pub fn get_query_url(domain: String) -> String {
-        format!("{ANUBIS_URL}{domain}")
+        format!("{ANUBIS_URL}/{domain}")
     }
 
     /// JSON parse method to extract subdomains

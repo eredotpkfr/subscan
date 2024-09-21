@@ -1,5 +1,3 @@
-use std::collections::BTreeSet;
-
 use crate::{
     enums::{AuthMethod, RequesterDispatcher},
     extractors::json::JSONExtractor,
@@ -8,29 +6,30 @@ use crate::{
     types::core::Subdomain,
 };
 use serde_json::Value;
+use std::collections::BTreeSet;
 
-/// Alienvault API integration module
+/// Bevigil API integration module
 ///
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
-pub struct AlienVault {}
+pub struct Bevigil {}
 
-pub const ALIENVAULT_MODULE_NAME: &str = "AlienVault";
-pub const ALIENVAULT_URL: &str = "https://otx.alienvault.com/api/v1/indicators/domain";
+pub const BEVIGIL_MODULE_NAME: &str = "Bevigil";
+pub const BEVIGIL_URL: &str = "https://osint.bevigil.com/api";
 
-impl AlienVault {
-    /// Create a new [`AlienVault`] module instance
+impl Bevigil {
+    /// Create a new [`Bevigil`] module instance
     ///
     /// # Examples
     ///
     /// ```no_run
-    /// use subscan::modules::integrations::alienvault;
+    /// use subscan::modules::integrations::bevigil;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let alienvault = alienvault::AlienVault::new();
+    ///     let bevigil = bevigil::Bevigil::new();
     ///
-    ///     // do something with alienvault instance
+    ///     // do something with bevigil instance
     /// }
     /// ```
     #[allow(clippy::new_ret_no_self)]
@@ -39,31 +38,31 @@ impl AlienVault {
         let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));
 
         GenericAPIIntegrationModule {
-            name: ALIENVAULT_MODULE_NAME.into(),
+            name: BEVIGIL_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
-            auth: AuthMethod::NoAuth,
+            auth: AuthMethod::APIKeyInHeader("X-Access-Token".into()),
             requester: requester.into(),
             extractor: extractor.into(),
         }
     }
 
-    /// Get Alienvault query URL from given domain address
+    /// Get Bevigil query URL from given domain address
     ///
     /// # Examples
     ///
     /// ```
-    /// use subscan::modules::integrations::alienvault::{self, ALIENVAULT_URL};
+    /// use subscan::modules::integrations::bevigil::{self, BEVIGIL_URL};
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let domain = "foo.com".to_string();
-    ///     let url = alienvault::AlienVault::get_query_url(domain.clone());
+    ///     let url = bevigil::Bevigil::get_query_url(domain.clone());
     ///
-    ///     assert_eq!(url, format!("{ALIENVAULT_URL}/{domain}/passive_dns"));
+    ///     assert_eq!(url, format!("{BEVIGIL_URL}/{domain}/subdomains"));
     /// }
     /// ```
     pub fn get_query_url(domain: String) -> String {
-        format!("{ALIENVAULT_URL}/{domain}/passive_dns")
+        format!("{BEVIGIL_URL}/{domain}/subdomains")
     }
 
     /// JSON parse method to extract subdomains
@@ -71,22 +70,22 @@ impl AlienVault {
     /// # Examples
     ///
     /// ```
-    /// use subscan::modules::integrations::alienvault;
+    /// use subscan::modules::integrations::bevigil;
     /// use std::collections::BTreeSet;
     /// use serde_json::Value;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let result = alienvault::AlienVault::extract(Value::default());
+    ///     let result = bevigil::Bevigil::extract(Value::default());
     ///
     ///     assert_eq!(result, BTreeSet::default());
     /// }
     /// ```
     pub fn extract(content: Value) -> BTreeSet<Subdomain> {
-        if let Some(passives) = content["passive_dns"].as_array() {
-            let filter = |item: &Value| Some(item["hostname"].as_str()?.to_string());
+        if let Some(subs) = content["subdomains"].as_array() {
+            let filter = |item: &Value| Some(item.as_str()?.to_string());
 
-            BTreeSet::from_iter(passives.iter().filter_map(filter))
+            BTreeSet::from_iter(subs.iter().filter_map(filter))
         } else {
             BTreeSet::default()
         }

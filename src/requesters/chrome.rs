@@ -107,13 +107,13 @@ impl RequesterInterface for ChromeBrowser {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let browser = ChromeBrowser::default();
+    ///     let mut browser = ChromeBrowser::default();
     ///
     ///     assert_eq!(browser.config().await.timeout, Duration::from_secs(10));
     /// }
     /// ```
-    async fn config(&self) -> RequesterConfig {
-        self.config.clone()
+    async fn config(&mut self) -> &mut RequesterConfig {
+        &mut self.config
     }
 
     /// Configure requester with a new config object
@@ -150,7 +150,7 @@ impl RequesterInterface for ChromeBrowser {
         }
 
         self.browser = Browser::new(options).unwrap();
-        self.config = config
+        self.config = config;
     }
 
     /// Get page source HTML from given [`reqwest::Url`]
@@ -164,7 +164,7 @@ impl RequesterInterface for ChromeBrowser {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let browser = ChromeBrowser::default();
+    ///     let mut browser = ChromeBrowser::default();
     ///     let url = Url::parse("https://foo.com").unwrap();
     ///
     ///     let content = browser.get_content(url).await.unwrap();

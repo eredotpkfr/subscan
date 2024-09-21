@@ -1,6 +1,6 @@
 use crate::{
     modules::engines::{bing, duckduckgo, google, yahoo},
-    modules::integrations::{alienvault, anubis},
+    modules::integrations::{alienvault, anubis, bevigil},
     SubscanModule,
 };
 use lazy_static::lazy_static;
@@ -17,6 +17,7 @@ lazy_static! {
         SubscanModule::new(duckduckgo::DuckDuckGo::new()),
         SubscanModule::new(alienvault::AlienVault::new()),
         SubscanModule::new(anubis::Anubis::new()),
+        SubscanModule::new(bevigil::Bevigil::new()),
     ];
 }
 

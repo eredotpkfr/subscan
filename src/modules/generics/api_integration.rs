@@ -1,10 +1,16 @@
-use crate::enums::{RequesterDispatcher, SubdomainExtractorDispatcher};
-use crate::interfaces::extractor::SubdomainExtractorInterface;
-use crate::interfaces::module::SubscanModuleInterface;
-use crate::interfaces::requester::RequesterInterface;
+use crate::{
+    enums::{AuthMethod, RequesterDispatcher, SubdomainExtractorDispatcher},
+    interfaces::{
+        extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
+        requester::RequesterInterface,
+    },
+};
 use async_trait::async_trait;
-use reqwest::Url;
-use std::collections::BTreeSet;
+use reqwest::{
+    header::{HeaderName, HeaderValue},
+    Url,
+};
+use std::{collections::BTreeSet, str::FromStr};
 use tokio::sync::Mutex;
 
 /// Generic API integration module
@@ -22,6 +28,9 @@ pub struct GenericAPIIntegrationModule {
     /// Simple function field that gets query URL
     /// by given domain address
     pub url: Box<dyn Fn(String) -> String + Sync + Send>,
+    /// Set authentication method, see [`AuthMethod`] enum
+    /// for details
+    pub auth: AuthMethod,
     /// Requester object instance for HTTP requests
     pub requester: Mutex<RequesterDispatcher>,
     /// Any extractor object to extract subdomain from content
@@ -43,8 +52,21 @@ impl SubscanModuleInterface for GenericAPIIntegrationModule {
     }
 
     async fn run(&mut self, domain: String) -> BTreeSet<String> {
-        let requester = self.requester.lock().await;
+        let mut requester = self.requester.lock().await;
         let url = Url::parse(&(self.url)(domain.clone())).unwrap();
+
+        match &self.auth {
+            AuthMethod::APIKeyInHeader(key) => {
+                let apikey = self.fetch_apikey().await;
+
+                let name = HeaderName::from_str(key.as_str()).unwrap();
+                let value = HeaderValue::from_str(apikey.as_str()).unwrap();
+
+                requester.config().await.add_header(name, value);
+            }
+            AuthMethod::APIKeyInURL => {}
+            AuthMethod::NoAuth => {}
+        }
 
         let content = requester.get_content(url).await.unwrap_or_default();
 

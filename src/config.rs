@@ -1,0 +1,1 @@
+pub const SUBSCAN_ENV_NAMESPACE: &str = "SUBSCAN";
