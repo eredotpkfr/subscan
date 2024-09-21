@@ -1,0 +1,22 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/alienvault"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "passive_dns": [
+                {
+                    "hostname": "bar.foo.com"
+                },
+                {
+                    "hostname": "baz.foo.com"
+                }
+            ]
+        },
+        "status": 200
+    }
+}
