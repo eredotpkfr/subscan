@@ -32,7 +32,7 @@ async fn alienvault_run_test() {
 
 #[tokio::test]
 async fn get_query_url_test() {
-    let url = alienvault::AlienVault::get_query_url(TEST_DOMAIN.to_string());
+    let url = alienvault::AlienVault::get_query_url(TEST_DOMAIN);
     let expected = format!("{ALIENVAULT_URL}/{TEST_DOMAIN}/passive_dns");
 
     assert_eq!(url, expected);

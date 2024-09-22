@@ -56,13 +56,13 @@ impl AlienVault {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = "foo.com".to_string();
-    ///     let url = alienvault::AlienVault::get_query_url(domain.clone());
+    ///     let domain = "foo.com";
+    ///     let url = alienvault::AlienVault::get_query_url(&domain);
     ///
     ///     assert_eq!(url, format!("{ALIENVAULT_URL}/{domain}/passive_dns"));
     /// }
     /// ```
-    pub fn get_query_url(domain: String) -> String {
+    pub fn get_query_url(domain: &str) -> String {
         format!("{ALIENVAULT_URL}/{domain}/passive_dns")
     }
 

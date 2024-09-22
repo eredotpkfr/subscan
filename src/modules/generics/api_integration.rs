@@ -6,10 +6,8 @@ use crate::{
     },
 };
 use async_trait::async_trait;
-use reqwest::{
-    header::{HeaderName, HeaderValue},
-    Url,
-};
+use reqwest::header::{HeaderName, HeaderValue};
+use reqwest::Url;
 use std::{collections::BTreeSet, str::FromStr};
 use tokio::sync::Mutex;
 
@@ -27,7 +25,7 @@ pub struct GenericAPIIntegrationModule {
     pub name: String,
     /// Simple function field that gets query URL
     /// by given domain address
-    pub url: Box<dyn Fn(String) -> String + Sync + Send>,
+    pub url: Box<dyn Fn(&str) -> String + Sync + Send>,
     /// Set authentication method, see [`AuthMethod`] enum
     /// for details
     pub auth: AuthMethod,
@@ -35,6 +33,30 @@ pub struct GenericAPIIntegrationModule {
     pub requester: Mutex<RequesterDispatcher>,
     /// Any extractor object to extract subdomain from content
     pub extractor: SubdomainExtractorDispatcher,
+}
+
+impl GenericAPIIntegrationModule {
+    async fn authenticate(&self, domain: &str) -> Url {
+        let url: Url = (self.url)(domain).parse().unwrap();
+        let apikey = self.fetch_apikey().await;
+
+        match &self.auth {
+            AuthMethod::APIKeyInHeader(key) => {
+                if let Ok(apikey) = apikey {
+                    let mut requester = self.requester.lock().await;
+
+                    let (name, value) = (HeaderName::from_str(key), HeaderValue::from_str(&apikey));
+
+                    if let (Ok(name), Ok(value)) = (name, value) {
+                        requester.config().await.add_header(name, value);
+                    }
+                }
+            }
+            AuthMethod::APIKeyInURL | AuthMethod::NoAuth => {}
+        }
+
+        url
+    }
 }
 
 #[async_trait(?Send)]
@@ -52,22 +74,9 @@ impl SubscanModuleInterface for GenericAPIIntegrationModule {
     }
 
     async fn run(&mut self, domain: String) -> BTreeSet<String> {
-        let mut requester = self.requester.lock().await;
-        let url = Url::parse(&(self.url)(domain.clone())).unwrap();
+        let url = self.authenticate(&domain).await;
 
-        match &self.auth {
-            AuthMethod::APIKeyInHeader(key) => {
-                if let Ok(apikey) = self.fetch_apikey().await {
-                    let name = HeaderName::from_str(key.as_str()).unwrap();
-                    let value = HeaderValue::from_str(apikey.as_str()).unwrap();
-
-                    requester.config().await.add_header(name, value);
-                }
-            }
-            AuthMethod::APIKeyInURL => {}
-            AuthMethod::NoAuth => {}
-        }
-
+        let requester = self.requester.lock().await;
         let content = requester.get_content(url).await.unwrap_or_default();
 
         self.extractor.extract(content, domain).await

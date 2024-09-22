@@ -33,7 +33,7 @@ async fn bevigil_run_test() {
 
 #[tokio::test]
 async fn get_query_url_test() {
-    let url = bevigil::Bevigil::get_query_url(TEST_DOMAIN.to_string());
+    let url = bevigil::Bevigil::get_query_url(TEST_DOMAIN);
     let expected = format!("{BEVIGIL_URL}/{TEST_DOMAIN}/subdomains");
 
     assert_eq!(url, expected);

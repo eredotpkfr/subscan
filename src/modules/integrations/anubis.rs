@@ -55,13 +55,13 @@ impl Anubis {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = "foo.com".to_string();
-    ///     let url = anubis::Anubis::get_query_url(domain.clone());
+    ///     let domain = "foo.com";
+    ///     let url = anubis::Anubis::get_query_url(&domain);
     ///
     ///     assert_eq!(url, format!("{ANUBIS_URL}/{domain}"));
     /// }
     /// ```
-    pub fn get_query_url(domain: String) -> String {
+    pub fn get_query_url(domain: &str) -> String {
         format!("{ANUBIS_URL}/{domain}")
     }
 

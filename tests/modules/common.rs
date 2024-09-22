@@ -59,9 +59,9 @@ pub mod mocks {
         }
     }
 
-    pub fn wrap_url_with_mock_func(url: &str) -> Box<dyn Fn(String) -> String + Sync + Send> {
-        let url = Url::parse(url).unwrap().to_string();
+    pub fn wrap_url_with_mock_func(url: &str) -> Box<dyn Fn(&str) -> String + Sync + Send> {
+        let url: Url = url.parse().unwrap();
 
-        Box::new(move |_| url.clone())
+        Box::new(move |_| url.to_string().clone())
     }
 }

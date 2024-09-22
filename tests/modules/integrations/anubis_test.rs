@@ -25,7 +25,7 @@ async fn anubis_run_test() {
 
 #[tokio::test]
 async fn get_query_url_test() {
-    let url = anubis::Anubis::get_query_url(TEST_DOMAIN.to_string());
+    let url = anubis::Anubis::get_query_url(TEST_DOMAIN);
     let expected = format!("{ANUBIS_URL}/{TEST_DOMAIN}");
 
     assert_eq!(url, expected);

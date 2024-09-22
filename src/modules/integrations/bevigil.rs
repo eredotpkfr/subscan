@@ -55,13 +55,13 @@ impl Bevigil {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = "foo.com".to_string();
-    ///     let url = bevigil::Bevigil::get_query_url(domain.clone());
+    ///     let domain = "foo.com";
+    ///     let url = bevigil::Bevigil::get_query_url(&domain);
     ///
     ///     assert_eq!(url, format!("{BEVIGIL_URL}/{domain}/subdomains"));
     /// }
     /// ```
-    pub fn get_query_url(domain: String) -> String {
+    pub fn get_query_url(domain: &str) -> String {
         format!("{BEVIGIL_URL}/{domain}/subdomains")
     }
 
