@@ -1,9 +1,10 @@
 pub mod constants {
-    pub const TEST_MODULE_NAME: &str = "foo-module";
+    pub const TEST_MODULE_NAME: &str = "foo";
     pub const TEST_URL: &str = "http://foo.com";
     pub const TEST_DOMAIN: &str = "foo.com";
     pub const TEST_BAR_SUBDOMAIN: &str = "bar.foo.com";
     pub const TEST_BAZ_SUBDOMAIN: &str = "baz.foo.com";
+    pub const TEST_API_KEY: &str = "test-api-key";
 }
 
 pub mod mocks {
@@ -35,7 +36,7 @@ pub mod mocks {
         }
     }
 
-    pub fn generic_api_integration(url: &str) -> GenericAPIIntegrationModule {
+    pub fn generic_api_integration(url: &str, auth: AuthMethod) -> GenericAPIIntegrationModule {
         let parse = |json: Value| {
             if let Some(subs) = json["subdomains"].as_array() {
                 let filter = |item: &Value| Some(item.as_str()?.to_string());
@@ -48,12 +49,11 @@ pub mod mocks {
 
         let requester = RequesterDispatcher::HTTPClient(HTTPClient::default());
         let extractor = JSONExtractor::new(Box::new(parse));
-        let url = url.to_string();
 
         GenericAPIIntegrationModule {
             name: TEST_MODULE_NAME.to_string(),
-            url: Box::new(move |_| url.clone()),
-            auth: AuthMethod::NoAuth,
+            url: wrap_url_with_mock_func(url),
+            auth,
             requester: requester.into(),
             extractor: extractor.into(),
         }
