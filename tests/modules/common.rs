@@ -58,4 +58,10 @@ pub mod mocks {
             extractor: extractor.into(),
         }
     }
+
+    pub fn wrap_url_with_mock_func(url: &str) -> Box<dyn Fn(String) -> String + Sync + Send> {
+        let url = Url::parse(url).unwrap().to_string();
+
+        Box::new(move |_| url.clone())
+    }
 }

@@ -74,14 +74,14 @@ impl GenericSearchEngineModule {
     /// #[tokio::main]
     /// async fn main() {
     ///     let module = GenericSearchEngineModule {
-    ///         name: "foo-module".into(),
+    ///         name: "foo-module".to_string(),
     ///         url: Url::parse("https://foo.com").unwrap(),
-    ///         param: "q".into(),
+    ///         param: SearchQueryParam::from("q"),
     ///         requester: Mutex::new(HTTPClient::default().into()),
     ///         extractor: RegexExtractor::default().into(),
     ///     };
     ///
-    ///     let mut query = module.get_search_query("foo.com".into()).await;
+    ///     let mut query = module.get_search_query("foo.com".to_string()).await;
     ///
     ///     assert_eq!(query.as_search_str(), "site:foo.com");
     /// }

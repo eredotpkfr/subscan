@@ -8,8 +8,6 @@ use subscan::{
 
 #[tokio::main]
 async fn main() {
-    dotenvy::dotenv().ok();
-
     let cli = Cli::parse();
     let config = RequesterConfig::from(&cli);
 

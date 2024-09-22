@@ -6,6 +6,7 @@ use subscan::{
     modules::engines::duckduckgo::{self, DUCKDUCKGO_MODULE_NAME},
     requesters::client::HTTPClient,
 };
+use tokio::sync::Mutex;
 
 #[tokio::test]
 #[stubr::mock("module/engines/duckduckgo.json")]
@@ -13,7 +14,7 @@ async fn duckduckgo_run_test() {
     let mut duckduckgo = duckduckgo::DuckDuckGo::new();
     let new_requester = HTTPClient::default();
 
-    duckduckgo.requester = RequesterDispatcher::HTTPClient(new_requester).into();
+    duckduckgo.requester = Mutex::new(RequesterDispatcher::HTTPClient(new_requester));
     duckduckgo.url = Url::parse(stubr.uri().as_str()).unwrap();
 
     let result = duckduckgo.run(TEST_DOMAIN.to_string()).await;

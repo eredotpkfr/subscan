@@ -57,12 +57,12 @@ impl SubscanModuleInterface for GenericAPIIntegrationModule {
 
         match &self.auth {
             AuthMethod::APIKeyInHeader(key) => {
-                let apikey = self.fetch_apikey().await;
+                if let Ok(apikey) = self.fetch_apikey().await {
+                    let name = HeaderName::from_str(key.as_str()).unwrap();
+                    let value = HeaderValue::from_str(apikey.as_str()).unwrap();
 
-                let name = HeaderName::from_str(key.as_str()).unwrap();
-                let value = HeaderValue::from_str(apikey.as_str()).unwrap();
-
-                requester.config().await.add_header(name, value);
+                    requester.config().await.add_header(name, value);
+                }
             }
             AuthMethod::APIKeyInURL => {}
             AuthMethod::NoAuth => {}

@@ -1,5 +1,10 @@
 {
     "request": {
+        "headers": {
+            "X-Access-Token": {
+                "equalTo": "bevigil-api-key"
+            }
+        },
         "method": "GET",
         "urlPath": "/bevigil"
     },

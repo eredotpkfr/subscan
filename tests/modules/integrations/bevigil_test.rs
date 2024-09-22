@@ -1,6 +1,9 @@
-use crate::common::constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN};
-use reqwest::Url;
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
+    mocks::wrap_url_with_mock_func,
+};
 use serde_json::{self, Value};
+use std::{collections::BTreeSet, env};
 use subscan::{
     interfaces::module::SubscanModuleInterface,
     modules::integrations::bevigil::{self, BEVIGIL_MODULE_NAME, BEVIGIL_URL},
@@ -9,10 +12,11 @@ use subscan::{
 #[tokio::test]
 #[stubr::mock("module/integrations/bevigil.json")]
 async fn bevigil_run_test() {
-    let mut bevigil = bevigil::Bevigil::new();
-    let url = Url::parse(stubr.path("/bevigil").as_str()).unwrap();
+    env::set_var("SUBSCAN_BEVIGIL_APIKEY", "bevigil-api-key");
 
-    bevigil.url = Box::new(move |_| url.to_string());
+    let mut bevigil = bevigil::Bevigil::new();
+
+    bevigil.url = wrap_url_with_mock_func(stubr.path("/bevigil").as_str());
 
     let result = bevigil.run(TEST_DOMAIN.to_string()).await;
 
@@ -43,5 +47,5 @@ async fn extract_test() {
     let not_extracted = bevigil::Bevigil::extract(Value::default());
 
     assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.to_string()].into());
-    assert_eq!(not_extracted, [].into());
+    assert_eq!(not_extracted, BTreeSet::new());
 }

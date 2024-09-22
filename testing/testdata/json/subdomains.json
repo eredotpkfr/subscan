@@ -1,0 +1,17 @@
+{
+    "data": {
+        "subdomains": [
+            {
+                "ip": "127.0.0.1",
+                "subdomain": "bar.foo.com"
+            },
+            {
+                "ip": "127.0.0.1",
+                "subdomain": "baz.foo.com"
+            }
+        ]
+    },
+    "id": "7a3db2d9-1713-4e72-8261-5976fa5b9cf9",
+    "scan_time": "2024-09-22T11:15:00.430218",
+    "status": "SUCCESS"
+}

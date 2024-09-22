@@ -1,5 +1,9 @@
-use crate::common::constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN};
-use reqwest::Url;
+use std::collections::BTreeSet;
+
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
+    mocks::wrap_url_with_mock_func,
+};
 use serde_json::{self, Value};
 use subscan::{
     interfaces::module::SubscanModuleInterface,
@@ -10,9 +14,8 @@ use subscan::{
 #[stubr::mock("module/integrations/alienvault.json")]
 async fn alienvault_run_test() {
     let mut alienvault = alienvault::AlienVault::new();
-    let url = Url::parse(stubr.path("/alienvault").as_str()).unwrap();
 
-    alienvault.url = Box::new(move |_| url.to_string());
+    alienvault.url = wrap_url_with_mock_func(stubr.path("/alienvault").as_str());
 
     let result = alienvault.run(TEST_DOMAIN.to_string()).await;
 
@@ -43,5 +46,5 @@ async fn extract_test() {
     let not_extracted = alienvault::AlienVault::extract(Value::default());
 
     assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.to_string()].into());
-    assert_eq!(not_extracted, [].into());
+    assert_eq!(not_extracted, BTreeSet::new());
 }

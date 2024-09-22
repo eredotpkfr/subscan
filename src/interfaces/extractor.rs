@@ -26,9 +26,7 @@ use std::collections::BTreeSet;
 /// #[async_trait]
 /// impl SubdomainExtractorInterface for CustomExtractor {
 ///     async fn extract(&self, content: String, domain: String) -> BTreeSet<Subdomain> {
-///         BTreeSet::from([
-///             Subdomain::from(content.replace("-", ""))
-///         ])
+///         [Subdomain::from(content.replace("-", ""))].into()
 ///     }
 /// }
 ///
@@ -41,7 +39,7 @@ use std::collections::BTreeSet;
 ///
 ///     let result = extractor.extract(content, domain).await;
 ///
-///     assert_eq!(result, BTreeSet::from([Subdomain::from("foo.com")]));
+///     assert_eq!(result, [Subdomain::from("foo.com")].into());
 /// }
 /// ```
 #[async_trait]

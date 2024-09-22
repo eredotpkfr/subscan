@@ -24,8 +24,9 @@ pub enum SubdomainExtractorDispatcher {
     /// struct to be compatible with
     /// [`SubdomainExtractorInterface`](crate::interfaces::extractor::SubdomainExtractorInterface)
     /// so parser method must be implemented and gave
-    /// this wrapper struct. See the [`JSONExtractor`]
-    /// examples and technical details
+    /// this wrapper struct. See the [`JSONExtractor`] struct
+    /// and [`InnerExtractMethod`](crate::types::core::InnerExtractMethod)
+    /// type for examples and technical details
     JSONExtractor(JSONExtractor),
 }
 
@@ -38,7 +39,7 @@ pub enum SubdomainExtractorDispatcher {
 pub enum RequesterDispatcher {
     /// Chrome browser struct definition as a enum value.
     /// On this requester type, Chrome browser will run and
-    /// all HTTP requests made with browser. Has pros according
+    /// all HTTP requests made with browser. It has pros according
     /// to [`HTTPClient`] requester like running Js, rendering
     /// pages, etc. See the [`ChromeBrowser`] definition to learn
     /// usage

@@ -67,10 +67,10 @@ impl SubdomainExtractorInterface for RegexExtractor {
     ///     let extractor = RegexExtractor::default();
     ///     let result = extractor.extract(content, domain).await;
     ///
-    ///     assert_eq!(result, BTreeSet::from([
+    ///     assert_eq!(result, [
     ///         Subdomain::from("bar.foo.com"),
     ///         Subdomain::from("baz.foo.com"),
-    ///     ]));
+    ///     ].into());
     ///     assert_eq!(result.len(), 2);
     /// }
     /// ```

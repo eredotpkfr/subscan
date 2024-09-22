@@ -1,6 +1,6 @@
 use crate::{
-    config::SUBSCAN_ENV_NAMESPACE,
     enums::{RequesterDispatcher, SubdomainExtractorDispatcher},
+    utils::env,
 };
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
@@ -34,7 +34,7 @@ use tokio::sync::Mutex;
 /// #[async_trait(?Send)]
 /// impl SubscanModuleInterface for FooModule {
 ///     async fn name(&self) -> &str {
-///         &"foo-module"
+///         &"foo"
 ///     }
 ///
 ///     async fn requester(&self) -> Option<&Mutex<RequesterDispatcher>> {
@@ -53,18 +53,21 @@ use tokio::sync::Mutex;
 ///
 /// #[tokio::main]
 /// async fn main() {
+///     let requester = RequesterDispatcher::HTTPClient(HTTPClient::default());
+///     let extracator = RegexExtractor::default();
+///
 ///     let mut foo = FooModule {
-///         requester: Mutex::new(HTTPClient::default().into()),
-///         extractor: RegexExtractor::default().into(),
+///         requester: Mutex::new(requester),
+///         extractor: SubdomainExtractorDispatcher::RegexExtractor(extracator),
 ///     };
 ///
 ///     assert!(foo.requester().await.is_some());
 ///     assert!(foo.extractor().await.is_some());
 ///
-///     assert_eq!(foo.name().await, "foo-module");
+///     assert_eq!(foo.name().await, "foo");
 ///
 ///     // do something with results
-///     let results = foo.run("foo.com".into()).await;
+///     let results = foo.run("foo.com".to_string()).await;
 /// }
 /// ```
 #[async_trait(?Send)]
@@ -81,16 +84,10 @@ pub trait SubscanModuleInterface: Sync + Send {
     /// run this `run` method will be called, so this method
     /// should do everything
     async fn run(&mut self, domain: String) -> BTreeSet<String>;
-    /// Fetches API key from system environment variables
-    /// if available. Module environment variables uses [`SUBSCAN_ENV_NAMESPACE`]
-    /// namespace with `SUBSCAN_<module_name>_APIKEY` format
-    async fn fetch_apikey(&self) -> String {
-        let key = format!(
-            "{}_{}_APIKEY",
-            SUBSCAN_ENV_NAMESPACE,
-            self.name().await.to_uppercase()
-        );
-
-        std::env::var(key).unwrap_or_default()
+    /// Fetches module API key from system environment variables
+    /// if available. See the [`get_subscan_module_apikey`](crate::utils::env::get_subscan_module_apikey)
+    /// for details
+    async fn fetch_apikey(&self) -> Result<String, dotenvy::Error> {
+        env::get_subscan_module_apikey(&self.name().await.to_uppercase())
     }
 }
