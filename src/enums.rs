@@ -55,14 +55,19 @@ pub enum RequesterDispatcher {
 /// [`GenericAPIIntegrationModule`](crate::modules::generics::api_integration::GenericAPIIntegrationModule)
 /// uses them to apply correct auth method. See the
 /// method descriptions to learn how it works
-pub enum AuthMethod {
+pub enum APIAuthMethod {
     /// Some APIs uses request headers to get
     /// API key. If this auth type selected API key
     /// will add in request headers with a given header key
-    APIKeyInHeader(String),
-    /// This auth type uses when API require API
-    /// key in URL
-    APIKeyInURL,
+    APIKeyAsHeader(String),
+    /// This auth type uses when API require API key
+    /// as a query param. If this method chose API key
+    /// will be added in URL as a query param with given
+    /// parameter key
+    APIKeyAsQueryParam(String),
+    /// This auth method checks if the query URL includes
+    /// API key's self
+    APIKeyAsURLSlug,
     /// This auth type does nothing for auth
     NoAuth,
 }

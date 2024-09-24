@@ -1,5 +1,6 @@
 use crate::{
     enums::{RequesterDispatcher, SubdomainExtractorDispatcher},
+    types::core::APIKeyAsEnv,
     utils::env,
 };
 use async_trait::async_trait;
@@ -84,10 +85,11 @@ pub trait SubscanModuleInterface: Sync + Send {
     /// run this `run` method will be called, so this method
     /// should do everything
     async fn run(&mut self, domain: String) -> BTreeSet<String>;
-    /// Fetches module API key from system environment variables
-    /// if available. See the [`get_subscan_module_apikey`](crate::utils::env::get_subscan_module_apikey)
+    /// Loads `.env` file and fetches module API key with variable name. If system
+    /// environment variable set with same name, `.env` file will be overrode
+    /// See the [`get_subscan_module_apikey`](crate::utils::env::get_subscan_module_apikey)
     /// for details
-    async fn fetch_apikey(&self) -> Result<String, dotenvy::Error> {
-        env::get_subscan_module_apikey(&self.name().await.to_uppercase())
+    async fn fetch_apikey(&self) -> APIKeyAsEnv {
+        env::get_subscan_module_apikey(self.name().await)
     }
 }

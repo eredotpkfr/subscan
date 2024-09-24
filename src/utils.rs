@@ -34,6 +34,7 @@ pub mod regex {
 
 pub mod env {
     use crate::config::SUBSCAN_ENV_NAMESPACE;
+    use crate::types::core::APIKeyAsEnv;
 
     /// Fetches API key from system environment variables
     /// if available. Module environment variables uses [`SUBSCAN_ENV_NAMESPACE`]
@@ -51,16 +52,20 @@ pub mod env {
     ///
     ///     env::remove_var(env_key);
     ///
-    ///     assert_eq!(get_subscan_module_apikey("FOO").is_ok(), false);
+    ///     assert_eq!(get_subscan_module_apikey("FOO").0, env_key);
+    ///     assert_eq!(get_subscan_module_apikey("FOO").1.is_ok(), false);
     ///
     ///     env::set_var(env_key, "foo");
     ///
-    ///     assert_eq!(get_subscan_module_apikey("FOO").unwrap(), "foo");
+    ///     assert_eq!(get_subscan_module_apikey("FOO").0, env_key);
+    ///     assert_eq!(get_subscan_module_apikey("FOO").1.unwrap(), "foo");
+    ///
+    ///     env::remove_var(env_key);
     /// }
     /// ```
-    pub fn get_subscan_module_apikey(name: &str) -> Result<String, dotenvy::Error> {
-        let key = format!("{}_{}_APIKEY", SUBSCAN_ENV_NAMESPACE, name);
+    pub fn get_subscan_module_apikey(name: &str) -> APIKeyAsEnv {
+        let var_name = format!("{}_{}_APIKEY", SUBSCAN_ENV_NAMESPACE, name.to_uppercase());
 
-        dotenvy::var(key)
+        (var_name.clone(), dotenvy::var(var_name))
     }
 }

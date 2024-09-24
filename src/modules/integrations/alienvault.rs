@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    enums::{AuthMethod, RequesterDispatcher},
+    enums::{APIAuthMethod, RequesterDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::api_integration::GenericAPIIntegrationModule,
     requesters::client::HTTPClient,
@@ -41,7 +41,7 @@ impl AlienVault {
         GenericAPIIntegrationModule {
             name: ALIENVAULT_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
-            auth: AuthMethod::NoAuth,
+            auth: APIAuthMethod::NoAuth,
             requester: requester.into(),
             extractor: extractor.into(),
         }

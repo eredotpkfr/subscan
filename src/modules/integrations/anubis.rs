@@ -1,5 +1,5 @@
 use crate::{
-    enums::{AuthMethod, RequesterDispatcher},
+    enums::{APIAuthMethod, RequesterDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::api_integration::GenericAPIIntegrationModule,
     requesters::client::HTTPClient,
@@ -40,7 +40,7 @@ impl Anubis {
         GenericAPIIntegrationModule {
             name: ANUBIS_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
-            auth: AuthMethod::NoAuth,
+            auth: APIAuthMethod::NoAuth,
             requester: requester.into(),
             extractor: extractor.into(),
         }

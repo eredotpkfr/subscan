@@ -25,6 +25,7 @@ use enums::{RequesterDispatcher, SubdomainExtractorDispatcher};
 use interfaces::module::SubscanModuleInterface;
 use std::collections::BTreeSet;
 use tokio::sync::Mutex;
+use types::core::APIKeyAsEnv;
 
 /// Wrapper around a [`SubscanModuleInterface`] trait object
 ///
@@ -102,5 +103,9 @@ impl SubscanModule {
 
     pub async fn name(&self) -> &str {
         self.0.name().await
+    }
+
+    pub async fn fetch_apikey(&self) -> APIKeyAsEnv {
+        self.0.fetch_apikey().await
     }
 }

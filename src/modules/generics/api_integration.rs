@@ -1,5 +1,5 @@
 use crate::{
-    enums::{AuthMethod, RequesterDispatcher, SubdomainExtractorDispatcher},
+    enums::{APIAuthMethod, RequesterDispatcher, SubdomainExtractorDispatcher},
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
@@ -26,9 +26,9 @@ pub struct GenericAPIIntegrationModule {
     /// Simple function field that gets query URL
     /// by given domain address
     pub url: Box<dyn Fn(&str) -> String + Sync + Send>,
-    /// Set authentication method, see [`AuthMethod`] enum
+    /// Set authentication method, see [`APIAuthMethod`] enum
     /// for details
-    pub auth: AuthMethod,
+    pub auth: APIAuthMethod,
     /// Requester object instance for HTTP requests
     pub requester: Mutex<RequesterDispatcher>,
     /// Any extractor object to extract subdomain from content
@@ -36,12 +36,12 @@ pub struct GenericAPIIntegrationModule {
 }
 
 impl GenericAPIIntegrationModule {
-    async fn authenticate(&self, domain: &str) -> Url {
-        let url: Url = (self.url)(domain).parse().unwrap();
-        let apikey = self.fetch_apikey().await;
+    pub async fn authenticate(&self, domain: &str) -> Url {
+        let mut url: Url = (self.url)(domain).parse().unwrap();
+        let (_, apikey) = self.fetch_apikey().await;
 
         match &self.auth {
-            AuthMethod::APIKeyInHeader(key) => {
+            APIAuthMethod::APIKeyAsHeader(key) => {
                 if let Ok(apikey) = apikey {
                     let mut requester = self.requester.lock().await;
 
@@ -52,7 +52,12 @@ impl GenericAPIIntegrationModule {
                     }
                 }
             }
-            AuthMethod::APIKeyInURL | AuthMethod::NoAuth => {}
+            APIAuthMethod::APIKeyAsQueryParam(query_param) => {
+                if let Ok(apikey) = apikey {
+                    url.set_query(Some(&format!("{query_param}={apikey}")))
+                }
+            }
+            APIAuthMethod::APIKeyAsURLSlug | APIAuthMethod::NoAuth => {}
         }
 
         url
