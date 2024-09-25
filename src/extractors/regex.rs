@@ -36,10 +36,9 @@ impl RegexExtractor {
     /// ```
     pub fn extract_one(&self, content: String, domain: String) -> Option<Subdomain> {
         let pattern = generate_subdomain_regex(domain).unwrap();
+        let to_string = |matches: Match| matches.as_str().to_string();
 
-        pattern
-            .find(&content)
-            .map(|matches| matches.as_str().to_string())
+        pattern.find(&content).map(to_string)
     }
 }
 
