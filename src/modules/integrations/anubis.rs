@@ -46,41 +46,10 @@ impl Anubis {
         }
     }
 
-    /// Get Anubis query URL from given domain address
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::modules::integrations::anubis::{self, ANUBIS_URL};
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let domain = "foo.com";
-    ///     let url = anubis::Anubis::get_query_url(&domain);
-    ///
-    ///     assert_eq!(url, format!("{ANUBIS_URL}/{domain}"));
-    /// }
-    /// ```
     pub fn get_query_url(domain: &str) -> String {
         format!("{ANUBIS_URL}/{domain}")
     }
 
-    /// JSON parse method to extract subdomains
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::modules::integrations::anubis;
-    /// use std::collections::BTreeSet;
-    /// use serde_json::Value;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let result = anubis::Anubis::extract(Value::default());
-    ///
-    ///     assert_eq!(result, BTreeSet::new());
-    /// }
-    /// ```
     pub fn extract(content: Value) -> BTreeSet<Subdomain> {
         if let Some(subs) = content.as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());

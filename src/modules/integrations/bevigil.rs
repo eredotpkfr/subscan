@@ -46,41 +46,10 @@ impl Bevigil {
         }
     }
 
-    /// Get Bevigil query URL from given domain address
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::modules::integrations::bevigil::{self, BEVIGIL_URL};
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let domain = "foo.com";
-    ///     let url = bevigil::Bevigil::get_query_url(&domain);
-    ///
-    ///     assert_eq!(url, format!("{BEVIGIL_URL}/{domain}/subdomains"));
-    /// }
-    /// ```
     pub fn get_query_url(domain: &str) -> String {
         format!("{BEVIGIL_URL}/{domain}/subdomains")
     }
 
-    /// JSON parse method to extract subdomains
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::modules::integrations::bevigil;
-    /// use std::collections::BTreeSet;
-    /// use serde_json::Value;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let result = bevigil::Bevigil::extract(Value::default());
-    ///
-    ///     assert_eq!(result, BTreeSet::new());
-    /// }
-    /// ```
     pub fn extract(content: Value) -> BTreeSet<Subdomain> {
         if let Some(subs) = content["subdomains"].as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());

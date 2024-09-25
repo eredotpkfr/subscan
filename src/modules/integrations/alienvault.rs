@@ -47,41 +47,10 @@ impl AlienVault {
         }
     }
 
-    /// Get Alienvault query URL from given domain address
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::modules::integrations::alienvault::{self, ALIENVAULT_URL};
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let domain = "foo.com";
-    ///     let url = alienvault::AlienVault::get_query_url(&domain);
-    ///
-    ///     assert_eq!(url, format!("{ALIENVAULT_URL}/{domain}/passive_dns"));
-    /// }
-    /// ```
     pub fn get_query_url(domain: &str) -> String {
         format!("{ALIENVAULT_URL}/{domain}/passive_dns")
     }
 
-    /// JSON parse method to extract subdomains
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::modules::integrations::alienvault;
-    /// use std::collections::BTreeSet;
-    /// use serde_json::Value;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let result = alienvault::AlienVault::extract(Value::default());
-    ///
-    ///     assert_eq!(result, BTreeSet::new());
-    /// }
-    /// ```
     pub fn extract(content: Value) -> BTreeSet<Subdomain> {
         if let Some(passives) = content["passive_dns"].as_array() {
             let filter = |item: &Value| Some(item["hostname"].as_str()?.to_string());
