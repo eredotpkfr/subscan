@@ -4,3 +4,5 @@ pub mod alienvault;
 pub mod anubis;
 /// Bevigil API integration module, API key required
 pub mod bevigil;
+/// Binaryedge API integration mmodule, API key required
+pub mod binaryedge;
