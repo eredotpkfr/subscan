@@ -1,6 +1,5 @@
-use std::collections::BTreeSet;
-
 use crate::common::constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN};
+use std::collections::BTreeSet;
 use subscan::extractors::regex::RegexExtractor;
 use subscan::interfaces::extractor::SubdomainExtractorInterface;
 
