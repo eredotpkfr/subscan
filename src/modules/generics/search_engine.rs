@@ -58,34 +58,6 @@ pub struct GenericSearchEngineModule {
 }
 
 impl GenericSearchEngineModule {
-    /// Converts [`SearchQueryParam`] to [`SearchQuery`]
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::generics::search_engine::GenericSearchEngineModule;
-    /// use subscan::types::query::SearchQueryParam;
-    /// use subscan::extractors::regex::RegexExtractor;
-    /// use subscan::requesters::client::HTTPClient;
-    /// use subscan::cache;
-    /// use tokio::sync::Mutex;
-    /// use reqwest::Url;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let module = GenericSearchEngineModule {
-    ///         name: "foo-module".to_string(),
-    ///         url: Url::parse("https://foo.com").unwrap(),
-    ///         param: SearchQueryParam::from("q"),
-    ///         requester: Mutex::new(HTTPClient::default().into()),
-    ///         extractor: RegexExtractor::default().into(),
-    ///     };
-    ///
-    ///     let mut query = module.get_search_query("foo.com".to_string()).await;
-    ///
-    ///     assert_eq!(query.as_search_str(), "site:foo.com");
-    /// }
-    /// ```
     pub async fn get_search_query(&self, domain: String) -> SearchQuery {
         self.param.to_search_query(domain, "site:".to_string())
     }

@@ -19,20 +19,6 @@ pub const ALIENVAULT_MODULE_NAME: &str = "AlienVault";
 pub const ALIENVAULT_URL: &str = "https://otx.alienvault.com/api/v1/indicators/domain";
 
 impl AlienVault {
-    /// Create a new [`AlienVault`] module instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::integrations::alienvault;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let alienvault = alienvault::AlienVault::new();
-    ///
-    ///     // do something with alienvault instance
-    /// }
-    /// ```
     #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericAPIIntegrationModule {
         let requester: RequesterDispatcher = HTTPClient::default().into();

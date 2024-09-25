@@ -23,20 +23,6 @@ pub const GOOGLE_CITE_TAG: &str = "cite";
 pub struct Google {}
 
 impl Google {
-    /// Create a new [`Google`] module instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::engines::google;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let google = google::Google::new();
-    ///
-    ///     // do something with google instance
-    /// }
-    /// ```
     #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericSearchEngineModule {
         let extractor: HTMLExtractor = HTMLExtractor::new(GOOGLE_CITE_TAG.into(), vec![]);

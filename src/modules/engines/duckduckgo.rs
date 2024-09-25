@@ -23,20 +23,6 @@ pub const DUCKDUCKGO_CITE_TAG: &str = "article > div > div > a > span:first-chil
 pub struct DuckDuckGo {}
 
 impl DuckDuckGo {
-    /// Create a new [`DuckDuckGo`] module instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::engines::duckduckgo;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let duckduckgo = duckduckgo::DuckDuckGo::new();
-    ///
-    ///     // do something with duckduckgo instance
-    /// }
-    /// ```
     #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericSearchEngineModule {
         let extractor: HTMLExtractor = HTMLExtractor::new(DUCKDUCKGO_CITE_TAG.into(), vec![]);

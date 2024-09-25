@@ -23,20 +23,6 @@ pub const BING_CITE_TAG: &str = "cite";
 pub struct Bing {}
 
 impl Bing {
-    /// Create a new [`Bing`] module instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::engines::bing;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let bing = bing::Bing::new();
-    ///
-    ///     // do something with bing instance
-    /// }
-    /// ```
     #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericSearchEngineModule {
         let extractor: HTMLExtractor = HTMLExtractor::new(BING_CITE_TAG.into(), vec![]);

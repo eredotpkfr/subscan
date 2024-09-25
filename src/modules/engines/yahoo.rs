@@ -23,20 +23,6 @@ pub const YAHOO_CITE_TAG: &str = "ol > li > div > div > h3 > a > span";
 pub struct Yahoo {}
 
 impl Yahoo {
-    /// Create a new [`Yahoo`] module instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::engines::yahoo;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let yahoo = yahoo::Yahoo::new();
-    ///
-    ///     // do something with yahoo instance
-    /// }
-    /// ```
     #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericSearchEngineModule {
         let removes: Vec<String> = vec!["<b>".into(), "</b>".into()];

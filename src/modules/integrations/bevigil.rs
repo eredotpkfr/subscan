@@ -18,20 +18,6 @@ pub const BEVIGIL_MODULE_NAME: &str = "Bevigil";
 pub const BEVIGIL_URL: &str = "https://osint.bevigil.com/api";
 
 impl Bevigil {
-    /// Create a new [`Bevigil`] module instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::integrations::bevigil;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let bevigil = bevigil::Bevigil::new();
-    ///
-    ///     // do something with bevigil instance
-    /// }
-    /// ```
     #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericAPIIntegrationModule {
         let requester: RequesterDispatcher = HTTPClient::default().into();

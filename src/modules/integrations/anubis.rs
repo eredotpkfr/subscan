@@ -18,20 +18,6 @@ pub const ANUBIS_MODULE_NAME: &str = "Anubis";
 pub const ANUBIS_URL: &str = "https://jonlu.ca/anubis/subdomains";
 
 impl Anubis {
-    /// Create a new [`Anubis`] module instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::integrations::anubis;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let anubis = anubis::Anubis::new();
-    ///
-    ///     // do something with anubis instance
-    /// }
-    /// ```
     #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericAPIIntegrationModule {
         let requester: RequesterDispatcher = HTTPClient::default().into();
