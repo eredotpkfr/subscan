@@ -26,6 +26,7 @@ impl Bevigil {
         GenericAPIIntegrationModule {
             name: BEVIGIL_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
+            next: Box::new(move |_, _| None),
             auth: APIAuthMethod::APIKeyAsHeader("X-Access-Token".into()),
             requester: requester.into(),
             extractor: extractor.into(),

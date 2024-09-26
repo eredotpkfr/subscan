@@ -62,6 +62,7 @@ pub mod mocks {
         GenericAPIIntegrationModule {
             name: md5_hex(thread_name),
             url: wrap_url_with_mock_func(url),
+            next: Box::new(|_, _| None),
             auth,
             requester: requester.into(),
             extractor: extractor.into(),

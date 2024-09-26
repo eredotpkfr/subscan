@@ -27,6 +27,7 @@ impl AlienVault {
         GenericAPIIntegrationModule {
             name: ALIENVAULT_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
+            next: Box::new(move |_, _| None),
             auth: APIAuthMethod::NoAuth,
             requester: requester.into(),
             extractor: extractor.into(),

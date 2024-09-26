@@ -2,6 +2,7 @@ use crate::{interfaces::requester::RequesterInterface, types::config::RequesterC
 use async_trait::async_trait;
 use headless_chrome::{browser::LaunchOptions, Browser};
 use reqwest::Url;
+use serde_json::Value;
 
 /// Chrome requester struct, send HTTP requests via Chrome browser.
 /// Also its compatible with [`RequesterInterface`]
@@ -186,5 +187,11 @@ impl RequesterInterface for ChromeBrowser {
         tab.close(true).unwrap();
 
         content
+    }
+
+    async fn get_json_content(&self, url: Url) -> Value {
+        let content = self.get_content(url).await.unwrap_or_default();
+
+        serde_json::from_str(&content).unwrap_or_default()
     }
 }

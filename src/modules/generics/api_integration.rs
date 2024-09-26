@@ -9,6 +9,7 @@ use crate::{
 use async_trait::async_trait;
 use reqwest::header::{HeaderName, HeaderValue};
 use reqwest::Url;
+use serde_json::Value;
 use std::{collections::BTreeSet, str::FromStr};
 use tokio::sync::Mutex;
 
@@ -27,6 +28,9 @@ pub struct GenericAPIIntegrationModule {
     /// Simple function field that gets query URL
     /// by given domain address
     pub url: Box<dyn Fn(&str) -> String + Sync + Send>,
+    /// Function definition that gets next URL to ensure
+    /// fully fetch data with pagination from API endpoint
+    pub next: Box<dyn Fn(Url, Value) -> Option<Url> + Sync + Send>,
     /// Set authentication method, see [`APIAuthMethod`] enum
     /// for details
     pub auth: APIAuthMethod,
@@ -85,12 +89,32 @@ impl SubscanModuleInterface for GenericAPIIntegrationModule {
 
     async fn run(&mut self, domain: String) -> BTreeSet<String> {
         let mut url: Url = (self.url)(&domain).parse().unwrap();
+        let mut all_results = BTreeSet::new();
 
         self.authenticate(&mut url, self.fetch_apikey().await).await;
 
         let requester = self.requester.lock().await;
-        let content = requester.get_content(url).await.unwrap_or_default();
 
-        self.extractor.extract(content, domain).await
+        loop {
+            let json = requester.get_json_content(url.clone()).await;
+            let news = self
+                .extractor
+                .extract(json.to_string(), domain.clone())
+                .await;
+
+            if news.is_empty() {
+                break;
+            }
+
+            all_results.extend(news);
+
+            if let Some(next_url) = (self.next)(url.clone(), json) {
+                url = next_url;
+            } else {
+                break;
+            }
+        }
+
+        all_results
     }
 }
