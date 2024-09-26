@@ -44,9 +44,9 @@ impl Binaryedge {
         if let Some(page) = page_param {
             let new_page = page.1.parse::<usize>().unwrap() + 1;
 
-            url.set_query(Some(&format!("{}={}", "page", new_page)));
+            url.set_query(Some(&format!("page={new_page}")));
         } else {
-            url.set_query(Some(&format!("{}={}", "page", "2")));
+            url.set_query(Some("page=2"));
         }
 
         Some(url)
