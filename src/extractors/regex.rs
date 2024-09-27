@@ -76,11 +76,9 @@ impl SubdomainExtractorInterface for RegexExtractor {
     /// ```
     async fn extract(&self, content: Content, domain: String) -> BTreeSet<Subdomain> {
         let pattern = generate_subdomain_regex(domain).unwrap();
+        let content = &content.to_string();
         let to_string = |item: Match| item.as_str().parse().ok();
 
-        pattern
-            .find_iter(&content.to_string())
-            .filter_map(to_string)
-            .collect()
+        pattern.find_iter(content).filter_map(to_string).collect()
     }
 }
