@@ -1,7 +1,9 @@
-use crate::{interfaces::requester::RequesterInterface, types::config::RequesterConfig};
+use crate::{
+    interfaces::requester::RequesterInterface, types::config::RequesterConfig,
+    types::content::Content,
+};
 use async_trait::async_trait;
 use reqwest::{Client, Proxy, Url};
-use serde_json::Value;
 
 const CLIENT_BUILD_ERR: &str = "Cannot create HTTP client!";
 const REQUEST_BUILD_ERR: &str = "Cannot build request!";
@@ -130,14 +132,14 @@ impl RequesterInterface for HTTPClient {
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut client = HTTPClient::default();
-    ///     let url = Url::parse("https://foo.com").unwrap();
+    ///     let url: Url = "https://foo.com".parse().unwrap();
     ///
-    ///     let content = client.get_content(url).await.unwrap();
+    ///     let content = client.get_content(url).await;
     ///
     ///     // do something with content
     /// }
     /// ```
-    async fn get_content(&self, url: Url) -> Option<String> {
+    async fn get_content(&self, url: Url) -> Content {
         let rbuilder = self.client.get(url);
         let request = rbuilder
             .timeout(self.config.timeout)
@@ -147,18 +149,16 @@ impl RequesterInterface for HTTPClient {
 
         if let Ok(response) = self.client.execute(request).await {
             if let Ok(content) = response.text().await {
-                Some(content)
+                Content::String(content)
             } else {
-                None
+                Content::Empty
             }
         } else {
-            None
+            Content::Empty
         }
     }
 
-    async fn get_json_content(&self, url: Url) -> Value {
-        let content = self.get_content(url).await.unwrap_or_default();
-
-        serde_json::from_str(&content).unwrap_or_default()
+    async fn get_json_content(&self, url: Url) -> Content {
+        Content::JSON(self.get_content(url).await.to_json())
     }
 }

@@ -4,11 +4,11 @@ use crate::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
+    types::core::{GetNextUrlMethod, GetQueryUrlMethod},
 };
 use async_trait::async_trait;
 use reqwest::header::{HeaderName, HeaderValue};
 use reqwest::Url;
-use serde_json::Value;
 use std::{collections::BTreeSet, str::FromStr};
 use tokio::sync::Mutex;
 
@@ -26,10 +26,10 @@ pub struct GenericAPIIntegrationModule {
     pub name: String,
     /// Simple function field that gets query URL
     /// by given domain address
-    pub url: Box<dyn Fn(&str) -> String + Sync + Send>,
+    pub url: GetQueryUrlMethod,
     /// Function definition that gets next URL to ensure
     /// fully fetch data with pagination from API endpoint
-    pub next: Box<dyn Fn(Url, Value) -> Option<Url> + Sync + Send>,
+    pub next: GetNextUrlMethod,
     /// Set authentication method, see [`APIAuthMethod`] enum
     /// for details
     pub auth: APIAuthMethod,
@@ -98,10 +98,7 @@ impl SubscanModuleInterface for GenericAPIIntegrationModule {
 
         loop {
             let json = requester.get_json_content(url.clone()).await;
-            let news = self
-                .extractor
-                .extract(json.to_string(), domain.clone())
-                .await;
+            let news = self.extractor.extract(json.clone(), domain.clone()).await;
 
             if news.is_empty() {
                 break;
@@ -109,7 +106,7 @@ impl SubscanModuleInterface for GenericAPIIntegrationModule {
 
             all_results.extend(news);
 
-            if let Some(next_url) = (self.next)(url.clone(), json) {
+            if let Some(next_url) = (self.next)(url.clone(), json.to_json()) {
                 url = next_url;
             } else {
                 break;

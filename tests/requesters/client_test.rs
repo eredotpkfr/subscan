@@ -7,6 +7,7 @@ use subscan::requesters::client::HTTPClient;
 use subscan::{
     interfaces::requester::RequesterInterface,
     types::config::{RequesterConfig, DEFAULT_HTTP_TIMEOUT},
+    types::content::Content,
 };
 
 #[tokio::test]
@@ -42,16 +43,15 @@ async fn client_configure_test() {
 #[stubr::mock("hello/hello.json")]
 async fn client_get_content_test() {
     let client = HTTPClient::default();
-    let url = Url::parse(&stubr.path("/hello")).unwrap();
+    let url: Url = stubr.path("/hello").parse().unwrap();
 
-    let content = client.get_content(url).await.unwrap();
+    let content = client.get_content(url).await;
 
-    assert_eq!(content, "hello");
+    assert_eq!(content.to_string(), "hello");
 }
 
 #[tokio::test]
 #[stubr::mock("hello/hello-delayed.json")]
-#[should_panic]
 async fn client_get_content_timeout_test() {
     let config = RequesterConfig {
         timeout: Duration::from_millis(500),
@@ -60,9 +60,11 @@ async fn client_get_content_timeout_test() {
     };
 
     let client = HTTPClient::with_config(config);
-    let url = Url::parse(&stubr.path("/hello-delayed")).unwrap();
+    let url: Url = stubr.path("/hello-delayed").parse().unwrap();
 
-    client.get_content(url).await.unwrap();
+    let content = client.get_content(url).await;
+
+    assert_eq!(content, Content::Empty)
 }
 
 #[tokio::test]
@@ -82,7 +84,7 @@ async fn client_get_content_extra_header_test() {
     )
     .unwrap();
 
-    let content = client.get_content(url).await.unwrap();
+    let content = client.get_content(url).await;
 
-    assert_eq!(content, "hello");
+    assert_eq!(content.to_string(), "hello");
 }

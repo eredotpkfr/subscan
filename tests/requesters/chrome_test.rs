@@ -42,11 +42,11 @@ async fn chrome_configure_test() {
 #[stubr::mock("hello/hello.json")]
 async fn chrome_get_content_test() {
     let browser = ChromeBrowser::default();
-    let url = Url::parse(&stubr.path("/hello")).unwrap();
+    let url: Url = stubr.path("/hello").parse().unwrap();
 
-    let content = browser.get_content(url).await.unwrap();
+    let content = browser.get_content(url).await;
 
-    assert!(content.contains("hello"));
+    assert!(content.to_string().contains("hello"));
 }
 
 #[tokio::test]
@@ -60,9 +60,9 @@ async fn chrome_get_content_timeout_test() {
     };
 
     let browser = ChromeBrowser::with_config(config);
-    let url = Url::parse(&stubr.path("/hello-delayed")).unwrap();
+    let url: Url = stubr.path("/hello-delayed").parse().unwrap();
 
-    browser.get_content(url).await.unwrap();
+    browser.get_content(url).await;
 }
 
 #[tokio::test]
@@ -82,7 +82,7 @@ async fn chrome_get_content_extra_header_test() {
     )
     .unwrap();
 
-    let content = browser.get_content(url).await.unwrap();
+    let content = browser.get_content(url).await;
 
-    assert!(content.contains("hello"));
+    assert!(content.to_string().contains("hello"));
 }

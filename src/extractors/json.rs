@@ -1,7 +1,9 @@
-use crate::interfaces::extractor::SubdomainExtractorInterface;
-use crate::types::core::{InnerExtractMethod, Subdomain};
+use crate::{
+    interfaces::extractor::SubdomainExtractorInterface,
+    types::content::Content,
+    types::core::{InnerExtractMethod, Subdomain},
+};
 use async_trait::async_trait;
-use serde_json;
 use std::collections::BTreeSet;
 
 /// JSON content parser wrapper struct. This object compatible
@@ -43,12 +45,13 @@ impl SubdomainExtractorInterface for JSONExtractor {
     /// use subscan::extractors::json::JSONExtractor;
     /// use subscan::interfaces::extractor::SubdomainExtractorInterface;
     /// use subscan::types::core::Subdomain;
+    /// use subscan::enums::Content;
     /// use std::collections::BTreeSet;
     /// use serde_json::Value;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let json = "{\"foo\": \"bar\"}".to_string();
+    ///     let json = Content::from(String::from("{\"foo\": \"bar\"}"));
     ///     let domain = "foo.com".to_string();
     ///
     ///     let func = |item: Value| {
@@ -63,7 +66,7 @@ impl SubdomainExtractorInterface for JSONExtractor {
     ///     assert_eq!(result, [Subdomain::from("bar")].into());
     /// }
     /// ```
-    async fn extract(&self, content: String, _domain: String) -> BTreeSet<Subdomain> {
-        (self.inner)(serde_json::from_str(&content).unwrap_or_default())
+    async fn extract(&self, content: Content, _domain: String) -> BTreeSet<Subdomain> {
+        (self.inner)(content.to_json())
     }
 }

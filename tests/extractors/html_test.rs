@@ -6,10 +6,11 @@ use crate::common::{
 };
 use subscan::extractors::html::HTMLExtractor;
 use subscan::interfaces::extractor::SubdomainExtractorInterface;
+use subscan::types::content::Content;
 
 #[tokio::test]
 async fn extract_without_removes() {
-    let html = read_testdata("html/subdomains.html");
+    let html = Content::from(read_testdata("html/subdomains.html"));
 
     let selector = String::from("article > div > a > span:first-child");
     let extractor = HTMLExtractor::new(selector, vec![]);
@@ -20,7 +21,7 @@ async fn extract_without_removes() {
 
 #[tokio::test]
 async fn extract_with_removes() {
-    let html = read_testdata("html/subdomains-with-removes.html");
+    let html = Content::from(read_testdata("html/subdomains-with-removes.html"));
 
     let selector = String::from("article > div > a > span");
     let extractor = HTMLExtractor::new(selector, vec!["<br>".to_string()]);

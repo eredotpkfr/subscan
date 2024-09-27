@@ -2,6 +2,7 @@ use crate::common::constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMA
 use std::collections::BTreeSet;
 use subscan::extractors::regex::RegexExtractor;
 use subscan::interfaces::extractor::SubdomainExtractorInterface;
+use subscan::types::content::Content;
 
 #[tokio::test]
 async fn extract_one_test() {
@@ -17,7 +18,7 @@ async fn extract_one_test() {
 
 #[tokio::test]
 async fn extract_test() {
-    let content = String::from("bar.foo.com\nbaz.foo.com");
+    let content = Content::from(String::from("bar.foo.com\nbaz.foo.com"));
 
     let extractor = RegexExtractor::default();
     let result = extractor.extract(content, TEST_DOMAIN.to_string()).await;

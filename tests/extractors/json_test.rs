@@ -6,10 +6,11 @@ use serde_json::Value;
 use std::collections::BTreeSet;
 use subscan::extractors::json::JSONExtractor;
 use subscan::interfaces::extractor::SubdomainExtractorInterface;
+use subscan::types::content::Content;
 
 #[tokio::test]
 async fn extract_test() {
-    let json = read_testdata("json/subdomains.json");
+    let json = Content::from(read_testdata("json/subdomains.json"));
 
     let inner_parser = |item: Value| {
         if let Some(subs) = item["data"]["subdomains"].as_array() {
@@ -25,7 +26,7 @@ async fn extract_test() {
     let extractor = JSONExtractor::new(Box::new(inner_parser));
 
     let result = extractor.extract(json, domain.clone()).await;
-    let no_result = extractor.extract(String::new(), domain).await;
+    let no_result = extractor.extract(Content::default(), domain).await;
 
     let expected = BTreeSet::from([
         TEST_BAR_SUBDOMAIN.to_string(),

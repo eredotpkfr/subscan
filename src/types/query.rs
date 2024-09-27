@@ -219,10 +219,10 @@ impl SearchQuery {
     /// let domain = String::from("foo.com");
     /// let prefix = String::from("site:");
     ///
-    /// let base_url = Url::parse("https://bar.com").unwrap();
+    /// let base_url: Url = "https://bar.com".parse().unwrap();
     /// let extra_params = &[("bar".to_string(), "baz".to_string())];
     ///
-    /// let expected_url = Url::parse("https://bar.com/?bar=baz&s=site%3Afoo.com").unwrap();
+    /// let expected_url: Url = "https://bar.com/?bar=baz&s=site%3Afoo.com".parse().unwrap();
     ///
     /// let mut query = SearchQuery::new(param, prefix, domain);
     ///
