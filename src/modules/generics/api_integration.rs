@@ -4,7 +4,6 @@ use crate::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
-    types::core::APIKeyAsEnv,
 };
 use async_trait::async_trait;
 use reqwest::header::{HeaderName, HeaderValue};
@@ -41,19 +40,11 @@ pub struct GenericAPIIntegrationModule {
 }
 
 impl GenericAPIIntegrationModule {
-    pub async fn authenticate(&self, url: &mut Url, apienv: APIKeyAsEnv) {
-        let apikey = apienv.1;
-
-        if apikey.is_err() {
-            return;
-        }
-
+    pub async fn authenticate(&self, url: &mut Url, apikey: String) {
         match &self.auth {
-            APIAuthMethod::APIKeyAsHeader(name) => {
-                self.set_apikey_header(name, &apikey.unwrap()).await
-            }
+            APIAuthMethod::APIKeyAsHeader(name) => self.set_apikey_header(name, &apikey).await,
             APIAuthMethod::APIKeyAsQueryParam(param) => {
-                self.set_apikey_param(url, param, &apikey.unwrap()).await
+                self.set_apikey_param(url, param, &apikey).await
             }
             APIAuthMethod::APIKeyAsURLSlug | APIAuthMethod::NoAuth => {}
         }
@@ -65,7 +56,9 @@ impl GenericAPIIntegrationModule {
 
     async fn set_apikey_header(&self, name: &str, apikey: &str) {
         let mut requester = self.requester.lock().await;
-        let (name, value) = (HeaderName::from_str(name), HeaderValue::from_str(apikey));
+
+        let name = HeaderName::from_str(name);
+        let value = HeaderValue::from_str(apikey);
 
         if let (Ok(name), Ok(value)) = (name, value) {
             requester.config().await.add_header(name, value);
@@ -91,7 +84,15 @@ impl SubscanModuleInterface for GenericAPIIntegrationModule {
         let mut url: Url = (self.url)(&domain).parse().unwrap();
         let mut all_results = BTreeSet::new();
 
-        self.authenticate(&mut url, self.fetch_apikey().await).await;
+        if self.auth.is_set() {
+            let apienv = self.fetch_apikey().await;
+
+            if let Ok(apikey) = apienv.1 {
+                self.authenticate(&mut url, apikey).await;
+            } else {
+                return all_results;
+            }
+        }
 
         let requester = self.requester.lock().await;
 

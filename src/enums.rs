@@ -55,6 +55,7 @@ pub enum RequesterDispatcher {
 /// [`GenericAPIIntegrationModule`](crate::modules::generics::api_integration::GenericAPIIntegrationModule)
 /// uses them to apply correct auth method. See the
 /// method descriptions to learn how it works
+#[derive(PartialEq)]
 pub enum APIAuthMethod {
     /// Some APIs uses request headers to get
     /// API key. If this auth type selected API key
@@ -70,4 +71,23 @@ pub enum APIAuthMethod {
     APIKeyAsURLSlug,
     /// This auth type does nothing for auth
     NoAuth,
+}
+
+impl APIAuthMethod {
+    /// Checks the any auth method selector or not
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::enums::APIAuthMethod;
+    ///
+    /// let as_header = APIAuthMethod::APIKeyAsHeader("X-API-Key".to_string());
+    /// let no_auth = APIAuthMethod::NoAuth;
+    ///
+    /// assert!(as_header.is_set());
+    /// assert!(!no_auth.is_set());
+    /// ```
+    pub fn is_set(&self) -> bool {
+        self != &Self::NoAuth
+    }
 }
