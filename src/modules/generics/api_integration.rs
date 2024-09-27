@@ -4,11 +4,11 @@ use crate::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
+    types::core::{GetNextUrlMethod, GetQueryUrlMethod},
 };
 use async_trait::async_trait;
 use reqwest::header::{HeaderName, HeaderValue};
 use reqwest::Url;
-use serde_json::Value;
 use std::{collections::BTreeSet, str::FromStr};
 use tokio::sync::Mutex;
 
@@ -26,10 +26,10 @@ pub struct GenericAPIIntegrationModule {
     pub name: String,
     /// Simple function field that gets query URL
     /// by given domain address
-    pub url: Box<dyn Fn(&str) -> String + Sync + Send>,
+    pub url: GetQueryUrlMethod,
     /// Function definition that gets next URL to ensure
     /// fully fetch data with pagination from API endpoint
-    pub next: Box<dyn Fn(Url, Value) -> Option<Url> + Sync + Send>,
+    pub next: GetNextUrlMethod,
     /// Set authentication method, see [`APIAuthMethod`] enum
     /// for details
     pub auth: APIAuthMethod,
