@@ -98,10 +98,8 @@ impl SubscanModuleInterface for GenericAPIIntegrationModule {
 
         loop {
             let json = requester.get_json_content(url.clone()).await;
-            let news = self
-                .extractor
-                .extract(json.to_string(), domain.clone())
-                .await;
+            let serialized = json.to_string();
+            let news = self.extractor.extract(serialized, domain.clone()).await;
 
             if news.is_empty() {
                 break;
