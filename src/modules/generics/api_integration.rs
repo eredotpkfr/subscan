@@ -4,7 +4,7 @@ use crate::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
-    types::core::{GetNextUrlMethod, GetQueryUrlMethod},
+    types::core::{GetNextUrlFunc, GetQueryUrlFunc},
 };
 use async_trait::async_trait;
 use reqwest::header::{HeaderName, HeaderValue};
@@ -26,10 +26,10 @@ pub struct GenericAPIIntegrationModule {
     pub name: String,
     /// Simple function field that gets query URL
     /// by given domain address
-    pub url: GetQueryUrlMethod,
+    pub url: GetQueryUrlFunc,
     /// Function definition that gets next URL to ensure
     /// fully fetch data with pagination from API endpoint
-    pub next: GetNextUrlMethod,
+    pub next: GetNextUrlFunc,
     /// Set authentication method, see [`APIAuthMethod`] enum
     /// for details
     pub auth: APIAuthMethod,

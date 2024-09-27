@@ -12,7 +12,7 @@ pub type InnerExtractMethod = Box<dyn Fn(Value) -> BTreeSet<Subdomain> + Sync + 
 pub type APIKeyAsEnv = (String, Result<String, dotenvy::Error>);
 /// Method definition type, [`GenericAPIIntegrationModule`](crate::modules::generics::api_integration::GenericAPIIntegrationModule)
 /// uses this type to define method that gets query URL
-pub type GetQueryUrlMethod = Box<dyn Fn(&str) -> String + Sync + Send>;
+pub type GetQueryUrlFunc = Box<dyn Fn(&str) -> String + Sync + Send>;
 /// Method definition type, [`GenericAPIIntegrationModule`](crate::modules::generics::api_integration::GenericAPIIntegrationModule)
 /// uses this type to define function that gets next query URL to fetch API fully
-pub type GetNextUrlMethod = Box<dyn Fn(Url, Value) -> Option<Url> + Sync + Send>;
+pub type GetNextUrlFunc = Box<dyn Fn(Url, Value) -> Option<Url> + Sync + Send>;
