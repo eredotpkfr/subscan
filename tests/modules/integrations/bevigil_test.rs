@@ -12,9 +12,10 @@ use subscan::{
 #[tokio::test]
 #[stubr::mock("module/integrations/bevigil.json")]
 async fn bevigil_run_test() {
-    env::set_var("SUBSCAN_BEVIGIL_APIKEY", "bevigil-api-key");
-
     let mut bevigil = bevigil::Bevigil::new();
+    let (env_name, _) = bevigil.fetch_apikey().await;
+
+    env::set_var(&env_name, "bevigil-api-key");
 
     bevigil.url = wrap_url_with_mock_func(stubr.path("/bevigil").as_str());
 
@@ -29,6 +30,8 @@ async fn bevigil_run_test() {
         ]
         .into()
     );
+
+    env::remove_var(env_name);
 }
 
 #[tokio::test]

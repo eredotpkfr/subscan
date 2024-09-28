@@ -12,9 +12,10 @@ use subscan::{
 #[tokio::test]
 #[stubr::mock("module/integrations/binaryedge.json")]
 async fn binaryedge_run_test() {
-    env::set_var("SUBSCAN_BINARYEDGE_APIKEY", "binaryedge-api-key");
-
     let mut binaryedge = binaryedge::Binaryedge::new();
+    let (env_name, _) = binaryedge.fetch_apikey().await;
+
+    env::set_var(&env_name, "binaryedge-api-key");
 
     binaryedge.url = wrap_url_with_mock_func(stubr.path("/binaryedge").as_str());
 
@@ -29,6 +30,8 @@ async fn binaryedge_run_test() {
         ]
         .into()
     );
+
+    env::remove_var(env_name);
 }
 
 #[tokio::test]
