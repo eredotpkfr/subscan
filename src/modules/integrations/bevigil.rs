@@ -37,7 +37,7 @@ impl Bevigil {
         format!("{BEVIGIL_URL}/{domain}/subdomains")
     }
 
-    pub fn extract(content: Value) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {
         if let Some(subs) = content["subdomains"].as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());
 

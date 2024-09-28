@@ -6,3 +6,5 @@ pub mod anubis;
 pub mod bevigil;
 /// Binaryedge API integration mmodule, API key required
 pub mod binaryedge;
+/// Bufferover API integration mmodule, API key required
+pub mod bufferover;

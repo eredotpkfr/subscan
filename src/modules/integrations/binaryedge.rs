@@ -52,7 +52,7 @@ impl Binaryedge {
         Some(url)
     }
 
-    pub fn extract(content: Value) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {
         if let Some(subs) = content["events"].as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());
 

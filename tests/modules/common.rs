@@ -45,7 +45,7 @@ pub mod mocks {
     }
 
     pub fn generic_api_integration(url: &str, auth: APIAuthMethod) -> GenericAPIIntegrationModule {
-        let parse = |json: Value| {
+        let parse = |json: Value, _domain: String| {
             if let Some(subs) = json["subdomains"].as_array() {
                 let filter = |item: &Value| Some(item.as_str()?.to_string());
 

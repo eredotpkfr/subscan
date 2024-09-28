@@ -23,7 +23,11 @@ impl JSONExtractor {
     /// use std::collections::BTreeSet;
     /// use serde_json::Value;
     ///
-    /// let extractor = JSONExtractor::new(Box::new(move |_: Value| BTreeSet::new()));
+    /// let inner = |_content: Value, _domain: String| {
+    ///     BTreeSet::new()
+    /// };
+    ///
+    /// let extractor = JSONExtractor::new(Box::new(inner));
     ///
     /// // do something with extractor instance
     /// ```
@@ -51,7 +55,7 @@ impl SubdomainExtractorInterface for JSONExtractor {
     ///     let json = "{\"foo\": \"bar\"}".to_string();
     ///     let domain = "foo.com".to_string();
     ///
-    ///     let func = |item: Value| {
+    ///     let func = |item: Value, _domain: String| {
     ///         [
     ///             Subdomain::from(item["foo"].as_str().unwrap())
     ///         ].into()
@@ -63,7 +67,7 @@ impl SubdomainExtractorInterface for JSONExtractor {
     ///     assert_eq!(result, [Subdomain::from("bar")].into());
     /// }
     /// ```
-    async fn extract(&self, content: String, _domain: String) -> BTreeSet<Subdomain> {
-        (self.inner)(serde_json::from_str(&content).unwrap_or_default())
+    async fn extract(&self, content: String, domain: String) -> BTreeSet<Subdomain> {
+        (self.inner)(serde_json::from_str(&content).unwrap_or_default(), domain)
     }
 }

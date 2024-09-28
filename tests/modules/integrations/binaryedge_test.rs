@@ -44,10 +44,11 @@ async fn get_query_url_test() {
 
 #[tokio::test]
 async fn extract_test() {
-    let json = "{\"events\": [\"bar.foo.com\"]}";
+    let content = "{\"events\": [\"bar.foo.com\"]}";
+    let json = serde_json::from_str(content).unwrap();
 
-    let extracted = binaryedge::Binaryedge::extract(serde_json::from_str(json).unwrap());
-    let not_extracted = binaryedge::Binaryedge::extract(Value::default());
+    let extracted = binaryedge::Binaryedge::extract(json, TEST_DOMAIN.to_string());
+    let not_extracted = binaryedge::Binaryedge::extract(Value::Null, TEST_DOMAIN.to_string());
 
     assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.to_string()].into());
     assert_eq!(not_extracted, BTreeSet::new());
