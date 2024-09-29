@@ -17,7 +17,7 @@ async fn main() {
         let mut module = item.lock().await;
         let requester = module.requester().await.unwrap();
 
-        if module.name().await != "Binaryedge" {
+        if module.name().await != "Builtwith" {
             continue;
         }
 

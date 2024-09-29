@@ -8,11 +8,28 @@ pub mod constants {
     pub const TEST_BAR_SUBDOMAIN: &str = "bar.foo.com";
     pub const TEST_BAZ_SUBDOMAIN: &str = "baz.foo.com";
     pub const TEST_API_KEY: &str = "test-api-key";
+    pub const READ_ERROR: &str = "Cannot read file!";
 }
 
 pub mod funcs {
+    use super::constants::READ_ERROR;
+    use serde_json::Value;
+    use std::fs;
+    use std::path::{Path, PathBuf};
+
+    fn stubs_path() -> PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/stubs")
+    }
+
     pub fn md5_hex(target: String) -> String {
         format!("{:x}", md5::compute(target))
+    }
+
+    pub fn read_stub(path: &str) -> Value {
+        let file_path = stubs_path().join(path);
+        let content = fs::read_to_string(file_path).expect(READ_ERROR);
+
+        serde_json::from_str(&content).unwrap()
     }
 }
 

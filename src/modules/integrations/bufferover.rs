@@ -50,7 +50,7 @@ impl Bufferover {
                 pattern.find(&line).map(to_string)
             };
 
-            BTreeSet::from_iter(subs.iter().filter_map(filter))
+            subs.iter().filter_map(filter).collect()
         } else {
             BTreeSet::new()
         }

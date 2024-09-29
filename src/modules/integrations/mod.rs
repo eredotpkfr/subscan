@@ -8,3 +8,5 @@ pub mod bevigil;
 pub mod binaryedge;
 /// Bufferover API integration mmodule, API key required
 pub mod bufferover;
+/// Builtwith API integration mmodule, API key required
+pub mod builtwith;

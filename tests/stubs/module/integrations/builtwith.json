@@ -1,0 +1,39 @@
+{
+    "request": {
+        "method": "GET",
+        "queryParameters": {
+            "KEY": {
+                "equalTo": "builtwith-api-key"
+            }
+        },
+        "urlPath": "/builtwith"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "Results": [
+                {
+                    "Result": {
+                        "Paths": [
+                            {
+                                "SubDomain": "bar"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Result": {
+                        "Paths": [
+                            {
+                                "SubDomain": "baz"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "status": 200
+    }
+}

@@ -41,7 +41,7 @@ impl Anubis {
         if let Some(subs) = content.as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());
 
-            BTreeSet::from_iter(subs.iter().filter_map(filter))
+            subs.iter().filter_map(filter).collect()
         } else {
             BTreeSet::new()
         }

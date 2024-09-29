@@ -51,7 +51,11 @@ impl GenericAPIIntegrationModule {
     }
 
     async fn set_apikey_param(&self, url: &mut Url, param: &str, apikey: &str) {
-        url.set_query(Some(&format!("{param}={apikey}")));
+        if let Some(query) = url.query() {
+            url.set_query(Some(&format!("{query}&{param}={apikey}")));
+        } else {
+            url.set_query(Some(&format!("{param}={apikey}")));
+        }
     }
 
     async fn set_apikey_header(&self, name: &str, apikey: &str) {

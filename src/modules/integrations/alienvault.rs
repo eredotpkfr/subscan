@@ -42,7 +42,7 @@ impl AlienVault {
         if let Some(passives) = content["passive_dns"].as_array() {
             let filter = |item: &Value| Some(item["hostname"].as_str()?.to_string());
 
-            BTreeSet::from_iter(passives.iter().filter_map(filter))
+            passives.iter().filter_map(filter).collect()
         } else {
             BTreeSet::new()
         }
