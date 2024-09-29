@@ -5,6 +5,7 @@ use crate::{
         requester::RequesterInterface,
     },
     types::core::{GetNextUrlFunc, GetQueryUrlFunc},
+    utils::http,
 };
 use async_trait::async_trait;
 use reqwest::header::{HeaderName, HeaderValue};
@@ -51,11 +52,7 @@ impl GenericAPIIntegrationModule {
     }
 
     async fn set_apikey_param(&self, url: &mut Url, param: &str, apikey: &str) {
-        if let Some(query) = url.query() {
-            url.set_query(Some(&format!("{query}&{param}={apikey}")));
-        } else {
-            url.set_query(Some(&format!("{param}={apikey}")));
-        }
+        http::set_query_without_override(url, param, apikey);
     }
 
     async fn set_apikey_header(&self, name: &str, apikey: &str) {

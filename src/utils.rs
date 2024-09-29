@@ -69,3 +69,40 @@ pub mod env {
         (var_name.clone(), dotenvy::var(var_name))
     }
 }
+
+pub mod http {
+
+    use reqwest::Url;
+
+    /// Set query param without override olds. If the given param
+    /// name already exists it will be updated
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::utils::http::set_query_without_override;
+    /// use reqwest::Url;
+    ///
+    /// let mut url: Url = "https://foo.com".parse().unwrap();
+    ///
+    /// set_query_without_override(&mut url, "a".into(), "b".into());
+    /// assert_eq!(url.to_string(), "https://foo.com/?a=b");
+    ///
+    /// set_query_without_override(&mut url, "x".into(), "y".into());
+    /// assert_eq!(url.to_string(), "https://foo.com/?a=b&x=y");
+    ///
+    /// set_query_without_override(&mut url, "a".into(), "c".into());
+    /// assert_eq!(url.to_string(), "https://foo.com/?x=y&a=c");
+    /// ```
+    pub fn set_query_without_override(url: &mut Url, name: &str, value: &str) {
+        let binding = url.clone();
+        let pairs = binding.query_pairs();
+        let filtered = pairs.filter(|item| item.0.to_lowercase() != name.to_lowercase());
+
+        url.query_pairs_mut()
+            .clear()
+            .extend_pairs(filtered)
+            .append_pair(name, value)
+            .finish();
+    }
+}

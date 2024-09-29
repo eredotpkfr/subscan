@@ -10,3 +10,6 @@ pub mod binaryedge;
 pub mod bufferover;
 /// Builtwith API integration mmodule, API key required
 pub mod builtwith;
+/// Censys API integration, basic HTTP auth required but `Authorization`
+/// header can be used (e.g. `Authorization: Basic foo`)
+pub mod censys;
