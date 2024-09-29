@@ -52,13 +52,13 @@ pub mod env {
     ///
     ///     env::remove_var(env_key);
     ///
-    ///     assert_eq!(get_subscan_module_apikey("FOO").0, env_key);
-    ///     assert_eq!(get_subscan_module_apikey("FOO").1.is_ok(), false);
+    ///     assert_eq!(get_subscan_module_apikey("foo").0, env_key);
+    ///     assert_eq!(get_subscan_module_apikey("foo").1.is_ok(), false);
     ///
     ///     env::set_var(env_key, "foo");
     ///
-    ///     assert_eq!(get_subscan_module_apikey("FOO").0, env_key);
-    ///     assert_eq!(get_subscan_module_apikey("FOO").1.unwrap(), "foo");
+    ///     assert_eq!(get_subscan_module_apikey("foo").0, env_key);
+    ///     assert_eq!(get_subscan_module_apikey("foo").1.unwrap(), "foo");
     ///
     ///     env::remove_var(env_key);
     /// }
