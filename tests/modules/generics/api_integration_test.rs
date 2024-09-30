@@ -43,7 +43,7 @@ async fn generic_api_integration_run_test_with_header_auth() {
 }
 
 #[tokio::test]
-#[stubr::mock("module/generics/api-integration-with-url-auth.json")]
+#[stubr::mock("module/generics/api-integration-with-query-auth.json")]
 async fn generic_api_integration_run_test_with_url_auth() {
     let auth = APIAuthMethod::APIKeyAsQueryParam("apikey".to_string());
     let mut module = generic_api_integration(&stubr.path("/subdomains"), auth);
