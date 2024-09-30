@@ -52,7 +52,7 @@ impl GenericAPIIntegrationModule {
     }
 
     async fn set_apikey_param(&self, url: &mut Url, param: &str, apikey: &str) {
-        http::set_query_without_override(url, param, apikey);
+        http::update_url_query(url, param, apikey);
     }
 
     async fn set_apikey_header(&self, name: &str, apikey: &str) {

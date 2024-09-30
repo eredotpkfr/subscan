@@ -4,8 +4,9 @@ use crate::{
     modules::generics::api_integration::GenericAPIIntegrationModule,
     requesters::client::HTTPClient,
     types::core::Subdomain,
-    utils::http,
+    utils::{http, regex::generate_subdomain_regex},
 };
+use regex::Match;
 use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;
@@ -41,23 +42,28 @@ impl Censys {
 
     pub fn get_next_url(mut url: Url, content: Value) -> Option<Url> {
         if let Some(cursor) = content["result"]["links"]["next"].as_str() {
-            http::set_query_without_override(&mut url, "cursor", cursor);
+            http::update_url_query(&mut url, "cursor", cursor);
             Some(url)
         } else {
             None
         }
     }
 
-    pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {
+        let pattern = generate_subdomain_regex(domain).unwrap();
+
         if let Some(hits) = content["result"]["hits"].as_array() {
             let mut subs = BTreeSet::new();
 
             for result in hits {
                 if let Some(names) = result["names"].as_array() {
-                    let to_string = |item: &Value| Some(item.as_str()?.to_string());
-                    let names = names.iter().filter_map(to_string);
+                    let matches = |item: &Value| {
+                        let to_string = |matched: Match| matched.as_str().to_string();
 
-                    subs.extend(names);
+                        pattern.find(item.as_str()?).map(to_string)
+                    };
+
+                    subs.extend(names.iter().filter_map(matches));
                 }
             }
             subs

@@ -44,10 +44,9 @@ impl Bufferover {
 
         if let Some(subs) = content["Results"].as_array() {
             let filter = |item: &Value| {
-                let line = item.as_str()?.to_string();
                 let to_string = |matches: Match| matches.as_str().to_string();
 
-                pattern.find(&line).map(to_string)
+                pattern.find(item.as_str()?).map(to_string)
             };
 
             subs.iter().filter_map(filter).collect()

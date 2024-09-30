@@ -1,0 +1,34 @@
+{
+    "request": {
+        "headers": {
+            "Authorization": {
+                "equalTo": "censys-api-key"
+            }
+        },
+        "method": "GET",
+        "urlPath": "/censys"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "result": {
+                "hits": [
+                    {
+                        "names": [
+                            "bar.foo.com",
+                            "*.bar.foo.com"
+                        ]
+                    },
+                    {
+                        "names": {
+                            "foo": "bar"
+                        }
+                    }
+                ]
+            }
+        },
+        "status": 200
+    }
+}
