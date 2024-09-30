@@ -32,6 +32,7 @@ pub mod regex {
     }
 }
 
+/// Utilities about project environments
 pub mod env {
     use crate::config::SUBSCAN_ENV_NAMESPACE;
     use crate::types::core::APIKeyAsEnv;
@@ -70,8 +71,8 @@ pub mod env {
     }
 }
 
+/// Helpful HTTP utilities
 pub mod http {
-
     use reqwest::Url;
 
     /// Set query param without override olds. If the given param
@@ -88,6 +89,7 @@ pub mod http {
     /// set_query_without_override(&mut url, "a".into(), "b".into());
     /// assert_eq!(url.to_string(), "https://foo.com/?a=b");
     ///
+    /// // does not override old `a` parameter
     /// set_query_without_override(&mut url, "x".into(), "y".into());
     /// assert_eq!(url.to_string(), "https://foo.com/?a=b&x=y");
     ///
