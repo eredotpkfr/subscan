@@ -6,6 +6,7 @@ use crate::{
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use reqwest::Url;
+use serde_json::Value;
 
 /// Generic HTTP client trait definition to implement different
 /// HTTP requester objects with a single interface compatible
@@ -23,6 +24,7 @@ use reqwest::Url;
 /// use subscan::types::config::RequesterConfig;
 /// use reqwest::Url;
 /// use async_trait::async_trait;
+/// use serde_json::Value;
 ///
 /// pub struct CustomRequester {
 ///     config: RequesterConfig
@@ -41,6 +43,10 @@ use reqwest::Url;
 ///     async fn get_content(&self, url: Url) -> Option<String> {
 ///         Some(String::from("foo"))
 ///     }
+///
+///     async fn get_json_content(&self, url: Url) -> Value {
+///         Value::Bool(false)
+///     }
 /// }
 ///
 /// #[tokio::main]
@@ -53,6 +59,7 @@ use reqwest::Url;
 ///
 ///     let config = requester.config().await.clone();
 ///
+///     assert_eq!(requester.get_json_content(url.clone()).await, false);
 ///     assert_eq!(requester.get_content(url).await.unwrap(), "foo");
 ///     assert_eq!(config.proxy, None);
 ///     assert_eq!(config.timeout, Duration::from_secs(10));
@@ -68,4 +75,6 @@ pub trait RequesterInterface: Sync + Send {
     async fn configure(&mut self, config: RequesterConfig);
     /// Get HTML source of page from given [`reqwest::Url`] object
     async fn get_content(&self, url: Url) -> Option<String>;
+    /// Get JSON content from any URL
+    async fn get_json_content(&self, url: Url) -> Value;
 }

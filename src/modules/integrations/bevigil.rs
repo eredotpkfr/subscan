@@ -26,6 +26,7 @@ impl Bevigil {
         GenericAPIIntegrationModule {
             name: BEVIGIL_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
+            next: Box::new(move |_, _| None),
             auth: APIAuthMethod::APIKeyAsHeader("X-Access-Token".into()),
             requester: requester.into(),
             extractor: extractor.into(),
@@ -36,11 +37,11 @@ impl Bevigil {
         format!("{BEVIGIL_URL}/{domain}/subdomains")
     }
 
-    pub fn extract(content: Value) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {
         if let Some(subs) = content["subdomains"].as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());
 
-            BTreeSet::from_iter(subs.iter().filter_map(filter))
+            subs.iter().filter_map(filter).collect()
         } else {
             BTreeSet::new()
         }

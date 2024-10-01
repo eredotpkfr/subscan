@@ -4,7 +4,8 @@ use crate::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
-    types::core::APIKeyAsEnv,
+    types::core::{GetNextUrlFunc, GetQueryUrlFunc},
+    utils::http,
 };
 use async_trait::async_trait;
 use reqwest::header::{HeaderName, HeaderValue};
@@ -26,7 +27,10 @@ pub struct GenericAPIIntegrationModule {
     pub name: String,
     /// Simple function field that gets query URL
     /// by given domain address
-    pub url: Box<dyn Fn(&str) -> String + Sync + Send>,
+    pub url: GetQueryUrlFunc,
+    /// Function definition that gets next URL to ensure
+    /// fully fetch data with pagination from API endpoint
+    pub next: GetNextUrlFunc,
     /// Set authentication method, see [`APIAuthMethod`] enum
     /// for details
     pub auth: APIAuthMethod,
@@ -37,31 +41,25 @@ pub struct GenericAPIIntegrationModule {
 }
 
 impl GenericAPIIntegrationModule {
-    pub async fn authenticate(&self, url: &mut Url, apienv: APIKeyAsEnv) {
-        let apikey = apienv.1;
-
-        if apikey.is_err() {
-            return;
-        }
-
+    pub async fn authenticate(&self, url: &mut Url, apikey: String) {
         match &self.auth {
-            APIAuthMethod::APIKeyAsHeader(name) => {
-                self.set_apikey_header(name, &apikey.unwrap()).await
-            }
+            APIAuthMethod::APIKeyAsHeader(name) => self.set_apikey_header(name, &apikey).await,
             APIAuthMethod::APIKeyAsQueryParam(param) => {
-                self.set_apikey_param(url, param, &apikey.unwrap()).await
+                self.set_apikey_param(url, param, &apikey).await
             }
             APIAuthMethod::APIKeyAsURLSlug | APIAuthMethod::NoAuth => {}
         }
     }
 
     async fn set_apikey_param(&self, url: &mut Url, param: &str, apikey: &str) {
-        url.set_query(Some(&format!("{param}={apikey}")));
+        http::update_url_query(url, param, apikey);
     }
 
     async fn set_apikey_header(&self, name: &str, apikey: &str) {
         let mut requester = self.requester.lock().await;
-        let (name, value) = (HeaderName::from_str(name), HeaderValue::from_str(apikey));
+
+        let name = HeaderName::from_str(name);
+        let value = HeaderValue::from_str(apikey);
 
         if let (Ok(name), Ok(value)) = (name, value) {
             requester.config().await.add_header(name, value);
@@ -85,12 +83,38 @@ impl SubscanModuleInterface for GenericAPIIntegrationModule {
 
     async fn run(&mut self, domain: String) -> BTreeSet<String> {
         let mut url: Url = (self.url)(&domain).parse().unwrap();
+        let mut all_results = BTreeSet::new();
 
-        self.authenticate(&mut url, self.fetch_apikey().await).await;
+        if self.auth.is_set() {
+            let apienv = self.fetch_apikey().await;
+
+            if let Ok(apikey) = apienv.1 {
+                self.authenticate(&mut url, apikey).await;
+            } else {
+                return all_results;
+            }
+        }
 
         let requester = self.requester.lock().await;
-        let content = requester.get_content(url).await.unwrap_or_default();
 
-        self.extractor.extract(content, domain).await
+        loop {
+            let json = requester.get_json_content(url.clone()).await;
+            let serialized = json.to_string();
+            let news = self.extractor.extract(serialized, domain.clone()).await;
+
+            if news.is_empty() {
+                break;
+            }
+
+            all_results.extend(news);
+
+            if let Some(next_url) = (self.next)(url.clone(), json) {
+                url = next_url;
+            } else {
+                break;
+            }
+        }
+
+        all_results
     }
 }

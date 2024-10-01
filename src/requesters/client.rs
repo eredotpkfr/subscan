@@ -1,6 +1,7 @@
 use crate::{interfaces::requester::RequesterInterface, types::config::RequesterConfig};
 use async_trait::async_trait;
 use reqwest::{Client, Proxy, Url};
+use serde_json::Value;
 
 const CLIENT_BUILD_ERR: &str = "Cannot create HTTP client!";
 const REQUEST_BUILD_ERR: &str = "Cannot build request!";
@@ -153,5 +154,11 @@ impl RequesterInterface for HTTPClient {
         } else {
             None
         }
+    }
+
+    async fn get_json_content(&self, url: Url) -> Value {
+        let content = self.get_content(url).await.unwrap_or_default();
+
+        serde_json::from_str(&content).unwrap_or_default()
     }
 }

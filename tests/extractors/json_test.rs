@@ -11,9 +11,9 @@ use subscan::interfaces::extractor::SubdomainExtractorInterface;
 async fn extract_test() {
     let json = read_testdata("json/subdomains.json");
 
-    let inner_parser = |item: Value| {
-        if let Some(subs) = item["data"]["subdomains"].as_array() {
-            let filter = |item: &Value| Some(item["subdomain"].as_str().unwrap().to_string());
+    let inner_parser = |json: Value, _domain: String| {
+        if let Some(subs) = json["data"]["subdomains"].as_array() {
+            let filter = |json: &Value| Some(json["subdomain"].as_str().unwrap().to_string());
 
             BTreeSet::from_iter(subs.iter().filter_map(filter))
         } else {

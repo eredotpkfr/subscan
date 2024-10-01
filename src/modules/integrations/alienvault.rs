@@ -27,6 +27,7 @@ impl AlienVault {
         GenericAPIIntegrationModule {
             name: ALIENVAULT_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
+            next: Box::new(move |_, _| None),
             auth: APIAuthMethod::NoAuth,
             requester: requester.into(),
             extractor: extractor.into(),
@@ -37,11 +38,11 @@ impl AlienVault {
         format!("{ALIENVAULT_URL}/{domain}/passive_dns")
     }
 
-    pub fn extract(content: Value) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {
         if let Some(passives) = content["passive_dns"].as_array() {
             let filter = |item: &Value| Some(item["hostname"].as_str()?.to_string());
 
-            BTreeSet::from_iter(passives.iter().filter_map(filter))
+            passives.iter().filter_map(filter).collect()
         } else {
             BTreeSet::new()
         }

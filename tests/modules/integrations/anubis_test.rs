@@ -2,6 +2,7 @@ use std::collections::BTreeSet;
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
+    funcs::read_stub,
     mocks::wrap_url_with_mock_func,
 };
 use serde_json::{self, Value};
@@ -33,10 +34,10 @@ async fn get_query_url_test() {
 
 #[tokio::test]
 async fn extract_test() {
-    let json = "[\"bar.foo.com\"]";
+    let json = read_stub("module/integrations/anubis.json")["response"]["jsonBody"].clone();
 
-    let extracted = anubis::Anubis::extract(serde_json::from_str(json).unwrap());
-    let not_extracted = anubis::Anubis::extract(Value::default());
+    let extracted = anubis::Anubis::extract(json, TEST_DOMAIN.to_string());
+    let not_extracted = anubis::Anubis::extract(Value::Null, TEST_DOMAIN.to_string());
 
     assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.to_string()].into());
     assert_eq!(not_extracted, BTreeSet::new());
