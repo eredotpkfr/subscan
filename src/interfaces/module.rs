@@ -1,4 +1,8 @@
-use crate::enums::{RequesterDispatcher, SubdomainExtractorDispatcher};
+use crate::{
+    enums::{RequesterDispatcher, SubdomainExtractorDispatcher},
+    types::core::APIKeyAsEnv,
+    utils::env,
+};
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use std::collections::BTreeSet;
@@ -31,7 +35,7 @@ use tokio::sync::Mutex;
 /// #[async_trait(?Send)]
 /// impl SubscanModuleInterface for FooModule {
 ///     async fn name(&self) -> &str {
-///         &"foo-module"
+///         &"foo"
 ///     }
 ///
 ///     async fn requester(&self) -> Option<&Mutex<RequesterDispatcher>> {
@@ -43,25 +47,28 @@ use tokio::sync::Mutex;
 ///     }
 ///
 ///     async fn run(&mut self, domain: String) -> BTreeSet<String> {
-///         BTreeSet::default()
+///         BTreeSet::new()
 ///         // do something in `run` method
 ///     }
 /// }
 ///
 /// #[tokio::main]
 /// async fn main() {
+///     let requester = RequesterDispatcher::HTTPClient(HTTPClient::default());
+///     let extracator = RegexExtractor::default();
+///
 ///     let mut foo = FooModule {
-///         requester: Mutex::new(HTTPClient::default().into()),
-///         extractor: RegexExtractor::default().into(),
+///         requester: Mutex::new(requester),
+///         extractor: SubdomainExtractorDispatcher::RegexExtractor(extracator),
 ///     };
 ///
 ///     assert!(foo.requester().await.is_some());
 ///     assert!(foo.extractor().await.is_some());
 ///
-///     assert_eq!(foo.name().await, "foo-module");
+///     assert_eq!(foo.name().await, "foo");
 ///
 ///     // do something with results
-///     let results = foo.run("foo.com".into()).await;
+///     let results = foo.run("foo.com".to_string()).await;
 /// }
 /// ```
 #[async_trait(?Send)]
@@ -78,4 +85,11 @@ pub trait SubscanModuleInterface: Sync + Send {
     /// run this `run` method will be called, so this method
     /// should do everything
     async fn run(&mut self, domain: String) -> BTreeSet<String>;
+    /// Loads `.env` file and fetches module API key with variable name. If system
+    /// environment variable set with same name, `.env` file will be overrode
+    /// See the [`get_subscan_module_apikey`](crate::utils::env::get_subscan_module_apikey)
+    /// for details
+    async fn fetch_apikey(&self) -> APIKeyAsEnv {
+        env::get_subscan_module_apikey(self.name().await)
+    }
 }

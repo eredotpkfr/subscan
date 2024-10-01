@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
     funcs::read_testdata,
@@ -24,10 +26,10 @@ async fn extract_with_removes() {
     let extractor = HTMLExtractor::new(selector, vec!["<br>".to_string()]);
     let result = extractor.extract(html, TEST_DOMAIN.to_string()).await;
 
-    let expected = [
+    let expected = BTreeSet::from([
         TEST_BAR_SUBDOMAIN.to_string(),
         TEST_BAZ_SUBDOMAIN.to_string(),
-    ];
+    ]);
 
-    assert_eq!(result, expected.into());
+    assert_eq!(result, expected);
 }

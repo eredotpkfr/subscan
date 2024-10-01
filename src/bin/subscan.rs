@@ -17,15 +17,15 @@ async fn main() {
         let mut module = item.lock().await;
         let requester = module.requester().await.unwrap();
 
+        if module.name().await != "Censys" {
+            continue;
+        }
+
         println!(
             "{:#?} {:p}",
             requester.lock().await.config().await,
-            requester
+            requester,
         );
-
-        if module.name().await != "DuckDuckGo" {
-            continue;
-        }
 
         println!("Running...{}({})", module.name().await, cli.domain.clone());
 

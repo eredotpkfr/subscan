@@ -1,14 +1,14 @@
 use crate::{interfaces::requester::RequesterInterface, types::config::RequesterConfig};
 use async_trait::async_trait;
 use reqwest::{Client, Proxy, Url};
+use serde_json::Value;
 
 const CLIENT_BUILD_ERR: &str = "Cannot create HTTP client!";
 const REQUEST_BUILD_ERR: &str = "Cannot build request!";
 const PROXY_PARSE_ERR: &str = "Cannot parse proxy!";
 
-/// HTTP requester struct, send HTTP requests
-/// via [`reqwest`] client. Also its compatible
-/// with [`RequesterInterface`]
+/// HTTP requester struct, send HTTP requests via [`reqwest`] client.
+/// Also its compatible with [`RequesterInterface`]
 #[derive(Default)]
 pub struct HTTPClient {
     config: RequesterConfig,
@@ -72,13 +72,13 @@ impl RequesterInterface for HTTPClient {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let client = HTTPClient::default();
+    ///     let mut client = HTTPClient::default();
     ///
     ///     assert_eq!(client.config().await.timeout, Duration::from_secs(10));
     /// }
     /// ```
-    async fn config(&self) -> RequesterConfig {
-        self.config.clone()
+    async fn config(&mut self) -> &mut RequesterConfig {
+        &mut self.config
     }
 
     /// Configure requester with a new config object
@@ -129,7 +129,7 @@ impl RequesterInterface for HTTPClient {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let client = HTTPClient::default();
+    ///     let mut client = HTTPClient::default();
     ///     let url = Url::parse("https://foo.com").unwrap();
     ///
     ///     let content = client.get_content(url).await.unwrap();
@@ -154,5 +154,11 @@ impl RequesterInterface for HTTPClient {
         } else {
             None
         }
+    }
+
+    async fn get_json_content(&self, url: Url) -> Value {
+        let content = self.get_content(url).await.unwrap_or_default();
+
+        serde_json::from_str(&content).unwrap_or_default()
     }
 }

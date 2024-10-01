@@ -6,8 +6,6 @@ use async_trait::async_trait;
 use scraper::{ElementRef, Html, Selector};
 use std::collections::BTreeSet;
 
-/// HTML extractor component to extract subdomain addresses
-///
 /// This object compatible with [`SubdomainExtractorInterface`]
 /// and it uses `extract` method to extract subdomain addresses
 /// from inner text by given `XPath` or `CSS` selector
@@ -57,7 +55,6 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     /// use subscan::extractors::html::HTMLExtractor;
     /// use subscan::interfaces::extractor::SubdomainExtractorInterface;
     /// use subscan::types::core::Subdomain;
-    /// use std::collections::BTreeSet;
     ///
     /// #[tokio::main]
     /// async fn main() {
@@ -69,7 +66,7 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     ///
     ///     let result = extractor.extract(html, domain).await;
     ///
-    ///     assert_eq!(result, BTreeSet::from([String::from("bar.foo.com")]));
+    ///     assert_eq!(result, [Subdomain::from("bar.foo.com")].into());
     /// }
     /// ```
     async fn extract(&self, content: String, domain: String) -> BTreeSet<Subdomain> {

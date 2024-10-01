@@ -33,7 +33,7 @@ mod modules {
             let module = module.lock().await;
 
             if let Some(requester) = module.requester().await {
-                assert_eq!(requester.lock().await.config().await, old_config);
+                assert_eq!(requester.lock().await.config().await, &old_config);
             }
         }
 
@@ -43,7 +43,7 @@ mod modules {
             let module = module.lock().await;
 
             if let Some(requester) = module.requester().await {
-                assert_eq!(requester.lock().await.config().await, new_config);
+                assert_eq!(requester.lock().await.config().await, &new_config);
             }
         }
     }

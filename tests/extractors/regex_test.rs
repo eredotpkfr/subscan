@@ -1,4 +1,5 @@
 use crate::common::constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN};
+use std::collections::BTreeSet;
 use subscan::extractors::regex::RegexExtractor;
 use subscan::interfaces::extractor::SubdomainExtractorInterface;
 
@@ -21,10 +22,10 @@ async fn extract_test() {
     let extractor = RegexExtractor::default();
     let result = extractor.extract(content, TEST_DOMAIN.to_string()).await;
 
-    let expected = [
+    let expected = BTreeSet::from([
         TEST_BAR_SUBDOMAIN.to_string(),
         TEST_BAZ_SUBDOMAIN.to_string(),
-    ];
+    ]);
 
-    assert_eq!(result, expected.into());
+    assert_eq!(result, expected);
 }

@@ -1,13 +1,13 @@
 use crate::{
     enums::RequesterDispatcher, extractors::html::HTMLExtractor,
-    modules::generics::searchengine::GenericSearchEngineModule, requesters::client::HTTPClient,
+    modules::generics::search_engine::GenericSearchEngineModule, requesters::client::HTTPClient,
 };
 use reqwest::Url;
 
-const GOOGLE_MODULE_NAME: &str = "Google";
-const GOOGLE_SEARCH_URL: &str = "https://www.google.com/search";
-const GOOGLE_SEARCH_PARAM: &str = "q";
-const GOOGLE_CITE_TAG: &str = "cite";
+pub const GOOGLE_MODULE_NAME: &str = "Google";
+pub const GOOGLE_SEARCH_URL: &str = "https://www.google.com/search";
+pub const GOOGLE_SEARCH_PARAM: &str = "q";
+pub const GOOGLE_CITE_TAG: &str = "cite";
 
 /// Google search engine enumerator
 ///
@@ -23,20 +23,6 @@ const GOOGLE_CITE_TAG: &str = "cite";
 pub struct Google {}
 
 impl Google {
-    /// Create a new [`Google`] module instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::engines::google;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let google = google::Google::new();
-    ///
-    ///     // do something with google instance
-    /// }
-    /// ```
     #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericSearchEngineModule {
         let extractor: HTMLExtractor = HTMLExtractor::new(GOOGLE_CITE_TAG.into(), vec![]);

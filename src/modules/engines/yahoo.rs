@@ -1,13 +1,13 @@
 use crate::{
     enums::RequesterDispatcher, extractors::html::HTMLExtractor,
-    modules::generics::searchengine::GenericSearchEngineModule, requesters::client::HTTPClient,
+    modules::generics::search_engine::GenericSearchEngineModule, requesters::client::HTTPClient,
 };
 use reqwest::Url;
 
-const YAHOO_MODULE_NAME: &str = "Yahoo";
-const YAHOO_SEARCH_URL: &str = "https://search.yahoo.com/search";
-const YAHOO_SEARCH_PARAM: &str = "p";
-const YAHOO_CITE_TAG: &str = "ol > li > div > div > h3 > a > span";
+pub const YAHOO_MODULE_NAME: &str = "Yahoo";
+pub const YAHOO_SEARCH_URL: &str = "https://search.yahoo.com/search";
+pub const YAHOO_SEARCH_PARAM: &str = "p";
+pub const YAHOO_CITE_TAG: &str = "ol > li > div > div > h3 > a > span";
 
 /// Yahoo search engine enumerator
 ///
@@ -23,20 +23,6 @@ const YAHOO_CITE_TAG: &str = "ol > li > div > div > h3 > a > span";
 pub struct Yahoo {}
 
 impl Yahoo {
-    /// Create a new [`Yahoo`] module instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::engines::yahoo;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let yahoo = yahoo::Yahoo::new();
-    ///
-    ///     // do something with yahoo instance
-    /// }
-    /// ```
     #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericSearchEngineModule {
         let removes: Vec<String> = vec!["<b>".into(), "</b>".into()];

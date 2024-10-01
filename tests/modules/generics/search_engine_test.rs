@@ -1,5 +1,5 @@
 use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_MODULE_NAME, TEST_URL},
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mocks::generic_search_engine,
 };
 use subscan::interfaces::module::SubscanModuleInterface;
@@ -11,7 +11,7 @@ async fn get_search_query_test() {
     let mut query = module.get_search_query(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(query.as_search_str(), "site:foo.com");
-    assert_eq!(module.name().await, TEST_MODULE_NAME.to_string());
+    assert_eq!(module.name().await, module.name);
 }
 
 #[tokio::test]
@@ -21,6 +21,6 @@ async fn generic_search_engine_run_test() {
 
     let result = module.run(TEST_DOMAIN.to_string()).await;
 
-    assert_eq!(module.name().await, TEST_MODULE_NAME.to_string());
+    assert_eq!(module.name().await, module.name);
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
 }

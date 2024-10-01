@@ -1,13 +1,13 @@
 use crate::{
     enums::RequesterDispatcher, extractors::html::HTMLExtractor,
-    modules::generics::searchengine::GenericSearchEngineModule, requesters::client::HTTPClient,
+    modules::generics::search_engine::GenericSearchEngineModule, requesters::client::HTTPClient,
 };
 use reqwest::Url;
 
-const BING_MODULE_NAME: &str = "Bing";
-const BING_SEARCH_URL: &str = "https://www.bing.com/search";
-const BING_SEARCH_PARAM: &str = "q";
-const BING_CITE_TAG: &str = "cite";
+pub const BING_MODULE_NAME: &str = "Bing";
+pub const BING_SEARCH_URL: &str = "https://www.bing.com/search";
+pub const BING_SEARCH_PARAM: &str = "q";
+pub const BING_CITE_TAG: &str = "cite";
 
 /// Bing search engine enumerator
 ///
@@ -23,20 +23,6 @@ const BING_CITE_TAG: &str = "cite";
 pub struct Bing {}
 
 impl Bing {
-    /// Create a new [`Bing`] module instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::engines::bing;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let bing = bing::Bing::new();
-    ///
-    ///     // do something with bing instance
-    /// }
-    /// ```
     #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericSearchEngineModule {
         let extractor: HTMLExtractor = HTMLExtractor::new(BING_CITE_TAG.into(), vec![]);

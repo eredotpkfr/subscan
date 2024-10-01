@@ -2,13 +2,13 @@
 pub mod cache;
 /// Includes CLI components
 pub mod cli;
+/// Project configuration utils
+pub mod config;
 /// Enumerations and project type definitions
 pub mod enums;
 /// Data extractors like
 /// [`extractors::regex`], [`extractors::html`], etc.
 pub mod extractors;
-/// Thirty party integration modules
-pub mod integrations;
 /// Trait implementations
 pub mod interfaces;
 /// All modules listed under this module, core components for subscan
@@ -25,6 +25,7 @@ use enums::{RequesterDispatcher, SubdomainExtractorDispatcher};
 use interfaces::module::SubscanModuleInterface;
 use std::collections::BTreeSet;
 use tokio::sync::Mutex;
+use types::core::APIKeyAsEnv;
 
 /// Wrapper around a [`SubscanModuleInterface`] trait object
 ///
@@ -69,7 +70,7 @@ impl SubscanModule {
     ///
     ///     async fn run(&mut self, domain: String) -> BTreeSet<String> {
     ///         // do something in `run` method
-    ///         BTreeSet::default()
+    ///         BTreeSet::new()
     ///     }
     /// }
     ///
@@ -102,5 +103,9 @@ impl SubscanModule {
 
     pub async fn name(&self) -> &str {
         self.0.name().await
+    }
+
+    pub async fn fetch_apikey(&self) -> APIKeyAsEnv {
+        self.0.fetch_apikey().await
     }
 }

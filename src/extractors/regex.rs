@@ -6,10 +6,10 @@ use async_trait::async_trait;
 use regex::Match;
 use std::collections::BTreeSet;
 
-/// Regex extractor component
-///
-/// Generates subdomain pattern by given domain
-/// address and extracts subdomains via this pattern
+/// Regex extractor component generates subdomain pattern by
+/// given domain address and extracts subdomains via this pattern.
+/// Also this object compatible with [`SubdomainExtractorInterface`]
+/// and it uses `extract` method
 #[derive(Default)]
 pub struct RegexExtractor {}
 
@@ -36,10 +36,9 @@ impl RegexExtractor {
     /// ```
     pub fn extract_one(&self, content: String, domain: String) -> Option<Subdomain> {
         let pattern = generate_subdomain_regex(domain).unwrap();
+        let to_string = |matches: Match| matches.as_str().to_string();
 
-        pattern
-            .find(&content)
-            .map(|matches| matches.as_str().to_string())
+        pattern.find(&content).map(to_string)
     }
 }
 
@@ -67,10 +66,10 @@ impl SubdomainExtractorInterface for RegexExtractor {
     ///     let extractor = RegexExtractor::default();
     ///     let result = extractor.extract(content, domain).await;
     ///
-    ///     assert_eq!(result, BTreeSet::from([
+    ///     assert_eq!(result, [
     ///         Subdomain::from("bar.foo.com"),
     ///         Subdomain::from("baz.foo.com"),
-    ///     ]));
+    ///     ].into());
     ///     assert_eq!(result.len(), 2);
     /// }
     /// ```

@@ -1,0 +1,22 @@
+{
+    "request": {
+        "headers": {
+            "X-API-Key": {
+                "equalTo": "test-api-key"
+            }
+        },
+        "method": "GET",
+        "urlPath": "/subdomains"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "subdomains": [
+                "bar.foo.com"
+            ]
+        },
+        "status": 200
+    }
+}

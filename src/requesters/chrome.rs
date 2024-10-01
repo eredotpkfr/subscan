@@ -2,10 +2,10 @@ use crate::{interfaces::requester::RequesterInterface, types::config::RequesterC
 use async_trait::async_trait;
 use headless_chrome::{browser::LaunchOptions, Browser};
 use reqwest::Url;
+use serde_json::Value;
 
-/// Chrome requester struct, send HTTP requests
-/// via Chrome browser. Also its compatible
-/// with [`RequesterInterface`]
+/// Chrome requester struct, send HTTP requests via Chrome browser.
+/// Also its compatible with [`RequesterInterface`]
 pub struct ChromeBrowser {
     config: RequesterConfig,
     browser: Browser,
@@ -107,13 +107,13 @@ impl RequesterInterface for ChromeBrowser {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let browser = ChromeBrowser::default();
+    ///     let mut browser = ChromeBrowser::default();
     ///
     ///     assert_eq!(browser.config().await.timeout, Duration::from_secs(10));
     /// }
     /// ```
-    async fn config(&self) -> RequesterConfig {
-        self.config.clone()
+    async fn config(&mut self) -> &mut RequesterConfig {
+        &mut self.config
     }
 
     /// Configure requester with a new config object
@@ -150,7 +150,7 @@ impl RequesterInterface for ChromeBrowser {
         }
 
         self.browser = Browser::new(options).unwrap();
-        self.config = config
+        self.config = config;
     }
 
     /// Get page source HTML from given [`reqwest::Url`]
@@ -164,7 +164,7 @@ impl RequesterInterface for ChromeBrowser {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let browser = ChromeBrowser::default();
+    ///     let mut browser = ChromeBrowser::default();
     ///     let url = Url::parse("https://foo.com").unwrap();
     ///
     ///     let content = browser.get_content(url).await.unwrap();
@@ -187,5 +187,11 @@ impl RequesterInterface for ChromeBrowser {
         tab.close(true).unwrap();
 
         content
+    }
+
+    async fn get_json_content(&self, url: Url) -> Value {
+        let content = self.get_content(url).await.unwrap_or_default();
+
+        serde_json::from_str(&content).unwrap_or_default()
     }
 }

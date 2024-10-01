@@ -1,0 +1,23 @@
+{
+    "request": {
+        "headers": {
+            "X-Access-Token": {
+                "equalTo": "bevigil-api-key"
+            }
+        },
+        "method": "GET",
+        "urlPath": "/bevigil"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "subdomains": [
+                "bar.foo.com",
+                "baz.foo.com"
+            ]
+        },
+        "status": 200
+    }
+}
