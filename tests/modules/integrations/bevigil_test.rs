@@ -18,7 +18,7 @@ async fn bevigil_run_test() {
 
     env::set_var(&env_name, "bevigil-api-key");
 
-    bevigil.url = wrap_url_with_mock_func(stubr.path("/bevigil").as_str());
+    bevigil.url = wrap_url_with_mock_func(&stubr.path("/bevigil"));
 
     let result = bevigil.run(TEST_DOMAIN.to_string()).await;
 

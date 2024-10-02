@@ -16,7 +16,7 @@ use subscan::{
 async fn anubis_run_test() {
     let mut anubis = anubis::Anubis::new();
 
-    anubis.url = wrap_url_with_mock_func(stubr.path("/anubis").as_str());
+    anubis.url = wrap_url_with_mock_func(&stubr.path("/anubis"));
 
     let result = anubis.run(TEST_DOMAIN.to_string()).await;
 

@@ -18,7 +18,7 @@ async fn bufferover_run_test() {
 
     env::set_var(&env_name, "bufferover-api-key");
 
-    bufferover.url = wrap_url_with_mock_func(stubr.path("/bufferover").as_str());
+    bufferover.url = wrap_url_with_mock_func(&stubr.path("/bufferover"));
 
     let result = bufferover.run(TEST_DOMAIN.to_string()).await;
 

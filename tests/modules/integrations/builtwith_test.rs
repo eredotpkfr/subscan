@@ -19,7 +19,7 @@ async fn builtwith_run_test() {
 
     env::set_var(&env_name, "builtwith-api-key");
 
-    builtwith.url = wrap_url_with_mock_func(stubr.path("/builtwith").as_str());
+    builtwith.url = wrap_url_with_mock_func(&stubr.path("/builtwith"));
 
     let result = builtwith.run(TEST_DOMAIN.to_string()).await;
 

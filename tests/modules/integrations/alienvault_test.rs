@@ -16,7 +16,7 @@ use subscan::{
 async fn alienvault_run_test() {
     let mut alienvault = alienvault::AlienVault::new();
 
-    alienvault.url = wrap_url_with_mock_func(stubr.path("/alienvault").as_str());
+    alienvault.url = wrap_url_with_mock_func(&stubr.path("/alienvault"));
 
     let result = alienvault.run(TEST_DOMAIN.to_string()).await;
 

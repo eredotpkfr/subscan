@@ -18,7 +18,7 @@ async fn censys_run_test() {
 
     env::set_var(&env_name, "censys-api-key");
 
-    censys.url = wrap_url_with_mock_func(stubr.path("/censys").as_str());
+    censys.url = wrap_url_with_mock_func(&stubr.path("/censys"));
 
     let result = censys.run(TEST_DOMAIN.to_string()).await;
 
