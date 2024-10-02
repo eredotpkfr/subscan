@@ -1,6 +1,14 @@
 use crate::extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor};
+use crate::modules::generics::api_integration::GenericAPIIntegrationModule;
+use crate::modules::generics::search_engine::GenericSearchEngineModule;
 use crate::requesters::{chrome::ChromeBrowser, client::HTTPClient};
 use enum_dispatch::enum_dispatch;
+
+#[enum_dispatch(SubscanModuleInterface)]
+pub enum SubscanModuleDispatcher {
+    GenericAPIIntegrationModule(GenericAPIIntegrationModule),
+    GenericSearchEngineModule(GenericSearchEngineModule),
+}
 
 /// Dispatcher enumeration to decide extractor types
 ///

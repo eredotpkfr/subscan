@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
     funcs::read_stub,
-    mocks::wrap_url_with_mock_func,
+    mocks,
 };
 use serde_json::{self, Value};
 use subscan::{
@@ -14,9 +14,9 @@ use subscan::{
 #[tokio::test]
 #[stubr::mock("module/integrations/alienvault.json")]
 async fn alienvault_run_test() {
-    let mut alienvault = alienvault::AlienVault::new();
+    let mut alienvault = alienvault::AlienVault::dispatcher();
 
-    alienvault.url = wrap_url_with_mock_func(&stubr.path("/alienvault"));
+    mocks::wrap_module_dispatcher_url(&mut alienvault, &stubr.path("/alienvault"));
 
     let result = alienvault.run(TEST_DOMAIN.to_string()).await;
 

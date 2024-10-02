@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher},
+    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::api_integration::GenericAPIIntegrationModule,
     requesters::client::HTTPClient,
@@ -9,29 +9,34 @@ use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;
 
+pub const BUILTWITH_MODULE_NAME: &str = "Builtwith";
+pub const BUILTWITH_URL: &str = "https://api.builtwith.com/v21/api.json";
+
 /// Builtwith API integration module
 ///
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
 pub struct Builtwith {}
 
-pub const BUILTWITH_MODULE_NAME: &str = "Builtwith";
-pub const BUILTWITH_URL: &str = "https://api.builtwith.com/v21/api.json";
-
 impl Builtwith {
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new() -> GenericAPIIntegrationModule {
+    pub fn dispatcher() -> SubscanModuleDispatcher {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));
 
-        GenericAPIIntegrationModule {
+        let generic = GenericAPIIntegrationModule {
             name: BUILTWITH_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
-            next: Box::new(move |_, _| None),
+            next: Box::new(Self::get_next_url),
             auth: APIAuthMethod::APIKeyAsQueryParam("KEY".into()),
             requester: requester.into(),
             extractor: extractor.into(),
-        }
+        };
+
+        generic.into()
+    }
+
+    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
+        None
     }
 
     pub fn get_query_url(domain: &str) -> String {

@@ -1,5 +1,7 @@
-use crate::common::constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN};
-use reqwest::Url;
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
+    mocks,
+};
 use subscan::{
     interfaces::module::SubscanModuleInterface,
     modules::engines::yahoo::{self, YAHOO_MODULE_NAME},
@@ -8,9 +10,9 @@ use subscan::{
 #[tokio::test]
 #[stubr::mock("module/engines/yahoo.json")]
 async fn yahoo_run_test() {
-    let mut yahoo = yahoo::Yahoo::new();
+    let mut yahoo = yahoo::Yahoo::dispatcher();
 
-    yahoo.url = Url::parse(stubr.path("/search").as_str()).unwrap();
+    mocks::wrap_module_dispatcher_url(&mut yahoo, &stubr.path("/search"));
 
     let result = yahoo.run(TEST_DOMAIN.to_string()).await;
 

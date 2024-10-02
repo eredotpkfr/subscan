@@ -1,12 +1,16 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher},
+    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::api_integration::GenericAPIIntegrationModule,
     requesters::client::HTTPClient,
     types::core::Subdomain,
 };
+use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;
+
+pub const BEVIGIL_MODULE_NAME: &str = "Bevigil";
+pub const BEVIGIL_URL: &str = "https://osint.bevigil.com/api";
 
 /// Bevigil API integration module
 ///
@@ -14,23 +18,25 @@ use std::collections::BTreeSet;
 /// here are the configurations
 pub struct Bevigil {}
 
-pub const BEVIGIL_MODULE_NAME: &str = "Bevigil";
-pub const BEVIGIL_URL: &str = "https://osint.bevigil.com/api";
-
 impl Bevigil {
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new() -> GenericAPIIntegrationModule {
+    pub fn dispatcher() -> SubscanModuleDispatcher {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));
 
-        GenericAPIIntegrationModule {
+        let generic = GenericAPIIntegrationModule {
             name: BEVIGIL_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
-            next: Box::new(move |_, _| None),
+            next: Box::new(Self::get_next_url),
             auth: APIAuthMethod::APIKeyAsHeader("X-Access-Token".into()),
             requester: requester.into(),
             extractor: extractor.into(),
-        }
+        };
+
+        generic.into()
+    }
+
+    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
+        None
     }
 
     pub fn get_query_url(domain: &str) -> String {
@@ -41,9 +47,9 @@ impl Bevigil {
         if let Some(subs) = content["subdomains"].as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());
 
-            subs.iter().filter_map(filter).collect()
-        } else {
-            BTreeSet::new()
+            return subs.iter().filter_map(filter).collect();
         }
+
+        [].into()
     }
 }

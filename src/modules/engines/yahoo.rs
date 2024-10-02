@@ -1,6 +1,8 @@
 use crate::{
-    enums::RequesterDispatcher, extractors::html::HTMLExtractor,
-    modules::generics::search_engine::GenericSearchEngineModule, requesters::client::HTTPClient,
+    enums::{RequesterDispatcher, SubscanModuleDispatcher},
+    extractors::html::HTMLExtractor,
+    modules::generics::search_engine::GenericSearchEngineModule,
+    requesters::client::HTTPClient,
 };
 use reqwest::Url;
 
@@ -23,19 +25,20 @@ pub const YAHOO_CITE_TAG: &str = "ol > li > div > div > h3 > a > span";
 pub struct Yahoo {}
 
 impl Yahoo {
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new() -> GenericSearchEngineModule {
+    pub fn dispatcher() -> SubscanModuleDispatcher {
         let removes: Vec<String> = vec!["<b>".into(), "</b>".into()];
         let extractor: HTMLExtractor = HTMLExtractor::new(YAHOO_CITE_TAG.into(), removes);
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let url = Url::parse(YAHOO_SEARCH_URL);
 
-        GenericSearchEngineModule {
+        let generic = GenericSearchEngineModule {
             name: YAHOO_MODULE_NAME.into(),
             param: YAHOO_SEARCH_PARAM.into(),
             url: url.unwrap(),
             requester: requester.into(),
             extractor: extractor.into(),
-        }
+        };
+
+        generic.into()
     }
 }

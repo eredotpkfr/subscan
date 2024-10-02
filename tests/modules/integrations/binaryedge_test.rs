@@ -1,7 +1,7 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
     funcs::read_stub,
-    mocks::wrap_url_with_mock_func,
+    mocks,
 };
 use serde_json::{self, Value};
 use std::{collections::BTreeSet, env};
@@ -13,12 +13,11 @@ use subscan::{
 #[tokio::test]
 #[stubr::mock("module/integrations/binaryedge.json")]
 async fn binaryedge_run_test() {
-    let mut binaryedge = binaryedge::Binaryedge::new();
+    let mut binaryedge = binaryedge::Binaryedge::dispatcher();
     let (env_name, _) = binaryedge.fetch_apikey().await;
 
     env::set_var(&env_name, "binaryedge-api-key");
-
-    binaryedge.url = wrap_url_with_mock_func(&stubr.path("/binaryedge"));
+    mocks::wrap_module_dispatcher_url(&mut binaryedge, &stubr.path("/binaryedge"));
 
     let result = binaryedge.run(TEST_DOMAIN.to_string()).await;
 

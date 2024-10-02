@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     funcs::read_stub,
-    mocks::wrap_url_with_mock_func,
+    mocks,
 };
 use serde_json::{self, Value};
 use subscan::{
@@ -14,9 +14,9 @@ use subscan::{
 #[tokio::test]
 #[stubr::mock("module/integrations/anubis.json")]
 async fn anubis_run_test() {
-    let mut anubis = anubis::Anubis::new();
+    let mut anubis = anubis::Anubis::dispatcher();
 
-    anubis.url = wrap_url_with_mock_func(&stubr.path("/anubis"));
+    mocks::wrap_module_dispatcher_url(&mut anubis, &stubr.path("/anubis"));
 
     let result = anubis.run(TEST_DOMAIN.to_string()).await;
 

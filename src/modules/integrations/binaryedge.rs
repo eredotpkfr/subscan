@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher},
+    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::api_integration::GenericAPIIntegrationModule,
     requesters::client::HTTPClient,
@@ -9,29 +9,30 @@ use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;
 
+pub const BINARYEDGE_MODULE_NAME: &str = "Binaryedge";
+pub const BINARYEDGE_URL: &str = "https://api.binaryedge.io/v2/query/domains/subdomain";
+
 /// Binaryedge API integration module
 ///
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
 pub struct Binaryedge {}
 
-pub const BINARYEDGE_MODULE_NAME: &str = "Binaryedge";
-pub const BINARYEDGE_URL: &str = "https://api.binaryedge.io/v2/query/domains/subdomain";
-
 impl Binaryedge {
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new() -> GenericAPIIntegrationModule {
+    pub fn dispatcher() -> SubscanModuleDispatcher {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));
 
-        GenericAPIIntegrationModule {
+        let generic = GenericAPIIntegrationModule {
             name: BINARYEDGE_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
             auth: APIAuthMethod::APIKeyAsHeader("X-Key".into()),
             requester: requester.into(),
             extractor: extractor.into(),
-        }
+        };
+
+        generic.into()
     }
 
     pub fn get_query_url(domain: &str) -> String {
@@ -56,9 +57,9 @@ impl Binaryedge {
         if let Some(subs) = content["events"].as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());
 
-            subs.iter().filter_map(filter).collect()
-        } else {
-            BTreeSet::new()
+            return subs.iter().filter_map(filter).collect();
         }
+
+        [].into()
     }
 }

@@ -1,6 +1,8 @@
 use crate::{
-    enums::RequesterDispatcher, extractors::html::HTMLExtractor,
-    modules::generics::search_engine::GenericSearchEngineModule, requesters::client::HTTPClient,
+    enums::{RequesterDispatcher, SubscanModuleDispatcher},
+    extractors::html::HTMLExtractor,
+    modules::generics::search_engine::GenericSearchEngineModule,
+    requesters::client::HTTPClient,
 };
 use reqwest::Url;
 
@@ -23,18 +25,19 @@ pub const BING_CITE_TAG: &str = "cite";
 pub struct Bing {}
 
 impl Bing {
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new() -> GenericSearchEngineModule {
+    pub fn dispatcher() -> SubscanModuleDispatcher {
         let extractor: HTMLExtractor = HTMLExtractor::new(BING_CITE_TAG.into(), vec![]);
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let url = Url::parse(BING_SEARCH_URL);
 
-        GenericSearchEngineModule {
+        let generic = GenericSearchEngineModule {
             name: BING_MODULE_NAME.into(),
             param: BING_SEARCH_PARAM.into(),
             url: url.unwrap(),
             requester: requester.into(),
             extractor: extractor.into(),
-        }
+        };
+
+        generic.into()
     }
 }

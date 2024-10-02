@@ -1,7 +1,7 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
     funcs::read_stub,
-    mocks::wrap_url_with_mock_func,
+    mocks,
 };
 use reqwest::Url;
 use serde_json::{self, Value};
@@ -14,12 +14,12 @@ use subscan::{
 #[tokio::test]
 #[stubr::mock("module/integrations/builtwith.json")]
 async fn builtwith_run_test() {
-    let mut builtwith = builtwith::Builtwith::new();
+    let mut builtwith = builtwith::Builtwith::dispatcher();
     let (env_name, _) = builtwith.fetch_apikey().await;
 
     env::set_var(&env_name, "builtwith-api-key");
 
-    builtwith.url = wrap_url_with_mock_func(&stubr.path("/builtwith"));
+    mocks::wrap_module_dispatcher_url(&mut builtwith, &stubr.path("/builtwith"));
 
     let result = builtwith.run(TEST_DOMAIN.to_string()).await;
 

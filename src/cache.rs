@@ -1,9 +1,9 @@
 use crate::{
+    enums::SubscanModuleDispatcher,
     modules::{
         engines::{bing, duckduckgo, google, yahoo},
         integrations::{alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys},
     },
-    SubscanModule,
 };
 use lazy_static::lazy_static;
 use tokio::sync::Mutex;
@@ -12,26 +12,29 @@ lazy_static! {
     /// All `subscan` modules are stores in this in-memory [`Vec`]
     /// as a [`SubscanModule`], all modules must be compatible
     /// with [`SubscanModuleInterface`](crate::interfaces::module::SubscanModuleInterface) trait
-    pub static ref ALL_MODULES: Vec<Mutex<SubscanModule>> = vec![
+    pub static ref ALL_MODULES: Vec<Mutex<SubscanModuleDispatcher>> = vec![
         // Search engines
-        SubscanModule::new(google::Google::new()),
-        SubscanModule::new(yahoo::Yahoo::new()),
-        SubscanModule::new(bing::Bing::new()),
-        SubscanModule::new(duckduckgo::DuckDuckGo::new()),
+        Mutex::new(google::Google::dispatcher()),
+        Mutex::new(yahoo::Yahoo::dispatcher()),
+        Mutex::new(bing::Bing::dispatcher()),
+        Mutex::new(duckduckgo::DuckDuckGo::dispatcher()),
         // API integrations
-        SubscanModule::new(alienvault::AlienVault::new()),
-        SubscanModule::new(anubis::Anubis::new()),
-        SubscanModule::new(bevigil::Bevigil::new()),
-        SubscanModule::new(binaryedge::Binaryedge::new()),
-        SubscanModule::new(bufferover::Bufferover::new()),
-        SubscanModule::new(builtwith::Builtwith::new()),
-        SubscanModule::new(censys::Censys::new()),
+        Mutex::new(alienvault::AlienVault::dispatcher()),
+        Mutex::new(anubis::Anubis::dispatcher()),
+        Mutex::new(bevigil::Bevigil::dispatcher()),
+        Mutex::new(binaryedge::Binaryedge::dispatcher()),
+        Mutex::new(bufferover::Bufferover::dispatcher()),
+        Mutex::new(builtwith::Builtwith::dispatcher()),
+        Mutex::new(censys::Censys::dispatcher()),
     ];
 }
 
 /// Module to manage modules that already cached in-memory cache
 pub mod modules {
-    use crate::{interfaces::requester::RequesterInterface, types::config::RequesterConfig};
+    use crate::{
+        interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
+        types::config::RequesterConfig,
+    };
 
     /// Configure all modules requester objects that has any requester
     ///

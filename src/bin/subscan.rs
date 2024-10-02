@@ -2,7 +2,7 @@ use clap::Parser;
 use subscan::{
     cache::{self, ALL_MODULES},
     cli::Cli,
-    interfaces::requester::RequesterInterface,
+    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     types::config::RequesterConfig,
 };
 

@@ -1,7 +1,7 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
     funcs::read_stub,
-    mocks::wrap_url_with_mock_func,
+    mocks,
 };
 use serde_json::{self, Value};
 use std::{collections::BTreeSet, env};
@@ -13,12 +13,11 @@ use subscan::{
 #[tokio::test]
 #[stubr::mock("module/integrations/bevigil.json")]
 async fn bevigil_run_test() {
-    let mut bevigil = bevigil::Bevigil::new();
+    let mut bevigil = bevigil::Bevigil::dispatcher();
     let (env_name, _) = bevigil.fetch_apikey().await;
 
     env::set_var(&env_name, "bevigil-api-key");
-
-    bevigil.url = wrap_url_with_mock_func(&stubr.path("/bevigil"));
+    mocks::wrap_module_dispatcher_url(&mut bevigil, &stubr.path("/bevigil"));
 
     let result = bevigil.run(TEST_DOMAIN.to_string()).await;
 

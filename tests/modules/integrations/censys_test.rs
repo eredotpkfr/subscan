@@ -1,7 +1,7 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     funcs::read_stub,
-    mocks::wrap_url_with_mock_func,
+    mocks,
 };
 use serde_json::{self, Value};
 use std::{collections::BTreeSet, env};
@@ -13,12 +13,11 @@ use subscan::{
 #[tokio::test]
 #[stubr::mock("module/integrations/censys.json")]
 async fn censys_run_test() {
-    let mut censys = censys::Censys::new();
+    let mut censys = censys::Censys::dispatcher();
     let (env_name, _) = censys.fetch_apikey().await;
 
     env::set_var(&env_name, "censys-api-key");
-
-    censys.url = wrap_url_with_mock_func(&stubr.path("/censys"));
+    mocks::wrap_module_dispatcher_url(&mut censys, &stubr.path("/censys"));
 
     let result = censys.run(TEST_DOMAIN.to_string()).await;
 

@@ -37,7 +37,7 @@ pub mod mocks {
     use super::funcs::md5_hex;
     use super::*;
     use subscan::{
-        enums::{APIAuthMethod, RequesterDispatcher},
+        enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
         extractors::{json::JSONExtractor, regex::RegexExtractor},
         modules::generics::{
             api_integration::GenericAPIIntegrationModule, search_engine::GenericSearchEngineModule,
@@ -90,5 +90,16 @@ pub mod mocks {
         let url: Url = url.parse().unwrap();
 
         Box::new(move |_| url.to_string().clone())
+    }
+
+    pub fn wrap_module_dispatcher_url(dispatcher: &mut SubscanModuleDispatcher, url: &str) {
+        match dispatcher {
+            SubscanModuleDispatcher::GenericSearchEngineModule(module) => {
+                module.url = Url::parse(url).unwrap()
+            }
+            SubscanModuleDispatcher::GenericAPIIntegrationModule(module) => {
+                module.url = wrap_url_with_mock_func(url)
+            }
+        }
     }
 }
