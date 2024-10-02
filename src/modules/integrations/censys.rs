@@ -50,10 +50,10 @@ impl Censys {
     }
 
     pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {
-        let pattern = generate_subdomain_regex(domain).unwrap();
+        let mut subs = BTreeSet::new();
 
         if let Some(hits) = content["result"]["hits"].as_array() {
-            let mut subs = BTreeSet::new();
+            let pattern = generate_subdomain_regex(domain).unwrap();
 
             for result in hits {
                 if let Some(names) = result["names"].as_array() {
@@ -66,9 +66,8 @@ impl Censys {
                     subs.extend(names.iter().filter_map(matches));
                 }
             }
-            subs
-        } else {
-            BTreeSet::new()
         }
+
+        subs
     }
 }

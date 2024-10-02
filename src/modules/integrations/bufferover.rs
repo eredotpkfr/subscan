@@ -40,18 +40,19 @@ impl Bufferover {
     }
 
     pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {
+        let mut subs = BTreeSet::new();
         let pattern = generate_subdomain_regex(domain).unwrap();
 
-        if let Some(subs) = content["Results"].as_array() {
+        if let Some(results) = content["Results"].as_array() {
             let filter = |item: &Value| {
                 let to_string = |matches: Match| matches.as_str().to_string();
 
                 pattern.find(item.as_str()?).map(to_string)
             };
 
-            subs.iter().filter_map(filter).collect()
-        } else {
-            BTreeSet::new()
+            subs.extend(results.iter().filter_map(filter));
         }
+
+        subs
     }
 }

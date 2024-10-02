@@ -51,9 +51,9 @@ impl Builtwith {
     }
 
     pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {
-        if let Some(results) = content["Results"].as_array() {
-            let mut subs = BTreeSet::new();
+        let mut subs = BTreeSet::new();
 
+        if let Some(results) = content["Results"].as_array() {
             for result in results {
                 if let Some(paths) = result["Result"]["Paths"].as_array() {
                     let filter = |item: &Value| {
@@ -65,9 +65,8 @@ impl Builtwith {
                     subs.extend(paths.iter().filter_map(filter));
                 }
             }
-            subs
-        } else {
-            BTreeSet::new()
         }
+
+        subs
     }
 }
