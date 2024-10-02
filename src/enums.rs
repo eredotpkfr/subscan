@@ -60,9 +60,9 @@ pub enum RequesterDispatcher {
 }
 
 /// Authentication methods for API calls.
-/// [`GenericAPIIntegrationModule`](crate::modules::generics::api_integration::GenericAPIIntegrationModule)
-/// uses them to apply correct auth method. See the
-/// method descriptions to learn how it works
+/// [`GenericAPIIntegrationModule`] uses them to apply
+/// correct auth method. See the method descriptions to
+/// learn how it works
 #[derive(PartialEq)]
 pub enum APIAuthMethod {
     /// Some APIs uses request headers to get
