@@ -12,7 +12,7 @@ use subscan::{
 async fn yahoo_run_test() {
     let mut yahoo = yahoo::Yahoo::dispatcher();
 
-    mocks::wrap_module_dispatcher_url(&mut yahoo, &stubr.path("/search"));
+    mocks::wrap_module_dispatcher_url_field(&mut yahoo, &stubr.path("/search"));
 
     let result = yahoo.run(TEST_DOMAIN.to_string()).await;
 

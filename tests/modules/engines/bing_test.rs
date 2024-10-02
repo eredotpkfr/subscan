@@ -12,7 +12,7 @@ use subscan::{
 async fn bing_run_test() {
     let mut bing = bing::Bing::dispatcher();
 
-    mocks::wrap_module_dispatcher_url(&mut bing, &stubr.path("/search"));
+    mocks::wrap_module_dispatcher_url_field(&mut bing, &stubr.path("/search"));
 
     let result = bing.run(TEST_DOMAIN.to_string()).await;
 

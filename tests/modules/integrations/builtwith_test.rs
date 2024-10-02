@@ -18,8 +18,7 @@ async fn builtwith_run_test() {
     let (env_name, _) = builtwith.fetch_apikey().await;
 
     env::set_var(&env_name, "builtwith-api-key");
-
-    mocks::wrap_module_dispatcher_url(&mut builtwith, &stubr.path("/builtwith"));
+    mocks::wrap_module_dispatcher_url_field(&mut builtwith, &stubr.path("/builtwith"));
 
     let result = builtwith.run(TEST_DOMAIN.to_string()).await;
 

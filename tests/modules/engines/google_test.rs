@@ -12,7 +12,7 @@ use subscan::{
 async fn google_run_test() {
     let mut google = google::Google::dispatcher();
 
-    mocks::wrap_module_dispatcher_url(&mut google, &stubr.path("/search"));
+    mocks::wrap_module_dispatcher_url_field(&mut google, &stubr.path("/search"));
 
     let result = google.run(TEST_DOMAIN.to_string()).await;
 

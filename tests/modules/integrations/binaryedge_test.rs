@@ -17,7 +17,7 @@ async fn binaryedge_run_test() {
     let (env_name, _) = binaryedge.fetch_apikey().await;
 
     env::set_var(&env_name, "binaryedge-api-key");
-    mocks::wrap_module_dispatcher_url(&mut binaryedge, &stubr.path("/binaryedge"));
+    mocks::wrap_module_dispatcher_url_field(&mut binaryedge, &stubr.path("/binaryedge"));
 
     let result = binaryedge.run(TEST_DOMAIN.to_string()).await;
 

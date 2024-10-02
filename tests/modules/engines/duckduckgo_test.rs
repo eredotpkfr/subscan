@@ -16,7 +16,7 @@ async fn duckduckgo_run_test() {
     let mut duckduckgo = duckduckgo::DuckDuckGo::dispatcher();
     let new_requester = HTTPClient::default();
 
-    mocks::wrap_module_dispatcher_url(&mut duckduckgo, &stubr.uri());
+    mocks::wrap_module_dispatcher_url_field(&mut duckduckgo, &stubr.uri());
 
     if let SubscanModuleDispatcher::GenericSearchEngineModule(ref mut duckduckgo) = duckduckgo {
         duckduckgo.requester = Mutex::new(new_requester.into());

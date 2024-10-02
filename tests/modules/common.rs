@@ -92,10 +92,10 @@ pub mod mocks {
         Box::new(move |_| url.to_string().clone())
     }
 
-    pub fn wrap_module_dispatcher_url(dispatcher: &mut SubscanModuleDispatcher, url: &str) {
+    pub fn wrap_module_dispatcher_url_field(dispatcher: &mut SubscanModuleDispatcher, url: &str) {
         match dispatcher {
             SubscanModuleDispatcher::GenericSearchEngineModule(module) => {
-                module.url = Url::parse(url).unwrap()
+                module.url = url.parse().unwrap()
             }
             SubscanModuleDispatcher::GenericAPIIntegrationModule(module) => {
                 module.url = wrap_url_with_mock_func(url)
