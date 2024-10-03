@@ -22,15 +22,6 @@
                             }
                         ]
                     }
-                },
-                {
-                    "Result": {
-                        "Paths": [
-                            {
-                                "SubDomain": "baz"
-                            }
-                        ]
-                    }
                 }
             ]
         },

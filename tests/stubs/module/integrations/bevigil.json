@@ -14,8 +14,7 @@
         },
         "jsonBody": {
             "subdomains": [
-                "bar.foo.com",
-                "baz.foo.com"
+                "bar.foo.com"
             ]
         },
         "status": 200

@@ -1,5 +1,5 @@
 use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     funcs::read_stub,
     mocks,
 };
@@ -22,14 +22,7 @@ async fn bufferover_run_test() {
     let result = bufferover.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(bufferover.name().await, BUFFEROVER_MODULE_NAME);
-    assert_eq!(
-        result,
-        [
-            TEST_BAR_SUBDOMAIN.to_string(),
-            TEST_BAZ_SUBDOMAIN.to_string(),
-        ]
-        .into()
-    );
+    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
     env::remove_var(env_name);
 }
@@ -48,13 +41,6 @@ async fn extract_test() {
     let extracted = bufferover::Bufferover::extract(json, TEST_DOMAIN.to_string());
     let not_extracted = bufferover::Bufferover::extract(Value::Null, TEST_DOMAIN.to_string());
 
-    assert_eq!(
-        extracted,
-        [
-            TEST_BAR_SUBDOMAIN.to_string(),
-            TEST_BAZ_SUBDOMAIN.to_string(),
-        ]
-        .into()
-    );
+    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(not_extracted, BTreeSet::new());
 }

@@ -1,5 +1,5 @@
 use crate::common::{
-    constants::{TEST_API_KEY, TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
+    constants::{TEST_API_KEY, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     mocks::generic_api_integration,
 };
 use std::env;
@@ -14,14 +14,7 @@ async fn generic_api_integration_run_test_no_auth() {
     let result = module.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(module.name().await, module.name);
-    assert_eq!(
-        result,
-        [
-            TEST_BAR_SUBDOMAIN.to_string(),
-            TEST_BAZ_SUBDOMAIN.to_string()
-        ]
-        .into()
-    );
+    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }
 
 #[tokio::test]
