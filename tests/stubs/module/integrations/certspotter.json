@@ -1,0 +1,31 @@
+{
+    "request": {
+        "headers": {
+            "Authorization": {
+                "equalTo": "certspotter-api-key"
+            }
+        },
+        "method": "GET",
+        "urlPath": "/certspotter"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": [
+            {
+                "cert_sha256": "360c41cbc12e1006f817f61819be80a892af7acf4cff89b43e90d0892d1ff221",
+                "dns_names": [
+                    "bar.foo.com"
+                ],
+                "id": "8304288493",
+                "not_after": "2024-12-30T12:46:39Z",
+                "not_before": "2024-10-01T12:46:40Z",
+                "pubkey_sha256": "abaddb27dfb94543a30d58656e2b0187889c26e5fd47c54cac1f568ecd99b3da",
+                "revoked": false,
+                "tbs_sha256": "79e9457e879c77d5a2306f0378456c0ef84125fbb593755886215fcb5b1f8c36c"
+            }
+        ],
+        "status": 200
+    }
+}

@@ -47,7 +47,7 @@ impl GenericAPIIntegrationModule {
             APIAuthMethod::APIKeyAsQueryParam(param) => {
                 self.set_apikey_param(url, param, &apikey).await
             }
-            APIAuthMethod::APIKeyAsURLSlug | APIAuthMethod::NoAuth => {}
+            APIAuthMethod::NoAuth => {}
         }
     }
 

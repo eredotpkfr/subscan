@@ -1,9 +1,9 @@
 use std::collections::BTreeSet;
 
 use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     funcs::read_stub,
-    mocks::wrap_url_with_mock_func,
+    mocks,
 };
 use serde_json::{self, Value};
 use subscan::{
@@ -14,21 +14,14 @@ use subscan::{
 #[tokio::test]
 #[stubr::mock("module/integrations/alienvault.json")]
 async fn alienvault_run_test() {
-    let mut alienvault = alienvault::AlienVault::new();
+    let mut alienvault = alienvault::AlienVault::dispatcher();
 
-    alienvault.url = wrap_url_with_mock_func(stubr.path("/alienvault").as_str());
+    mocks::wrap_module_dispatcher_url_field(&mut alienvault, &stubr.path("/alienvault"));
 
     let result = alienvault.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(alienvault.name().await, ALIENVAULT_MODULE_NAME);
-    assert_eq!(
-        result,
-        [
-            TEST_BAR_SUBDOMAIN.to_string(),
-            TEST_BAZ_SUBDOMAIN.to_string(),
-        ]
-        .into()
-    );
+    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }
 
 #[tokio::test]
@@ -46,14 +39,6 @@ async fn extract_test() {
     let extracted = alienvault::AlienVault::extract(json, TEST_DOMAIN.to_string());
     let not_extracted = alienvault::AlienVault::extract(Value::Null, TEST_DOMAIN.to_string());
 
-    assert_eq!(
-        extracted,
-        [
-            TEST_BAR_SUBDOMAIN.to_string(),
-            TEST_BAZ_SUBDOMAIN.to_string(),
-        ]
-        .into()
-    );
-
+    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(not_extracted, BTreeSet::new());
 }

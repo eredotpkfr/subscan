@@ -1,5 +1,8 @@
 use crate::{
-    enums::{RequesterDispatcher, SubdomainExtractorDispatcher},
+    enums::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+    modules::generics::{
+        api_integration::GenericAPIIntegrationModule, search_engine::GenericSearchEngineModule,
+    },
     types::core::APIKeyAsEnv,
     utils::env,
 };

@@ -1,15 +1,21 @@
 {
     "request": {
+        "headers": {
+            "Authorization": {
+                "equalTo": "chaos-api-key"
+            }
+        },
         "method": "GET",
-        "urlPath": "/subdomains"
+        "urlPath": "/chaos"
     },
     "response": {
         "headers": {
             "content-type": "application/json"
         },
         "jsonBody": {
+            "domain": "foo.com",
             "subdomains": [
-                "bar.foo.com"
+                "bar"
             ]
         },
         "status": 200

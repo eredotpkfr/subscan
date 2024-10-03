@@ -2,7 +2,7 @@ use clap::Parser;
 use subscan::{
     cache::{self, ALL_MODULES},
     cli::Cli,
-    interfaces::requester::RequesterInterface,
+    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     types::config::RequesterConfig,
 };
 
@@ -17,7 +17,7 @@ async fn main() {
         let mut module = item.lock().await;
         let requester = module.requester().await.unwrap();
 
-        if module.name().await != "Censys" {
+        if module.name().await != "chaos" {
             continue;
         }
 

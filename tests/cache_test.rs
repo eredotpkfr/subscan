@@ -13,7 +13,7 @@ mod modules {
     use std::time::Duration;
     use subscan::{
         cache::{self, modules},
-        interfaces::requester::RequesterInterface,
+        interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
         types::config::RequesterConfig,
     };
 

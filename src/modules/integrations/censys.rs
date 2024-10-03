@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher},
+    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::api_integration::GenericAPIIntegrationModule,
     requesters::client::HTTPClient,
@@ -11,29 +11,36 @@ use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;
 
-/// Censys API integration module
+pub const CENSYS_MODULE_NAME: &str = "censys";
+pub const CENSYS_URL: &str = "https://search.censys.io/api/v2/certificates/search";
+
+/// `Censys` API integration module
 ///
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
+///
+/// | Property           | Value                             |
+/// |:------------------:|:---------------------------------:|
+/// | Module Name        | `censys`                          |
+/// | Doc URL            | <https://search.censys.io>        |
+/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
 pub struct Censys {}
 
-pub const CENSYS_MODULE_NAME: &str = "Censys";
-pub const CENSYS_URL: &str = "https://search.censys.io/api/v2/certificates/search";
-
 impl Censys {
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new() -> GenericAPIIntegrationModule {
+    pub fn dispatcher() -> SubscanModuleDispatcher {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));
 
-        GenericAPIIntegrationModule {
+        let generic = GenericAPIIntegrationModule {
             name: CENSYS_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
             auth: APIAuthMethod::APIKeyAsHeader("Authorization".into()),
             requester: requester.into(),
             extractor: extractor.into(),
-        }
+        };
+
+        generic.into()
     }
 
     pub fn get_query_url(domain: &str) -> String {
@@ -50,10 +57,10 @@ impl Censys {
     }
 
     pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {
-        let pattern = generate_subdomain_regex(domain).unwrap();
+        let mut subs = BTreeSet::new();
 
         if let Some(hits) = content["result"]["hits"].as_array() {
-            let mut subs = BTreeSet::new();
+            let pattern = generate_subdomain_regex(domain).unwrap();
 
             for result in hits {
                 if let Some(names) = result["names"].as_array() {
@@ -66,9 +73,8 @@ impl Censys {
                     subs.extend(names.iter().filter_map(matches));
                 }
             }
-            subs
-        } else {
-            BTreeSet::new()
         }
+
+        subs
     }
 }

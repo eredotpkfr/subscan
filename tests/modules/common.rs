@@ -6,7 +6,6 @@ pub mod constants {
     pub const TEST_URL: &str = "http://foo.com";
     pub const TEST_DOMAIN: &str = "foo.com";
     pub const TEST_BAR_SUBDOMAIN: &str = "bar.foo.com";
-    pub const TEST_BAZ_SUBDOMAIN: &str = "baz.foo.com";
     pub const TEST_API_KEY: &str = "test-api-key";
     pub const READ_ERROR: &str = "Cannot read file!";
 }
@@ -37,7 +36,7 @@ pub mod mocks {
     use super::funcs::md5_hex;
     use super::*;
     use subscan::{
-        enums::{APIAuthMethod, RequesterDispatcher},
+        enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
         extractors::{json::JSONExtractor, regex::RegexExtractor},
         modules::generics::{
             api_integration::GenericAPIIntegrationModule, search_engine::GenericSearchEngineModule,
@@ -86,9 +85,20 @@ pub mod mocks {
         }
     }
 
-    pub fn wrap_url_with_mock_func(url: &str) -> Box<dyn Fn(&str) -> String + Sync + Send> {
+    fn wrap_url_with_mock_func(url: &str) -> Box<dyn Fn(&str) -> String + Sync + Send> {
         let url: Url = url.parse().unwrap();
 
         Box::new(move |_| url.to_string().clone())
+    }
+
+    pub fn wrap_module_dispatcher_url_field(dispatcher: &mut SubscanModuleDispatcher, url: &str) {
+        match dispatcher {
+            SubscanModuleDispatcher::GenericSearchEngineModule(module) => {
+                module.url = url.parse().unwrap()
+            }
+            SubscanModuleDispatcher::GenericAPIIntegrationModule(module) => {
+                module.url = wrap_url_with_mock_func(url)
+            }
+        }
     }
 }

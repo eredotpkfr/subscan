@@ -1,6 +1,34 @@
 use crate::extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor};
+use crate::modules::generics::api_integration::GenericAPIIntegrationModule;
+use crate::modules::generics::search_engine::GenericSearchEngineModule;
 use crate::requesters::{chrome::ChromeBrowser, client::HTTPClient};
 use enum_dispatch::enum_dispatch;
+
+/// Dispatcher enumeration to decide module types
+///
+/// It allows to made static type dispatching instead of
+/// dynamic dispatch and speed up performance. For more
+/// technical details please follow up `enum_dispatch` package
+///
+/// Each `Subscan` module that compatible with [`SubscanModuleInterface`](crate::interfaces::module::SubscanModuleInterface)
+/// must be appeared in this dispatcher as a any enum variant c/o `enum_dispatch`
+/// macro creates a sub method for [`SubscanModuleInterface`](crate::interfaces::module::SubscanModuleInterface)
+/// methods and matches all of these variants with their methods
+///
+/// When you call any method from [`SubscanModuleDispatcher`] object this mappings
+/// should be implemented otherwise you cannot access these methods like
+/// `.name(`, `.requester(`, `.run(`, etc.
+#[enum_dispatch(SubscanModuleInterface)]
+pub enum SubscanModuleDispatcher {
+    /// Enum variant of generic API integrations. It can be used for all
+    /// generic API modules at the same time, for this only requirement
+    /// is the module should be implemented as a [`GenericAPIIntegrationModule`]
+    GenericAPIIntegrationModule(GenericAPIIntegrationModule),
+    /// Also another generic variant for search engines, It can be used for
+    /// all generic search engine modules at the same time. Just modules should be
+    /// implemented as a [`GenericSearchEngineModule`]
+    GenericSearchEngineModule(GenericSearchEngineModule),
+}
 
 /// Dispatcher enumeration to decide extractor types
 ///
@@ -52,9 +80,9 @@ pub enum RequesterDispatcher {
 }
 
 /// Authentication methods for API calls.
-/// [`GenericAPIIntegrationModule`](crate::modules::generics::api_integration::GenericAPIIntegrationModule)
-/// uses them to apply correct auth method. See the
-/// method descriptions to learn how it works
+/// [`GenericAPIIntegrationModule`] uses them to apply
+/// correct auth method. See the method descriptions to
+/// learn how it works
 #[derive(PartialEq)]
 pub enum APIAuthMethod {
     /// Some APIs uses request headers to get
@@ -66,9 +94,6 @@ pub enum APIAuthMethod {
     /// will be added in URL as a query param with given
     /// parameter key
     APIKeyAsQueryParam(String),
-    /// This auth method checks if the query URL includes
-    /// API key's self
-    APIKeyAsURLSlug,
     /// This auth type does nothing for auth
     NoAuth,
 }

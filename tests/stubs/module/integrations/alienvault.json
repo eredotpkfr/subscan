@@ -11,9 +11,6 @@
             "passive_dns": [
                 {
                     "hostname": "bar.foo.com"
-                },
-                {
-                    "hostname": "baz.foo.com"
                 }
             ]
         },

@@ -9,31 +9,31 @@ use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;
 
-pub const ANUBIS_MODULE_NAME: &str = "anubis";
-pub const ANUBIS_URL: &str = "https://jonlu.ca/anubis/subdomains";
+pub const CHAOS_MODULE_NAME: &str = "chaos";
+pub const CHAOS_URL: &str = "https://dns.projectdiscovery.io/dns";
 
-/// `Anubis` API integration module
+/// `Chaos` API integration module
 ///
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                           |
-/// |:------------------:|:-------------------------------:|
-/// | Module Name        | `anubis`                        |
-/// | Doc URL            | <https://jonlu.ca/anubis>       |
-/// | Authentication     | [`APIAuthMethod::NoAuth`]       |
-pub struct Anubis {}
+/// | Property           | Value                               |
+/// |:------------------:|:-----------------------------------:|
+/// | Module Name        | `chaos`                             |
+/// | Doc URL            | <https://cloud.projectdiscovery.io> |
+/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`]   |
+pub struct Chaos {}
 
-impl Anubis {
+impl Chaos {
     pub fn dispatcher() -> SubscanModuleDispatcher {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));
 
         let generic = GenericAPIIntegrationModule {
-            name: ANUBIS_MODULE_NAME.into(),
+            name: CHAOS_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::NoAuth,
+            auth: APIAuthMethod::APIKeyAsHeader("Authorization".into()),
             requester: requester.into(),
             extractor: extractor.into(),
         };
@@ -42,16 +42,16 @@ impl Anubis {
     }
 
     pub fn get_query_url(domain: &str) -> String {
-        format!("{ANUBIS_URL}/{domain}")
+        format!("{CHAOS_URL}/{domain}/subdomains")
     }
 
     pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
         None
     }
 
-    pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {
-        if let Some(subs) = content.as_array() {
-            let filter = |item: &Value| Some(item.as_str()?.to_string());
+    pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {
+        if let Some(subs) = content["subdomains"].as_array() {
+            let filter = |item: &Value| Some(format!("{}.{}", item.as_str()?, domain));
 
             return subs.iter().filter_map(filter).collect();
         }
