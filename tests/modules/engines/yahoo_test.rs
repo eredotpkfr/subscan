@@ -17,5 +17,5 @@ async fn yahoo_run_test() {
     let result = yahoo.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(yahoo.name().await, YAHOO_MODULE_NAME);
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }

@@ -17,5 +17,5 @@ async fn google_run_test() {
     let result = google.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(google.name().await, GOOGLE_MODULE_NAME);
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }

@@ -22,7 +22,7 @@ async fn chaos_run_test() {
     let result = chaos.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(chaos.name().await, CHAOS_MODULE_NAME);
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
     env::remove_var(env_name);
 }
@@ -40,6 +40,6 @@ async fn extract_test() {
     let extracted = chaos::Chaos::extract(json, TEST_DOMAIN.to_string());
     let not_extracted = chaos::Chaos::extract(Value::Null, TEST_DOMAIN.to_string());
 
-    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(not_extracted, BTreeSet::new());
 }

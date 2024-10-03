@@ -25,5 +25,5 @@ async fn duckduckgo_run_test() {
     let result = duckduckgo.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(duckduckgo.name().await, DUCKDUCKGO_MODULE_NAME);
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }

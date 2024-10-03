@@ -30,7 +30,7 @@ async fn generic_api_integration_run_test_with_header_auth() {
     let result = module.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(module.name().await, module.name);
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
     env::remove_var(env_key);
 }
@@ -48,7 +48,7 @@ async fn generic_api_integration_run_test_with_url_auth() {
     let result = module.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(module.name().await, module.name);
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
     env::remove_var(env_key);
 }

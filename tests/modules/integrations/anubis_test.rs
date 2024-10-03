@@ -21,7 +21,7 @@ async fn anubis_run_test() {
     let result = anubis.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(anubis.name().await, ANUBIS_MODULE_NAME);
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }
 
 #[tokio::test]
@@ -39,6 +39,6 @@ async fn extract_test() {
     let extracted = anubis::Anubis::extract(json, TEST_DOMAIN.to_string());
     let not_extracted = anubis::Anubis::extract(Value::Null, TEST_DOMAIN.to_string());
 
-    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(not_extracted, BTreeSet::new());
 }

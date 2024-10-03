@@ -22,5 +22,5 @@ async fn generic_search_engine_run_test() {
     let result = module.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(module.name().await, module.name);
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }
