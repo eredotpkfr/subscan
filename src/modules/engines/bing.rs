@@ -26,9 +26,10 @@ pub struct Bing {}
 
 impl Bing {
     pub fn dispatcher() -> SubscanModuleDispatcher {
+        let url = Url::parse(BING_SEARCH_URL);
+
         let extractor: HTMLExtractor = HTMLExtractor::new(BING_CITE_TAG.into(), vec![]);
         let requester: RequesterDispatcher = HTTPClient::default().into();
-        let url = Url::parse(BING_SEARCH_URL);
 
         let generic = GenericSearchEngineModule {
             name: BING_MODULE_NAME.into(),

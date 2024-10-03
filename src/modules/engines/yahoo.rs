@@ -26,10 +26,11 @@ pub struct Yahoo {}
 
 impl Yahoo {
     pub fn dispatcher() -> SubscanModuleDispatcher {
-        let removes: Vec<String> = vec!["<b>".into(), "</b>".into()];
+        let url = Url::parse(YAHOO_SEARCH_URL);
+        let removes = vec![String::from("<b>"), String::from("</b>")];
+
         let extractor: HTMLExtractor = HTMLExtractor::new(YAHOO_CITE_TAG.into(), removes);
         let requester: RequesterDispatcher = HTTPClient::default().into();
-        let url = Url::parse(YAHOO_SEARCH_URL);
 
         let generic = GenericSearchEngineModule {
             name: YAHOO_MODULE_NAME.into(),

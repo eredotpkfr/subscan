@@ -26,9 +26,10 @@ pub struct DuckDuckGo {}
 
 impl DuckDuckGo {
     pub fn dispatcher() -> SubscanModuleDispatcher {
+        let url = Url::parse(DUCKDUCKGO_SEARCH_URL);
+
         let extractor: HTMLExtractor = HTMLExtractor::new(DUCKDUCKGO_CITE_TAG.into(), vec![]);
         let requester: RequesterDispatcher = ChromeBrowser::default().into();
-        let url = Url::parse(DUCKDUCKGO_SEARCH_URL);
 
         let generic = GenericSearchEngineModule {
             name: DUCKDUCKGO_MODULE_NAME.into(),
