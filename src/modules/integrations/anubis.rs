@@ -9,13 +9,19 @@ use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;
 
-pub const ANUBIS_MODULE_NAME: &str = "Anubis";
+pub const ANUBIS_MODULE_NAME: &str = "anubis";
 pub const ANUBIS_URL: &str = "https://jonlu.ca/anubis/subdomains";
 
-/// Anubis API integration module
+/// `Anubis` API integration module
 ///
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
+///
+/// | Property           | Value                           |
+/// |:------------------:|:-------------------------------:|
+/// | Module Name        | `anubis`                        |
+/// | Doc URL            | <https://jonlu.ca/anubis>       |
+/// | Authentication     | [`APIAuthMethod::NoAuth`]       |
 pub struct Anubis {}
 
 impl Anubis {
@@ -35,12 +41,12 @@ impl Anubis {
         generic.into()
     }
 
-    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
-        None
-    }
-
     pub fn get_query_url(domain: &str) -> String {
         format!("{ANUBIS_URL}/{domain}")
+    }
+
+    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
+        None
     }
 
     pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {

@@ -9,16 +9,22 @@ use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;
 
-pub const BINARYEDGE_MODULE_NAME: &str = "Binaryedge";
+pub const BINARYEDGE_MODULE_NAME: &str = "binaryedge";
 pub const BINARYEDGE_URL: &str = "https://api.binaryedge.io/v2/query/domains/subdomain";
 
-/// Binaryedge API integration module
+/// `BinaryEdge` API integration module
 ///
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
-pub struct Binaryedge {}
+///
+/// | Property           | Value                             |
+/// |:------------------:|:---------------------------------:|
+/// | Module Name        | `binaryedge`                      |
+/// | Doc URL            | <https://www.binaryedge.io>       |
+/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
+pub struct BinaryEdge {}
 
-impl Binaryedge {
+impl BinaryEdge {
     pub fn dispatcher() -> SubscanModuleDispatcher {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));

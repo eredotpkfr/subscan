@@ -13,3 +13,5 @@ pub mod builtwith;
 /// Censys API integration, basic HTTP auth required but `Authorization`
 /// header can be used (e.g. `Authorization: Basic foo`)
 pub mod censys;
+/// Certspotter API integration, API key required
+pub mod certspotter;

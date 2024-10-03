@@ -10,13 +10,19 @@ use crate::{
 use reqwest::Url;
 use serde_json::Value;
 
-pub const ALIENVAULT_MODULE_NAME: &str = "AlienVault";
+pub const ALIENVAULT_MODULE_NAME: &str = "alienvault";
 pub const ALIENVAULT_URL: &str = "https://otx.alienvault.com/api/v1/indicators/domain";
 
-/// Alienvault API integration module
+/// `AlienVault` API integration module
 ///
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
+///
+/// | Property           | Value                           |
+/// |:------------------:|:-------------------------------:|
+/// | Module Name        | `alienvault`                    |
+/// | Doc URL            | <https://otx.alienvault.com>    |
+/// | Authentication     | [`APIAuthMethod::NoAuth`]       |
 pub struct AlienVault {}
 
 impl AlienVault {
@@ -36,12 +42,12 @@ impl AlienVault {
         generic.into()
     }
 
-    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
-        None
-    }
-
     pub fn get_query_url(domain: &str) -> String {
         format!("{ALIENVAULT_URL}/{domain}/passive_dns")
+    }
+
+    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
+        None
     }
 
     pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {

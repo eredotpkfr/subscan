@@ -11,16 +11,22 @@ use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;
 
-pub const BUFFEROVER_MODULE_NAME: &str = "Bufferover";
+pub const BUFFEROVER_MODULE_NAME: &str = "bufferover";
 pub const BUFFEROVER_URL: &str = "https://tls.bufferover.run";
 
-/// Bufferover API integration module
+/// `BufferOver` API integration module
 ///
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
-pub struct Bufferover {}
+///
+/// | Property           | Value                             |
+/// |:------------------:|:---------------------------------:|
+/// | Module Name        | `bufferover`                      |
+/// | Doc URL            | <https://tls.bufferover.run>      |
+/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
+pub struct BufferOver {}
 
-impl Bufferover {
+impl BufferOver {
     pub fn dispatcher() -> SubscanModuleDispatcher {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));
@@ -37,12 +43,12 @@ impl Bufferover {
         generic.into()
     }
 
-    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
-        None
-    }
-
     pub fn get_query_url(domain: &str) -> String {
         format!("{BUFFEROVER_URL}/dns?q={domain}")
+    }
+
+    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
+        None
     }
 
     pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {

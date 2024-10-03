@@ -6,7 +6,7 @@ use crate::{
 };
 use reqwest::Url;
 
-pub const GOOGLE_MODULE_NAME: &str = "Google";
+pub const GOOGLE_MODULE_NAME: &str = "google";
 pub const GOOGLE_SEARCH_URL: &str = "https://www.google.com/search";
 pub const GOOGLE_SEARCH_PARAM: &str = "q";
 pub const GOOGLE_CITE_TAG: &str = "cite";
@@ -18,7 +18,7 @@ pub const GOOGLE_CITE_TAG: &str = "cite";
 ///
 /// | Property           | Value                           |
 /// |:------------------:|:-------------------------------:|
-/// | Module Name        | `Google`                        |
+/// | Module Name        | `google`                        |
 /// | Search URL         | <https://www.google.com/search> |
 /// | Search Param       | `q`                             |
 /// | Subdomain Selector | `cite`                          |

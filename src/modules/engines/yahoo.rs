@@ -6,7 +6,7 @@ use crate::{
 };
 use reqwest::Url;
 
-pub const YAHOO_MODULE_NAME: &str = "Yahoo";
+pub const YAHOO_MODULE_NAME: &str = "yahoo";
 pub const YAHOO_SEARCH_URL: &str = "https://search.yahoo.com/search";
 pub const YAHOO_SEARCH_PARAM: &str = "p";
 pub const YAHOO_CITE_TAG: &str = "ol > li > div > div > h3 > a > span";
@@ -18,7 +18,7 @@ pub const YAHOO_CITE_TAG: &str = "ol > li > div > div > h3 > a > span";
 ///
 /// | Property           | Value                                 |
 /// |:------------------:|:-------------------------------------:|
-/// | Module Name        | `Yahoo`                               |
+/// | Module Name        | `yahoo`                               |
 /// | Search URL         | <https://search.yahoo.com/search>     |
 /// | Search Param       | `p`                                   |
 /// | Subdomain Selector | `ol > li > div > div > h3 > a > span` |

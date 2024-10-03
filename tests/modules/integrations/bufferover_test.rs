@@ -13,7 +13,7 @@ use subscan::{
 #[tokio::test]
 #[stubr::mock("module/integrations/bufferover.json")]
 async fn bufferover_run_test() {
-    let mut bufferover = bufferover::Bufferover::dispatcher();
+    let mut bufferover = bufferover::BufferOver::dispatcher();
     let (env_name, _) = bufferover.fetch_apikey().await;
 
     env::set_var(&env_name, "bufferover-api-key");
@@ -29,7 +29,7 @@ async fn bufferover_run_test() {
 
 #[tokio::test]
 async fn get_query_url_test() {
-    let url = bufferover::Bufferover::get_query_url(TEST_DOMAIN);
+    let url = bufferover::BufferOver::get_query_url(TEST_DOMAIN);
     let expected = format!("{BUFFEROVER_URL}/dns?q={TEST_DOMAIN}");
 
     assert_eq!(url, expected);
@@ -38,8 +38,8 @@ async fn get_query_url_test() {
 #[tokio::test]
 async fn extract_test() {
     let json = read_stub("module/integrations/bufferover.json")["response"]["jsonBody"].clone();
-    let extracted = bufferover::Bufferover::extract(json, TEST_DOMAIN.to_string());
-    let not_extracted = bufferover::Bufferover::extract(Value::Null, TEST_DOMAIN.to_string());
+    let extracted = bufferover::BufferOver::extract(json, TEST_DOMAIN.to_string());
+    let not_extracted = bufferover::BufferOver::extract(Value::Null, TEST_DOMAIN.to_string());
 
     assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(not_extracted, BTreeSet::new());

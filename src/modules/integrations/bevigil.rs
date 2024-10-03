@@ -9,13 +9,19 @@ use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;
 
-pub const BEVIGIL_MODULE_NAME: &str = "Bevigil";
+pub const BEVIGIL_MODULE_NAME: &str = "bevigil";
 pub const BEVIGIL_URL: &str = "https://osint.bevigil.com/api";
 
-/// Bevigil API integration module
+/// `Bevigil` API integration module
 ///
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
+///
+/// | Property           | Value                             |
+/// |:------------------:|:---------------------------------:|
+/// | Module Name        | `bevigil`                         |
+/// | Doc URL            | <https://bevigil.com>             |
+/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
 pub struct Bevigil {}
 
 impl Bevigil {
@@ -35,12 +41,12 @@ impl Bevigil {
         generic.into()
     }
 
-    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
-        None
-    }
-
     pub fn get_query_url(domain: &str) -> String {
         format!("{BEVIGIL_URL}/{domain}/subdomains")
+    }
+
+    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
+        None
     }
 
     pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {

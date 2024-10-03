@@ -2,7 +2,9 @@ use crate::{
     enums::SubscanModuleDispatcher,
     modules::{
         engines::{bing, duckduckgo, google, yahoo},
-        integrations::{alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys},
+        integrations::{
+            alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys, certspotter,
+        },
     },
 };
 use lazy_static::lazy_static;
@@ -22,10 +24,11 @@ lazy_static! {
         Mutex::new(alienvault::AlienVault::dispatcher()),
         Mutex::new(anubis::Anubis::dispatcher()),
         Mutex::new(bevigil::Bevigil::dispatcher()),
-        Mutex::new(binaryedge::Binaryedge::dispatcher()),
-        Mutex::new(bufferover::Bufferover::dispatcher()),
-        Mutex::new(builtwith::Builtwith::dispatcher()),
+        Mutex::new(binaryedge::BinaryEdge::dispatcher()),
+        Mutex::new(bufferover::BufferOver::dispatcher()),
+        Mutex::new(builtwith::BuiltWith::dispatcher()),
         Mutex::new(censys::Censys::dispatcher()),
+        Mutex::new(certspotter::CertSpotter::dispatcher()),
     ];
 }
 

@@ -11,13 +11,19 @@ use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;
 
-pub const CENSYS_MODULE_NAME: &str = "Censys";
+pub const CENSYS_MODULE_NAME: &str = "censys";
 pub const CENSYS_URL: &str = "https://search.censys.io/api/v2/certificates/search";
 
-/// Censys API integration module
+/// `Censys` API integration module
 ///
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
+///
+/// | Property           | Value                             |
+/// |:------------------:|:---------------------------------:|
+/// | Module Name        | `censys`                          |
+/// | Doc URL            | <https://search.censys.io>        |
+/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
 pub struct Censys {}
 
 impl Censys {

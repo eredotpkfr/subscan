@@ -6,7 +6,7 @@ use crate::{
 };
 use reqwest::Url;
 
-pub const DUCKDUCKGO_MODULE_NAME: &str = "DuckDuckGo";
+pub const DUCKDUCKGO_MODULE_NAME: &str = "duckduckgo";
 pub const DUCKDUCKGO_SEARCH_URL: &str = "https://duckduckgo.com";
 pub const DUCKDUCKGO_SEARCH_PARAM: &str = "q";
 pub const DUCKDUCKGO_CITE_TAG: &str = "article > div > div > a > span:first-child";
@@ -18,7 +18,7 @@ pub const DUCKDUCKGO_CITE_TAG: &str = "article > div > div > a > span:first-chil
 ///
 /// | Property           | Value                                        |
 /// |:------------------:|:--------------------------------------------:|
-/// | Module Name        | `DuckDuckGo`                                 |
+/// | Module Name        | `duckduckgo`                                 |
 /// | Search URL         | <https://duckduckgo.com>                     |
 /// | Search Param       | `q`                                          |
 /// | Subdomain Selector | `article > div > div > a > span:first-child` |
