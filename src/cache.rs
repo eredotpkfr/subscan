@@ -4,6 +4,7 @@ use crate::{
         engines::{bing, duckduckgo, google, yahoo},
         integrations::{
             alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys, certspotter,
+            chaos,
         },
     },
 };
@@ -29,6 +30,7 @@ lazy_static! {
         Mutex::new(builtwith::BuiltWith::dispatcher()),
         Mutex::new(censys::Censys::dispatcher()),
         Mutex::new(certspotter::CertSpotter::dispatcher()),
+        Mutex::new(chaos::Chaos::dispatcher()),
     ];
 }
 
