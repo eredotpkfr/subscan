@@ -16,11 +16,12 @@ pub const DIGITORUS_SUBDOMAIN_TAG: &str = "main > div:nth-last-child(3) > div > 
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                            |
-/// |:------------------:|:--------------------------------:|
-/// | Module Name        | `digitorus`                      |
-/// | Doc URL            | <https://certificatedetails.com> |
-/// | Authentication     | [`APIAuthMethod::NoAuth`]        |
+/// | Property           | Value                                          |
+/// |:------------------:|:----------------------------------------------:|
+/// | Module Name        | `digitorus`                                    |
+/// | Subdomain Selector | `main > div:nth-last-child(3) > div > div > a` |
+/// | Doc URL            | <https://certificatedetails.com>               |
+/// | Authentication     | [`APIAuthMethod::NoAuth`]                      |
 pub struct Digitorus {}
 
 impl Digitorus {
