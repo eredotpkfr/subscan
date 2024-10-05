@@ -52,11 +52,11 @@ impl SubdomainExtractorInterface for JSONExtractor {
     /// use subscan::types::core::Subdomain;
     /// use subscan::enums::Content;
     /// use std::collections::BTreeSet;
-    /// use serde_json::Value;
+    /// use serde_json::{Value, json};
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let content = Content::from("{\"foo\": \"bar\"}");
+    ///     let content = Content::from(json!({"foo": "bar"}));
     ///     let domain = "foo.com".to_string();
     ///
     ///     let func = |item: Value, _domain: String| {
