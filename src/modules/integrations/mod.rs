@@ -19,3 +19,5 @@ pub mod certspotter;
 pub mod chaos;
 /// `Crt.sh` API integration
 pub mod crtsh;
+/// `Digitorus` API integration
+pub mod digitorus;

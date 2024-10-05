@@ -4,7 +4,7 @@ use crate::{
         engines::{bing, duckduckgo, google, yahoo},
         integrations::{
             alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys, certspotter,
-            chaos, crtsh,
+            chaos, crtsh, digitorus,
         },
     },
 };
@@ -32,6 +32,7 @@ lazy_static! {
         Mutex::new(certspotter::CertSpotter::dispatcher()),
         Mutex::new(chaos::Chaos::dispatcher()),
         Mutex::new(crtsh::Crtsh::dispatcher()),
+        Mutex::new(digitorus::Digitorus::dispatcher()),
     ];
 }
 

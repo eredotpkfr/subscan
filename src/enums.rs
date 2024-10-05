@@ -3,6 +3,7 @@ use crate::modules::generics::api_integration::GenericAPIIntegrationModule;
 use crate::modules::generics::search_engine::GenericSearchEngineModule;
 use crate::requesters::{chrome::ChromeBrowser, client::HTTPClient};
 use enum_dispatch::enum_dispatch;
+use serde_json::Value;
 
 /// Dispatcher enumeration to decide module types
 ///
@@ -114,5 +115,45 @@ impl APIAuthMethod {
     /// ```
     pub fn is_set(&self) -> bool {
         self != &Self::NoAuth
+    }
+}
+
+#[derive(Clone, Default)]
+pub enum Content {
+    String(String),
+    JSON(Value),
+    #[default]
+    Empty,
+}
+
+impl From<&str> for Content {
+    fn from(value: &str) -> Self {
+        Self::String(value.to_string())
+    }
+}
+
+impl Content {
+    pub fn as_string(self) -> String {
+        match self {
+            Self::String(content) => content,
+            Self::JSON(json) => json.to_string(),
+            Self::Empty => String::new(),
+        }
+    }
+
+    pub fn as_json(self) -> Value {
+        match self {
+            Self::String(content) => serde_json::from_str(&content).unwrap_or_default(),
+            Self::JSON(json) => json,
+            Self::Empty => Value::Null,
+        }
+    }
+
+    pub fn is_empty(self) -> bool {
+        match self {
+            Self::String(content) => content.is_empty(),
+            Self::JSON(json) => json == Value::Null,
+            Self::Empty => true,
+        }
     }
 }
