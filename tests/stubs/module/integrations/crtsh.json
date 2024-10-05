@@ -1,0 +1,26 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/crtsh"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": [
+            {
+                "common_name": "bar.foo.com",
+                "entry_timestamp": "2024-06-14T07:17:12.05",
+                "id": 13356418102,
+                "issuer_ca_id": 247125,
+                "issuer_name": "C=US, O=Foo, CN=Foo RSA 2048 M02",
+                "name_value": "bar.foo.com",
+                "not_after": "2025-07-13T23:59:59",
+                "not_before": "2024-06-14T00:00:00",
+                "result_count": 1,
+                "serial_number": "0140a766bf10b20714379fd5ddce96f2"
+            }
+        ],
+        "status": 200
+    }
+}
