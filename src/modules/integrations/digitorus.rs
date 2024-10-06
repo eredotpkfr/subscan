@@ -11,7 +11,7 @@ pub const DIGITORUS_MODULE_NAME: &str = "digitorus";
 pub const DIGITORUS_URL: &str = "https://certificatedetails.com";
 pub const DIGITORUS_SUBDOMAIN_TAG: &str = "main > div:nth-last-child(3) > div > div > a";
 
-/// `Crt.sh` API integration module
+/// `Digitorus` API integration module
 ///
 /// It uses [`GenericAPIIntegrationModule`] its own inner
 /// here are the configurations
@@ -26,7 +26,7 @@ pub struct Digitorus {}
 
 impl Digitorus {
     pub fn dispatcher() -> SubscanModuleDispatcher {
-        let selector = String::from(DIGITORUS_SUBDOMAIN_TAG);
+        let selector: String = DIGITORUS_SUBDOMAIN_TAG.into();
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: HTMLExtractor = HTMLExtractor::new(selector, vec![]);
 
