@@ -4,8 +4,9 @@ use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
     funcs::read_testdata,
 };
-use subscan::extractors::html::HTMLExtractor;
-use subscan::interfaces::extractor::SubdomainExtractorInterface;
+use subscan::{
+    extractors::html::HTMLExtractor, interfaces::extractor::SubdomainExtractorInterface,
+};
 
 #[tokio::test]
 async fn extract_without_removes() {

@@ -1,6 +1,6 @@
 use crate::{
-    extractors::regex::RegexExtractor, interfaces::extractor::SubdomainExtractorInterface,
-    types::core::Subdomain,
+    enums::Content, extractors::regex::RegexExtractor,
+    interfaces::extractor::SubdomainExtractorInterface, types::core::Subdomain,
 };
 use async_trait::async_trait;
 use scraper::{ElementRef, Html, Selector};
@@ -55,10 +55,11 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     /// use subscan::extractors::html::HTMLExtractor;
     /// use subscan::interfaces::extractor::SubdomainExtractorInterface;
     /// use subscan::types::core::Subdomain;
+    /// use subscan::enums::Content;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let html = String::from("<div><a>bar.foo.com</a></div>");
+    ///     let html = Content::from("<div><a>bar.foo.com</a></div>");
     ///     let domain = String::from("foo.com");
     ///     let selector = String::from("div > a");
     ///
@@ -69,8 +70,8 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     ///     assert_eq!(result, [Subdomain::from("bar.foo.com")].into());
     /// }
     /// ```
-    async fn extract(&self, content: String, domain: String) -> BTreeSet<Subdomain> {
-        let document = Html::parse_document(&content);
+    async fn extract(&self, content: Content, domain: String) -> BTreeSet<Subdomain> {
+        let document = Html::parse_document(&content.as_string());
         let selector = Selector::parse(&self.selector).unwrap();
         let selected = document.select(&selector);
 

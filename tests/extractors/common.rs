@@ -9,12 +9,13 @@ pub mod funcs {
     use super::constants::READ_ERROR;
     use std::fs;
     use std::path::{Path, PathBuf};
+    use subscan::enums::Content;
 
     fn testdata_path() -> PathBuf {
         Path::new(env!("CARGO_MANIFEST_DIR")).join("testing/testdata")
     }
 
-    pub fn read_testdata(path: &str) -> String {
-        fs::read_to_string(testdata_path().join(path)).expect(READ_ERROR)
+    pub fn read_testdata(path: &str) -> Content {
+        Content::String(fs::read_to_string(testdata_path().join(path)).expect(READ_ERROR))
     }
 }

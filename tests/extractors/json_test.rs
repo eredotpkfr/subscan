@@ -4,8 +4,10 @@ use crate::common::{
 };
 use serde_json::Value;
 use std::collections::BTreeSet;
-use subscan::extractors::json::JSONExtractor;
-use subscan::interfaces::extractor::SubdomainExtractorInterface;
+use subscan::{
+    enums::Content, extractors::json::JSONExtractor,
+    interfaces::extractor::SubdomainExtractorInterface,
+};
 
 #[tokio::test]
 async fn extract_test() {
@@ -25,7 +27,7 @@ async fn extract_test() {
     let extractor = JSONExtractor::new(Box::new(inner_parser));
 
     let result = extractor.extract(json, domain.clone()).await;
-    let no_result = extractor.extract(String::new(), domain).await;
+    let no_result = extractor.extract(Content::default(), domain).await;
 
     let expected = BTreeSet::from([
         TEST_BAR_SUBDOMAIN.to_string(),

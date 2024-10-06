@@ -1,7 +1,7 @@
 use crate::{
     enums::{RequesterDispatcher, SubscanModuleDispatcher},
     extractors::html::HTMLExtractor,
-    modules::generics::search_engine::GenericSearchEngineModule,
+    modules::generics::engine::GenericSearchEngineModule,
     requesters::client::HTTPClient,
 };
 use reqwest::Url;
@@ -22,6 +22,8 @@ pub const BING_CITE_TAG: &str = "cite";
 /// | Search URL         | <https://www.bing.com/search> |
 /// | Search Param       | `q`                           |
 /// | Subdomain Selector | `cite`                        |
+/// | Requester          | [`HTTPClient`]                |
+/// | Extractor          | [`HTMLExtractor`]             |
 pub struct Bing {}
 
 impl Bing {

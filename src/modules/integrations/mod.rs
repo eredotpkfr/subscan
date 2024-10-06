@@ -15,5 +15,11 @@ pub mod builtwith;
 pub mod censys;
 /// `CertSpotter` API integration, API key required
 pub mod certspotter;
-/// Chaos API integration, API key required
+/// `Chaos` API integration, API key required
 pub mod chaos;
+/// `Crt.sh` API integration
+pub mod crtsh;
+/// `Digitorus` HTML crawler integration
+pub mod digitorus;
+/// `HackerTarget` HTML crawler integration
+pub mod hackertarget;

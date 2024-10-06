@@ -11,33 +11,33 @@ use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;
 
-pub const BUFFEROVER_MODULE_NAME: &str = "bufferover";
-pub const BUFFEROVER_URL: &str = "https://tls.bufferover.run";
+pub const CRTSH_MODULE_NAME: &str = "crtsh";
+pub const CRTSH_URL: &str = "https://crt.sh";
 
-/// `BufferOver` API integration module
+/// `Crt.sh` API integration module
 ///
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                             |
-/// |:------------------:|:---------------------------------:|
-/// | Module Name        | `bufferover`                      |
-/// | Doc URL            | <https://tls.bufferover.run>      |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
-/// | Requester          | [`HTTPClient`]                    |
-/// | Extractor          | [`JSONExtractor`]                 |
-pub struct BufferOver {}
+/// | Property           | Value                     |
+/// |:------------------:|:-------------------------:|
+/// | Module Name        | `crtsh`                   |
+/// | Doc URL            | <https://crt.sh>          |
+/// | Authentication     | [`APIAuthMethod::NoAuth`] |
+/// | Requester          | [`HTTPClient`]            |
+/// | Extractor          | [`JSONExtractor`]         |
+pub struct Crtsh {}
 
-impl BufferOver {
+impl Crtsh {
     pub fn dispatcher() -> SubscanModuleDispatcher {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));
 
         let generic = GenericIntegrationModule {
-            name: BUFFEROVER_MODULE_NAME.into(),
+            name: CRTSH_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsHeader("X-API-Key".into()),
+            auth: APIAuthMethod::NoAuth,
             requester: requester.into(),
             extractor: extractor.into(),
         };
@@ -46,7 +46,10 @@ impl BufferOver {
     }
 
     pub fn get_query_url(domain: &str) -> String {
-        format!("{BUFFEROVER_URL}/dns?q={domain}")
+        let params = &[("q", domain), ("output", "json")];
+        let url = Url::parse_with_params(CRTSH_URL, params);
+
+        url.unwrap().to_string()
     }
 
     pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
@@ -57,14 +60,14 @@ impl BufferOver {
         let mut subs = BTreeSet::new();
         let pattern = generate_subdomain_regex(domain).unwrap();
 
-        if let Some(results) = content["Results"].as_array() {
-            let filter = |item: &Value| {
-                let to_string = |matches: Match| matches.as_str().to_string();
+        if let Some(results) = content.as_array() {
+            let matches = |item: &Value| {
+                let to_string = |matched: Match| matched.as_str().to_string();
 
-                pattern.find(item.as_str()?).map(to_string)
+                pattern.find(item["name_value"].as_str()?).map(to_string)
             };
 
-            subs.extend(results.iter().filter_map(filter));
+            subs.extend(results.iter().filter_map(matches));
         }
 
         subs

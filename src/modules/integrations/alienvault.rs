@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use crate::{
     enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
-    modules::generics::api_integration::GenericAPIIntegrationModule,
+    modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::core::Subdomain,
 };
@@ -15,7 +15,7 @@ pub const ALIENVAULT_URL: &str = "https://otx.alienvault.com/api/v1/indicators/d
 
 /// `AlienVault` API integration module
 ///
-/// It uses [`GenericAPIIntegrationModule`] its own inner
+/// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
 /// | Property           | Value                           |
@@ -23,6 +23,8 @@ pub const ALIENVAULT_URL: &str = "https://otx.alienvault.com/api/v1/indicators/d
 /// | Module Name        | `alienvault`                    |
 /// | Doc URL            | <https://otx.alienvault.com>    |
 /// | Authentication     | [`APIAuthMethod::NoAuth`]       |
+/// | Requester          | [`HTTPClient`]                  |
+/// | Extractor          | [`JSONExtractor`]               |
 pub struct AlienVault {}
 
 impl AlienVault {
@@ -30,7 +32,7 @@ impl AlienVault {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));
 
-        let generic = GenericAPIIntegrationModule {
+        let generic = GenericIntegrationModule {
             name: ALIENVAULT_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),

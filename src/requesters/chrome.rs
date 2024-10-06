@@ -1,8 +1,9 @@
-use crate::{interfaces::requester::RequesterInterface, types::config::RequesterConfig};
+use crate::{
+    enums::Content, interfaces::requester::RequesterInterface, types::config::RequesterConfig,
+};
 use async_trait::async_trait;
 use headless_chrome::{browser::LaunchOptions, Browser};
 use reqwest::Url;
-use serde_json::Value;
 
 /// Chrome requester struct, send HTTP requests via Chrome browser.
 /// Also its compatible with [`RequesterInterface`]
@@ -167,12 +168,12 @@ impl RequesterInterface for ChromeBrowser {
     ///     let mut browser = ChromeBrowser::default();
     ///     let url = Url::parse("https://foo.com").unwrap();
     ///
-    ///     let content = browser.get_content(url).await.unwrap();
+    ///     let content = browser.get_content(url).await;
     ///
     ///     // do something with content
     /// }
     /// ```
-    async fn get_content(&self, url: Url) -> Option<String> {
+    async fn get_content(&self, url: Url) -> Content {
         let tab = self.browser.new_tab().expect("Cannot create tab!");
         let headers = self.config.headers_as_hashmap();
 
@@ -186,12 +187,6 @@ impl RequesterInterface for ChromeBrowser {
 
         tab.close(true).unwrap();
 
-        content
-    }
-
-    async fn get_json_content(&self, url: Url) -> Value {
-        let content = self.get_content(url).await.unwrap_or_default();
-
-        serde_json::from_str(&content).unwrap_or_default()
+        Content::String(content.unwrap_or_default())
     }
 }

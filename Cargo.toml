@@ -1,6 +1,6 @@
 [package]
 name = "subscan"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "Next generation subdomain enumeration tool"
 readme = "README.md"

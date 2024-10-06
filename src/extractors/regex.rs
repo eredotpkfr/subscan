@@ -1,5 +1,5 @@
 use crate::{
-    interfaces::extractor::SubdomainExtractorInterface, types::core::Subdomain,
+    enums::Content, interfaces::extractor::SubdomainExtractorInterface, types::core::Subdomain,
     utils::regex::generate_subdomain_regex,
 };
 use async_trait::async_trait;
@@ -28,11 +28,16 @@ impl RegexExtractor {
     /// let domain = String::from("foo.com");
     /// let extractor = RegexExtractor::default();
     ///
-    /// let match_content = String::from("bar.foo.com");
+    /// let match_content = String::from("bar.foo.com\nbaz.foo.com");
     /// let no_match_content = String::from("foobarbaz");
     ///
-    /// assert!(extractor.extract_one(match_content, domain.clone()).is_some());
-    /// assert!(extractor.extract_one(no_match_content, domain).is_none());
+    /// let matched = extractor.extract_one(match_content, domain.clone());
+    /// let not_matched = extractor.extract_one(no_match_content, domain);
+    ///
+    /// assert!(matched.is_some());
+    /// assert!(not_matched.is_none());
+    ///
+    /// assert_eq!(matched.unwrap(), "bar.foo.com");
     /// ```
     pub fn extract_one(&self, content: String, domain: String) -> Option<Subdomain> {
         let pattern = generate_subdomain_regex(domain).unwrap();
@@ -57,11 +62,12 @@ impl SubdomainExtractorInterface for RegexExtractor {
     /// use subscan::extractors::regex::RegexExtractor;
     /// use subscan::interfaces::extractor::SubdomainExtractorInterface;
     /// use subscan::types::core::Subdomain;
+    /// use subscan::enums::Content;
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let domain = String::from("foo.com");
-    ///     let content = String::from("bar.foo.com\nbaz.foo.com");
+    ///     let content = Content::from("bar.foo.com\nbaz.foo.com");
     ///
     ///     let extractor = RegexExtractor::default();
     ///     let result = extractor.extract(content, domain).await;
@@ -73,9 +79,10 @@ impl SubdomainExtractorInterface for RegexExtractor {
     ///     assert_eq!(result.len(), 2);
     /// }
     /// ```
-    async fn extract(&self, content: String, domain: String) -> BTreeSet<Subdomain> {
+    async fn extract(&self, content: Content, domain: String) -> BTreeSet<Subdomain> {
         let pattern = generate_subdomain_regex(domain).unwrap();
         let to_string = |item: Match| item.as_str().parse().ok();
+        let content = content.as_string();
 
         pattern.find_iter(&content).filter_map(to_string).collect()
     }
