@@ -1,4 +1,4 @@
-# configuration for https://rust-lang.github.io/rustfmt/
+# Configuration for https://rust-lang.github.io/rustfmt/
 
 edition = "2021"
 max_width = 100
