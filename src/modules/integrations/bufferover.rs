@@ -24,6 +24,8 @@ pub const BUFFEROVER_URL: &str = "https://tls.bufferover.run";
 /// | Module Name        | `bufferover`                      |
 /// | Doc URL            | <https://tls.bufferover.run>      |
 /// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
+/// | Requester          | [`HTTPClient`]                    |
+/// | Extractor          | [`JSONExtractor`]                 |
 pub struct BufferOver {}
 
 impl BufferOver {

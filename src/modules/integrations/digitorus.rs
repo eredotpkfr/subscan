@@ -22,6 +22,8 @@ pub const DIGITORUS_SUBDOMAIN_TAG: &str = "main > div:nth-last-child(3) > div > 
 /// | Subdomain Selector | `main > div:nth-last-child(3) > div > div > a` |
 /// | Doc URL            | <https://certificatedetails.com>               |
 /// | Authentication     | [`APIAuthMethod::NoAuth`]                      |
+/// | Requester          | [`HTTPClient`]                                 |
+/// | Extractor          | [`HTMLExtractor`]                              |
 pub struct Digitorus {}
 
 impl Digitorus {

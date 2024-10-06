@@ -22,6 +22,8 @@ pub const BINARYEDGE_URL: &str = "https://api.binaryedge.io/v2/query/domains/sub
 /// | Module Name        | `binaryedge`                      |
 /// | Doc URL            | <https://www.binaryedge.io>       |
 /// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
+/// | Requester          | [`HTTPClient`]                    |
+/// | Extractor          | [`JSONExtractor`]                 |
 pub struct BinaryEdge {}
 
 impl BinaryEdge {

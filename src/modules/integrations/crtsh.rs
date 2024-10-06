@@ -24,6 +24,8 @@ pub const CRTSH_URL: &str = "https://crt.sh";
 /// | Module Name        | `crtsh`                   |
 /// | Doc URL            | <https://crt.sh>          |
 /// | Authentication     | [`APIAuthMethod::NoAuth`] |
+/// | Requester          | [`HTTPClient`]            |
+/// | Extractor          | [`JSONExtractor`]         |
 pub struct Crtsh {}
 
 impl Crtsh {

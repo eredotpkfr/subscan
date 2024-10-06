@@ -11,33 +11,27 @@ use reqwest::Url;
 use std::collections::BTreeSet;
 use tokio::sync::Mutex;
 
-/// Generic search engine module that enumerates subdomain
-/// addresses by using dorking technique
+/// Generic search engine module that enumerates subdomain addresses by using dorking technique
 ///
-/// Most search engines has advanced search techniques
-/// to filter results, these techniques are called dorking.
-/// To be example `inurl:foo` dork filters only URLs that includes
-/// `foo` keyword, there is a so many dorking keywords like
-/// `intext`, `filetype`, `intitle`, `ext`, etc. You can guess
-/// what each dork does from its name
+/// Most search engines has advanced search techniques to filter results, these techniques are
+/// called dorking. To be example `inurl:foo` dork filters only URLs that includes `foo`
+/// keyword, there is a so many dorking keywords like `intext`, `filetype`, `intitle`, `ext`, etc.
+/// You can guess what each dork does from its name
 ///
-/// To enumerate already indexed subdomains by search engine
-/// `site:foo.com` dork can be used. Site dork filters only
-/// `foo.com` domains and all the indexed subdomains are listed
+/// To enumerate already indexed subdomains by search engine `site:foo.com` dork can be used.
+/// Site dork filters only `foo.com` domains and all the indexed subdomains are listed
 /// in the results
 ///
-/// Also you can exclude any search result into results with using
-/// dash (`-`) character. To be example `site:foo.com -www` dork
-/// gets `foo.com` related domain addresses but excludes `www.foo.com`
+/// Also you can exclude any search result into results with using dash (`-`) character. To be
+/// example `site:foo.com -www` dork gets `foo.com` related domain addresses but
+/// excludes `www.foo.com`
 ///
-/// According to above information, we can concat this two
-/// technique. If we search subdomains by using `site:foo.com`
-/// dork and then in the next search if we exclude all previous
-/// search results we can get new subdomain addresses. After then
-/// the only thing to do just repeat this logic as long as
-/// there are new subdomains
+/// According to above information, we can concat this two technique. If we search subdomains by
+/// using `site:foo.com` dork and then in the next search if we exclude all previous search results
+/// we can get new subdomain addresses. After then the only thing to do just repeat this logic as
+/// long as there are new subdomains
 ///
-/// To understand better you can follow up following table
+/// To understand better you can follow up below table
 ///
 /// | Search | Dork                          | Results      | URL                                                   |
 /// |:------:|:-----------------------------:|:------------:|:-----------------------------------------------------:|

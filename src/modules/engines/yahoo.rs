@@ -22,6 +22,8 @@ pub const YAHOO_CITE_TAG: &str = "ol > li > div > div > h3 > a > span";
 /// | Search URL         | <https://search.yahoo.com/search>     |
 /// | Search Param       | `p`                                   |
 /// | Subdomain Selector | `ol > li > div > div > h3 > a > span` |
+/// | Requester          | [`HTTPClient`]                        |
+/// | Extractor          | [`HTMLExtractor`]                     |
 pub struct Yahoo {}
 
 impl Yahoo {

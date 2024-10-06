@@ -22,6 +22,8 @@ pub const BING_CITE_TAG: &str = "cite";
 /// | Search URL         | <https://www.bing.com/search> |
 /// | Search Param       | `q`                           |
 /// | Subdomain Selector | `cite`                        |
+/// | Requester          | [`HTTPClient`]                |
+/// | Extractor          | [`HTMLExtractor`]             |
 pub struct Bing {}
 
 impl Bing {

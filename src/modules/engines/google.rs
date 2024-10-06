@@ -22,6 +22,8 @@ pub const GOOGLE_CITE_TAG: &str = "cite";
 /// | Search URL         | <https://www.google.com/search> |
 /// | Search Param       | `q`                             |
 /// | Subdomain Selector | `cite`                          |
+/// | Requester          | [`HTTPClient`]                  |
+/// | Extractor          | [`HTMLExtractor`]               |
 pub struct Google {}
 
 impl Google {

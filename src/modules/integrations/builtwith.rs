@@ -22,6 +22,8 @@ pub const BUILTWITH_URL: &str = "https://api.builtwith.com/v21/api.json";
 /// | Module Name        | `builtwith`                           |
 /// | Doc URL            | <https://api.builtwith.com>           |
 /// | Authentication     | [`APIAuthMethod::APIKeyAsQueryParam`] |
+/// | Requester          | [`HTTPClient`]                        |
+/// | Extractor          | [`JSONExtractor`]                     |
 pub struct BuiltWith {}
 
 impl BuiltWith {

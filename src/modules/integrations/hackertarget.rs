@@ -20,6 +20,8 @@ pub const HACKERTARGET_URL: &str = "https://api.hackertarget.com/hostsearch";
 /// | Module Name        | `hackertarget`             |
 /// | Doc URL            | <https://hackertarget.com> |
 /// | Authentication     | [`APIAuthMethod::NoAuth`]  |
+/// | Requester          | [`HTTPClient`]             |
+/// | Extractor          | [`RegexExtractor`]         |
 pub struct HackerTarget {}
 
 impl HackerTarget {

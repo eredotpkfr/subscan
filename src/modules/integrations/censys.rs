@@ -24,6 +24,8 @@ pub const CENSYS_URL: &str = "https://search.censys.io/api/v2/certificates/searc
 /// | Module Name        | `censys`                          |
 /// | Doc URL            | <https://search.censys.io>        |
 /// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
+/// | Requester          | [`HTTPClient`]                    |
+/// | Extractor          | [`JSONExtractor`]                 |
 pub struct Censys {}
 
 impl Censys {

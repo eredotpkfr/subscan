@@ -15,24 +15,19 @@ use tokio::sync::Mutex;
 
 /// Generic API integration module
 ///
-/// Several modules uses this generic module
-/// to make API calls and parsing JSON response
-///
-/// It takes a extractor that compatible with
-/// [`SubdomainExtractorInterface`], mostly
-/// [`JSONExtractor`](crate::extractors::json::JSONExtractor) extractor
-/// is used with this module to parse JSON contents
+/// Several modules uses this generic module to make API calls and parsing JSON response
+/// It takes a extractor that compatible with [`SubdomainExtractorInterface`], mostly
+/// [`JSONExtractor`](crate::extractors::json::JSONExtractor) extractor is used with this
+/// module to parse JSON contents
 pub struct GenericAPIIntegrationModule {
     /// Module name
     pub name: String,
-    /// Simple function field that gets query URL
-    /// by given domain address
+    /// Simple function field that gets query URL by given domain address
     pub url: GetQueryUrlFunc,
-    /// Function definition that gets next URL to ensure
-    /// fully fetch data with pagination from API endpoint
+    /// Function definition that gets next URL to ensure fully fetch data with pagination
+    /// from API endpoint
     pub next: GetNextUrlFunc,
-    /// Set authentication method, see [`APIAuthMethod`] enum
-    /// for details
+    /// Set authentication method, see [`APIAuthMethod`] enum for details
     pub auth: APIAuthMethod,
     /// Requester object instance for HTTP requests
     pub requester: Mutex<RequesterDispatcher>,

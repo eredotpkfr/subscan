@@ -22,6 +22,8 @@ pub const CHAOS_URL: &str = "https://dns.projectdiscovery.io/dns";
 /// | Module Name        | `chaos`                             |
 /// | Doc URL            | <https://cloud.projectdiscovery.io> |
 /// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`]   |
+/// | Requester          | [`HTTPClient`]                      |
+/// | Extractor          | [`JSONExtractor`]                   |
 pub struct Chaos {}
 
 impl Chaos {

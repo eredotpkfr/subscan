@@ -22,6 +22,8 @@ pub const DUCKDUCKGO_CITE_TAG: &str = "article > div > div > a > span:first-chil
 /// | Search URL         | <https://duckduckgo.com>                     |
 /// | Search Param       | `q`                                          |
 /// | Subdomain Selector | `article > div > div > a > span:first-child` |
+/// | Requester          | [`ChromeBrowser`]                            |
+/// | Extractor          | [`HTMLExtractor`]                            |
 pub struct DuckDuckGo {}
 
 impl DuckDuckGo {

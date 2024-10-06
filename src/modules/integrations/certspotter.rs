@@ -24,6 +24,8 @@ pub const CERTSPOTTER_URL: &str = "https://api.certspotter.com/v1/issuances";
 /// | Module Name        | `certspotter`                     |
 /// | Doc URL            | <https://sslmate.com/certspotter> |
 /// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
+/// | Requester          | [`HTTPClient`]                    |
+/// | Extractor          | [`JSONExtractor`]                 |
 pub struct CertSpotter {}
 
 impl CertSpotter {
