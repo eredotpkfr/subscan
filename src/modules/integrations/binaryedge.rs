@@ -4,6 +4,7 @@ use crate::{
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::core::Subdomain,
+    utils::http,
 };
 use reqwest::Url;
 use serde_json::Value;
@@ -51,11 +52,11 @@ impl BinaryEdge {
         let page_param = url.query_pairs().find(|item| item.0 == "page");
 
         if let Some(page) = page_param {
-            let new_page = page.1.parse::<usize>().unwrap() + 1;
+            let new_page = (page.1.parse::<usize>().unwrap() + 1).to_string();
 
-            url.set_query(Some(&format!("page={new_page}")));
+            http::update_url_query(&mut url, "page", &new_page);
         } else {
-            url.set_query(Some("page=2"));
+            http::update_url_query(&mut url, "page", "2");
         }
 
         Some(url)
