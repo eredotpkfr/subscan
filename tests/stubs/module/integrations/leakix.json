@@ -1,0 +1,19 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/leakix"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": [
+            {
+                "distinct_ips": 1,
+                "last_seen": "2021-05-13T10:28:34.356Z",
+                "subdomain": "bar.foo.com"
+            }
+        ],
+        "status": 200
+    }
+}
