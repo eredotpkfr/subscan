@@ -9,14 +9,13 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-  
+
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
-  
+
   - package-ecosystem: "cargo" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
-      
