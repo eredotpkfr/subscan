@@ -1,7 +1,8 @@
-use crate::extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor};
-use crate::modules::generics::engine::GenericSearchEngineModule;
-use crate::modules::generics::integration::GenericIntegrationModule;
-use crate::requesters::{chrome::ChromeBrowser, client::HTTPClient};
+use crate::{
+    extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor},
+    modules::generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
+    requesters::{chrome::ChromeBrowser, client::HTTPClient},
+};
 use enum_dispatch::enum_dispatch;
 use serde_json::Value;
 

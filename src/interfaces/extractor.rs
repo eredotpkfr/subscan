@@ -1,6 +1,8 @@
-use crate::enums::{Content, SubdomainExtractorDispatcher};
-use crate::extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor};
-use crate::types::core::Subdomain;
+use crate::{
+    enums::{Content, SubdomainExtractorDispatcher},
+    extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor},
+    types::core::Subdomain,
+};
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use std::collections::BTreeSet;

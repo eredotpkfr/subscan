@@ -1,11 +1,12 @@
 use crate::common::constants::TEST_URL;
-use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
-use reqwest::header::{CONTENT_LENGTH, USER_AGENT};
-use reqwest::Url;
+use reqwest::{
+    header::{HeaderMap, HeaderName, HeaderValue, CONTENT_LENGTH, USER_AGENT},
+    Url,
+};
 use std::time::Duration;
-use subscan::requesters::client::HTTPClient;
 use subscan::{
     interfaces::requester::RequesterInterface,
+    requesters::client::HTTPClient,
     types::config::{RequesterConfig, DEFAULT_HTTP_TIMEOUT},
 };
 
