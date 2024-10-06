@@ -9,7 +9,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/engines/yahoo.json")]
-async fn yahoo_run_test() {
+async fn run_test() {
     let mut yahoo = yahoo::Yahoo::dispatcher();
 
     mocks::wrap_module_dispatcher_url_field(&mut yahoo, &stubr.path("/search"));

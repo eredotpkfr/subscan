@@ -12,7 +12,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/leakix.json")]
-async fn leakix_run_test() {
+async fn run_test() {
     let mut leakix = leakix::Leakix::dispatcher();
 
     mocks::wrap_module_dispatcher_url_field(&mut leakix, &stubr.path("/leakix"));

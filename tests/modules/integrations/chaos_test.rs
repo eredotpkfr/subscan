@@ -12,7 +12,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/chaos.json")]
-async fn chaos_run_test() {
+async fn run_test() {
     let mut chaos = chaos::Chaos::dispatcher();
     let (env_name, _) = chaos.fetch_apikey().await;
 

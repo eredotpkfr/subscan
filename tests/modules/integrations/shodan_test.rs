@@ -12,7 +12,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/shodan.json")]
-async fn shodan_run_test() {
+async fn run_test() {
     let mut shodan = shodan::Shodan::dispatcher();
     let (env_name, _) = shodan.fetch_apikey().await;
 

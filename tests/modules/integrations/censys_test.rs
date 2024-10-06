@@ -12,7 +12,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/censys.json")]
-async fn censys_run_test() {
+async fn run_test() {
     let mut censys = censys::Censys::dispatcher();
     let (env_name, _) = censys.fetch_apikey().await;
 

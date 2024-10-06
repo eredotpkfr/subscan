@@ -13,7 +13,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/builtwith.json")]
-async fn builtwith_run_test() {
+async fn run_test() {
     let mut builtwith = builtwith::BuiltWith::dispatcher();
     let (env_name, _) = builtwith.fetch_apikey().await;
 

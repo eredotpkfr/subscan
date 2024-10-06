@@ -13,7 +13,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/certspotter.json")]
-async fn certspotter_run_test() {
+async fn run_test() {
     let mut certspotter = certspotter::CertSpotter::dispatcher();
     let (env_name, _) = certspotter.fetch_apikey().await;
 

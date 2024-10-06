@@ -12,7 +12,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/binaryedge.json")]
-async fn binaryedge_run_test() {
+async fn run_test() {
     let mut binaryedge = binaryedge::BinaryEdge::dispatcher();
     let (env_name, _) = binaryedge.fetch_apikey().await;
 

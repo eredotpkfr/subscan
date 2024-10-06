@@ -12,7 +12,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/crtsh.json")]
-async fn crtsh_run_test() {
+async fn run_test() {
     let mut crtsh = crtsh::Crtsh::dispatcher();
 
     mocks::wrap_module_dispatcher_url_field(&mut crtsh, &stubr.path("/crtsh"));

@@ -12,7 +12,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/bufferover.json")]
-async fn bufferover_run_test() {
+async fn run_test() {
     let mut bufferover = bufferover::BufferOver::dispatcher();
     let (env_name, _) = bufferover.fetch_apikey().await;
 

@@ -9,7 +9,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/digitorus.json")]
-async fn digitorus_run_test() {
+async fn run_test() {
     let mut digitorus = digitorus::Digitorus::dispatcher();
 
     mocks::wrap_module_dispatcher_url_field(&mut digitorus, &stubr.path("/digitorus"));
