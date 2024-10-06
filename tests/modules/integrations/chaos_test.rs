@@ -30,8 +30,9 @@ async fn chaos_run_test() {
 #[tokio::test]
 async fn get_query_url_test() {
     let url = chaos::Chaos::get_query_url(TEST_DOMAIN);
+    let expected = format!("{CHAOS_URL}/{TEST_DOMAIN}/subdomains");
 
-    assert_eq!(url, format!("{CHAOS_URL}/{TEST_DOMAIN}/subdomains"));
+    assert_eq!(url, expected);
 }
 
 #[tokio::test]

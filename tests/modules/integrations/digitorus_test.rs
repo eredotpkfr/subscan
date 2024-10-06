@@ -23,6 +23,7 @@ async fn digitorus_run_test() {
 #[tokio::test]
 async fn get_query_url_test() {
     let url = digitorus::Digitorus::get_query_url(TEST_DOMAIN);
+    let expected = format!("{DIGITORUS_URL}/{TEST_DOMAIN}");
 
-    assert_eq!(url, format!("{DIGITORUS_URL}/{TEST_DOMAIN}"));
+    assert_eq!(url, expected);
 }
