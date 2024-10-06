@@ -12,7 +12,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/censys.json")]
-async fn censys_run_test() {
+async fn run_test() {
     let mut censys = censys::Censys::dispatcher();
     let (env_name, _) = censys.fetch_apikey().await;
 
@@ -30,8 +30,9 @@ async fn censys_run_test() {
 #[tokio::test]
 async fn get_query_url_test() {
     let url = censys::Censys::get_query_url(TEST_DOMAIN);
+    let expected = format!("{CENSYS_URL}?q={TEST_DOMAIN}");
 
-    assert_eq!(url, format!("{CENSYS_URL}?q={TEST_DOMAIN}"));
+    assert_eq!(url, expected);
 }
 
 #[tokio::test]

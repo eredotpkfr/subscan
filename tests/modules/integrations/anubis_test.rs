@@ -13,7 +13,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/anubis.json")]
-async fn anubis_run_test() {
+async fn run_test() {
     let mut anubis = anubis::Anubis::dispatcher();
 
     mocks::wrap_module_dispatcher_url_field(&mut anubis, &stubr.path("/anubis"));

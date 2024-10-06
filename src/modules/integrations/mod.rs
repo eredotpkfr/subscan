@@ -23,3 +23,7 @@ pub mod crtsh;
 pub mod digitorus;
 /// `HackerTarget` HTML crawler integration
 pub mod hackertarget;
+/// `Leakix` API integration
+pub mod leakix;
+/// `Shodan` API integration, API key required
+pub mod shodan;

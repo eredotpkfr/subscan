@@ -7,7 +7,7 @@ use subscan::{enums::APIAuthMethod, interfaces::module::SubscanModuleInterface};
 
 #[tokio::test]
 #[stubr::mock("module/generics/api-integration-no-auth.json")]
-async fn generic_api_integration_run_test_no_auth() {
+async fn run_test_no_auth() {
     let auth = APIAuthMethod::NoAuth;
     let mut module = generic_api_integration(&stubr.path("/subdomains"), auth);
 
@@ -19,7 +19,7 @@ async fn generic_api_integration_run_test_no_auth() {
 
 #[tokio::test]
 #[stubr::mock("module/generics/api-integration-with-header-auth.json")]
-async fn generic_api_integration_run_test_with_header_auth() {
+async fn run_test_with_header_auth() {
     let auth = APIAuthMethod::APIKeyAsHeader("X-API-Key".to_string());
     let mut module = generic_api_integration(&stubr.path("/subdomains"), auth);
 
@@ -37,7 +37,7 @@ async fn generic_api_integration_run_test_with_header_auth() {
 
 #[tokio::test]
 #[stubr::mock("module/generics/api-integration-with-query-auth.json")]
-async fn generic_api_integration_run_test_with_url_auth() {
+async fn run_test_with_query_auth() {
     let auth = APIAuthMethod::APIKeyAsQueryParam("apikey".to_string());
     let mut module = generic_api_integration(&stubr.path("/subdomains"), auth);
 

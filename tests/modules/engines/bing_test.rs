@@ -9,7 +9,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/engines/bing.json")]
-async fn bing_run_test() {
+async fn run_test() {
     let mut bing = bing::Bing::dispatcher();
 
     mocks::wrap_module_dispatcher_url_field(&mut bing, &stubr.path("/search"));

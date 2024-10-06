@@ -12,7 +12,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/chaos.json")]
-async fn chaos_run_test() {
+async fn run_test() {
     let mut chaos = chaos::Chaos::dispatcher();
     let (env_name, _) = chaos.fetch_apikey().await;
 
@@ -30,8 +30,9 @@ async fn chaos_run_test() {
 #[tokio::test]
 async fn get_query_url_test() {
     let url = chaos::Chaos::get_query_url(TEST_DOMAIN);
+    let expected = format!("{CHAOS_URL}/{TEST_DOMAIN}/subdomains");
 
-    assert_eq!(url, format!("{CHAOS_URL}/{TEST_DOMAIN}/subdomains"));
+    assert_eq!(url, expected);
 }
 
 #[tokio::test]

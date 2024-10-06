@@ -12,7 +12,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/bevigil.json")]
-async fn bevigil_run_test() {
+async fn run_test() {
     let mut bevigil = bevigil::Bevigil::dispatcher();
     let (env_name, _) = bevigil.fetch_apikey().await;
 

@@ -9,7 +9,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/engines/google.json")]
-async fn google_run_test() {
+async fn run_test() {
     let mut google = google::Google::dispatcher();
 
     mocks::wrap_module_dispatcher_url_field(&mut google, &stubr.path("/search"));

@@ -16,7 +16,7 @@ async fn get_search_query_test() {
 
 #[tokio::test]
 #[stubr::mock("module/generics/search-engine.json")]
-async fn generic_search_engine_run_test() {
+async fn run_test() {
     let mut module = generic_search_engine(&stubr.path("/search"));
 
     let result = module.run(TEST_DOMAIN.to_string()).await;

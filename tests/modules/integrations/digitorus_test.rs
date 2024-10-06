@@ -9,7 +9,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/digitorus.json")]
-async fn digitorus_run_test() {
+async fn run_test() {
     let mut digitorus = digitorus::Digitorus::dispatcher();
 
     mocks::wrap_module_dispatcher_url_field(&mut digitorus, &stubr.path("/digitorus"));
@@ -23,6 +23,7 @@ async fn digitorus_run_test() {
 #[tokio::test]
 async fn get_query_url_test() {
     let url = digitorus::Digitorus::get_query_url(TEST_DOMAIN);
+    let expected = format!("{DIGITORUS_URL}/{TEST_DOMAIN}");
 
-    assert_eq!(url, format!("{DIGITORUS_URL}/{TEST_DOMAIN}"));
+    assert_eq!(url, expected);
 }

@@ -12,7 +12,7 @@ use tokio::sync::Mutex;
 
 #[tokio::test]
 #[stubr::mock("module/engines/duckduckgo.json")]
-async fn duckduckgo_run_test() {
+async fn run_test() {
     let mut duckduckgo = duckduckgo::DuckDuckGo::dispatcher();
     let new_requester = HTTPClient::default();
 

@@ -19,8 +19,8 @@ pub const DIGITORUS_SUBDOMAIN_TAG: &str = "main > div:nth-last-child(3) > div > 
 /// | Property           | Value                                          |
 /// |:------------------:|:----------------------------------------------:|
 /// | Module Name        | `digitorus`                                    |
-/// | Subdomain Selector | `main > div:nth-last-child(3) > div > div > a` |
 /// | Doc URL            | <https://certificatedetails.com>               |
+/// | Subdomain Selector | `main > div:nth-last-child(3) > div > div > a` |
 /// | Authentication     | [`APIAuthMethod::NoAuth`]                      |
 /// | Requester          | [`HTTPClient`]                                 |
 /// | Extractor          | [`HTMLExtractor`]                              |

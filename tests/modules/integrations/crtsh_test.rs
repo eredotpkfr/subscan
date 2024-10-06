@@ -12,7 +12,7 @@ use subscan::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/crtsh.json")]
-async fn crtsh_run_test() {
+async fn run_test() {
     let mut crtsh = crtsh::Crtsh::dispatcher();
 
     mocks::wrap_module_dispatcher_url_field(&mut crtsh, &stubr.path("/crtsh"));
@@ -26,8 +26,9 @@ async fn crtsh_run_test() {
 #[tokio::test]
 async fn get_query_url_test() {
     let url = crtsh::Crtsh::get_query_url(TEST_DOMAIN);
+    let expected = format!("{CRTSH_URL}/?q={TEST_DOMAIN}&output=json");
 
-    assert_eq!(url, format!("{CRTSH_URL}/?q={TEST_DOMAIN}&output=json"));
+    assert_eq!(url, expected);
 }
 
 #[tokio::test]
