@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/digitorus"
+    },
+    "response": {
+        "body": "<main><div><div><div><a>bar.foo.com</a></div></div></div><div></div><div></div></main>",
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}

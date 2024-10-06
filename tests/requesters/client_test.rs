@@ -1,11 +1,12 @@
 use crate::common::constants::TEST_URL;
-use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
-use reqwest::header::{CONTENT_LENGTH, USER_AGENT};
-use reqwest::Url;
+use reqwest::{
+    header::{HeaderMap, HeaderName, HeaderValue, CONTENT_LENGTH, USER_AGENT},
+    Url,
+};
 use std::time::Duration;
-use subscan::requesters::client::HTTPClient;
 use subscan::{
     interfaces::requester::RequesterInterface,
+    requesters::client::HTTPClient,
     types::config::{RequesterConfig, DEFAULT_HTTP_TIMEOUT},
 };
 
@@ -44,7 +45,7 @@ async fn client_get_content_test() {
     let client = HTTPClient::default();
     let url = Url::parse(&stubr.path("/hello")).unwrap();
 
-    let content = client.get_content(url).await.unwrap();
+    let content = client.get_content(url).await.as_string();
 
     assert_eq!(content, "hello");
 }
@@ -62,7 +63,7 @@ async fn client_get_content_timeout_test() {
     let client = HTTPClient::with_config(config);
     let url = Url::parse(&stubr.path("/hello-delayed")).unwrap();
 
-    client.get_content(url).await.unwrap();
+    client.get_content(url).await.as_json().as_str().unwrap();
 }
 
 #[tokio::test]
@@ -82,7 +83,7 @@ async fn client_get_content_extra_header_test() {
     )
     .unwrap();
 
-    let content = client.get_content(url).await.unwrap();
+    let content = client.get_content(url).await.as_string();
 
     assert_eq!(content, "hello");
 }

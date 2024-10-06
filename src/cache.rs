@@ -4,7 +4,7 @@ use crate::{
         engines::{bing, duckduckgo, google, yahoo},
         integrations::{
             alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys, certspotter,
-            chaos, crtsh,
+            chaos, crtsh, digitorus, hackertarget,
         },
     },
 };
@@ -12,16 +12,14 @@ use lazy_static::lazy_static;
 use tokio::sync::Mutex;
 
 lazy_static! {
-    /// All `subscan` modules are stores in this in-memory [`Vec`]
-    /// as a [`SubscanModule`], all modules must be compatible
-    /// with [`SubscanModuleInterface`](crate::interfaces::module::SubscanModuleInterface) trait
+    /// All `Subscan` modules are stores in this in-memory [`Vec`] as a [`SubscanModuleDispatcher`]
     pub static ref ALL_MODULES: Vec<Mutex<SubscanModuleDispatcher>> = vec![
         // Search engines
         Mutex::new(google::Google::dispatcher()),
         Mutex::new(yahoo::Yahoo::dispatcher()),
         Mutex::new(bing::Bing::dispatcher()),
         Mutex::new(duckduckgo::DuckDuckGo::dispatcher()),
-        // API integrations
+        // Integrations
         Mutex::new(alienvault::AlienVault::dispatcher()),
         Mutex::new(anubis::Anubis::dispatcher()),
         Mutex::new(bevigil::Bevigil::dispatcher()),
@@ -32,6 +30,8 @@ lazy_static! {
         Mutex::new(certspotter::CertSpotter::dispatcher()),
         Mutex::new(chaos::Chaos::dispatcher()),
         Mutex::new(crtsh::Crtsh::dispatcher()),
+        Mutex::new(digitorus::Digitorus::dispatcher()),
+        Mutex::new(hackertarget::HackerTarget::dispatcher())
     ];
 }
 

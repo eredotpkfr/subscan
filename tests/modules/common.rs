@@ -39,7 +39,7 @@ pub mod mocks {
         enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
         extractors::{json::JSONExtractor, regex::RegexExtractor},
         modules::generics::{
-            api_integration::GenericAPIIntegrationModule, search_engine::GenericSearchEngineModule,
+            engine::GenericSearchEngineModule, integration::GenericIntegrationModule,
         },
         requesters::client::HTTPClient,
         types::query::SearchQueryParam,
@@ -60,7 +60,7 @@ pub mod mocks {
         }
     }
 
-    pub fn generic_api_integration(url: &str, auth: APIAuthMethod) -> GenericAPIIntegrationModule {
+    pub fn generic_api_integration(url: &str, auth: APIAuthMethod) -> GenericIntegrationModule {
         let parse = |json: Value, _domain: String| {
             if let Some(subs) = json["subdomains"].as_array() {
                 let filter = |item: &Value| Some(item.as_str()?.to_string());
@@ -75,7 +75,7 @@ pub mod mocks {
         let extractor = JSONExtractor::new(Box::new(parse));
         let thread_name = thread::current().name().unwrap().to_uppercase();
 
-        GenericAPIIntegrationModule {
+        GenericIntegrationModule {
             name: md5_hex(thread_name),
             url: wrap_url_with_mock_func(url),
             next: Box::new(|_, _| None),
@@ -96,7 +96,7 @@ pub mod mocks {
             SubscanModuleDispatcher::GenericSearchEngineModule(module) => {
                 module.url = url.parse().unwrap()
             }
-            SubscanModuleDispatcher::GenericAPIIntegrationModule(module) => {
+            SubscanModuleDispatcher::GenericIntegrationModule(module) => {
                 module.url = wrap_url_with_mock_func(url)
             }
         }

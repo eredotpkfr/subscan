@@ -15,24 +15,19 @@ use tokio::sync::Mutex;
 
 /// Generic API integration module
 ///
-/// Several modules uses this generic module
-/// to make API calls and parsing JSON response
-///
-/// It takes a extractor that compatible with
-/// [`SubdomainExtractorInterface`], mostly
-/// [`JSONExtractor`](crate::extractors::json::JSONExtractor) extractor
-/// is used with this module to parse JSON contents
-pub struct GenericAPIIntegrationModule {
+/// Several modules uses this generic module to make API calls and parsing JSON response
+/// It takes a extractor that compatible with [`SubdomainExtractorInterface`], mostly
+/// [`JSONExtractor`](crate::extractors::json::JSONExtractor) extractor is used with this
+/// module to parse JSON contents
+pub struct GenericIntegrationModule {
     /// Module name
     pub name: String,
-    /// Simple function field that gets query URL
-    /// by given domain address
+    /// Simple function field that gets query URL by given domain address
     pub url: GetQueryUrlFunc,
-    /// Function definition that gets next URL to ensure
-    /// fully fetch data with pagination from API endpoint
+    /// Function definition that gets next URL to ensure fully fetch data with pagination
+    /// from API endpoint
     pub next: GetNextUrlFunc,
-    /// Set authentication method, see [`APIAuthMethod`] enum
-    /// for details
+    /// Set authentication method, see [`APIAuthMethod`] enum for details
     pub auth: APIAuthMethod,
     /// Requester object instance for HTTP requests
     pub requester: Mutex<RequesterDispatcher>,
@@ -40,7 +35,7 @@ pub struct GenericAPIIntegrationModule {
     pub extractor: SubdomainExtractorDispatcher,
 }
 
-impl GenericAPIIntegrationModule {
+impl GenericIntegrationModule {
     pub async fn authenticate(&self, url: &mut Url, apikey: String) {
         match &self.auth {
             APIAuthMethod::APIKeyAsHeader(name) => self.set_apikey_header(name, &apikey).await,
@@ -68,7 +63,7 @@ impl GenericAPIIntegrationModule {
 }
 
 #[async_trait(?Send)]
-impl SubscanModuleInterface for GenericAPIIntegrationModule {
+impl SubscanModuleInterface for GenericIntegrationModule {
     async fn name(&self) -> &str {
         &self.name
     }
@@ -98,9 +93,10 @@ impl SubscanModuleInterface for GenericAPIIntegrationModule {
         let requester = self.requester.lock().await;
 
         loop {
-            let json = requester.get_json_content(url.clone()).await;
-            let serialized = json.to_string();
-            let news = self.extractor.extract(serialized, domain.clone()).await;
+            let content = requester.get_content(url.clone()).await;
+            let (parsing, domain) = (content.clone(), domain.clone());
+
+            let news = self.extractor.extract(parsing, domain).await;
 
             if news.is_empty() {
                 break;
@@ -108,7 +104,7 @@ impl SubscanModuleInterface for GenericAPIIntegrationModule {
 
             all_results.extend(news);
 
-            if let Some(next_url) = (self.next)(url.clone(), json) {
+            if let Some(next_url) = (self.next)(url.clone(), content.as_json()) {
                 url = next_url;
             } else {
                 break;

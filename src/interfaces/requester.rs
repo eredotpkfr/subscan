@@ -1,12 +1,11 @@
 use crate::{
-    enums::RequesterDispatcher,
+    enums::{Content, RequesterDispatcher},
     requesters::{chrome::ChromeBrowser, client::HTTPClient},
     types::config::RequesterConfig,
 };
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use reqwest::Url;
-use serde_json::Value;
 
 /// Generic HTTP client trait definition to implement different
 /// HTTP requester objects with a single interface compatible
@@ -22,6 +21,7 @@ use serde_json::Value;
 /// use std::time::Duration;
 /// use subscan::interfaces::requester::RequesterInterface;
 /// use subscan::types::config::RequesterConfig;
+/// use subscan::enums::Content;
 /// use reqwest::Url;
 /// use async_trait::async_trait;
 /// use serde_json::Value;
@@ -40,12 +40,8 @@ use serde_json::Value;
 ///         self.config = config;
 ///     }
 ///
-///     async fn get_content(&self, url: Url) -> Option<String> {
-///         Some(String::from("foo"))
-///     }
-///
-///     async fn get_json_content(&self, url: Url) -> Value {
-///         Value::Bool(false)
+///     async fn get_content(&self, url: Url) -> Content {
+///         Content::from("foo")
 ///     }
 /// }
 ///
@@ -59,8 +55,7 @@ use serde_json::Value;
 ///
 ///     let config = requester.config().await.clone();
 ///
-///     assert_eq!(requester.get_json_content(url.clone()).await, false);
-///     assert_eq!(requester.get_content(url).await.unwrap(), "foo");
+///     assert_eq!(requester.get_content(url).await.as_string(), "foo");
 ///     assert_eq!(config.proxy, None);
 ///     assert_eq!(config.timeout, Duration::from_secs(10));
 ///     assert_eq!(config.headers.len(), 0);
@@ -74,7 +69,5 @@ pub trait RequesterInterface: Sync + Send {
     /// Configure current requester object by using new [`RequesterConfig`] object
     async fn configure(&mut self, config: RequesterConfig);
     /// Get HTML source of page from given [`reqwest::Url`] object
-    async fn get_content(&self, url: Url) -> Option<String>;
-    /// Get JSON content from any URL
-    async fn get_json_content(&self, url: Url) -> Value;
+    async fn get_content(&self, url: Url) -> Content;
 }

@@ -1,7 +1,7 @@
 use crate::{
     enums::{RequesterDispatcher, SubscanModuleDispatcher},
     extractors::html::HTMLExtractor,
-    modules::generics::search_engine::GenericSearchEngineModule,
+    modules::generics::engine::GenericSearchEngineModule,
     requesters::client::HTTPClient,
 };
 use reqwest::Url;
@@ -22,6 +22,8 @@ pub const YAHOO_CITE_TAG: &str = "ol > li > div > div > h3 > a > span";
 /// | Search URL         | <https://search.yahoo.com/search>     |
 /// | Search Param       | `p`                                   |
 /// | Subdomain Selector | `ol > li > div > div > h3 > a > span` |
+/// | Requester          | [`HTTPClient`]                        |
+/// | Extractor          | [`HTMLExtractor`]                     |
 pub struct Yahoo {}
 
 impl Yahoo {

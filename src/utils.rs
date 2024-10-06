@@ -34,8 +34,7 @@ pub mod regex {
 
 /// Utilities about project environments
 pub mod env {
-    use crate::config::SUBSCAN_ENV_NAMESPACE;
-    use crate::types::core::APIKeyAsEnv;
+    use crate::{config::SUBSCAN_ENV_NAMESPACE, types::core::APIKeyAsEnv};
 
     /// Fetches API key from system environment variables
     /// if available. Module environment variables uses [`SUBSCAN_ENV_NAMESPACE`]

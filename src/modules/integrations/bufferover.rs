@@ -1,7 +1,7 @@
 use crate::{
     enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
-    modules::generics::api_integration::GenericAPIIntegrationModule,
+    modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::core::Subdomain,
     utils::regex::generate_subdomain_regex,
@@ -16,7 +16,7 @@ pub const BUFFEROVER_URL: &str = "https://tls.bufferover.run";
 
 /// `BufferOver` API integration module
 ///
-/// It uses [`GenericAPIIntegrationModule`] its own inner
+/// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
 /// | Property           | Value                             |
@@ -24,6 +24,8 @@ pub const BUFFEROVER_URL: &str = "https://tls.bufferover.run";
 /// | Module Name        | `bufferover`                      |
 /// | Doc URL            | <https://tls.bufferover.run>      |
 /// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
+/// | Requester          | [`HTTPClient`]                    |
+/// | Extractor          | [`JSONExtractor`]                 |
 pub struct BufferOver {}
 
 impl BufferOver {
@@ -31,7 +33,7 @@ impl BufferOver {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));
 
-        let generic = GenericAPIIntegrationModule {
+        let generic = GenericIntegrationModule {
             name: BUFFEROVER_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
