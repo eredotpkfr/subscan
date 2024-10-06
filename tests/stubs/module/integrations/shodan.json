@@ -1,0 +1,42 @@
+{
+    "request": {
+        "method": "GET",
+        "queryParameters": {
+            "key": {
+                "equalTo": "shodan-api-key"
+            }
+        },
+        "urlPath": "/shodan"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "data": [
+                {
+                    "last_seen": "2024-10-06T03:23:59.910000",
+                    "ports": [
+                        80,
+                        443,
+                        2082
+                    ],
+                    "subdomain": "",
+                    "tags": [
+                        "cdn"
+                    ],
+                    "type": "A",
+                    "value": "104.18.174.21"
+                }
+            ],
+            "domain": "foo.com",
+            "subdomains": [
+                "bar"
+            ],
+            "tags": [
+                "dmarc"
+            ]
+        },
+        "status": 200
+    }
+}

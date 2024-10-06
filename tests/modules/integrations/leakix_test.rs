@@ -26,8 +26,9 @@ async fn leakix_run_test() {
 #[tokio::test]
 async fn get_query_url_test() {
     let url = leakix::Leakix::get_query_url(TEST_DOMAIN);
+    let expected = format!("{LEAKIX_URL}/subdomains/{TEST_DOMAIN}");
 
-    assert_eq!(url, format!("{LEAKIX_URL}/subdomains/{TEST_DOMAIN}"));
+    assert_eq!(url, expected);
 }
 
 #[tokio::test]
