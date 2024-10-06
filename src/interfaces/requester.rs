@@ -1,5 +1,5 @@
 use crate::{
-    enums::{RequesterDispatcher, RequesterType},
+    enums::{Content, RequesterDispatcher},
     requesters::{chrome::ChromeBrowser, client::HTTPClient},
     types::config::RequesterConfig,
 };
@@ -21,34 +21,41 @@ use reqwest::Url;
 /// use std::time::Duration;
 /// use subscan::interfaces::requester::RequesterInterface;
 /// use subscan::types::config::RequesterConfig;
-/// use subscan::enums::RequesterType;
+/// use subscan::enums::Content;
 /// use reqwest::Url;
 /// use async_trait::async_trait;
+/// use serde_json::Value;
 ///
-/// pub struct CustomRequester {}
+/// pub struct CustomRequester {
+///     config: RequesterConfig
+/// }
 ///
 /// #[async_trait(?Send)]
 /// impl RequesterInterface for CustomRequester {
-///     async fn r#type(&self) -> RequesterType {
-///         RequesterType::HTTPClient
+///     async fn config(&mut self) -> &mut RequesterConfig {
+///         &mut self.config
 ///     }
-///     async fn config(&self) -> RequesterConfig {
-///         RequesterConfig::default()
+///
+///     async fn configure(&mut self, config: RequesterConfig) {
+///         self.config = config;
 ///     }
-///     async fn configure(&mut self, config: RequesterConfig) {}
-///     async fn get_content(&self, url: Url) -> Option<String> {
-///         Some(String::from("foo"))
+///
+///     async fn get_content(&self, url: Url) -> Content {
+///         Content::from("foo")
 ///     }
 /// }
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let url = Url::parse("https://foo.com").expect("URL parse error!");
-///     let requester = CustomRequester {};
-///     let config = requester.config().await;
+///     let url = Url::parse("https://foo.com").unwrap();
 ///
-///     assert_eq!(requester.r#type().await, RequesterType::HTTPClient);
-///     assert_eq!(requester.get_content(url).await.unwrap(), "foo");
+///     let mut requester = CustomRequester {
+///         config: RequesterConfig::default(),
+///     };
+///
+///     let config = requester.config().await.clone();
+///
+///     assert_eq!(requester.get_content(url).await.as_string(), "foo");
 ///     assert_eq!(config.proxy, None);
 ///     assert_eq!(config.timeout, Duration::from_secs(10));
 ///     assert_eq!(config.headers.len(), 0);
@@ -57,14 +64,10 @@ use reqwest::Url;
 #[async_trait(?Send)]
 #[enum_dispatch]
 pub trait RequesterInterface: Sync + Send {
-    /// Requester type method returns requester's type.
-    /// All requester types defined under the [`RequesterType`]
-    /// enum
-    async fn r#type(&self) -> RequesterType;
     /// Returns requester configurations as a [`RequesterConfig`] object
-    async fn config(&self) -> RequesterConfig;
+    async fn config(&mut self) -> &mut RequesterConfig;
     /// Configure current requester object by using new [`RequesterConfig`] object
     async fn configure(&mut self, config: RequesterConfig);
     /// Get HTML source of page from given [`reqwest::Url`] object
-    async fn get_content(&self, url: Url) -> Option<String>;
+    async fn get_content(&self, url: Url) -> Content;
 }

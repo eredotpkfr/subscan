@@ -1,13 +1,15 @@
 use crate::{
-    cache::requesters, enums::RequesterType, extractors::html::HTMLExtractor,
-    modules::generics::searchengine::GenericSearchEngineModule, types::query::SearchQueryParam,
+    enums::{RequesterDispatcher, SubscanModuleDispatcher},
+    extractors::html::HTMLExtractor,
+    modules::generics::engine::GenericSearchEngineModule,
+    requesters::client::HTTPClient,
 };
 use reqwest::Url;
 
-const BING_MODULE_NAME: &str = "Bing";
-const BING_SEARCH_URL: &str = "https://www.bing.com/search";
-const BING_SEARCH_PARAM: &str = "q";
-const BING_CITE_TAG: &str = "cite";
+pub const BING_MODULE_NAME: &str = "bing";
+pub const BING_SEARCH_URL: &str = "https://www.bing.com/search";
+pub const BING_SEARCH_PARAM: &str = "q";
+pub const BING_CITE_TAG: &str = "cite";
 
 /// Bing search engine enumerator
 ///
@@ -16,37 +18,29 @@ const BING_CITE_TAG: &str = "cite";
 ///
 /// | Property           | Value                         |
 /// |:------------------:|:-----------------------------:|
-/// | Module Name        | `Bing`                        |
+/// | Module Name        | `bing`                        |
 /// | Search URL         | <https://www.bing.com/search> |
 /// | Search Param       | `q`                           |
 /// | Subdomain Selector | `cite`                        |
+/// | Requester          | [`HTTPClient`]                |
+/// | Extractor          | [`HTMLExtractor`]             |
 pub struct Bing {}
 
-impl<'a> Bing {
-    /// Create a new [`Bing`] module instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::engines::bing;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let bing = bing::Bing::new();
-    ///
-    ///     // do something with bing instance
-    /// }
-    /// ```
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new() -> GenericSearchEngineModule<'a> {
-        let extractor = HTMLExtractor::new(String::from(BING_CITE_TAG), vec![]);
+impl Bing {
+    pub fn dispatcher() -> SubscanModuleDispatcher {
+        let url = Url::parse(BING_SEARCH_URL);
 
-        GenericSearchEngineModule {
-            name: String::from(BING_MODULE_NAME),
-            url: Url::parse(BING_SEARCH_URL).expect("URL parse error!"),
-            param: SearchQueryParam::from(BING_SEARCH_PARAM),
-            requester: requesters::get_by_type(&RequesterType::HTTPClient),
+        let extractor: HTMLExtractor = HTMLExtractor::new(BING_CITE_TAG.into(), vec![]);
+        let requester: RequesterDispatcher = HTTPClient::default().into();
+
+        let generic = GenericSearchEngineModule {
+            name: BING_MODULE_NAME.into(),
+            param: BING_SEARCH_PARAM.into(),
+            url: url.unwrap(),
+            requester: requester.into(),
             extractor: extractor.into(),
-        }
+        };
+
+        generic.into()
     }
 }

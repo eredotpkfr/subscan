@@ -1,13 +1,12 @@
 use crate::{
-    enums::RequesterType, interfaces::requester::RequesterInterface, types::config::RequesterConfig,
+    enums::Content, interfaces::requester::RequesterInterface, types::config::RequesterConfig,
 };
 use async_trait::async_trait;
 use headless_chrome::{browser::LaunchOptions, Browser};
 use reqwest::Url;
 
-/// Chrome requester struct, send HTTP requests
-/// via Chrome browser. Also its compatible
-/// with [`RequesterInterface`]
+/// Chrome requester struct, send HTTP requests via Chrome browser.
+/// Also its compatible with [`RequesterInterface`]
 pub struct ChromeBrowser {
     config: RequesterConfig,
     browser: Browser,
@@ -98,26 +97,6 @@ impl ChromeBrowser {
 
 #[async_trait(?Send)]
 impl RequesterInterface for ChromeBrowser {
-    /// Get requester type as a [`RequesterType`]
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::requesters::chrome::ChromeBrowser;
-    /// use subscan::enums::RequesterType;
-    /// use crate::subscan::interfaces::requester::RequesterInterface;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let browser = ChromeBrowser::new();
-    ///
-    ///     assert_eq!(browser.r#type().await, RequesterType::ChromeBrowser);
-    /// }
-    /// ```
-    async fn r#type(&self) -> RequesterType {
-        RequesterType::ChromeBrowser
-    }
-
     /// Get requester config object as a [`RequesterConfig`]
     ///
     /// # Examples
@@ -129,13 +108,13 @@ impl RequesterInterface for ChromeBrowser {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let browser = ChromeBrowser::new();
+    ///     let mut browser = ChromeBrowser::default();
     ///
     ///     assert_eq!(browser.config().await.timeout, Duration::from_secs(10));
     /// }
     /// ```
-    async fn config(&self) -> RequesterConfig {
-        self.config.clone()
+    async fn config(&mut self) -> &mut RequesterConfig {
+        &mut self.config
     }
 
     /// Configure requester with a new config object
@@ -151,7 +130,7 @@ impl RequesterInterface for ChromeBrowser {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let mut browser = ChromeBrowser::new();
+    ///     let mut browser = ChromeBrowser::default();
     ///
     ///     let new_config = RequesterConfig {
     ///         timeout: Duration::from_secs(120),
@@ -172,7 +151,7 @@ impl RequesterInterface for ChromeBrowser {
         }
 
         self.browser = Browser::new(options).unwrap();
-        self.config = config
+        self.config = config;
     }
 
     /// Get page source HTML from given [`reqwest::Url`]
@@ -186,15 +165,15 @@ impl RequesterInterface for ChromeBrowser {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let browser = ChromeBrowser::new();
+    ///     let mut browser = ChromeBrowser::default();
     ///     let url = Url::parse("https://foo.com").unwrap();
     ///
-    ///     let content = browser.get_content(url).await.unwrap();
+    ///     let content = browser.get_content(url).await;
     ///
     ///     // do something with content
     /// }
     /// ```
-    async fn get_content(&self, url: Url) -> Option<String> {
+    async fn get_content(&self, url: Url) -> Content {
         let tab = self.browser.new_tab().expect("Cannot create tab!");
         let headers = self.config.headers_as_hashmap();
 
@@ -208,6 +187,6 @@ impl RequesterInterface for ChromeBrowser {
 
         tab.close(true).unwrap();
 
-        content
+        Content::String(content.unwrap_or_default())
     }
 }

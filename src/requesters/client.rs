@@ -1,5 +1,5 @@
 use crate::{
-    enums::RequesterType, interfaces::requester::RequesterInterface, types::config::RequesterConfig,
+    enums::Content, interfaces::requester::RequesterInterface, types::config::RequesterConfig,
 };
 use async_trait::async_trait;
 use reqwest::{Client, Proxy, Url};
@@ -8,9 +8,8 @@ const CLIENT_BUILD_ERR: &str = "Cannot create HTTP client!";
 const REQUEST_BUILD_ERR: &str = "Cannot build request!";
 const PROXY_PARSE_ERR: &str = "Cannot parse proxy!";
 
-/// HTTP requester struct, send HTTP requests
-/// via [`reqwest`] client. Also its compatible
-/// with [`RequesterInterface`]
+/// HTTP requester struct, send HTTP requests via [`reqwest`] client.
+/// Also its compatible with [`RequesterInterface`]
 #[derive(Default)]
 pub struct HTTPClient {
     config: RequesterConfig,
@@ -18,6 +17,21 @@ pub struct HTTPClient {
 }
 
 impl HTTPClient {
+    /// Returns a new default [`HTTPClient`] instance
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use subscan::requesters::client::HTTPClient;
+    ///
+    /// let client = HTTPClient::new();
+    ///
+    /// // do something with client instance
+    /// ```
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Returns a new [`HTTPClient`] instance from given [`RequesterConfig`]
     ///
     /// # Examples
@@ -48,26 +62,6 @@ impl HTTPClient {
 
 #[async_trait(?Send)]
 impl RequesterInterface for HTTPClient {
-    /// Get requester type as a [`RequesterType`]
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::requesters::client::HTTPClient;
-    /// use subscan::enums::RequesterType;
-    /// use crate::subscan::interfaces::requester::RequesterInterface;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let client = HTTPClient::default();
-    ///
-    ///     assert_eq!(client.r#type().await, RequesterType::HTTPClient);
-    /// }
-    /// ```
-    async fn r#type(&self) -> RequesterType {
-        RequesterType::HTTPClient
-    }
-
     /// Get requester config object as a [`RequesterConfig`]
     ///
     /// # Examples
@@ -79,13 +73,13 @@ impl RequesterInterface for HTTPClient {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let client = HTTPClient::default();
+    ///     let mut client = HTTPClient::default();
     ///
     ///     assert_eq!(client.config().await.timeout, Duration::from_secs(10));
     /// }
     /// ```
-    async fn config(&self) -> RequesterConfig {
-        self.config.clone()
+    async fn config(&mut self) -> &mut RequesterConfig {
+        &mut self.config
     }
 
     /// Configure requester with a new config object
@@ -136,18 +130,17 @@ impl RequesterInterface for HTTPClient {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let client = HTTPClient::default();
+    ///     let mut client = HTTPClient::default();
     ///     let url = Url::parse("https://foo.com").unwrap();
     ///
-    ///     let content = client.get_content(url).await.unwrap();
+    ///     let content = client.get_content(url).await;
     ///
     ///     // do something with content
     /// }
     /// ```
-    async fn get_content(&self, url: Url) -> Option<String> {
-        let request = self
-            .client
-            .get(url)
+    async fn get_content(&self, url: Url) -> Content {
+        let rbuilder = self.client.get(url);
+        let request = rbuilder
             .timeout(self.config.timeout)
             .headers(self.config.headers.clone())
             .build()
@@ -155,12 +148,12 @@ impl RequesterInterface for HTTPClient {
 
         if let Ok(response) = self.client.execute(request).await {
             if let Ok(content) = response.text().await {
-                Some(content)
+                Content::String(content)
             } else {
-                None
+                Content::Empty
             }
         } else {
-            None
+            Content::Empty
         }
     }
 }

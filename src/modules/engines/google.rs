@@ -1,13 +1,15 @@
 use crate::{
-    cache::requesters, enums::RequesterType, extractors::html::HTMLExtractor,
-    modules::generics::searchengine::GenericSearchEngineModule, types::query::SearchQueryParam,
+    enums::{RequesterDispatcher, SubscanModuleDispatcher},
+    extractors::html::HTMLExtractor,
+    modules::generics::engine::GenericSearchEngineModule,
+    requesters::client::HTTPClient,
 };
 use reqwest::Url;
 
-const GOOGLE_MODULE_NAME: &str = "Google";
-const GOOGLE_SEARCH_URL: &str = "https://www.google.com/search";
-const GOOGLE_SEARCH_PARAM: &str = "q";
-const GOOGLE_CITE_TAG: &str = "cite";
+pub const GOOGLE_MODULE_NAME: &str = "google";
+pub const GOOGLE_SEARCH_URL: &str = "https://www.google.com/search";
+pub const GOOGLE_SEARCH_PARAM: &str = "q";
+pub const GOOGLE_CITE_TAG: &str = "cite";
 
 /// Google search engine enumerator
 ///
@@ -16,37 +18,28 @@ const GOOGLE_CITE_TAG: &str = "cite";
 ///
 /// | Property           | Value                           |
 /// |:------------------:|:-------------------------------:|
-/// | Module Name        | `Google`                        |
+/// | Module Name        | `google`                        |
 /// | Search URL         | <https://www.google.com/search> |
 /// | Search Param       | `q`                             |
 /// | Subdomain Selector | `cite`                          |
+/// | Requester          | [`HTTPClient`]                  |
+/// | Extractor          | [`HTMLExtractor`]               |
 pub struct Google {}
 
-impl<'a> Google {
-    /// Create a new [`Google`] module instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::modules::engines::google;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let google = google::Google::new();
-    ///
-    ///     // do something with google instance
-    /// }
-    /// ```
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new() -> GenericSearchEngineModule<'a> {
-        let extractor = HTMLExtractor::new(String::from(GOOGLE_CITE_TAG), vec![]);
+impl Google {
+    pub fn dispatcher() -> SubscanModuleDispatcher {
+        let extractor: HTMLExtractor = HTMLExtractor::new(GOOGLE_CITE_TAG.into(), vec![]);
+        let requester: RequesterDispatcher = HTTPClient::default().into();
+        let url = Url::parse(GOOGLE_SEARCH_URL);
 
-        GenericSearchEngineModule {
-            name: String::from(GOOGLE_MODULE_NAME),
-            url: Url::parse(GOOGLE_SEARCH_URL).expect("URL parse error!"),
-            param: SearchQueryParam::from(GOOGLE_SEARCH_PARAM),
-            requester: requesters::get_by_type(&RequesterType::HTTPClient),
+        let generic = GenericSearchEngineModule {
+            name: GOOGLE_MODULE_NAME.into(),
+            param: GOOGLE_SEARCH_PARAM.into(),
+            url: url.unwrap(),
+            requester: requester.into(),
             extractor: extractor.into(),
-        }
+        };
+
+        generic.into()
     }
 }

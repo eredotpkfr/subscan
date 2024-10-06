@@ -1,99 +1,77 @@
 use crate::{
-    enums::{RequesterDispatcher, RequesterType},
-    modules::engines::{bing, duckduckgo, google, yahoo},
-    requesters::{chrome::ChromeBrowser, client::HTTPClient},
-    SubscanModule,
+    enums::SubscanModuleDispatcher,
+    modules::{
+        engines::{bing, duckduckgo, google, yahoo},
+        integrations::{
+            alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys, certspotter,
+            chaos, crtsh, digitorus, hackertarget,
+        },
+    },
 };
 use lazy_static::lazy_static;
-use std::collections::HashMap;
 use tokio::sync::Mutex;
 
 lazy_static! {
-    /// All `subscan` modules are stores in this in-memory [`Vec`]
-    /// as a [`SubscanModule`], all modules must be compatible
-    /// with [`SubscanModuleInterface`](crate::interfaces::module::SubscanModuleInterface) trait
-    pub static ref ALL_MODULES: Vec<Mutex<SubscanModule>> = vec![
-        SubscanModule::new(google::Google::new()),
-        SubscanModule::new(yahoo::Yahoo::new()),
-        SubscanModule::new(bing::Bing::new()),
-        SubscanModule::new(duckduckgo::DuckDuckGo::new()),
+    /// All `Subscan` modules are stores in this in-memory [`Vec`] as a [`SubscanModuleDispatcher`]
+    pub static ref ALL_MODULES: Vec<Mutex<SubscanModuleDispatcher>> = vec![
+        // Search engines
+        Mutex::new(google::Google::dispatcher()),
+        Mutex::new(yahoo::Yahoo::dispatcher()),
+        Mutex::new(bing::Bing::dispatcher()),
+        Mutex::new(duckduckgo::DuckDuckGo::dispatcher()),
+        // Integrations
+        Mutex::new(alienvault::AlienVault::dispatcher()),
+        Mutex::new(anubis::Anubis::dispatcher()),
+        Mutex::new(bevigil::Bevigil::dispatcher()),
+        Mutex::new(binaryedge::BinaryEdge::dispatcher()),
+        Mutex::new(bufferover::BufferOver::dispatcher()),
+        Mutex::new(builtwith::BuiltWith::dispatcher()),
+        Mutex::new(censys::Censys::dispatcher()),
+        Mutex::new(certspotter::CertSpotter::dispatcher()),
+        Mutex::new(chaos::Chaos::dispatcher()),
+        Mutex::new(crtsh::Crtsh::dispatcher()),
+        Mutex::new(digitorus::Digitorus::dispatcher()),
+        Mutex::new(hackertarget::HackerTarget::dispatcher())
     ];
-    /// All HTTP requester objects are stores in this in-memory [`HashMap`]
-    /// as a [`RequesterInterface`](crate::interfaces::requester::RequesterInterface)
-    pub static ref ALL_REQUESTERS: HashMap<RequesterType, Mutex<RequesterDispatcher>> =
-        HashMap::from([
-            (
-                RequesterType::ChromeBrowser,
-                Mutex::new(ChromeBrowser::new().into())
-            ),
-            (
-                RequesterType::HTTPClient,
-                Mutex::new(HTTPClient::default().into())
-            ),
-        ]);
 }
 
-/// Module to manage in-memory requester cache. Basic cache functions
-/// are listed in here
-pub mod requesters {
-    use tokio::sync::Mutex;
+/// Module to manage modules that already cached in-memory cache
+pub mod modules {
+    use crate::{
+        interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
+        types::config::RequesterConfig,
+    };
 
-    use super::{RequesterDispatcher, RequesterType, ALL_REQUESTERS};
-    use crate::{interfaces::requester::RequesterInterface, types::config::RequesterConfig};
-
-    /// Enumerates all pre-defined HTTP requesters on in-memory [`std::collections::HashMap`]
-    /// and returns [`RequesterDispatcher`] by given [`RequesterType`]
-    ///
-    /// # Panics
-    ///
-    /// When the given [`RequesterType`] did not mapped any
-    /// [`RequesterDispatcher`] instance object in [`struct@crate::cache::ALL_REQUESTERS`]
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::cache;
-    /// use subscan::enums::RequesterType;
-    /// use subscan::interfaces::requester::RequesterInterface;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let rtype = RequesterType::HTTPClient;
-    ///     let requester = cache::requesters::get_by_type(&rtype).lock().await;
-    ///
-    ///     // do something with requester instance
-    /// }
-    /// ```
-    pub fn get_by_type(rtype: &RequesterType) -> &Mutex<RequesterDispatcher> {
-        ALL_REQUESTERS.get(rtype).expect("Requester not found!")
-    }
-
-    /// Configure all pre-defined HTTP requester instances with using
-    /// single stupid function according to given any [`RequesterConfig`]
-    /// object
+    /// Configure all modules requester objects that has any requester
     ///
     /// # Examples
     ///
     /// ```no_run
     /// use std::time::Duration;
-    /// use reqwest::header::HeaderMap;
-    /// use subscan::cache;
+    /// use subscan::cache::modules;
     /// use subscan::types::config::RequesterConfig;
+    /// use reqwest::header::HeaderMap;
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let new_config = RequesterConfig {
     ///         timeout: Duration::from_secs(120),
-    ///         headers: HeaderMap::default(),
     ///         proxy: None,
+    ///         headers: HeaderMap::default(),
     ///     };
     ///
-    ///     cache::requesters::configure_all(new_config).await;
+    ///     modules::configure_all_requesters(new_config);
+    ///
+    ///     // configured all modules requester objects
     /// }
     /// ```
-    pub async fn configure_all(config: RequesterConfig) {
-        for requester in ALL_REQUESTERS.values() {
-            requester.lock().await.configure(config.clone()).await
+    pub async fn configure_all_requesters(config: RequesterConfig) {
+        for module in super::ALL_MODULES.iter() {
+            let module = module.lock().await;
+
+            if let Some(requester) = module.requester().await {
+                requester.lock().await.configure(config.clone()).await;
+            }
         }
     }
 }

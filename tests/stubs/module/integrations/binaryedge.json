@@ -1,0 +1,27 @@
+{
+    "request": {
+        "headers": {
+            "X-Key": {
+                "equalTo": "binaryedge-api-key"
+            }
+        },
+        "method": "GET",
+        "queryParameters": {
+            "page": {
+                "absent": true
+            }
+        },
+        "urlPath": "/binaryedge"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "events": [
+                "bar.foo.com"
+            ]
+        },
+        "status": 200
+    }
+}

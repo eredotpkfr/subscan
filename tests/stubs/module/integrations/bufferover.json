@@ -1,0 +1,25 @@
+{
+    "request": {
+        "headers": {
+            "X-API-Key": {
+                "equalTo": "bufferover-api-key"
+            }
+        },
+        "method": "GET",
+        "urlPath": "/bufferover"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "Meta": {
+                "domain": "foo.com"
+            },
+            "Results": [
+                "54.201.204.183,581faa6ff692d0ba8185753570c8624a2a6b4e8e47bd5322216cc12a41def044,,bar.foo.com"
+            ]
+        },
+        "status": 200
+    }
+}
