@@ -1,7 +1,7 @@
 use crate::{
     enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::html::HTMLExtractor,
-    modules::generics::api_integration::GenericAPIIntegrationModule,
+    modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
 };
 use reqwest::Url;
@@ -13,7 +13,7 @@ pub const DIGITORUS_SUBDOMAIN_TAG: &str = "main > div:nth-last-child(3) > div > 
 
 /// `Digitorus` API integration module
 ///
-/// It uses [`GenericAPIIntegrationModule`] its own inner
+/// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
 /// | Property           | Value                                          |
@@ -32,7 +32,7 @@ impl Digitorus {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: HTMLExtractor = HTMLExtractor::new(selector, vec![]);
 
-        let generic = GenericAPIIntegrationModule {
+        let generic = GenericIntegrationModule {
             name: DIGITORUS_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),

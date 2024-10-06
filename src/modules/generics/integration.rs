@@ -19,7 +19,7 @@ use tokio::sync::Mutex;
 /// It takes a extractor that compatible with [`SubdomainExtractorInterface`], mostly
 /// [`JSONExtractor`](crate::extractors::json::JSONExtractor) extractor is used with this
 /// module to parse JSON contents
-pub struct GenericAPIIntegrationModule {
+pub struct GenericIntegrationModule {
     /// Module name
     pub name: String,
     /// Simple function field that gets query URL by given domain address
@@ -35,7 +35,7 @@ pub struct GenericAPIIntegrationModule {
     pub extractor: SubdomainExtractorDispatcher,
 }
 
-impl GenericAPIIntegrationModule {
+impl GenericIntegrationModule {
     pub async fn authenticate(&self, url: &mut Url, apikey: String) {
         match &self.auth {
             APIAuthMethod::APIKeyAsHeader(name) => self.set_apikey_header(name, &apikey).await,
@@ -63,7 +63,7 @@ impl GenericAPIIntegrationModule {
 }
 
 #[async_trait(?Send)]
-impl SubscanModuleInterface for GenericAPIIntegrationModule {
+impl SubscanModuleInterface for GenericIntegrationModule {
     async fn name(&self) -> &str {
         &self.name
     }

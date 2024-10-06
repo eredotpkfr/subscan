@@ -1,7 +1,7 @@
 use crate::{
     enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
-    modules::generics::api_integration::GenericAPIIntegrationModule,
+    modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::core::Subdomain,
 };
@@ -14,7 +14,7 @@ pub const BINARYEDGE_URL: &str = "https://api.binaryedge.io/v2/query/domains/sub
 
 /// `BinaryEdge` API integration module
 ///
-/// It uses [`GenericAPIIntegrationModule`] its own inner
+/// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
 /// | Property           | Value                             |
@@ -31,7 +31,7 @@ impl BinaryEdge {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));
 
-        let generic = GenericAPIIntegrationModule {
+        let generic = GenericIntegrationModule {
             name: BINARYEDGE_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),

@@ -1,8 +1,6 @@
 use crate::{
     enums::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-    modules::generics::{
-        api_integration::GenericAPIIntegrationModule, search_engine::GenericSearchEngineModule,
-    },
+    modules::generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
     types::core::APIKeyAsEnv,
     utils::env,
 };

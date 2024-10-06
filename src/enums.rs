@@ -1,6 +1,6 @@
 use crate::extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor};
-use crate::modules::generics::api_integration::GenericAPIIntegrationModule;
-use crate::modules::generics::search_engine::GenericSearchEngineModule;
+use crate::modules::generics::engine::GenericSearchEngineModule;
+use crate::modules::generics::integration::GenericIntegrationModule;
 use crate::requesters::{chrome::ChromeBrowser, client::HTTPClient};
 use enum_dispatch::enum_dispatch;
 use serde_json::Value;
@@ -22,8 +22,8 @@ use serde_json::Value;
 pub enum SubscanModuleDispatcher {
     /// Enum variant of generic API integrations. It can be used for all generic API modules
     /// at the same time, for this only requirement is the module should be implemented as
-    /// a [`GenericAPIIntegrationModule`]
-    GenericAPIIntegrationModule(GenericAPIIntegrationModule),
+    /// a [`GenericIntegrationModule`]
+    GenericIntegrationModule(GenericIntegrationModule),
     /// Also another generic variant for search engines, It can be used for all generic search
     /// engine modules at the same time. Just modules should be implemented as
     /// a [`GenericSearchEngineModule`]
@@ -70,7 +70,7 @@ pub enum RequesterDispatcher {
 }
 
 /// Authentication methods for API calls.
-/// [`GenericAPIIntegrationModule`] uses them to apply
+/// [`GenericIntegrationModule`] uses them to apply
 /// correct auth method. See the method descriptions to
 /// learn how it works
 #[derive(PartialEq)]

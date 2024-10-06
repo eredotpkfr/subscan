@@ -12,16 +12,14 @@ use lazy_static::lazy_static;
 use tokio::sync::Mutex;
 
 lazy_static! {
-    /// All `subscan` modules are stores in this in-memory [`Vec`]
-    /// as a [`SubscanModule`], all modules must be compatible
-    /// with [`SubscanModuleInterface`](crate::interfaces::module::SubscanModuleInterface) trait
+    /// All `Subscan` modules are stores in this in-memory [`Vec`] as a [`SubscanModuleDispatcher`]
     pub static ref ALL_MODULES: Vec<Mutex<SubscanModuleDispatcher>> = vec![
         // Search engines
         Mutex::new(google::Google::dispatcher()),
         Mutex::new(yahoo::Yahoo::dispatcher()),
         Mutex::new(bing::Bing::dispatcher()),
         Mutex::new(duckduckgo::DuckDuckGo::dispatcher()),
-        // API integrations
+        // Integrations
         Mutex::new(alienvault::AlienVault::dispatcher()),
         Mutex::new(anubis::Anubis::dispatcher()),
         Mutex::new(bevigil::Bevigil::dispatcher()),

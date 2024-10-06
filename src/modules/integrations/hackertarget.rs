@@ -1,7 +1,7 @@
 use crate::{
     enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::regex::RegexExtractor,
-    modules::generics::api_integration::GenericAPIIntegrationModule,
+    modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
 };
 use reqwest::Url;
@@ -12,7 +12,7 @@ pub const HACKERTARGET_URL: &str = "https://api.hackertarget.com/hostsearch";
 
 /// `HackerTarget` integration module
 ///
-/// It uses [`GenericAPIIntegrationModule`] its own inner
+/// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
 /// | Property           | Value                      |
@@ -29,7 +29,7 @@ impl HackerTarget {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: RegexExtractor = RegexExtractor::default();
 
-        let generic = GenericAPIIntegrationModule {
+        let generic = GenericIntegrationModule {
             name: HACKERTARGET_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
