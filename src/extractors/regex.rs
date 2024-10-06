@@ -28,11 +28,16 @@ impl RegexExtractor {
     /// let domain = String::from("foo.com");
     /// let extractor = RegexExtractor::default();
     ///
-    /// let match_content = String::from("bar.foo.com");
+    /// let match_content = String::from("bar.foo.com\nbaz.foo.com");
     /// let no_match_content = String::from("foobarbaz");
     ///
-    /// assert!(extractor.extract_one(match_content, domain.clone()).is_some());
-    /// assert!(extractor.extract_one(no_match_content, domain).is_none());
+    /// let matched = extractor.extract_one(match_content, domain.clone());
+    /// let not_matched = extractor.extract_one(no_match_content, domain);
+    ///
+    /// assert!(matched.is_some());
+    /// assert!(not_matched.is_none());
+    ///
+    /// assert_eq!(matched.unwrap(), "bar.foo.com");
     /// ```
     pub fn extract_one(&self, content: String, domain: String) -> Option<Subdomain> {
         let pattern = generate_subdomain_regex(domain).unwrap();

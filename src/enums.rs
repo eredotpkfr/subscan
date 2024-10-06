@@ -139,10 +139,9 @@ pub enum Content {
     ///
     /// ```no_run
     /// use subscan::enums::Content;
-    /// use serde_json;
+    /// use serde_json::json;
     ///
-    /// let content = "{\"foo\": \"bar\"}";
-    /// let json = Content::JSON(serde_json::from_str(content).unwrap());
+    /// let json = Content::JSON(json!({"foo": "bar"}));
     /// ```
     JSON(Value),
     /// Empty content type

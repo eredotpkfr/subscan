@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/hackertarget"
+    },
+    "response": {
+        "body": "bar.foo.com\n",
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}
