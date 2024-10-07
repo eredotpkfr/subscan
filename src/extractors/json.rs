@@ -26,13 +26,16 @@ impl JSONExtractor {
     /// use std::collections::BTreeSet;
     /// use serde_json::Value;
     ///
-    /// let inner = |_content: Value, _domain: String| {
-    ///     BTreeSet::new()
-    /// };
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let inner = |_content: Value, _domain: String| {
+    ///         BTreeSet::new()
+    ///     };
     ///
-    /// let extractor = JSONExtractor::new(Box::new(inner));
+    ///     let extractor = JSONExtractor::new(Box::new(inner));
     ///
-    /// // do something with extractor instance
+    ///     // do something with extractor instance
+    /// }
     /// ```
     pub fn new(inner: InnerExtractMethod) -> Self {
         Self { inner }
