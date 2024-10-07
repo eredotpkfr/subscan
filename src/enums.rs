@@ -140,8 +140,10 @@ impl Content {
     ///
     /// let json = json!({"foo": "bar"});
     /// let content = Content::from(json);
+    /// let empty = Content::default();
     ///
     /// assert_eq!(content.as_string(), "{\"foo\":\"bar\"}");
+    /// assert_eq!(empty.as_string(), "");
     /// ```
     pub fn as_string(self) -> String {
         match self {

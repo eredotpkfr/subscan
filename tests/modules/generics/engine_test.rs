@@ -5,13 +5,21 @@ use crate::common::{
 use subscan::interfaces::module::SubscanModuleInterface;
 
 #[tokio::test]
-async fn get_search_query_test() {
+async fn attribute_test() {
     let module = generic_search_engine(TEST_URL);
 
+    assert_eq!(module.name().await, module.name);
+
+    assert!(module.requester().await.is_some());
+    assert!(module.extractor().await.is_some());
+}
+
+#[tokio::test]
+async fn get_search_query_test() {
+    let module = generic_search_engine(TEST_URL);
     let mut query = module.get_search_query(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(query.as_search_str(), "site:foo.com");
-    assert_eq!(module.name().await, module.name);
 }
 
 #[tokio::test]
@@ -21,6 +29,5 @@ async fn run_test() {
 
     let result = module.run(TEST_DOMAIN.to_string()).await;
 
-    assert_eq!(module.name().await, module.name);
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }

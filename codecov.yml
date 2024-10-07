@@ -11,5 +11,7 @@ coverage: # https://docs.codecov.com/docs/codecovyml-reference#coverage
         if_ci_failed: error
         branches:
           - main
+    patch: off
+
 ignore:
   - "src/bin/subscan.rs"

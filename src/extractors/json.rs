@@ -21,20 +21,27 @@ impl JSONExtractor {
     ///
     /// # Examples
     ///
-    /// ```no_run
+    /// ```
     /// use subscan::extractors::json::JSONExtractor;
+    /// use subscan::interfaces::extractor::SubdomainExtractorInterface;
+    /// use subscan::enums::Content;
     /// use std::collections::BTreeSet;
-    /// use serde_json::Value;
+    /// use serde_json::{Value, json};
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let inner = |_content: Value, _domain: String| {
-    ///         BTreeSet::new()
+    ///     let domain = String::from("foo.com");
+    ///     let inner = |content: Value, _domain: String| {
+    ///         let bar = content["foo"].as_str().unwrap().to_string();
+    ///
+    ///         [bar].into()
     ///     };
     ///
+    ///     let json = Content::from(json!({"foo": "bar"}));
     ///     let extractor = JSONExtractor::new(Box::new(inner));
+    ///     let expected = BTreeSet::from(["bar".to_string()]);
     ///
-    ///     // do something with extractor instance
+    ///     assert_eq!(extractor.extract(json, domain).await, expected);
     /// }
     /// ```
     pub fn new(inner: InnerExtractMethod) -> Self {
