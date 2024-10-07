@@ -15,9 +15,12 @@ impl From<&str> for SearchQueryParam {
     /// ```no_run
     /// use subscan::types::query::SearchQueryParam;
     ///
-    /// let param = SearchQueryParam::from("q");
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let param = SearchQueryParam::from("q");
     ///
-    /// // do something with param
+    ///     // do something with param
+    /// }
     /// ```
     fn from(value: &str) -> Self {
         Self(value.to_string())
@@ -33,11 +36,14 @@ impl ToString for SearchQueryParam {
     /// ```no_run
     /// use subscan::types::query::SearchQueryParam;
     ///
-    /// let param = SearchQueryParam::from("q");
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let param = SearchQueryParam::from("q");
     ///
-    /// let as_string = param.to_string();
+    ///     let as_string = param.to_string();
     ///
-    /// // do something with string query param
+    ///     // do something with string query param
+    /// }
     /// ```
     fn to_string(&self) -> String {
         self.0.clone()

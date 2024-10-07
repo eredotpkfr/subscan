@@ -78,25 +78,9 @@ pub enum RequesterDispatcher {
 pub enum APIAuthMethod {
     /// Some APIs uses request headers to get API key. If this auth type selected API key
     /// will add in request headers with a given header key
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::enums::APIAuthMethod;
-    ///
-    /// let auth = APIAuthMethod::APIKeyAsHeader("X-API-Key".into());
-    /// ```
     APIKeyAsHeader(String),
     /// This auth type uses when API require API key as a query param. If this method chose
     /// API key will be added in URL as a query param with given parameter key
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::enums::APIAuthMethod;
-    ///
-    /// let auth = APIAuthMethod::APIKeyAsQueryParam("q".into());
-    /// ```
     APIKeyAsQueryParam(String),
     /// This auth type does nothing for auth
     NoAuth,
@@ -125,25 +109,8 @@ impl APIAuthMethod {
 #[derive(Clone, Default)]
 pub enum Content {
     /// Stores [`String`] typed content
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::enums::Content;
-    ///
-    /// let content = Content::String(String::from("foo"));
-    /// ```
     String(String),
     /// Stores [`Value`] typed content
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::enums::Content;
-    /// use serde_json::json;
-    ///
-    /// let json = Content::JSON(json!({"foo": "bar"}));
-    /// ```
     JSON(Value),
     /// Empty content type
     #[default]

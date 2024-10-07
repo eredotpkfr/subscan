@@ -24,12 +24,15 @@ impl HTMLExtractor {
     /// ```no_run
     /// use subscan::extractors::html::HTMLExtractor;
     ///
-    /// let selector = String::from("div > a");
-    /// let removes = vec!["<br>".to_string()];
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let selector = String::from("div > a");
+    ///     let removes = vec!["<br>".to_string()];
     ///
-    /// let extractor = HTMLExtractor::new(selector, removes);
+    ///     let extractor = HTMLExtractor::new(selector, removes);
     ///
-    /// // do something with extractor instance
+    ///     // do something with extractor instance
+    /// }
     /// ```
     pub fn new(selector: String, removes: Vec<String>) -> Self {
         Self {

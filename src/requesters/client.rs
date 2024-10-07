@@ -18,16 +18,6 @@ pub struct HTTPClient {
 
 impl HTTPClient {
     /// Returns a new default [`HTTPClient`] instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::requesters::client::HTTPClient;
-    ///
-    /// let client = HTTPClient::new();
-    ///
-    /// // do something with client instance
-    /// ```
     pub fn new() -> Self {
         Self::default()
     }
@@ -42,15 +32,18 @@ impl HTTPClient {
     /// use subscan::requesters::client::HTTPClient;
     /// use subscan::types::config::RequesterConfig;
     ///
-    /// let config = RequesterConfig {
-    ///     proxy: None,
-    ///     headers: HeaderMap::default(),
-    ///     timeout: Duration::from_secs(60),
-    /// };
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = RequesterConfig {
+    ///         proxy: None,
+    ///         headers: HeaderMap::default(),
+    ///         timeout: Duration::from_secs(60),
+    ///     };
     ///
-    /// let client = HTTPClient::with_config(config);
+    ///     let client = HTTPClient::with_config(config);
     ///
-    /// // do something with client
+    ///     // do something with client
+    /// }
     /// ```
     pub fn with_config(config: RequesterConfig) -> Self {
         Self {

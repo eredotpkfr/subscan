@@ -20,16 +20,6 @@ impl Default for ChromeBrowser {
 
 impl ChromeBrowser {
     /// Returns a new [`ChromeBrowser`] instance
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::requesters::chrome::ChromeBrowser;
-    ///
-    /// let browser = ChromeBrowser::new();
-    ///
-    /// // do something with browser
-    /// ```
     pub fn new() -> Self {
         Self {
             config: RequesterConfig::default(),
@@ -47,15 +37,18 @@ impl ChromeBrowser {
     /// use subscan::requesters::chrome::ChromeBrowser;
     /// use subscan::types::config::RequesterConfig;
     ///
-    /// let config = RequesterConfig {
-    ///     proxy: None,
-    ///     headers: HeaderMap::default(),
-    ///     timeout: Duration::from_secs(60),
-    /// };
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = RequesterConfig {
+    ///         proxy: None,
+    ///         headers: HeaderMap::default(),
+    ///         timeout: Duration::from_secs(60),
+    ///     };
     ///
-    /// let browser = ChromeBrowser::with_config(config);
+    ///     let browser = ChromeBrowser::with_config(config);
     ///
-    /// // do something with browser
+    ///     // do something with browser
+    /// }
     /// ```
     pub fn with_config(config: RequesterConfig) -> Self {
         Self {
@@ -80,10 +73,13 @@ impl ChromeBrowser {
     /// use subscan::requesters::chrome::ChromeBrowser;
     /// use headless_chrome::Browser;
     ///
-    /// let options = ChromeBrowser::default_options();
-    /// let browser = Browser::new(options).unwrap();
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let options = ChromeBrowser::default_options();
+    ///     let browser = Browser::new(options).unwrap();
     ///
-    /// // do something with browser
+    ///     // do something with browser
+    /// }
     /// ```
     pub fn default_options<'a>() -> LaunchOptions<'a> {
         LaunchOptions::default_builder()
