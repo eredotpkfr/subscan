@@ -28,7 +28,7 @@ async fn attribute_test() {
 async fn authenticate_test_no_auth() {
     let mut url = Url::parse(TEST_URL).unwrap();
     let auth = APIAuthMethod::NoAuth;
-    let module = generic_integration(&url.to_string(), auth);
+    let module = generic_integration(url.as_ref(), auth);
 
     module.authenticate(&mut url, TEST_API_KEY.into()).await;
 
@@ -44,7 +44,7 @@ async fn authenticate_test_no_auth() {
 async fn authenticate_test_with_header_auth() {
     let mut url = Url::parse(TEST_URL).unwrap();
     let auth = APIAuthMethod::APIKeyAsHeader("X-API-Key".to_string());
-    let module = generic_integration(&url.to_string(), auth);
+    let module = generic_integration(url.as_ref(), auth);
 
     module.authenticate(&mut url, TEST_API_KEY.into()).await;
 
@@ -60,7 +60,7 @@ async fn authenticate_test_with_query_auth() {
     let expected = Url::parse_with_params(TEST_URL, &[("apikey", TEST_API_KEY)]).unwrap();
 
     let auth = APIAuthMethod::APIKeyAsQueryParam("apikey".to_string());
-    let module = generic_integration(&url.to_string(), auth);
+    let module = generic_integration(url.as_ref(), auth);
 
     module.authenticate(&mut url, TEST_API_KEY.into()).await;
 
