@@ -13,7 +13,7 @@ use reqwest::Url;
 use std::{collections::BTreeSet, str::FromStr};
 use tokio::sync::Mutex;
 
-/// Generic API integration module
+/// Generic integration module
 ///
 /// Several modules uses this generic module to make API calls and parsing JSON response
 /// It takes a extractor that compatible with [`SubdomainExtractorInterface`], mostly

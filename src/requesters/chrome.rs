@@ -143,7 +143,7 @@ impl RequesterInterface for ChromeBrowser {
         let mut options = Self::default_options();
 
         if let Some(proxy) = &config.proxy {
-            options.proxy_server = Some(proxy.as_str())
+            options.proxy_server = Some(proxy.as_str());
         }
 
         self.browser = Browser::new(options).unwrap();

@@ -47,18 +47,29 @@ use reqwest::Url;
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let url = Url::parse("https://foo.com").unwrap();
+///     let url: Url = "https://foo.com".parse().unwrap();
 ///
 ///     let mut requester = CustomRequester {
 ///         config: RequesterConfig::default(),
 ///     };
 ///
 ///     let config = requester.config().await.clone();
+///     let content = requester.get_content(url).await;
 ///
-///     assert_eq!(requester.get_content(url).await.as_string(), "foo");
+///     assert_eq!(content.as_string(), "foo");
 ///     assert_eq!(config.proxy, None);
-///     assert_eq!(config.timeout, Duration::from_secs(10));
+///     assert_eq!(config.timeout.as_secs(), 10);
 ///     assert_eq!(config.headers.len(), 0);
+///
+///     // Configure with new config instance
+///     let new_config = RequesterConfig {
+///         timeout: Duration::from_secs(120),
+///         ..Default::default()
+///     };
+///
+///     requester.configure(new_config).await;
+///
+///     assert_eq!(requester.config().await.timeout.as_secs(), 120);
 /// }
 /// ```
 #[async_trait(?Send)]

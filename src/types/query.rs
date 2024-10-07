@@ -108,13 +108,16 @@ impl SearchQuery {
     /// ```no_run
     /// use subscan::types::query::{SearchQuery, SearchQueryParam};
     ///
-    /// let param = SearchQueryParam::from("s");
-    /// let domain = String::from("foo.com");
-    /// let prefix = String::from("site:");
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let param = SearchQueryParam::from("s");
+    ///     let domain = String::from("foo.com");
+    ///     let prefix = String::from("site:");
     ///
-    /// let query = SearchQuery::new(param, prefix, domain);
+    ///     let query = SearchQuery::new(param, prefix, domain);
     ///
-    /// // do something with query
+    ///     // do something with query
+    /// }
     /// ```
     pub fn new(param: SearchQueryParam, prefix: String, domain: String) -> Self {
         Self {
@@ -143,6 +146,7 @@ impl SearchQuery {
     /// assert_eq!(query.update(Subdomain::from("api.foo.com")), true);
     /// assert_eq!(query.as_search_str(), String::from("site:foo.com -api"));
     /// assert_eq!(query.update(Subdomain::from("api.foo.com")), false);
+    /// assert_eq!(query.update(Subdomain::from("bar")), false);
     /// ```
     pub fn update(&mut self, sub: Subdomain) -> bool {
         let formatted = format!(".{}", self.domain);

@@ -17,11 +17,6 @@ pub struct HTTPClient {
 }
 
 impl HTTPClient {
-    /// Returns a new default [`HTTPClient`] instance
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     /// Returns a new [`HTTPClient`] instance from given [`RequesterConfig`]
     ///
     /// # Examples
