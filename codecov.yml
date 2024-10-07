@@ -1,0 +1,15 @@
+coverage: # https://docs.codecov.com/docs/codecovyml-reference#coverage
+  precision: 2 # e.g. 91.67%
+  round: nearest
+  range: 65..85 # https://docs.codecov.com/docs/coverage-configuration#section-range
+
+  status: # https://docs.codecov.com/docs/commit-status
+    project:
+      default:
+        target: auto
+        threshold: "1%"
+        if_ci_failed: error
+        branches:
+          - main
+ignore:
+  - "src/bin/subscan.rs"
