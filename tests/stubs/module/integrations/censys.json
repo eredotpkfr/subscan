@@ -6,6 +6,11 @@
             }
         },
         "method": "GET",
+        "queryParameters": {
+            "cursor": {
+                "absent": true
+            }
+        },
         "urlPath": "/censys"
     },
     "response": {
@@ -26,7 +31,10 @@
                             "foo": "bar"
                         }
                     }
-                ]
+                ],
+                "links": {
+                    "next": "cursor"
+                }
             }
         },
         "status": 200

@@ -4,6 +4,9 @@
         "queryParameters": {
             "key": {
                 "equalTo": "shodan-api-key"
+            },
+            "page": {
+                "absent": true
             }
         },
         "urlPath": "/shodan"
@@ -30,6 +33,7 @@
                 }
             ],
             "domain": "foo.com",
+            "more": true,
             "subdomains": [
                 "bar"
             ],
