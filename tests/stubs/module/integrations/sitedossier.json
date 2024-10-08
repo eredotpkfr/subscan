@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/sitedossier"
+    },
+    "response": {
+        "body": "<ol><li><a>bar.foo.com</a></li></ol>",
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}
