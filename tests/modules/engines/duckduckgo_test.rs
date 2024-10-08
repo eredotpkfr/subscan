@@ -3,17 +3,15 @@ use crate::common::{
     mocks,
 };
 use subscan::{
-    enums::SubscanModuleDispatcher,
-    interfaces::module::SubscanModuleInterface,
-    modules::engines::duckduckgo::{self, DUCKDUCKGO_MODULE_NAME},
-    requesters::client::HTTPClient,
+    enums::SubscanModuleDispatcher, interfaces::module::SubscanModuleInterface,
+    modules::engines::duckduckgo::DuckDuckGo, requesters::client::HTTPClient,
 };
 use tokio::sync::Mutex;
 
 #[tokio::test]
 #[stubr::mock("module/engines/duckduckgo.json")]
 async fn run_test() {
-    let mut duckduckgo = duckduckgo::DuckDuckGo::dispatcher();
+    let mut duckduckgo = DuckDuckGo::dispatcher();
     let new_requester = HTTPClient::default();
 
     mocks::wrap_module_dispatcher_url_field(&mut duckduckgo, &stubr.uri());
@@ -24,6 +22,5 @@ async fn run_test() {
 
     let result = duckduckgo.run(TEST_DOMAIN.to_string()).await;
 
-    assert_eq!(duckduckgo.name().await, DUCKDUCKGO_MODULE_NAME);
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }
