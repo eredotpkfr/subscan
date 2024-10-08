@@ -31,3 +31,5 @@ pub mod shodan;
 pub mod sitedossier;
 /// `SubdomainCenter` API integration module
 pub mod subdomaincenter;
+/// `VirusTotal` API integration, API key required
+pub mod virustotal;
