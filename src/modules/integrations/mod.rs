@@ -33,3 +33,5 @@ pub mod sitedossier;
 pub mod subdomaincenter;
 /// `VirusTotal` API integration, API key required
 pub mod virustotal;
+/// `WhoisXMLAPI` API integration, API key required
+pub mod whoisxmlapi;
