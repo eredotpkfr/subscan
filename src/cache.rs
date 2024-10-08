@@ -4,7 +4,7 @@ use crate::{
         engines::{bing, duckduckgo, google, yahoo},
         integrations::{
             alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys, certspotter,
-            chaos, crtsh, digitorus, hackertarget, leakix, shodan,
+            chaos, crtsh, digitorus, hackertarget, leakix, shodan, sitedossier,
         },
     },
 };
@@ -34,6 +34,7 @@ lazy_static! {
         Mutex::new(hackertarget::HackerTarget::dispatcher()),
         Mutex::new(leakix::Leakix::dispatcher()),
         Mutex::new(shodan::Shodan::dispatcher()),
+        Mutex::new(sitedossier::Sitedossier::dispatcher()),
     ];
 }
 

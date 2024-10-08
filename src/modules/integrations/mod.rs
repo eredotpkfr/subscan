@@ -27,3 +27,5 @@ pub mod hackertarget;
 pub mod leakix;
 /// `Shodan` API integration, API key required
 pub mod shodan;
+/// `Sitedossier` HTML crawler integration
+pub mod sitedossier;
