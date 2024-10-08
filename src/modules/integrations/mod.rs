@@ -29,3 +29,5 @@ pub mod leakix;
 pub mod shodan;
 /// `Sitedossier` HTML crawler integration
 pub mod sitedossier;
+/// `SubdomainCenter` API integration module
+pub mod subdomaincenter;
