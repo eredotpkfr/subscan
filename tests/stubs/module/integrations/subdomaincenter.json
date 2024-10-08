@@ -1,0 +1,15 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/subdomaincenter"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": [
+            "bar.foo.com"
+        ],
+        "status": 200
+    }
+}
