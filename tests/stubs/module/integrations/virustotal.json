@@ -1,0 +1,29 @@
+{
+    "request": {
+        "headers": {
+            "X-APIKey": {
+                "equalTo": "virustotal-api-key"
+            }
+        },
+        "method": "GET",
+        "queryParameters": {
+            "cursor": {
+                "absent": true
+            }
+        },
+        "urlPath": "/virustotal"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "data": [
+                {
+                    "id": "bar.foo.com"
+                }
+            ]
+        },
+        "status": 200
+    }
+}
