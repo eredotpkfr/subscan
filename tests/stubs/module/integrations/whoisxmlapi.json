@@ -1,0 +1,30 @@
+{
+    "request": {
+        "method": "GET",
+        "queryParameters": {
+            "apiKey": {
+                "equalTo": "whoisxmlapi-api-key"
+            }
+        },
+        "urlPath": "/whoisxmlapi"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "result": {
+                "count": 1,
+                "records": [
+                    {
+                        "domain": "bar.foo.com",
+                        "firstSeen": 1678185120,
+                        "lastSeen": 1678185120
+                    }
+                ]
+            },
+            "search": "foo.com"
+        },
+        "status": 200
+    }
+}

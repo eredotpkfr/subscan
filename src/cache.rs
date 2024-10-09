@@ -5,6 +5,7 @@ use crate::{
         integrations::{
             alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys, certspotter,
             chaos, crtsh, digitorus, hackertarget, leakix, shodan, sitedossier, subdomaincenter,
+            threatcrowd, virustotal, whoisxmlapi,
         },
     },
 };
@@ -15,10 +16,10 @@ lazy_static! {
     /// All `Subscan` modules are stores in this in-memory [`Vec`] as a [`SubscanModuleDispatcher`]
     pub static ref ALL_MODULES: Vec<Mutex<SubscanModuleDispatcher>> = vec![
         // Search engines
-        Mutex::new(google::Google::dispatcher()),
-        Mutex::new(yahoo::Yahoo::dispatcher()),
         Mutex::new(bing::Bing::dispatcher()),
         Mutex::new(duckduckgo::DuckDuckGo::dispatcher()),
+        Mutex::new(google::Google::dispatcher()),
+        Mutex::new(yahoo::Yahoo::dispatcher()),
         // Integrations
         Mutex::new(alienvault::AlienVault::dispatcher()),
         Mutex::new(anubis::Anubis::dispatcher()),
@@ -35,7 +36,10 @@ lazy_static! {
         Mutex::new(leakix::Leakix::dispatcher()),
         Mutex::new(shodan::Shodan::dispatcher()),
         Mutex::new(sitedossier::Sitedossier::dispatcher()),
-        Mutex::new(subdomaincenter::SubdomainCenter::dispatcher())
+        Mutex::new(subdomaincenter::SubdomainCenter::dispatcher()),
+        Mutex::new(threatcrowd::ThreatCrowd::dispatcher()),
+        Mutex::new(virustotal::VirusTotal::dispatcher()),
+        Mutex::new(whoisxmlapi::WhoisXMLAPI::dispatcher()),
     ];
 }
 
