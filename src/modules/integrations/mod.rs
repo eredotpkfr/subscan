@@ -27,3 +27,13 @@ pub mod hackertarget;
 pub mod leakix;
 /// `Shodan` API integration, API key required
 pub mod shodan;
+/// `Sitedossier` HTML crawler integration
+pub mod sitedossier;
+/// `SubdomainCenter` API integration module
+pub mod subdomaincenter;
+/// `ThreatCrowd` API integration
+pub mod threatcrowd;
+/// `VirusTotal` API integration, API key required
+pub mod virustotal;
+/// `WhoisXMLAPI` API integration, API key required
+pub mod whoisxmlapi;
