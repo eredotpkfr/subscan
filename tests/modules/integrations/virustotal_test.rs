@@ -15,16 +15,16 @@ use subscan::{
 #[stubr::mock("module/integrations/virustotal.json")]
 async fn run_test() {
     let mut virustotal = VirusTotal::dispatcher();
-    let (env_name, _) = virustotal.fetch_apikey().await;
+    let env_key = virustotal.envs().await.apikey.name;
 
-    env::set_var(&env_name, "virustotal-api-key");
+    env::set_var(&env_key, "virustotal-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut virustotal, &stubr.path("/virustotal"));
 
     let result = virustotal.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
-    env::remove_var(env_name);
+    env::remove_var(env_key);
 }
 
 #[tokio::test]

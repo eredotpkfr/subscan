@@ -15,16 +15,16 @@ use subscan::{
 #[stubr::mock("module/integrations/shodan.json")]
 async fn run_test() {
     let mut shodan = Shodan::dispatcher();
-    let (env_name, _) = shodan.fetch_apikey().await;
+    let env_key = shodan.envs().await.apikey.name;
 
-    env::set_var(&env_name, "shodan-api-key");
+    env::set_var(&env_key, "shodan-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut shodan, &stubr.path("/shodan"));
 
     let result = shodan.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
-    env::remove_var(env_name);
+    env::remove_var(env_key);
 }
 
 #[tokio::test]

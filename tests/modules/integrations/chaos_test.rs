@@ -14,16 +14,16 @@ use subscan::{
 #[stubr::mock("module/integrations/chaos.json")]
 async fn run_test() {
     let mut chaos = Chaos::dispatcher();
-    let (env_name, _) = chaos.fetch_apikey().await;
+    let env_key = chaos.envs().await.apikey.name;
 
-    env::set_var(&env_name, "chaos-api-key");
+    env::set_var(&env_key, "chaos-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut chaos, &stubr.path("/chaos"));
 
     let result = chaos.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
-    env::remove_var(env_name);
+    env::remove_var(env_key);
 }
 
 #[tokio::test]

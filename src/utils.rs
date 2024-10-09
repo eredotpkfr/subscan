@@ -34,39 +34,30 @@ pub mod regex {
 
 /// Utilities about project environments
 pub mod env {
-    use crate::{config::SUBSCAN_ENV_NAMESPACE, types::core::APIKeyAsEnv};
+    use crate::config::SUBSCAN_ENV_NAMESPACE;
 
-    /// Fetches API key from system environment variables
-    /// if available. Module environment variables uses [`SUBSCAN_ENV_NAMESPACE`]
-    /// namespace with `SUBSCAN_<module_name>_APIKEY` format
+    /// Formats given module name and environment variable name with [`SUBSCAN_ENV_NAMESPACE`]
+    /// prefix, returns fully generated environment variable name
     ///
     /// # Examples
     ///
     /// ```
-    /// use std::env;
-    /// use subscan::utils::env::get_subscan_module_apikey;
+    /// use subscan::utils::env::format_env;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let env_key = "SUBSCAN_FOO_APIKEY";
-    ///
-    ///     env::remove_var(env_key);
-    ///
-    ///     assert_eq!(get_subscan_module_apikey("foo").0, env_key);
-    ///     assert_eq!(get_subscan_module_apikey("foo").1.is_ok(), false);
-    ///
-    ///     env::set_var(env_key, "foo");
-    ///
-    ///     assert_eq!(get_subscan_module_apikey("foo").0, env_key);
-    ///     assert_eq!(get_subscan_module_apikey("foo").1.unwrap(), "foo");
-    ///
-    ///     env::remove_var(env_key);
+    ///     assert_eq!(format_env("foo", "apikey"), "SUBSCAN_FOO_APIKEY");
+    ///     assert_eq!(format_env("foo", "username"), "SUBSCAN_FOO_USERNAME");
+    ///     assert_eq!(format_env("bar", "password"), "SUBSCAN_BAR_PASSWORD");
     /// }
     /// ```
-    pub fn get_subscan_module_apikey(name: &str) -> APIKeyAsEnv {
-        let var_name = format!("{}_{}_APIKEY", SUBSCAN_ENV_NAMESPACE, name.to_uppercase());
-
-        (var_name.clone(), dotenvy::var(var_name))
+    pub fn format_env(name: &str, env: &str) -> String {
+        format!(
+            "{}_{}_{}",
+            SUBSCAN_ENV_NAMESPACE,
+            name.to_uppercase(),
+            env.to_uppercase(),
+        )
     }
 }
 

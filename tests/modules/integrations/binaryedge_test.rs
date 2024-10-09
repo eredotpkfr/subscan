@@ -15,16 +15,16 @@ use subscan::{
 #[stubr::mock("module/integrations/binaryedge.json")]
 async fn run_test() {
     let mut binaryedge = BinaryEdge::dispatcher();
-    let (env_name, _) = binaryedge.fetch_apikey().await;
+    let env_key = binaryedge.envs().await.apikey.name;
 
-    env::set_var(&env_name, "binaryedge-api-key");
+    env::set_var(&env_key, "binaryedge-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut binaryedge, &stubr.path("/binaryedge"));
 
     let result = binaryedge.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
-    env::remove_var(env_name);
+    env::remove_var(env_key);
 }
 
 #[tokio::test]

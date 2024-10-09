@@ -15,16 +15,16 @@ use subscan::{
 #[stubr::mock("module/integrations/certspotter.json")]
 async fn run_test() {
     let mut certspotter = CertSpotter::dispatcher();
-    let (env_name, _) = certspotter.fetch_apikey().await;
+    let env_key = certspotter.envs().await.apikey.name;
 
-    env::set_var(&env_name, "certspotter-api-key");
+    env::set_var(&env_key, "certspotter-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut certspotter, &stubr.path("/certspotter"));
 
     let result = certspotter.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
-    env::remove_var(env_name);
+    env::remove_var(env_key);
 }
 
 #[tokio::test]

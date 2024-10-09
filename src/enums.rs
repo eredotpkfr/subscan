@@ -48,7 +48,7 @@ pub enum SubdomainExtractorDispatcher {
     /// is to know that created as a wrapper struct to be compatible with
     /// [`SubdomainExtractorInterface`](crate::interfaces::extractor::SubdomainExtractorInterface)
     /// so parser method must be implemented and gave this wrapper struct. See the
-    /// [`JSONExtractor`] struct and [`InnerExtractMethod`](crate::types::core::InnerExtractMethod)
+    /// [`JSONExtractor`] struct and [`InnerExtractFunc`](crate::types::core::InnerExtractFunc)
     /// type for examples and technical details
     JSONExtractor(JSONExtractor),
 }

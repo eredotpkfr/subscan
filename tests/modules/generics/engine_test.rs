@@ -7,8 +7,13 @@ use subscan::interfaces::module::SubscanModuleInterface;
 #[tokio::test]
 async fn attribute_test() {
     let module = generic_search_engine(TEST_URL);
+    let envs = module.envs().await;
 
     assert_eq!(module.name().await, module.name);
+
+    assert!(envs.apikey.value.is_none());
+    assert!(envs.credentials.username.value.is_none());
+    assert!(envs.credentials.password.value.is_none());
 
     assert!(module.requester().await.is_some());
     assert!(module.extractor().await.is_some());

@@ -14,16 +14,16 @@ use subscan::{
 #[stubr::mock("module/integrations/bufferover.json")]
 async fn run_test() {
     let mut bufferover = BufferOver::dispatcher();
-    let (env_name, _) = bufferover.fetch_apikey().await;
+    let env_key = bufferover.envs().await.apikey.name;
 
-    env::set_var(&env_name, "bufferover-api-key");
+    env::set_var(&env_key, "bufferover-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut bufferover, &stubr.path("/bufferover"));
 
     let result = bufferover.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
-    env::remove_var(env_name);
+    env::remove_var(env_key);
 }
 
 #[tokio::test]

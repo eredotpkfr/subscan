@@ -4,7 +4,7 @@ use crate::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
-    types::core::{GetNextUrlFunc, GetQueryUrlFunc},
+    types::func::{GetNextUrlFunc, GetQueryUrlFunc},
     utils::http,
 };
 use async_trait::async_trait;
@@ -36,11 +36,11 @@ pub struct GenericIntegrationModule {
 }
 
 impl GenericIntegrationModule {
-    pub async fn authenticate(&self, url: &mut Url, apikey: String) {
+    pub async fn authenticate(&self, url: &mut Url, apikey: &str) {
         match &self.auth {
-            APIAuthMethod::APIKeyAsHeader(name) => self.set_apikey_header(name, &apikey).await,
+            APIAuthMethod::APIKeyAsHeader(name) => self.set_apikey_header(name, apikey).await,
             APIAuthMethod::APIKeyAsQueryParam(param) => {
-                self.set_apikey_param(url, param, &apikey).await
+                self.set_apikey_param(url, param, apikey).await
             }
             APIAuthMethod::NoAuth => {}
         }
@@ -81,9 +81,7 @@ impl SubscanModuleInterface for GenericIntegrationModule {
         let mut all_results = BTreeSet::new();
 
         if self.auth.is_set() {
-            let apienv = self.fetch_apikey().await;
-
-            if let Ok(apikey) = apienv.1 {
+            if let Some(apikey) = &self.envs().await.apikey.value {
                 self.authenticate(&mut url, apikey).await;
             } else {
                 return all_results;

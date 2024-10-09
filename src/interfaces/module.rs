@@ -1,8 +1,7 @@
 use crate::{
     enums::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
     modules::generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
-    types::core::APIKeyAsEnv,
-    utils::env,
+    types::env::SubscanModuleEnvs,
 };
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
@@ -75,8 +74,14 @@ use tokio::sync::Mutex;
 #[async_trait(?Send)]
 #[enum_dispatch]
 pub trait SubscanModuleInterface: Sync + Send {
-    /// Returns module name, name should clarify what does module
+    /// Returns module name
     async fn name(&self) -> &str;
+    /// Loads `.env` file and fetches module environment variables with variable name.
+    /// If system environment variable set with same name, `.env` file will be overrode
+    /// See the [`SubscanModuleEnvs`](crate::types::env::SubscanModuleEnvs) for details
+    async fn envs(&self) -> SubscanModuleEnvs {
+        self.name().await.into()
+    }
     /// Returns module requester address as a mutable reference
     /// if available
     async fn requester(&self) -> Option<&Mutex<RequesterDispatcher>>;
@@ -86,11 +91,4 @@ pub trait SubscanModuleInterface: Sync + Send {
     /// run this `run` method will be called, so this method
     /// should do everything
     async fn run(&mut self, domain: String) -> BTreeSet<String>;
-    /// Loads `.env` file and fetches module API key with variable name. If system
-    /// environment variable set with same name, `.env` file will be overrode
-    /// See the [`get_subscan_module_apikey`](crate::utils::env::get_subscan_module_apikey)
-    /// for details
-    async fn fetch_apikey(&self) -> APIKeyAsEnv {
-        env::get_subscan_module_apikey(self.name().await)
-    }
 }

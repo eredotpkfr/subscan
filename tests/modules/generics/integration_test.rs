@@ -14,13 +14,20 @@ use subscan::{
 async fn attribute_test() {
     let auth = APIAuthMethod::NoAuth;
     let module = generic_integration(TEST_URL, auth);
+    let envs = module.envs().await;
+
     let expected = Url::parse(TEST_URL).unwrap();
 
-    assert_eq!(module.name().await, module.name);
     assert_eq!((module.url)(TEST_DOMAIN), expected.to_string());
+    assert_eq!(module.name().await, module.name);
+
+    assert!(envs.apikey.value.is_none());
+    assert!(envs.credentials.username.value.is_none());
+    assert!(envs.credentials.password.value.is_none());
 
     assert!(module.requester().await.is_some());
     assert!(module.extractor().await.is_some());
+
     assert!((module.next)(TEST_URL.parse().unwrap(), Value::Null).is_none());
 }
 
@@ -84,7 +91,7 @@ async fn run_test_with_header_auth() {
     let auth = APIAuthMethod::APIKeyAsHeader("X-API-Key".to_string());
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
 
-    let (env_key, _) = module.fetch_apikey().await;
+    let env_key = module.envs().await.apikey.name;
 
     env::set_var(env_key.clone(), TEST_API_KEY);
 
@@ -101,7 +108,7 @@ async fn run_test_with_query_auth() {
     let auth = APIAuthMethod::APIKeyAsQueryParam("apikey".to_string());
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
 
-    let (env_key, _) = module.fetch_apikey().await;
+    let env_key = module.envs().await.apikey.name;
 
     env::set_var(env_key.clone(), TEST_API_KEY);
 

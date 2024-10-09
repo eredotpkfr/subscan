@@ -15,16 +15,16 @@ use subscan::{
 #[stubr::mock("module/integrations/censys.json")]
 async fn run_test() {
     let mut censys = Censys::dispatcher();
-    let (env_name, _) = censys.fetch_apikey().await;
+    let env_key = censys.envs().await.apikey.name;
 
-    env::set_var(&env_name, "censys-api-key");
+    env::set_var(&env_key, "censys-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut censys, &stubr.path("/censys"));
 
     let result = censys.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
-    env::remove_var(env_name);
+    env::remove_var(env_key);
 }
 
 #[tokio::test]
