@@ -2,20 +2,16 @@ use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     mocks,
 };
-use subscan::{
-    interfaces::module::SubscanModuleInterface,
-    modules::engines::google::{self, GOOGLE_MODULE_NAME},
-};
+use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::google::Google};
 
 #[tokio::test]
 #[stubr::mock("module/engines/google.json")]
 async fn run_test() {
-    let mut google = google::Google::dispatcher();
+    let mut google = Google::dispatcher();
 
     mocks::wrap_module_dispatcher_url_field(&mut google, &stubr.path("/search"));
 
     let result = google.run(TEST_DOMAIN.to_string()).await;
 
-    assert_eq!(google.name().await, GOOGLE_MODULE_NAME);
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }
