@@ -78,7 +78,7 @@ pub mod modules {
             let module = module.lock().await;
 
             if let Some(requester) = module.requester().await {
-                requester.lock().await.configure(config.clone()).await;
+                requester.lock().await.configure(config.clone()).await
             }
         }
     }

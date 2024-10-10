@@ -57,7 +57,7 @@ impl GenericIntegrationModule {
         let value = HeaderValue::from_str(apikey);
 
         if let (Ok(name), Ok(value)) = (name, value) {
-            requester.config().await.add_header(name, value);
+            requester.config().await.add_header(name, value)
         }
     }
 }
