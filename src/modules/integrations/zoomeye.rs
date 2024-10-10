@@ -47,7 +47,6 @@ impl ZoomEye {
 
     pub fn get_query_url(domain: &str) -> String {
         let params = &[("q", domain), ("s", "250"), ("type", "1")];
-
         let url = Url::parse_with_params(ZOOMEYE_URL, params);
 
         url.unwrap().to_string()
