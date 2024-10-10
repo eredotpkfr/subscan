@@ -37,3 +37,5 @@ pub mod threatcrowd;
 pub mod virustotal;
 /// `WhoisXMLAPI` API integration, API key required
 pub mod whoisxmlapi;
+/// `ZoomEye` API integration, API key required
+pub mod zoomeye;

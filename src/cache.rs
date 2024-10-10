@@ -5,7 +5,7 @@ use crate::{
         integrations::{
             alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys, certspotter,
             chaos, crtsh, digitorus, hackertarget, leakix, shodan, sitedossier, subdomaincenter,
-            threatcrowd, virustotal, whoisxmlapi,
+            threatcrowd, virustotal, whoisxmlapi, zoomeye,
         },
     },
 };
@@ -40,6 +40,7 @@ lazy_static! {
         Mutex::new(threatcrowd::ThreatCrowd::dispatcher()),
         Mutex::new(virustotal::VirusTotal::dispatcher()),
         Mutex::new(whoisxmlapi::WhoisXMLAPI::dispatcher()),
+        Mutex::new(zoomeye::ZoomEye::dispatcher()),
     ];
 }
 
