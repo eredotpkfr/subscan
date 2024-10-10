@@ -60,6 +60,27 @@ impl Credentials {
     }
 }
 
+/// This struct implemented to store module environments in a single storage
+///
+/// Always extensible according to needs and you can fetch all environment variables
+/// with their names in a single line with [`From`] trait by using module name
+///
+/// See the [`format_env`] to environment variables name formats. Formatting allows to make
+/// isolation between different module environments
+///
+/// # Examples
+///
+/// ```
+/// use subscan::types::env::SubscanModuleEnvs;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let envs = SubscanModuleEnvs::from("foo");
+///
+///     assert_eq!(envs.apikey.name, "SUBSCAN_FOO_APIKEY");
+///     assert_eq!(envs.apikey.value, None);
+/// }
+/// ```
 #[derive(Debug)]
 pub struct SubscanModuleEnvs {
     /// Host value as a [`Env`], we stores the API host name as environment c/o
