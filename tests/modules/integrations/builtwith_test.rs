@@ -36,12 +36,13 @@ async fn get_query_url_test() {
         ("NOMETA", "yes"),
         ("NOPII", "yes"),
         ("NOATTR", "yes"),
+        ("LOOKUP", TEST_DOMAIN),
     ];
 
     let expected = Url::parse_with_params(BUILTWITH_URL, params).unwrap();
     let url = BuiltWith::get_query_url(TEST_DOMAIN);
 
-    assert_eq!(url, format!("{expected}&LOOKUP={TEST_DOMAIN}"));
+    assert_eq!(url, expected.to_string());
 }
 
 #[tokio::test]
