@@ -74,7 +74,7 @@ use tokio::sync::Mutex;
 #[async_trait(?Send)]
 #[enum_dispatch]
 pub trait SubscanModuleInterface: Sync + Send {
-    /// Returns module name
+    /// Returns module name, name should clarify what does module
     async fn name(&self) -> &str;
     /// Loads `.env` file and fetches module environment variables with variable name.
     /// If system environment variable set with same name, `.env` file will be overrode
@@ -87,8 +87,7 @@ pub trait SubscanModuleInterface: Sync + Send {
     async fn requester(&self) -> Option<&Mutex<RequesterDispatcher>>;
     /// Returns module extractor reference if available
     async fn extractor(&self) -> Option<&SubdomainExtractorDispatcher>;
-    /// Just like a `main` method, when the module
-    /// run this `run` method will be called, so this method
-    /// should do everything
+    /// Just like a `main` method, when the module run this `run` method will be called.
+    /// So this method should do everything
     async fn run(&mut self, domain: String) -> BTreeSet<String>;
 }

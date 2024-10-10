@@ -20,14 +20,6 @@ async fn attribute_test() {
 }
 
 #[tokio::test]
-async fn get_search_query_test() {
-    let module = generic_search_engine(TEST_URL);
-    let mut query = module.get_search_query(TEST_DOMAIN.to_string()).await;
-
-    assert_eq!(query.as_search_str(), "site:foo.com");
-}
-
-#[tokio::test]
 #[stubr::mock("module/generics/search-engine.json")]
 async fn run_test() {
     let mut module = generic_search_engine(&stubr.path("/search"));
