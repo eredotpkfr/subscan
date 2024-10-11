@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -22,7 +22,7 @@ pub const WHOISXMLAPI_URL: &str = "https://subdomains.whoisxmlapi.com/api/v1";
 /// |:------------------:|:-------------------------------------:|
 /// | Module Name        | `whoisxmlapi`                         |
 /// | Doc URL            | <https://www.whoisxmlapi.com>         |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsQueryParam`] |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsQueryParam`] |
 /// | Requester          | [`HTTPClient`]                        |
 /// | Extractor          | [`JSONExtractor`]                     |
 pub struct WhoisXMLAPI {}
@@ -36,7 +36,7 @@ impl WhoisXMLAPI {
             name: WHOISXMLAPI_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsQueryParam("apiKey".into()),
+            auth: AuthenticationMethod::APIKeyAsQueryParam("apiKey".into()),
             requester: requester.into(),
             extractor: extractor.into(),
         };

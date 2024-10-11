@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -23,7 +23,7 @@ pub const CERTSPOTTER_URL: &str = "https://api.certspotter.com/v1/issuances";
 /// |:------------------:|:---------------------------------:|
 /// | Module Name        | `certspotter`                     |
 /// | Doc URL            | <https://sslmate.com/certspotter> |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
 /// | Requester          | [`HTTPClient`]                    |
 /// | Extractor          | [`JSONExtractor`]                 |
 pub struct CertSpotter {}
@@ -37,7 +37,7 @@ impl CertSpotter {
             name: CERTSPOTTER_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsHeader("Authorization".into()),
+            auth: AuthenticationMethod::APIKeyAsHeader("Authorization".into()),
             requester: requester.into(),
             extractor: extractor.into(),
         };

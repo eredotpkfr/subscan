@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -23,7 +23,7 @@ pub const BUFFEROVER_URL: &str = "https://tls.bufferover.run";
 /// |:------------------:|:---------------------------------:|
 /// | Module Name        | `bufferover`                      |
 /// | Doc URL            | <https://tls.bufferover.run>      |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
 /// | Requester          | [`HTTPClient`]                    |
 /// | Extractor          | [`JSONExtractor`]                 |
 pub struct BufferOver {}
@@ -37,7 +37,7 @@ impl BufferOver {
             name: BUFFEROVER_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsHeader("X-API-Key".into()),
+            auth: AuthenticationMethod::APIKeyAsHeader("X-API-Key".into()),
             requester: requester.into(),
             extractor: extractor.into(),
         };

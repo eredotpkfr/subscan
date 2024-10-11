@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -23,7 +23,7 @@ pub const ZOOMEYE_URL: &str = "https://api.zoomeye.hk/domain/search";
 /// |:------------------:|:---------------------------------:|
 /// | Module Name        | `zoomeye`                         |
 /// | Doc URL            | <https://www.zoomeye.hk>          |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
 /// | Requester          | [`HTTPClient`]                    |
 /// | Extractor          | [`JSONExtractor`]                 |
 pub struct ZoomEye {}
@@ -37,7 +37,7 @@ impl ZoomEye {
             name: ZOOMEYE_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsHeader("API-Key".into()),
+            auth: AuthenticationMethod::APIKeyAsHeader("API-Key".into()),
             requester: requester.into(),
             extractor: extractor.into(),
         };

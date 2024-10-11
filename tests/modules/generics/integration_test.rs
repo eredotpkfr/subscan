@@ -6,13 +6,13 @@ use reqwest::Url;
 use serde_json::Value;
 use std::env;
 use subscan::{
-    enums::APIAuthMethod,
+    enums::AuthenticationMethod,
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
 };
 
 #[tokio::test]
 async fn attribute_test() {
-    let auth = APIAuthMethod::NoAuth;
+    let auth = AuthenticationMethod::NoAuthentication;
     let module = generic_integration(TEST_URL, auth);
     let envs = module.envs().await;
 
@@ -34,10 +34,10 @@ async fn attribute_test() {
 #[tokio::test]
 async fn authenticate_test_no_auth() {
     let mut url = Url::parse(TEST_URL).unwrap();
-    let auth = APIAuthMethod::NoAuth;
+    let auth = AuthenticationMethod::NoAuthentication;
     let module = generic_integration(url.as_ref(), auth);
 
-    module.authenticate(&mut url, TEST_API_KEY.into()).await;
+    module.authenticate(&mut url).await;
 
     let mut requester = module.requester().await.unwrap().lock().await;
     let rconfig = requester.config().await;
@@ -50,10 +50,10 @@ async fn authenticate_test_no_auth() {
 #[tokio::test]
 async fn authenticate_test_with_header_auth() {
     let mut url = Url::parse(TEST_URL).unwrap();
-    let auth = APIAuthMethod::APIKeyAsHeader("X-API-Key".to_string());
+    let auth = AuthenticationMethod::APIKeyAsHeader("X-API-Key".to_string());
     let module = generic_integration(url.as_ref(), auth);
 
-    module.authenticate(&mut url, TEST_API_KEY.into()).await;
+    module.authenticate(&mut url).await;
 
     let mut requester = module.requester().await.unwrap().lock().await;
     let rconfig = requester.config().await;
@@ -66,10 +66,10 @@ async fn authenticate_test_with_query_auth() {
     let mut url = Url::parse(TEST_URL).unwrap();
     let expected = Url::parse_with_params(TEST_URL, &[("apikey", TEST_API_KEY)]).unwrap();
 
-    let auth = APIAuthMethod::APIKeyAsQueryParam("apikey".to_string());
+    let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
     let module = generic_integration(url.as_ref(), auth);
 
-    module.authenticate(&mut url, TEST_API_KEY.into()).await;
+    module.authenticate(&mut url).await;
 
     assert_eq!(url, expected);
 }
@@ -77,7 +77,7 @@ async fn authenticate_test_with_query_auth() {
 #[tokio::test]
 #[stubr::mock("module/generics/integration-no-auth.json")]
 async fn run_test_no_auth() {
-    let auth = APIAuthMethod::NoAuth;
+    let auth = AuthenticationMethod::NoAuthentication;
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
 
     let result = module.run(TEST_DOMAIN.to_string()).await;
@@ -88,7 +88,7 @@ async fn run_test_no_auth() {
 #[tokio::test]
 #[stubr::mock("module/generics/integration-with-header-auth.json")]
 async fn run_test_with_header_auth() {
-    let auth = APIAuthMethod::APIKeyAsHeader("X-API-Key".to_string());
+    let auth = AuthenticationMethod::APIKeyAsHeader("X-API-Key".to_string());
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
 
     let env_name = module.envs().await.apikey.name;
@@ -105,7 +105,7 @@ async fn run_test_with_header_auth() {
 #[tokio::test]
 #[stubr::mock("module/generics/integration-with-query-auth.json")]
 async fn run_test_with_query_auth() {
-    let auth = APIAuthMethod::APIKeyAsQueryParam("apikey".to_string());
+    let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
 
     let env_name = module.envs().await.apikey.name;
@@ -122,7 +122,7 @@ async fn run_test_with_query_auth() {
 #[tokio::test]
 #[stubr::mock("module/generics/integration-with-query-auth.json")]
 async fn run_test_with_query_auth_but_no_apikey() {
-    let auth = APIAuthMethod::APIKeyAsQueryParam("apikey".to_string());
+    let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
 
     assert!(module.run(TEST_DOMAIN.to_string()).await.is_empty());

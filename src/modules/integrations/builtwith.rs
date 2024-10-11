@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -21,7 +21,7 @@ pub const BUILTWITH_URL: &str = "https://api.builtwith.com/v21/api.json";
 /// |:------------------:|:-------------------------------------:|
 /// | Module Name        | `builtwith`                           |
 /// | Doc URL            | <https://api.builtwith.com>           |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsQueryParam`] |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsQueryParam`] |
 /// | Requester          | [`HTTPClient`]                        |
 /// | Extractor          | [`JSONExtractor`]                     |
 pub struct BuiltWith {}
@@ -35,7 +35,7 @@ impl BuiltWith {
             name: BUILTWITH_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsQueryParam("KEY".into()),
+            auth: AuthenticationMethod::APIKeyAsQueryParam("KEY".into()),
             requester: requester.into(),
             extractor: extractor.into(),
         };

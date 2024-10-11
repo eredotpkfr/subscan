@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -21,7 +21,7 @@ pub const VIRUSTOTAL_URL: &str = "https://www.virustotal.com/api/v3/domains";
 /// |:------------------:|:--------------------------------------------:|
 /// | Module Name        | `virustotal`                                 |
 /// | Doc URL            | <https://www.virustotal.com/gui/home/upload> |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`]            |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`]            |
 /// | Requester          | [`HTTPClient`]                               |
 /// | Extractor          | [`JSONExtractor`]                            |
 pub struct VirusTotal {}
@@ -35,7 +35,7 @@ impl VirusTotal {
             name: VIRUSTOTAL_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsHeader("X-APIKey".into()),
+            auth: AuthenticationMethod::APIKeyAsHeader("X-APIKey".into()),
             requester: requester.into(),
             extractor: extractor.into(),
         };

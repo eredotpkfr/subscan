@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -23,7 +23,7 @@ pub const CENSYS_URL: &str = "https://search.censys.io/api/v2/certificates/searc
 /// |:------------------:|:---------------------------------:|
 /// | Module Name        | `censys`                          |
 /// | Doc URL            | <https://search.censys.io>        |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
 /// | Requester          | [`HTTPClient`]                    |
 /// | Extractor          | [`JSONExtractor`]                 |
 pub struct Censys {}
@@ -37,7 +37,7 @@ impl Censys {
             name: CENSYS_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsHeader("Authorization".into()),
+            auth: AuthenticationMethod::APIKeyAsHeader("Authorization".into()),
             requester: requester.into(),
             extractor: extractor.into(),
         };

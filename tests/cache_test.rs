@@ -14,7 +14,10 @@ mod modules {
     use subscan::{
         cache::{self, modules},
         interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
-        types::config::RequesterConfig,
+        types::{
+            config::RequesterConfig,
+            env::{Credentials, Env},
+        },
     };
 
     #[tokio::test]
@@ -27,6 +30,16 @@ mod modules {
                 (CONTENT_LENGTH, CONTENT_LENGTH_VALUE),
             ]),
             proxy: Some(TEST_URL.to_string()),
+            credentials: Credentials {
+                username: Env {
+                    name: "USERNAME".into(),
+                    value: Some("foo".to_string()),
+                },
+                password: Env {
+                    name: "PASSWORD".into(),
+                    value: None,
+                },
+            },
         };
 
         for module in cache::ALL_MODULES.iter() {

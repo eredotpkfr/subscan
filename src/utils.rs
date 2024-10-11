@@ -90,11 +90,11 @@ pub mod http {
     pub fn update_url_query(url: &mut Url, name: &str, value: &str) {
         let binding = url.clone();
         let pairs = binding.query_pairs();
-        let filtered = pairs.filter(|item| item.0.to_lowercase() != name.to_lowercase());
+        let old = pairs.filter(|item| item.0.to_lowercase() != name.to_lowercase());
 
         url.query_pairs_mut()
             .clear()
-            .extend_pairs(filtered)
+            .extend_pairs(old)
             .append_pair(name, value)
             .finish();
     }

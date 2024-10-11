@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -18,13 +18,13 @@ pub const SUBDOMAINCENTER_URL: &str = "https://api.subdomain.center";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                           |
-/// |:------------------:|:-------------------------------:|
-/// | Module Name        | `subdomaincenter`               |
-/// | Doc URL            | <https://www.subdomain.center>  |
-/// | Authentication     | [`APIAuthMethod::NoAuth`]       |
-/// | Requester          | [`HTTPClient`]                  |
-/// | Extractor          | [`JSONExtractor`]               |
+/// | Property           | Value                                      |
+/// |:------------------:|:------------------------------------------:|
+/// | Module Name        | `subdomaincenter`                          |
+/// | Doc URL            | <https://www.subdomain.center>             |
+/// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
+/// | Requester          | [`HTTPClient`]                             |
+/// | Extractor          | [`JSONExtractor`]                          |
 pub struct SubdomainCenter {}
 
 impl SubdomainCenter {
@@ -36,7 +36,7 @@ impl SubdomainCenter {
             name: SUBDOMAINCENTER_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::NoAuth,
+            auth: AuthenticationMethod::NoAuthentication,
             requester: requester.into(),
             extractor: extractor.into(),
         };

@@ -7,7 +7,10 @@ use std::time::Duration;
 use subscan::{
     interfaces::requester::RequesterInterface,
     requesters::client::HTTPClient,
-    types::config::{RequesterConfig, DEFAULT_HTTP_TIMEOUT},
+    types::{
+        config::{RequesterConfig, DEFAULT_HTTP_TIMEOUT},
+        env::{Credentials, Env},
+    },
 };
 
 #[tokio::test]
@@ -24,7 +27,21 @@ async fn client_configure_test() {
         headers: new_headers.clone(),
         timeout: Duration::from_secs(120),
         proxy: Some(TEST_URL.to_string()),
+        credentials: Credentials {
+            username: Env {
+                name: "USERNAME".into(),
+                value: Some("foo".to_string()),
+            },
+            password: Env {
+                name: "PASSWORD".into(),
+                value: Some("bar".to_string()),
+            },
+        },
     };
+
+    assert!(!config.credentials.is_ok());
+    assert!(config.credentials.username.value.is_none());
+    assert!(config.credentials.password.value.is_none());
 
     assert_eq!(config.timeout, DEFAULT_HTTP_TIMEOUT);
     assert_eq!(config.headers.len(), 0);
@@ -37,6 +54,11 @@ async fn client_configure_test() {
     assert_eq!(config.headers, new_config.headers);
     assert_eq!(config.headers.len(), new_headers.len());
     assert_eq!(config.proxy, new_config.proxy);
+
+    assert_eq!(config.credentials.username.name, "USERNAME");
+    assert_eq!(config.credentials.password.name, "PASSWORD");
+    assert_eq!(config.credentials.username.value, Some("foo".to_string()));
+    assert_eq!(config.credentials.password.value, Some("bar".to_string()));
 }
 
 #[tokio::test]
@@ -45,7 +67,7 @@ async fn client_get_content_test() {
     let client = HTTPClient::default();
     let url = Url::parse(&stubr.path("/hello")).unwrap();
 
-    let content = client.get_content(url).await.as_string();
+    let content = client.get_request(url).await.as_string();
 
     assert_eq!(content, "hello");
 }
@@ -56,14 +78,13 @@ async fn client_get_content_test() {
 async fn client_get_content_timeout_test() {
     let config = RequesterConfig {
         timeout: Duration::from_millis(500),
-        headers: HeaderMap::default(),
-        proxy: None,
+        ..Default::default()
     };
 
     let client = HTTPClient::with_config(config);
     let url = Url::parse(&stubr.path("/hello-delayed")).unwrap();
 
-    client.get_content(url).await.as_json().as_str().unwrap();
+    client.get_request(url).await.as_json().as_str().unwrap();
 }
 
 #[tokio::test]
@@ -83,7 +104,7 @@ async fn client_get_content_extra_header_test() {
     )
     .unwrap();
 
-    let content = client.get_content(url).await.as_string();
+    let content = client.get_request(url).await.as_string();
 
     assert_eq!(content, "hello");
 }

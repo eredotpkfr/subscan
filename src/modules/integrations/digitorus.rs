@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::html::HTMLExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -21,7 +21,7 @@ pub const DIGITORUS_SUBDOMAIN_TAG: &str = "main > div:nth-last-child(3) > div > 
 /// | Module Name        | `digitorus`                                    |
 /// | Doc URL            | <https://certificatedetails.com>               |
 /// | Subdomain Selector | `main > div:nth-last-child(3) > div > div > a` |
-/// | Authentication     | [`APIAuthMethod::NoAuth`]                      |
+/// | Authentication     | [`AuthenticationMethod::NoAuthentication`]     |
 /// | Requester          | [`HTTPClient`]                                 |
 /// | Extractor          | [`HTMLExtractor`]                              |
 pub struct Digitorus {}
@@ -36,7 +36,7 @@ impl Digitorus {
             name: DIGITORUS_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::NoAuth,
+            auth: AuthenticationMethod::NoAuthentication,
             requester: requester.into(),
             extractor: extractor.into(),
         };
