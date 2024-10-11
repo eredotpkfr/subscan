@@ -6,10 +6,12 @@
   </picture>
 </div>
 <div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/rust-test.yml?label=test&logo=Github&labelColor=dc0000&color=e6e6e6">
-    <img alt="GitHub Actions Test Workflow Status" src="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/rust-test.yml?label=test&logo=Github&labelColor=42445a&color=e6e6e6">
-  </picture>
+  <a href="https://github.com/eredotpkfr/subscan/actions/workflows/rust-test.yml">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/rust-test.yml?label=test&logo=Github&labelColor=dc0000&color=e6e6e6">
+      <img alt="GitHub Actions Test Workflow Status" src="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/rust-test.yml?label=test&logo=Github&labelColor=42445a&color=e6e6e6">
+    </picture>
+  </a>
   <a href="https://app.codecov.io/gh/eredotpkfr/subscan">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/codecov/c/gh/eredotpkfr/subscan?labelColor=dc0000&color=e6e6e6">
