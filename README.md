@@ -5,6 +5,7 @@
     <img alt="Subscan Logo" height="105px" src="https://github.com/eredotpkfr/subscan/blob/main/assets/logo-dark.png">
   </picture>
 </div>
+<br>
 <div align="center">
   <a href="https://github.com/eredotpkfr/subscan/actions/workflows/rust-test.yml">
     <picture>
