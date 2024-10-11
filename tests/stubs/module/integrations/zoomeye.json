@@ -1,0 +1,29 @@
+{
+    "request": {
+        "headers": {
+            "API-Key": {
+                "equalTo": "zoomeye-api-key"
+            }
+        },
+        "method": "GET",
+        "queryParameters": {
+            "page": {
+                "absent": true
+            }
+        },
+        "urlPath": "/zoomeye"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "list": [
+                {
+                    "name": "bar.foo.com"
+                }
+            ]
+        },
+        "status": 200
+    }
+}

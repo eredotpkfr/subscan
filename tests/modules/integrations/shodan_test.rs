@@ -15,7 +15,7 @@ use subscan::{
 #[stubr::mock("module/integrations/shodan.json")]
 async fn run_test() {
     let mut shodan = Shodan::dispatcher();
-    let (env_name, _) = shodan.fetch_apikey().await;
+    let env_name = shodan.envs().await.apikey.name;
 
     env::set_var(&env_name, "shodan-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut shodan, &stubr.path("/shodan"));

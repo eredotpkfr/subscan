@@ -14,7 +14,7 @@ use subscan::{
 #[stubr::mock("module/integrations/bevigil.json")]
 async fn run_test() {
     let mut bevigil = Bevigil::dispatcher();
-    let (env_name, _) = bevigil.fetch_apikey().await;
+    let env_name = bevigil.envs().await.apikey.name;
 
     env::set_var(&env_name, "bevigil-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut bevigil, &stubr.path("/bevigil"));

@@ -15,7 +15,7 @@ use subscan::{
 #[stubr::mock("module/integrations/virustotal.json")]
 async fn run_test() {
     let mut virustotal = VirusTotal::dispatcher();
-    let (env_name, _) = virustotal.fetch_apikey().await;
+    let env_name = virustotal.envs().await.apikey.name;
 
     env::set_var(&env_name, "virustotal-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut virustotal, &stubr.path("/virustotal"));

@@ -15,7 +15,7 @@ use subscan::{
 #[stubr::mock("module/integrations/builtwith.json")]
 async fn run_test() {
     let mut builtwith = BuiltWith::dispatcher();
-    let (env_name, _) = builtwith.fetch_apikey().await;
+    let env_name = builtwith.envs().await.apikey.name;
 
     env::set_var(&env_name, "builtwith-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut builtwith, &stubr.path("/builtwith"));
@@ -36,12 +36,13 @@ async fn get_query_url_test() {
         ("NOMETA", "yes"),
         ("NOPII", "yes"),
         ("NOATTR", "yes"),
+        ("LOOKUP", TEST_DOMAIN),
     ];
 
     let expected = Url::parse_with_params(BUILTWITH_URL, params).unwrap();
     let url = BuiltWith::get_query_url(TEST_DOMAIN);
 
-    assert_eq!(url, format!("{expected}&LOOKUP={TEST_DOMAIN}"));
+    assert_eq!(url, expected.to_string());
 }
 
 #[tokio::test]

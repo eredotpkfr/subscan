@@ -15,7 +15,7 @@ use subscan::{
 #[stubr::mock("module/integrations/censys.json")]
 async fn run_test() {
     let mut censys = Censys::dispatcher();
-    let (env_name, _) = censys.fetch_apikey().await;
+    let env_name = censys.envs().await.apikey.name;
 
     env::set_var(&env_name, "censys-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut censys, &stubr.path("/censys"));

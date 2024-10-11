@@ -1,7 +1,7 @@
 use crate::{
     enums::Content,
     interfaces::extractor::SubdomainExtractorInterface,
-    types::core::{InnerExtractMethod, Subdomain},
+    types::{core::Subdomain, func::InnerExtractFunc},
 };
 use async_trait::async_trait;
 use std::collections::BTreeSet;
@@ -13,7 +13,7 @@ use std::collections::BTreeSet;
 /// JSON parsing function must be given for this extractor. Please
 /// follow up examples to learn usage techniques
 pub struct JSONExtractor {
-    inner: InnerExtractMethod,
+    inner: InnerExtractFunc,
 }
 
 impl JSONExtractor {
@@ -44,7 +44,7 @@ impl JSONExtractor {
     ///     assert_eq!(extractor.extract(json, domain).await, expected);
     /// }
     /// ```
-    pub fn new(inner: InnerExtractMethod) -> Self {
+    pub fn new(inner: InnerExtractFunc) -> Self {
         Self { inner }
     }
 }

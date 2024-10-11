@@ -14,7 +14,7 @@ use subscan::{
 #[stubr::mock("module/integrations/whoisxmlapi.json")]
 async fn run_test() {
     let mut whoisxmlapi = WhoisXMLAPI::dispatcher();
-    let (env_name, _) = whoisxmlapi.fetch_apikey().await;
+    let env_name = whoisxmlapi.envs().await.apikey.name;
 
     env::set_var(&env_name, "whoisxmlapi-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut whoisxmlapi, &stubr.path("/whoisxmlapi"));

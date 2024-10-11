@@ -59,22 +59,17 @@ impl SearchQueryParam {
     /// ```
     /// use subscan::types::query::SearchQueryParam;
     ///
-    /// let (domain, prefix) = (
-    ///     String::from("foo.com"),
-    ///     String::from("site:"),
-    /// );
+    /// let domain = "foo.com";
+    /// let prefix = "site:";
     ///
     /// let param = SearchQueryParam::from("q");
-    /// let mut search_query = param.to_search_query(
-    ///     domain.clone(),
-    ///     prefix.clone()
-    /// );
+    /// let mut search_query = param.to_search_query(domain, prefix);
     ///
     /// assert_eq!(search_query.domain, domain);
     /// assert_eq!(search_query.prefix, prefix);
     /// assert_eq!(search_query.as_search_str(), "site:foo.com".to_string());
     /// ```
-    pub fn to_search_query(&self, domain: String, prefix: String) -> SearchQuery {
+    pub fn to_search_query(&self, domain: &str, prefix: &str) -> SearchQuery {
         SearchQuery::new(self.clone(), prefix, domain)
     }
 }
@@ -111,19 +106,16 @@ impl SearchQuery {
     /// #[tokio::main]
     /// async fn main() {
     ///     let param = SearchQueryParam::from("s");
-    ///     let domain = String::from("foo.com");
-    ///     let prefix = String::from("site:");
-    ///
-    ///     let query = SearchQuery::new(param, prefix, domain);
+    ///     let query = SearchQuery::new(param, "site:", "foo.com");
     ///
     ///     // do something with query
     /// }
     /// ```
-    pub fn new(param: SearchQueryParam, prefix: String, domain: String) -> Self {
+    pub fn new(param: SearchQueryParam, prefix: &str, domain: &str) -> Self {
         Self {
             param,
-            prefix,
-            domain,
+            prefix: prefix.to_string(),
+            domain: domain.to_string(),
             state: BTreeSet::new(),
         }
     }
@@ -137,10 +129,7 @@ impl SearchQuery {
     /// use subscan::types::core::Subdomain;
     ///
     /// let param = SearchQueryParam::from("s");
-    /// let domain = String::from("foo.com");
-    /// let prefix = String::from("site:");
-    ///
-    /// let mut query = SearchQuery::new(param, prefix, domain);
+    /// let mut query = SearchQuery::new(param, "site:", "foo.com");
     ///
     /// assert_eq!(query.as_search_str(), String::from("site:foo.com"));
     /// assert_eq!(query.update(Subdomain::from("api.foo.com")), true);
@@ -168,15 +157,13 @@ impl SearchQuery {
     /// use subscan::types::core::Subdomain;
     ///
     /// let param = SearchQueryParam::from("s");
-    /// let domain = String::from("foo.com");
-    /// let prefix = String::from("site:");
     ///
     /// let news = BTreeSet::from_iter([
     ///     Subdomain::from("api.foo.com"),
     ///     Subdomain::from("app.foo.com"),
     /// ]);
     ///
-    /// let mut query = SearchQuery::new(param, prefix, domain);
+    /// let mut query = SearchQuery::new(param, "site:", "foo.com");
     ///
     /// assert_eq!(query.as_search_str(), String::from("site:foo.com"));
     /// assert_eq!(query.update_many(news.clone()), true);
@@ -198,10 +185,7 @@ impl SearchQuery {
     /// use subscan::types::core::Subdomain;
     ///
     /// let param = SearchQueryParam::from("s");
-    /// let domain = String::from("foo.com");
-    /// let prefix = String::from("site:");
-    ///
-    /// let mut query = SearchQuery::new(param, prefix, domain);
+    /// let mut query = SearchQuery::new(param, "site:", "foo.com");
     ///
     /// assert_eq!(query.as_search_str(), "site:foo.com".to_string());
     /// ````
@@ -222,19 +206,15 @@ impl SearchQuery {
     ///
     /// ```
     /// use subscan::types::query::{SearchQuery, SearchQueryParam};
-    /// use subscan::types::core::Subdomain;
     /// use reqwest::Url;
     ///
     /// let param = SearchQueryParam::from("s");
-    /// let domain = String::from("foo.com");
-    /// let prefix = String::from("site:");
-    ///
     /// let base_url = Url::parse("https://bar.com").unwrap();
     /// let extra_params = &[("bar".to_string(), "baz".to_string())];
     ///
     /// let expected_url = Url::parse("https://bar.com/?bar=baz&s=site%3Afoo.com").unwrap();
     ///
-    /// let mut query = SearchQuery::new(param, prefix, domain);
+    /// let mut query = SearchQuery::new(param, "site:", "foo.com");
     ///
     /// assert_eq!(query.as_url(base_url, extra_params), expected_url);
     /// ````
