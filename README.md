@@ -18,5 +18,11 @@
       <img alt="Codecov Status" src="https://img.shields.io/codecov/c/gh/eredotpkfr/subscan?labelColor=42445a&color=e6e6e6">
     </picture>
   </a>
+  <a href="https://github.com/eredotpkfr/subscan/blob/main/LICENSE">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/github/license/eredotpkfr/fipv?labelColor=dc0000&color=e6e6e6">
+      <img alt="Codecov Status" src="https://img.shields.io/github/license/eredotpkfr/fipv?labelColor=42445a&color=e6e6e6">
+    </picture>
+  </a>
 </div>
 <!-- markdownlint-enable MD033 MD041 -->
