@@ -14,7 +14,7 @@ use subscan::{
 #[stubr::mock("module/integrations/bufferover.json")]
 async fn run_test() {
     let mut bufferover = BufferOver::dispatcher();
-    let (env_name, _) = bufferover.fetch_apikey().await;
+    let env_name = bufferover.envs().await.apikey.name;
 
     env::set_var(&env_name, "bufferover-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut bufferover, &stubr.path("/bufferover"));

@@ -4,7 +4,7 @@ use crate::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
-    types::query::{SearchQuery, SearchQueryParam},
+    types::query::SearchQueryParam,
 };
 use async_trait::async_trait;
 use reqwest::Url;
@@ -51,12 +51,6 @@ pub struct GenericSearchEngineModule {
     pub extractor: SubdomainExtractorDispatcher,
 }
 
-impl GenericSearchEngineModule {
-    pub async fn get_search_query(&self, domain: String) -> SearchQuery {
-        self.param.to_search_query(domain, "site:".to_string())
-    }
-}
-
 #[async_trait(?Send)]
 impl SubscanModuleInterface for GenericSearchEngineModule {
     async fn name(&self) -> &str {
@@ -75,7 +69,7 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
         let requester = self.requester.lock().await;
         let extra_params = [("num".to_string(), 100.to_string())];
 
-        let mut query = self.get_search_query(domain.clone()).await;
+        let mut query = self.param.to_search_query(&domain, "site:");
         let mut all_results = BTreeSet::new();
 
         loop {

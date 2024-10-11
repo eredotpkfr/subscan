@@ -15,7 +15,7 @@ use subscan::{
 #[stubr::mock("module/integrations/binaryedge.json")]
 async fn run_test() {
     let mut binaryedge = BinaryEdge::dispatcher();
-    let (env_name, _) = binaryedge.fetch_apikey().await;
+    let env_name = binaryedge.envs().await.apikey.name;
 
     env::set_var(&env_name, "binaryedge-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut binaryedge, &stubr.path("/binaryedge"));

@@ -15,7 +15,7 @@ use subscan::{
 #[stubr::mock("module/integrations/certspotter.json")]
 async fn run_test() {
     let mut certspotter = CertSpotter::dispatcher();
-    let (env_name, _) = certspotter.fetch_apikey().await;
+    let env_name = certspotter.envs().await.apikey.name;
 
     env::set_var(&env_name, "certspotter-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut certspotter, &stubr.path("/certspotter"));

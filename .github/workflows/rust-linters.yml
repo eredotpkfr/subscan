@@ -8,6 +8,7 @@ on:
     branches: ["main", "dev"]
 
 env:
+  RUSTDOCFLAGS: "-Dwarnings"
   RUSTFLAGS: "-Dwarnings"
   CARGO_TERM_COLOR: "always"
 
@@ -24,6 +25,16 @@ jobs:
 
       - name: Run clippy
         run: make clippy
+
+  lint-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: dtolnay/install@cargo-docs-rs
+      - uses: Swatinem/rust-cache@v2
+
+      - run: cargo +nightly docs-rs
 
   typos:
     runs-on: ubuntu-latest

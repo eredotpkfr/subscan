@@ -14,7 +14,7 @@ use subscan::{
 #[stubr::mock("module/integrations/chaos.json")]
 async fn run_test() {
     let mut chaos = Chaos::dispatcher();
-    let (env_name, _) = chaos.fetch_apikey().await;
+    let env_name = chaos.envs().await.apikey.name;
 
     env::set_var(&env_name, "chaos-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut chaos, &stubr.path("/chaos"));
