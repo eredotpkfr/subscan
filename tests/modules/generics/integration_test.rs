@@ -91,15 +91,15 @@ async fn run_test_with_header_auth() {
     let auth = APIAuthMethod::APIKeyAsHeader("X-API-Key".to_string());
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
 
-    let env_key = module.envs().await.apikey.name;
+    let env_name = module.envs().await.apikey.name;
 
-    env::set_var(env_key.clone(), TEST_API_KEY);
+    env::set_var(env_name.clone(), TEST_API_KEY);
 
     let result = module.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
-    env::remove_var(env_key);
+    env::remove_var(env_name);
 }
 
 #[tokio::test]
@@ -108,15 +108,15 @@ async fn run_test_with_query_auth() {
     let auth = APIAuthMethod::APIKeyAsQueryParam("apikey".to_string());
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
 
-    let env_key = module.envs().await.apikey.name;
+    let env_name = module.envs().await.apikey.name;
 
-    env::set_var(env_key.clone(), TEST_API_KEY);
+    env::set_var(env_name.clone(), TEST_API_KEY);
 
     let result = module.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
-    env::remove_var(env_key);
+    env::remove_var(env_name);
 }
 
 #[tokio::test]

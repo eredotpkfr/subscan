@@ -15,16 +15,16 @@ use subscan::{
 #[stubr::mock("module/integrations/zoomeye.json")]
 async fn run_test() {
     let mut zoomeye = ZoomEye::dispatcher();
-    let env_key = zoomeye.envs().await.apikey.name;
+    let env_name = zoomeye.envs().await.apikey.name;
 
-    env::set_var(&env_key, "zoomeye-api-key");
+    env::set_var(&env_name, "zoomeye-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut zoomeye, &stubr.path("/zoomeye"));
 
     let result = zoomeye.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
-    env::remove_var(env_key);
+    env::remove_var(env_name);
 }
 
 #[tokio::test]

@@ -14,16 +14,16 @@ use subscan::{
 #[stubr::mock("module/integrations/whoisxmlapi.json")]
 async fn run_test() {
     let mut whoisxmlapi = WhoisXMLAPI::dispatcher();
-    let env_key = whoisxmlapi.envs().await.apikey.name;
+    let env_name = whoisxmlapi.envs().await.apikey.name;
 
-    env::set_var(&env_key, "whoisxmlapi-api-key");
+    env::set_var(&env_name, "whoisxmlapi-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut whoisxmlapi, &stubr.path("/whoisxmlapi"));
 
     let result = whoisxmlapi.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
-    env::remove_var(env_key);
+    env::remove_var(env_name);
 }
 
 #[tokio::test]

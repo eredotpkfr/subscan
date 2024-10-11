@@ -14,16 +14,16 @@ use subscan::{
 #[stubr::mock("module/integrations/bevigil.json")]
 async fn run_test() {
     let mut bevigil = Bevigil::dispatcher();
-    let env_key = bevigil.envs().await.apikey.name;
+    let env_name = bevigil.envs().await.apikey.name;
 
-    env::set_var(&env_key, "bevigil-api-key");
+    env::set_var(&env_name, "bevigil-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut bevigil, &stubr.path("/bevigil"));
 
     let result = bevigil.run(TEST_DOMAIN.to_string()).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
-    env::remove_var(env_key);
+    env::remove_var(env_name);
 }
 
 #[tokio::test]
