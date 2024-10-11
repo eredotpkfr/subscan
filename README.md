@@ -10,11 +10,11 @@
     <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/rust-test.yml?label=test&logo=Github&labelColor=dc0000&color=e6e6e6">
     <img alt="GitHub Actions Test Workflow Status" src="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/rust-test.yml?label=test&logo=Github&labelColor=42445a&color=e6e6e6">
   </picture>
-  <picture>
-    <a href="https://app.codecov.io/gh/eredotpkfr/subscan">
+  <a href="https://app.codecov.io/gh/eredotpkfr/subscan">
+    <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/codecov/c/gh/eredotpkfr/subscan?labelColor=dc0000&color=e6e6e6">
       <img alt="Codecov Status" src="https://img.shields.io/codecov/c/gh/eredotpkfr/subscan?labelColor=42445a&color=e6e6e6">
-    </a>
-  </picture>
+    </picture>
+  </a>
 </div>
 <!-- markdownlint-enable MD033 MD041 -->
