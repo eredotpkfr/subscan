@@ -8,7 +8,7 @@ use subscan::{
     interfaces::requester::RequesterInterface,
     requesters::chrome::ChromeBrowser,
     types::{
-        config::{RequesterConfig, DEFAULT_HTTP_TIMEOUT},
+        config::RequesterConfig,
         env::{Credentials, Env},
     },
 };
@@ -16,49 +16,32 @@ use subscan::{
 #[tokio::test]
 async fn chrome_configure_test() {
     let mut browser = ChromeBrowser::default();
-    let mut config = browser.config().await;
 
-    let new_headers = HeaderMap::from_iter([
+    let headers = HeaderMap::from_iter([
         (USER_AGENT, HeaderValue::from_static("foo")),
         (CONTENT_LENGTH, HeaderValue::from_static("20")),
     ]);
-
-    let new_config = RequesterConfig {
-        headers: new_headers.clone(),
-        timeout: Duration::from_secs(120),
-        proxy: Some(TEST_URL.to_string()),
-        credentials: Credentials {
-            username: Env {
-                name: "USERNAME".into(),
-                value: Some("foo".to_string()),
-            },
-            password: Env {
-                name: "PASSWORD".into(),
-                value: Some("bar".to_string()),
-            },
+    let credentials = Credentials {
+        username: Env {
+            name: "USERNAME".into(),
+            value: Some("foo".to_string()),
+        },
+        password: Env {
+            name: "PASSWORD".into(),
+            value: Some("bar".to_string()),
         },
     };
 
-    assert!(!config.credentials.is_ok());
-    assert!(config.credentials.username.value.is_none());
-    assert!(config.credentials.password.value.is_none());
-
-    assert_eq!(config.timeout, DEFAULT_HTTP_TIMEOUT);
-    assert_eq!(config.headers.len(), 0);
-    assert_eq!(config.proxy, None);
+    let new_config = RequesterConfig {
+        headers,
+        timeout: Duration::from_secs(120),
+        proxy: Some(TEST_URL.to_string()),
+        credentials,
+    };
 
     browser.configure(new_config.clone()).await;
-    config = browser.config().await;
 
-    assert_eq!(config.timeout, new_config.timeout);
-    assert_eq!(config.headers, new_config.headers);
-    assert_eq!(config.headers.len(), new_headers.len());
-    assert_eq!(config.proxy, new_config.proxy);
-
-    assert_eq!(config.credentials.username.name, "USERNAME");
-    assert_eq!(config.credentials.password.name, "PASSWORD");
-    assert_eq!(config.credentials.username.value, Some("foo".to_string()));
-    assert_eq!(config.credentials.password.value, Some("bar".to_string()));
+    assert_eq!(browser.config().await.clone(), new_config);
 }
 
 #[tokio::test]

@@ -1,0 +1,17 @@
+{
+    "request": {
+        "basicAuth": {
+            "password": "bar",
+            "username": "foo"
+        },
+        "method": "GET",
+        "urlPath": "/hello-with-basic-http-auth"
+    },
+    "response": {
+        "body": "hello",
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}

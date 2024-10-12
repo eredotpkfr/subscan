@@ -188,7 +188,7 @@ async fn authenticate_test_with_basic_http_auth_no_credentials() {
 }
 
 #[tokio::test]
-#[stubr::mock("module/generics/integration-no-auth.json")]
+#[stubr::mock("module/generics/integration-with-no-auth.json")]
 async fn run_test_no_auth() {
     let auth = AuthenticationMethod::NoAuthentication;
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
@@ -230,6 +230,27 @@ async fn run_test_with_query_auth() {
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
     env::remove_var(env_name);
+}
+
+#[tokio::test]
+#[stubr::mock("module/generics/integration-with-basic-http-auth.json")]
+async fn run_test_with_basic_http_auth() {
+    let credentials = Credentials {
+        username: Env {
+            name: "USERNAME".into(),
+            value: Some("foo".to_string()),
+        },
+        password: Env {
+            name: "PASSWORD".into(),
+            value: Some("bar".to_string()),
+        },
+    };
+
+    let auth = AuthenticationMethod::BasicHTTPAuthentication(credentials);
+    let mut module = generic_integration(&stubr.path("/subdomains"), auth);
+    let result = module.run(TEST_DOMAIN.to_string()).await;
+
+    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }
 
 #[tokio::test]
