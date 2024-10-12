@@ -3,6 +3,7 @@ use crate::{
     extractors::html::HTMLExtractor,
     modules::generics::engine::GenericSearchEngineModule,
     requesters::client::HTTPClient,
+    types::core::SubscanModuleCoreComponents,
 };
 use reqwest::Url;
 
@@ -36,8 +37,10 @@ impl Google {
             name: GOOGLE_MODULE_NAME.into(),
             param: GOOGLE_SEARCH_PARAM.into(),
             url: url.unwrap(),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()

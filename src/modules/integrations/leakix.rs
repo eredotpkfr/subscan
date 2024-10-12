@@ -5,7 +5,10 @@ use crate::{
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
-    types::core::Subdomain,
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        func::GenericIntegrationCoreFuncs,
+    },
 };
 use reqwest::Url;
 use serde_json::Value;
@@ -34,11 +37,16 @@ impl Leakix {
 
         let generic = GenericIntegrationModule {
             name: LEAKIX_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+                request: None,
+            },
             auth: AuthenticationMethod::NoAuthentication,
-            requester: requester.into(),
-            extractor: extractor.into(),
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
@@ -52,7 +60,7 @@ impl Leakix {
         None
     }
 
-    pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
         if let Some(subs) = content.as_array() {
             let filter = |item: &Value| Some(item["subdomain"].as_str()?.to_string());
 

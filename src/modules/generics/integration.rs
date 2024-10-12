@@ -5,14 +5,17 @@ use crate::{
         requester::RequesterInterface,
     },
     types::{
+        core::SubscanModuleCoreComponents,
         env::{Credentials, Env},
-        func::{GetNextUrlFunc, GetQueryUrlFunc},
+        func::GenericIntegrationCoreFuncs,
     },
     utils::http,
 };
 use async_trait::async_trait;
-use reqwest::header::{HeaderName, HeaderValue};
-use reqwest::Url;
+use reqwest::{
+    header::{HeaderName, HeaderValue},
+    Url,
+};
 use std::{collections::BTreeSet, str::FromStr};
 use tokio::sync::Mutex;
 
@@ -25,17 +28,12 @@ use tokio::sync::Mutex;
 pub struct GenericIntegrationModule {
     /// Module name
     pub name: String,
-    /// Simple function field that gets query URL by given domain address
-    pub url: GetQueryUrlFunc,
-    /// Function definition that gets next URL to ensure fully fetch data with pagination
-    /// from API endpoint
-    pub next: GetNextUrlFunc,
     /// Set authentication method, see [`AuthenticationMethod`] enum for details
     pub auth: AuthenticationMethod,
-    /// Requester object instance for HTTP requests
-    pub requester: Mutex<RequesterDispatcher>,
-    /// Any extractor object to extract subdomain from content
-    pub extractor: SubdomainExtractorDispatcher,
+    /// Core functions
+    pub funcs: GenericIntegrationCoreFuncs,
+    /// Core components
+    pub components: SubscanModuleCoreComponents,
 }
 
 impl GenericIntegrationModule {
@@ -63,7 +61,7 @@ impl GenericIntegrationModule {
 
     async fn set_credentials(&self, credentials: Credentials) -> bool {
         if credentials.is_ok() {
-            let mut requester = self.requester.lock().await;
+            let mut requester = self.components.requester.lock().await;
 
             requester.config().await.set_credentials(credentials);
 
@@ -82,7 +80,7 @@ impl GenericIntegrationModule {
 
     async fn set_apikey_header(&self, name: &str, apikey: Env) -> bool {
         if let Some(apikey) = &apikey.value {
-            let mut requester = self.requester.lock().await;
+            let mut requester = self.components.requester.lock().await;
 
             let name = HeaderName::from_str(name).unwrap();
             let value = HeaderValue::from_str(apikey).unwrap();
@@ -101,28 +99,32 @@ impl SubscanModuleInterface for GenericIntegrationModule {
     }
 
     async fn requester(&self) -> Option<&Mutex<RequesterDispatcher>> {
-        Some(&self.requester)
+        Some(&self.components.requester)
     }
 
     async fn extractor(&self) -> Option<&SubdomainExtractorDispatcher> {
-        Some(&self.extractor)
+        Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: String) -> BTreeSet<String> {
-        let mut url: Url = (self.url)(&domain).parse().unwrap();
+    async fn run(&mut self, domain: &str) -> BTreeSet<String> {
+        let mut url: Url = (self.funcs.url)(domain).parse().unwrap();
         let mut all_results = BTreeSet::new();
 
         if self.auth.is_set() && !self.authenticate(&mut url).await {
             return all_results;
         }
 
-        let requester = self.requester.lock().await;
+        let requester = self.components.requester.lock().await;
 
         loop {
-            let content = requester.get_request(url.clone()).await;
-            let (parsing, domain) = (content.clone(), domain.clone());
+            let content = if let Some(request) = &self.funcs.request {
+                (request)(&requester, url.clone())
+            } else {
+                requester.get_request(url.clone()).await
+            };
 
-            let news = self.extractor.extract(parsing, domain).await;
+            let (parsing, domain) = (content.clone(), domain);
+            let news = self.components.extractor.extract(parsing, domain).await;
 
             if news.is_empty() {
                 break;
@@ -130,7 +132,7 @@ impl SubscanModuleInterface for GenericIntegrationModule {
 
             all_results.extend(news);
 
-            if let Some(next_url) = (self.next)(url.clone(), content.as_json()) {
+            if let Some(next_url) = (self.funcs.next)(url.clone(), content.as_json()) {
                 url = next_url;
             } else {
                 break;

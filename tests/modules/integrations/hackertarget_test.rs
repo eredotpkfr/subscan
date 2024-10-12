@@ -15,7 +15,7 @@ async fn run_test() {
 
     mocks::wrap_module_dispatcher_url_field(&mut hackertarget, &stubr.path("/hackertarget"));
 
-    let result = hackertarget.run(TEST_DOMAIN.to_string()).await;
+    let result = hackertarget.run(TEST_DOMAIN).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }

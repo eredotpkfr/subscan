@@ -15,7 +15,7 @@ async fn run_test() {
 
     mocks::wrap_module_dispatcher_url_field(&mut sitedossier, &stubr.path("/sitedossier"));
 
-    let result = sitedossier.run(TEST_DOMAIN.to_string()).await;
+    let result = sitedossier.run(TEST_DOMAIN).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }

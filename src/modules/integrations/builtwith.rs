@@ -3,7 +3,10 @@ use crate::{
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
-    types::core::Subdomain,
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        func::GenericIntegrationCoreFuncs,
+    },
 };
 use reqwest::Url;
 use serde_json::Value;
@@ -33,11 +36,16 @@ impl BuiltWith {
 
         let generic = GenericIntegrationModule {
             name: BUILTWITH_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+                request: None,
+            },
             auth: AuthenticationMethod::APIKeyAsQueryParam("KEY".into()),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
@@ -63,7 +71,7 @@ impl BuiltWith {
         None
     }
 
-    pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
         let mut subs = BTreeSet::new();
 
         if let Some(results) = content["Results"].as_array() {

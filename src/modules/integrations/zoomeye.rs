@@ -5,7 +5,10 @@ use crate::{
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
-    types::core::Subdomain,
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        func::GenericIntegrationCoreFuncs,
+    },
     utils::http,
 };
 use reqwest::Url;
@@ -35,11 +38,16 @@ impl ZoomEye {
 
         let generic = GenericIntegrationModule {
             name: ZOOMEYE_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+                request: None,
+            },
             auth: AuthenticationMethod::APIKeyAsHeader("API-Key".into()),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
@@ -66,7 +74,7 @@ impl ZoomEye {
         Some(url)
     }
 
-    pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
         if let Some(passives) = content["list"].as_array() {
             let filter = |item: &Value| Some(item["name"].as_str()?.to_string());
 

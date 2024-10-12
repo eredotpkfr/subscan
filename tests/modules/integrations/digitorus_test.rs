@@ -15,7 +15,7 @@ async fn run_test() {
 
     mocks::wrap_module_dispatcher_url_field(&mut digitorus, &stubr.path("/digitorus"));
 
-    let result = digitorus.run(TEST_DOMAIN.to_string()).await;
+    let result = digitorus.run(TEST_DOMAIN).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }

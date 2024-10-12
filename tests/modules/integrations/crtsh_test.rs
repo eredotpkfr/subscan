@@ -17,7 +17,7 @@ async fn run_test() {
 
     mocks::wrap_module_dispatcher_url_field(&mut crtsh, &stubr.path("/crtsh"));
 
-    let result = crtsh.run(TEST_DOMAIN.to_string()).await;
+    let result = crtsh.run(TEST_DOMAIN).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }
@@ -41,8 +41,8 @@ async fn get_next_url_test() {
 #[tokio::test]
 async fn extract_test() {
     let json = read_stub("module/integrations/crtsh.json")["response"]["jsonBody"].clone();
-    let extracted = Crtsh::extract(json, TEST_DOMAIN.to_string());
-    let not_extracted = Crtsh::extract(Value::Null, TEST_DOMAIN.to_string());
+    let extracted = Crtsh::extract(json, TEST_DOMAIN);
+    let not_extracted = Crtsh::extract(Value::Null, TEST_DOMAIN);
 
     assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(not_extracted, BTreeSet::new());

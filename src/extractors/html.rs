@@ -63,17 +63,15 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     /// #[tokio::main]
     /// async fn main() {
     ///     let html = Content::from("<div><a>bar.foo.com</a></div>");
-    ///     let domain = String::from("foo.com");
     ///     let selector = String::from("div > a");
     ///
     ///     let extractor = HTMLExtractor::new(selector, vec![]);
-    ///
-    ///     let result = extractor.extract(html, domain).await;
+    ///     let result = extractor.extract(html, "foo.com").await;
     ///
     ///     assert_eq!(result, [Subdomain::from("bar.foo.com")].into());
     /// }
     /// ```
-    async fn extract(&self, content: Content, domain: String) -> BTreeSet<Subdomain> {
+    async fn extract(&self, content: Content, domain: &str) -> BTreeSet<Subdomain> {
         let document = Html::parse_document(&content.as_string());
         let selector = Selector::parse(&self.selector).unwrap();
         let selected = document.select(&selector);
@@ -88,7 +86,7 @@ impl SubdomainExtractorInterface for HTMLExtractor {
             text
         };
 
-        let extract = |item| self.regextractor.extract_one(item, domain.clone());
+        let extract = |item| self.regextractor.extract_one(item, domain);
 
         selected.map(remove).filter_map(extract).collect()
     }

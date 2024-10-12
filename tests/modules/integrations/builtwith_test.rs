@@ -20,7 +20,7 @@ async fn run_test() {
     env::set_var(&env_name, "builtwith-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut builtwith, &stubr.path("/builtwith"));
 
-    let result = builtwith.run(TEST_DOMAIN.to_string()).await;
+    let result = builtwith.run(TEST_DOMAIN).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
@@ -56,8 +56,8 @@ async fn get_next_url_test() {
 #[tokio::test]
 async fn extract_test() {
     let json = read_stub("module/integrations/builtwith.json")["response"]["jsonBody"].clone();
-    let extracted = BuiltWith::extract(json, TEST_DOMAIN.to_string());
-    let not_extracted = BuiltWith::extract(Value::Null, TEST_DOMAIN.to_string());
+    let extracted = BuiltWith::extract(json, TEST_DOMAIN);
+    let not_extracted = BuiltWith::extract(Value::Null, TEST_DOMAIN);
 
     assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(not_extracted, BTreeSet::new());

@@ -3,7 +3,10 @@ use crate::{
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
-    types::core::Subdomain,
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        func::GenericIntegrationCoreFuncs,
+    },
     utils::regex::generate_subdomain_regex,
 };
 use regex::Match;
@@ -35,11 +38,16 @@ impl Crtsh {
 
         let generic = GenericIntegrationModule {
             name: CRTSH_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+                request: None,
+            },
             auth: AuthenticationMethod::NoAuthentication,
-            requester: requester.into(),
-            extractor: extractor.into(),
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
@@ -56,7 +64,7 @@ impl Crtsh {
         None
     }
 
-    pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
         let mut subs = BTreeSet::new();
         let pattern = generate_subdomain_regex(domain).unwrap();
 

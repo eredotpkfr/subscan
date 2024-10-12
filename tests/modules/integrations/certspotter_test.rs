@@ -20,7 +20,7 @@ async fn run_test() {
     env::set_var(&env_name, "certspotter-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut certspotter, &stubr.path("/certspotter"));
 
-    let result = certspotter.run(TEST_DOMAIN.to_string()).await;
+    let result = certspotter.run(TEST_DOMAIN).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
@@ -53,8 +53,8 @@ async fn get_next_url_test() {
 #[tokio::test]
 async fn extract_test() {
     let json = read_stub("module/integrations/certspotter.json")["response"]["jsonBody"].clone();
-    let extracted = CertSpotter::extract(json, TEST_DOMAIN.to_string());
-    let not_extracted = CertSpotter::extract(Value::Null, TEST_DOMAIN.to_string());
+    let extracted = CertSpotter::extract(json, TEST_DOMAIN);
+    let not_extracted = CertSpotter::extract(Value::Null, TEST_DOMAIN);
 
     assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(not_extracted, BTreeSet::new());

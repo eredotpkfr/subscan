@@ -42,7 +42,10 @@ pub mod mocks {
             engine::GenericSearchEngineModule, integration::GenericIntegrationModule,
         },
         requesters::client::HTTPClient,
-        types::query::SearchQueryParam,
+        types::{
+            core::SubscanModuleCoreComponents, func::GenericIntegrationCoreFuncs,
+            query::SearchQueryParam,
+        },
     };
 
     pub fn generic_search_engine(url: &str) -> GenericSearchEngineModule {
@@ -50,18 +53,21 @@ pub mod mocks {
         let extractor = RegexExtractor::default();
         let url = Url::parse(url);
         let thread_name = thread::current().name().unwrap().to_uppercase();
+        let components = SubscanModuleCoreComponents {
+            requester: requester.into(),
+            extractor: extractor.into(),
+        };
 
         GenericSearchEngineModule {
             name: md5_hex(thread_name),
             url: url.unwrap(),
             param: SearchQueryParam::from("q"),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            components,
         }
     }
 
     pub fn generic_integration(url: &str, auth: AuthenticationMethod) -> GenericIntegrationModule {
-        let parse = |json: Value, _domain: String| {
+        let parse = |json: Value, _domain: &str| {
             if let Some(subs) = json["subdomains"].as_array() {
                 let filter = |item: &Value| Some(item.as_str()?.to_string());
 
@@ -74,14 +80,22 @@ pub mod mocks {
         let requester = RequesterDispatcher::HTTPClient(HTTPClient::default());
         let extractor = JSONExtractor::new(Box::new(parse));
         let thread_name = thread::current().name().unwrap().to_uppercase();
+        let components = SubscanModuleCoreComponents {
+            requester: requester.into(),
+            extractor: extractor.into(),
+        };
+
+        let funcs = GenericIntegrationCoreFuncs {
+            url: wrap_url_with_mock_func(url),
+            next: Box::new(|_, _| None),
+            request: None,
+        };
 
         GenericIntegrationModule {
             name: md5_hex(thread_name),
-            url: wrap_url_with_mock_func(url),
-            next: Box::new(|_, _| None),
             auth,
-            requester: requester.into(),
-            extractor: extractor.into(),
+            funcs,
+            components,
         }
     }
 
@@ -97,7 +111,7 @@ pub mod mocks {
                 module.url = url.parse().unwrap()
             }
             SubscanModuleDispatcher::GenericIntegrationModule(module) => {
-                module.url = wrap_url_with_mock_func(url)
+                module.funcs.url = wrap_url_with_mock_func(url)
             }
         }
     }

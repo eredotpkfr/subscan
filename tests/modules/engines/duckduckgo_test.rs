@@ -17,10 +17,10 @@ async fn run_test() {
     mocks::wrap_module_dispatcher_url_field(&mut duckduckgo, &stubr.uri());
 
     if let SubscanModuleDispatcher::GenericSearchEngineModule(ref mut duckduckgo) = duckduckgo {
-        duckduckgo.requester = Mutex::new(new_requester.into());
+        duckduckgo.components.requester = Mutex::new(new_requester.into());
     }
 
-    let result = duckduckgo.run(TEST_DOMAIN.to_string()).await;
+    let result = duckduckgo.run(TEST_DOMAIN).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }

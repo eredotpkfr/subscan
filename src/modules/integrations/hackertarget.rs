@@ -3,6 +3,7 @@ use crate::{
     extractors::regex::RegexExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
+    types::{core::SubscanModuleCoreComponents, func::GenericIntegrationCoreFuncs},
 };
 use reqwest::Url;
 use serde_json::Value;
@@ -31,11 +32,16 @@ impl HackerTarget {
 
         let generic = GenericIntegrationModule {
             name: HACKERTARGET_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+                request: None,
+            },
             auth: AuthenticationMethod::NoAuthentication,
-            requester: requester.into(),
-            extractor: extractor.into(),
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
