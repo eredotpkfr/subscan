@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -18,13 +18,13 @@ pub const SHODAN_URL: &str = "https://api.shodan.io";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                                 |
-/// |:------------------:|:-------------------------------------:|
-/// | Module Name        | `shodan`                              |
-/// | Doc URL            | <https://shodan.io>                   |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsQueryParam`] |
-/// | Requester          | [`HTTPClient`]                        |
-/// | Extractor          | [`JSONExtractor`]                     |
+/// | Property           | Value                                        |
+/// |:------------------:|:--------------------------------------------:|
+/// | Module Name        | `shodan`                                     |
+/// | Doc URL            | <https://shodan.io>                          |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsQueryParam`] |
+/// | Requester          | [`HTTPClient`]                               |
+/// | Extractor          | [`JSONExtractor`]                            |
 pub struct Shodan {}
 
 impl Shodan {
@@ -36,7 +36,7 @@ impl Shodan {
             name: SHODAN_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsQueryParam("key".into()),
+            auth: AuthenticationMethod::APIKeyAsQueryParam("key".into()),
             requester: requester.into(),
             extractor: extractor.into(),
         };

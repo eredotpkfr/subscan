@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -17,13 +17,13 @@ pub const BEVIGIL_URL: &str = "https://osint.bevigil.com/api";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                             |
-/// |:------------------:|:---------------------------------:|
-/// | Module Name        | `bevigil`                         |
-/// | Doc URL            | <https://bevigil.com>             |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
-/// | Requester          | [`HTTPClient`]                    |
-/// | Extractor          | [`JSONExtractor`]                 |
+/// | Property           | Value                                    |
+/// |:------------------:|:----------------------------------------:|
+/// | Module Name        | `bevigil`                                |
+/// | Doc URL            | <https://bevigil.com>                    |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
+/// | Requester          | [`HTTPClient`]                           |
+/// | Extractor          | [`JSONExtractor`]                        |
 pub struct Bevigil {}
 
 impl Bevigil {
@@ -35,7 +35,7 @@ impl Bevigil {
             name: BEVIGIL_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsHeader("X-Access-Token".into()),
+            auth: AuthenticationMethod::APIKeyAsHeader("X-Access-Token".into()),
             requester: requester.into(),
             extractor: extractor.into(),
         };

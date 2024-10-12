@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -17,13 +17,13 @@ pub const CHAOS_URL: &str = "https://dns.projectdiscovery.io/dns";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                               |
-/// |:------------------:|:-----------------------------------:|
-/// | Module Name        | `chaos`                             |
-/// | Doc URL            | <https://cloud.projectdiscovery.io> |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`]   |
-/// | Requester          | [`HTTPClient`]                      |
-/// | Extractor          | [`JSONExtractor`]                   |
+/// | Property           | Value                                    |
+/// |:------------------:|:----------------------------------------:|
+/// | Module Name        | `chaos`                                  |
+/// | Doc URL            | <https://cloud.projectdiscovery.io>      |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
+/// | Requester          | [`HTTPClient`]                           |
+/// | Extractor          | [`JSONExtractor`]                        |
 pub struct Chaos {}
 
 impl Chaos {
@@ -35,7 +35,7 @@ impl Chaos {
             name: CHAOS_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsHeader("Authorization".into()),
+            auth: AuthenticationMethod::APIKeyAsHeader("Authorization".into()),
             requester: requester.into(),
             extractor: extractor.into(),
         };

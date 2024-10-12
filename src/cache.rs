@@ -65,8 +65,7 @@ pub mod modules {
     /// async fn main() {
     ///     let new_config = RequesterConfig {
     ///         timeout: Duration::from_secs(120),
-    ///         proxy: None,
-    ///         headers: HeaderMap::default(),
+    ///         ..Default::default()
     ///     };
     ///
     ///     modules::configure_all_requesters(new_config);

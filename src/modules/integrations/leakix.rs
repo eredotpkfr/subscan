@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -18,13 +18,13 @@ pub const LEAKIX_URL: &str = "https://leakix.net/api";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                      |
-/// |:------------------:|:--------------------------:|
-/// | Module Name        | `leakix`                   |
-/// | Doc URL            | <https://leakix.net>       |
-/// | Authentication     | [`APIAuthMethod::NoAuth`]  |
-/// | Requester          | [`HTTPClient`]             |
-/// | Extractor          | [`JSONExtractor`]          |
+/// | Property           | Value                                      |
+/// |:------------------:|:------------------------------------------:|
+/// | Module Name        | `leakix`                                   |
+/// | Doc URL            | <https://leakix.net>                       |
+/// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
+/// | Requester          | [`HTTPClient`]                             |
+/// | Extractor          | [`JSONExtractor`]                          |
 pub struct Leakix {}
 
 impl Leakix {
@@ -36,7 +36,7 @@ impl Leakix {
             name: LEAKIX_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::NoAuth,
+            auth: AuthenticationMethod::NoAuthentication,
             requester: requester.into(),
             extractor: extractor.into(),
         };

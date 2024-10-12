@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -19,13 +19,13 @@ pub const CRTSH_URL: &str = "https://crt.sh";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                     |
-/// |:------------------:|:-------------------------:|
-/// | Module Name        | `crtsh`                   |
-/// | Doc URL            | <https://crt.sh>          |
-/// | Authentication     | [`APIAuthMethod::NoAuth`] |
-/// | Requester          | [`HTTPClient`]            |
-/// | Extractor          | [`JSONExtractor`]         |
+/// | Property           | Value                                      |
+/// |:------------------:|:------------------------------------------:|
+/// | Module Name        | `crtsh`                                    |
+/// | Doc URL            | <https://crt.sh>                           |
+/// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
+/// | Requester          | [`HTTPClient`]                             |
+/// | Extractor          | [`JSONExtractor`]                          |
 pub struct Crtsh {}
 
 impl Crtsh {
@@ -37,7 +37,7 @@ impl Crtsh {
             name: CRTSH_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::NoAuth,
+            auth: AuthenticationMethod::NoAuthentication,
             requester: requester.into(),
             extractor: extractor.into(),
         };

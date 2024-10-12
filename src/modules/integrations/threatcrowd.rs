@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -18,13 +18,13 @@ pub const THREATCROWD_URL: &str = "http://ci-www.threatcrowd.org/searchApi/v2/do
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                           |
-/// |:------------------:|:-------------------------------:|
-/// | Module Name        | `threatcrowd`                   |
-/// | Doc URL            | <http://ci-www.threatcrowd.org> |
-/// | Authentication     | [`APIAuthMethod::NoAuth`]       |
-/// | Requester          | [`HTTPClient`]                  |
-/// | Extractor          | [`JSONExtractor`]               |
+/// | Property           | Value                                      |
+/// |:------------------:|:------------------------------------------:|
+/// | Module Name        | `threatcrowd`                              |
+/// | Doc URL            | <http://ci-www.threatcrowd.org>            |
+/// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
+/// | Requester          | [`HTTPClient`]                             |
+/// | Extractor          | [`JSONExtractor`]                          |
 pub struct ThreatCrowd {}
 
 impl ThreatCrowd {
@@ -36,7 +36,7 @@ impl ThreatCrowd {
             name: THREATCROWD_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::NoAuth,
+            auth: AuthenticationMethod::NoAuthentication,
             requester: requester.into(),
             extractor: extractor.into(),
         };

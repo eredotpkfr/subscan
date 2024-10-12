@@ -1,10 +1,13 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubdomainExtractorDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubdomainExtractorDispatcher},
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
-    types::func::{GetNextUrlFunc, GetQueryUrlFunc},
+    types::{
+        env::{Credentials, Env},
+        func::{GetNextUrlFunc, GetQueryUrlFunc},
+    },
     utils::http,
 };
 use async_trait::async_trait;
@@ -27,8 +30,8 @@ pub struct GenericIntegrationModule {
     /// Function definition that gets next URL to ensure fully fetch data with pagination
     /// from API endpoint
     pub next: GetNextUrlFunc,
-    /// Set authentication method, see [`APIAuthMethod`] enum for details
-    pub auth: APIAuthMethod,
+    /// Set authentication method, see [`AuthenticationMethod`] enum for details
+    pub auth: AuthenticationMethod,
     /// Requester object instance for HTTP requests
     pub requester: Mutex<RequesterDispatcher>,
     /// Any extractor object to extract subdomain from content
@@ -36,29 +39,58 @@ pub struct GenericIntegrationModule {
 }
 
 impl GenericIntegrationModule {
-    pub async fn authenticate(&self, url: &mut Url, apikey: &str) {
+    pub async fn authenticate(&self, url: &mut Url) -> bool {
+        let envs = self.envs().await;
+
         match &self.auth {
-            APIAuthMethod::APIKeyAsHeader(name) => self.set_apikey_header(name, apikey).await,
-            APIAuthMethod::APIKeyAsQueryParam(param) => {
-                self.set_apikey_param(url, param, apikey).await
+            AuthenticationMethod::APIKeyAsHeader(name) => {
+                self.set_apikey_header(name, envs.apikey).await
             }
-            APIAuthMethod::NoAuth => {}
+            AuthenticationMethod::APIKeyAsQueryParam(param) => {
+                self.set_apikey_param(url, param, envs.apikey).await
+            }
+            AuthenticationMethod::BasicHTTPAuthentication(credentials) => {
+                if credentials.is_ok() {
+                    self.set_credentials(credentials.clone()).await
+                } else {
+                    // Try to fetch credentials from envs if not provided on startup
+                    self.set_credentials(envs.credentials).await
+                }
+            }
+            AuthenticationMethod::NoAuthentication => true,
         }
     }
 
-    async fn set_apikey_param(&self, url: &mut Url, param: &str, apikey: &str) {
-        http::update_url_query(url, param, apikey);
+    async fn set_credentials(&self, credentials: Credentials) -> bool {
+        if credentials.is_ok() {
+            let mut requester = self.requester.lock().await;
+
+            requester.config().await.set_credentials(credentials);
+
+            return true;
+        }
+        false
     }
 
-    async fn set_apikey_header(&self, name: &str, apikey: &str) {
-        let mut requester = self.requester.lock().await;
-
-        let name = HeaderName::from_str(name);
-        let value = HeaderValue::from_str(apikey);
-
-        if let (Ok(name), Ok(value)) = (name, value) {
-            requester.config().await.add_header(name, value)
+    async fn set_apikey_param(&self, url: &mut Url, param: &str, apikey: Env) -> bool {
+        if let Some(apikey) = &apikey.value {
+            http::update_url_query(url, param, apikey);
+            return true;
         }
+        false
+    }
+
+    async fn set_apikey_header(&self, name: &str, apikey: Env) -> bool {
+        if let Some(apikey) = &apikey.value {
+            let mut requester = self.requester.lock().await;
+
+            let name = HeaderName::from_str(name).unwrap();
+            let value = HeaderValue::from_str(apikey).unwrap();
+
+            requester.config().await.add_header(name, value);
+            return true;
+        }
+        false
     }
 }
 
@@ -80,18 +112,14 @@ impl SubscanModuleInterface for GenericIntegrationModule {
         let mut url: Url = (self.url)(&domain).parse().unwrap();
         let mut all_results = BTreeSet::new();
 
-        if self.auth.is_set() {
-            if let Some(apikey) = &self.envs().await.apikey.value {
-                self.authenticate(&mut url, apikey).await;
-            } else {
-                return all_results;
-            }
+        if self.auth.is_set() && !self.authenticate(&mut url).await {
+            return all_results;
         }
 
         let requester = self.requester.lock().await;
 
         loop {
-            let content = requester.get_content(url.clone()).await;
+            let content = requester.get_request(url.clone()).await;
             let (parsing, domain) = (content.clone(), domain.clone());
 
             let news = self.extractor.extract(parsing, domain).await;

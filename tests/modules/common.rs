@@ -36,7 +36,7 @@ pub mod mocks {
     use super::funcs::md5_hex;
     use super::*;
     use subscan::{
-        enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+        enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
         extractors::{json::JSONExtractor, regex::RegexExtractor},
         modules::generics::{
             engine::GenericSearchEngineModule, integration::GenericIntegrationModule,
@@ -60,7 +60,7 @@ pub mod mocks {
         }
     }
 
-    pub fn generic_integration(url: &str, auth: APIAuthMethod) -> GenericIntegrationModule {
+    pub fn generic_integration(url: &str, auth: AuthenticationMethod) -> GenericIntegrationModule {
         let parse = |json: Value, _domain: String| {
             if let Some(subs) = json["subdomains"].as_array() {
                 let filter = |item: &Value| Some(item.as_str()?.to_string());

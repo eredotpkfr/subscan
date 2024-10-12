@@ -1,4 +1,4 @@
-use crate::cli::Cli;
+use crate::{cli::Cli, types::env::Credentials};
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
 use std::{collections::HashMap, time::Duration};
 
@@ -16,6 +16,8 @@ pub struct RequesterConfig {
     pub timeout: Duration,
     /// Proxy server for HTTP requests
     pub proxy: Option<String>,
+    /// Basic HTTP authentication credentials
+    pub credentials: Credentials,
 }
 
 impl Default for RequesterConfig {
@@ -24,6 +26,7 @@ impl Default for RequesterConfig {
             headers: HeaderMap::new(),
             timeout: DEFAULT_HTTP_TIMEOUT,
             proxy: None,
+            credentials: Credentials::default(),
         }
     }
 }
@@ -62,6 +65,7 @@ impl From<&Cli> for RequesterConfig {
             )]),
             timeout: Duration::from_secs(cli.timeout),
             proxy: cli.proxy.clone(),
+            ..Default::default()
         }
     }
 }
@@ -82,8 +86,7 @@ impl RequesterConfig {
     ///     headers: HeaderMap::from_iter([
     ///         (USER_AGENT, user_agent)
     ///     ]),
-    ///     timeout: Duration::from_secs(60),
-    ///     proxy: None,
+    ///     ..Default::default()
     /// };
     ///
     /// let headers = config.headers_as_hashmap();
@@ -113,10 +116,46 @@ impl RequesterConfig {
     /// config.add_header(USER_AGENT, user_agent);
     ///
     /// assert!(config.headers.contains_key(USER_AGENT));
+    ///
     /// assert_eq!(config.headers.len(), 1);
     /// assert_eq!(config.headers.get(USER_AGENT).unwrap(), "foo");
     /// ```
     pub fn add_header(&mut self, name: HeaderName, value: HeaderValue) {
         self.headers.insert(name, value);
+    }
+
+    /// Set basic HTTP authentication credentials for requester
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::config::RequesterConfig;
+    /// use subscan::types::env::{Env, Credentials};
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut config = RequesterConfig::default();
+    ///
+    ///     let credentials = Credentials {
+    ///         username: Env { name: "USERNAME".into(), value: Some("foo".to_string())},
+    ///         password: Env { name: "PASSWORD".into(), value: Some("bar".to_string())},
+    ///     };
+    ///
+    ///     assert!(!config.credentials.is_ok());
+    ///     assert!(config.credentials.username.value.is_none());
+    ///     assert!(config.credentials.password.value.is_none());
+    ///
+    ///     config.set_credentials(credentials);
+    ///
+    ///     assert!(config.credentials.is_ok());
+    ///
+    ///     assert_eq!(config.credentials.username.name, "USERNAME");
+    ///     assert_eq!(config.credentials.password.name, "PASSWORD");
+    ///     assert_eq!(config.credentials.username.value, Some("foo".to_string()));
+    ///     assert_eq!(config.credentials.password.value, Some("bar".to_string()));
+    /// }
+    /// ```
+    pub fn set_credentials(&mut self, credentials: Credentials) {
+        self.credentials = credentials;
     }
 }

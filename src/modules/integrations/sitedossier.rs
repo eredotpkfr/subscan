@@ -1,5 +1,5 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::html::HTMLExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -16,14 +16,14 @@ pub const SITEDOSSIER_SUBDOMAIN_TAG: &str = "ol > li > a";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                        |
-/// |:------------------:|:----------------------------:|
-/// | Module Name        | `sitedossier`                |
-/// | Doc URL            | <http://www.sitedossier.com> |
-/// | Subdomain Selector | `ol > li > a`                |
-/// | Authentication     | [`APIAuthMethod::NoAuth`]    |
-/// | Requester          | [`HTTPClient`]               |
-/// | Extractor          | [`HTMLExtractor`]            |
+/// | Property           | Value                                      |
+/// |:------------------:|:------------------------------------------:|
+/// | Module Name        | `sitedossier`                              |
+/// | Doc URL            | <http://www.sitedossier.com>               |
+/// | Subdomain Selector | `ol > li > a`                              |
+/// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
+/// | Requester          | [`HTTPClient`]                             |
+/// | Extractor          | [`HTMLExtractor`]                          |
 pub struct Sitedossier {}
 
 impl Sitedossier {
@@ -36,7 +36,7 @@ impl Sitedossier {
             name: SITEDOSSIER_MODULE_NAME.into(),
             url: Box::new(Self::get_query_url),
             next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::NoAuth,
+            auth: AuthenticationMethod::NoAuthentication,
             requester: requester.into(),
             extractor: extractor.into(),
         };
