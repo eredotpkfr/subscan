@@ -118,7 +118,7 @@ impl SubscanModuleInterface for GenericIntegrationModule {
 
         loop {
             let content = requester.get_content(url.clone()).await;
-            let (parsing, domain) = (content.clone(), domain);
+            let parsing = content.clone();
             let news = self.components.extractor.extract(parsing, domain).await;
 
             if news.is_empty() {
