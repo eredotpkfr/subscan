@@ -19,13 +19,13 @@ pub const CENSYS_URL: &str = "https://search.censys.io/api/v2/certificates/searc
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                             |
-/// |:------------------:|:---------------------------------:|
-/// | Module Name        | `censys`                          |
-/// | Doc URL            | <https://search.censys.io>        |
+/// | Property           | Value                                    |
+/// |:------------------:|:----------------------------------------:|
+/// | Module Name        | `censys`                                 |
+/// | Doc URL            | <https://search.censys.io>               |
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
-/// | Requester          | [`HTTPClient`]                    |
-/// | Extractor          | [`JSONExtractor`]                 |
+/// | Requester          | [`HTTPClient`]                           |
+/// | Extractor          | [`JSONExtractor`]                        |
 pub struct Censys {}
 
 impl Censys {

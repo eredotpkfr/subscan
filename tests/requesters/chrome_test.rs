@@ -63,7 +63,7 @@ async fn chrome_configure_test() {
 
 #[tokio::test]
 #[stubr::mock("hello/hello.json")]
-async fn chrome_get_content_test() {
+async fn chrome_get_request_test() {
     let browser = ChromeBrowser::default();
     let url = Url::parse(&stubr.path("/hello")).unwrap();
 
@@ -75,7 +75,7 @@ async fn chrome_get_content_test() {
 #[tokio::test]
 #[stubr::mock("hello/hello-delayed.json")]
 #[should_panic]
-async fn chrome_get_content_timeout_test() {
+async fn chrome_get_request_timeout_test() {
     let config = RequesterConfig {
         timeout: Duration::from_millis(500),
         ..Default::default()
@@ -89,7 +89,7 @@ async fn chrome_get_content_timeout_test() {
 
 #[tokio::test]
 #[stubr::mock("hello/hello-with-headers.json")]
-async fn chrome_get_content_extra_header_test() {
+async fn chrome_get_request_extra_header_test() {
     let mut config = RequesterConfig::default();
 
     config.add_header(

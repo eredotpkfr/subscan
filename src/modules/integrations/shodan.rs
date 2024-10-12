@@ -18,13 +18,13 @@ pub const SHODAN_URL: &str = "https://api.shodan.io";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                                 |
-/// |:------------------:|:-------------------------------------:|
-/// | Module Name        | `shodan`                              |
-/// | Doc URL            | <https://shodan.io>                   |
+/// | Property           | Value                                        |
+/// |:------------------:|:--------------------------------------------:|
+/// | Module Name        | `shodan`                                     |
+/// | Doc URL            | <https://shodan.io>                          |
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsQueryParam`] |
-/// | Requester          | [`HTTPClient`]                        |
-/// | Extractor          | [`JSONExtractor`]                     |
+/// | Requester          | [`HTTPClient`]                               |
+/// | Extractor          | [`JSONExtractor`]                            |
 pub struct Shodan {}
 
 impl Shodan {

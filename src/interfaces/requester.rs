@@ -12,7 +12,7 @@ use reqwest::Url;
 ///
 /// Other requesters that will be implemented in the future
 /// must conform to this interface. Mostly use to get
-/// string content from any URL with a single stupid `get_content`
+/// string content from any URL with a single stupid `get_request`
 /// method
 ///
 /// # Examples
@@ -40,7 +40,7 @@ use reqwest::Url;
 ///         self.config = config;
 ///     }
 ///
-///     async fn get_content(&self, url: Url) -> Content {
+///     async fn get_request(&self, url: Url) -> Content {
 ///         Content::from("foo")
 ///     }
 /// }
@@ -54,7 +54,7 @@ use reqwest::Url;
 ///     };
 ///
 ///     let config = requester.config().await.clone();
-///     let content = requester.get_content(url).await;
+///     let content = requester.get_request(url).await;
 ///
 ///     assert_eq!(content.as_string(), "foo");
 ///     assert_eq!(config.proxy, None);

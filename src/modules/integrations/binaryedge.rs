@@ -18,13 +18,13 @@ pub const BINARYEDGE_URL: &str = "https://api.binaryedge.io/v2/query/domains/sub
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                             |
-/// |:------------------:|:---------------------------------:|
-/// | Module Name        | `binaryedge`                      |
-/// | Doc URL            | <https://www.binaryedge.io>       |
+/// | Property           | Value                                    |
+/// |:------------------:|:----------------------------------------:|
+/// | Module Name        | `binaryedge`                             |
+/// | Doc URL            | <https://www.binaryedge.io>              |
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
-/// | Requester          | [`HTTPClient`]                    |
-/// | Extractor          | [`JSONExtractor`]                 |
+/// | Requester          | [`HTTPClient`]                           |
+/// | Extractor          | [`JSONExtractor`]                        |
 pub struct BinaryEdge {}
 
 impl BinaryEdge {

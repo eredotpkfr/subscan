@@ -17,13 +17,13 @@ pub const CHAOS_URL: &str = "https://dns.projectdiscovery.io/dns";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                               |
-/// |:------------------:|:-----------------------------------:|
-/// | Module Name        | `chaos`                             |
-/// | Doc URL            | <https://cloud.projectdiscovery.io> |
-/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`]   |
-/// | Requester          | [`HTTPClient`]                      |
-/// | Extractor          | [`JSONExtractor`]                   |
+/// | Property           | Value                                    |
+/// |:------------------:|:----------------------------------------:|
+/// | Module Name        | `chaos`                                  |
+/// | Doc URL            | <https://cloud.projectdiscovery.io>      |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
+/// | Requester          | [`HTTPClient`]                           |
+/// | Extractor          | [`JSONExtractor`]                        |
 pub struct Chaos {}
 
 impl Chaos {

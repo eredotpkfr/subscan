@@ -22,24 +22,27 @@ mod modules {
 
     #[tokio::test]
     async fn configure_all_requesters_test() {
+        let headers = HeaderMap::from_iter([
+            (USER_AGENT, USER_AGENT_VALUE),
+            (CONTENT_LENGTH, CONTENT_LENGTH_VALUE),
+        ]);
+        let credentials = Credentials {
+            username: Env {
+                name: "USERNAME".into(),
+                value: Some("foo".to_string()),
+            },
+            password: Env {
+                name: "PASSWORD".into(),
+                value: None,
+            },
+        };
+
         let old_config = RequesterConfig::default();
         let new_config = RequesterConfig {
             timeout: Duration::from_secs(120),
-            headers: HeaderMap::from_iter([
-                (USER_AGENT, USER_AGENT_VALUE),
-                (CONTENT_LENGTH, CONTENT_LENGTH_VALUE),
-            ]),
+            headers,
             proxy: Some(TEST_URL.to_string()),
-            credentials: Credentials {
-                username: Env {
-                    name: "USERNAME".into(),
-                    value: Some("foo".to_string()),
-                },
-                password: Env {
-                    name: "PASSWORD".into(),
-                    value: None,
-                },
-            },
+            credentials,
         };
 
         for module in cache::ALL_MODULES.iter() {

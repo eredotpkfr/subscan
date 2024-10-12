@@ -21,7 +21,7 @@ pub const VIRUSTOTAL_URL: &str = "https://www.virustotal.com/api/v3/domains";
 /// |:------------------:|:--------------------------------------------:|
 /// | Module Name        | `virustotal`                                 |
 /// | Doc URL            | <https://www.virustotal.com/gui/home/upload> |
-/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`]            |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`]     |
 /// | Requester          | [`HTTPClient`]                               |
 /// | Extractor          | [`JSONExtractor`]                            |
 pub struct VirusTotal {}

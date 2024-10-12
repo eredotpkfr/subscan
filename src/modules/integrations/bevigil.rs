@@ -17,13 +17,13 @@ pub const BEVIGIL_URL: &str = "https://osint.bevigil.com/api";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                             |
-/// |:------------------:|:---------------------------------:|
-/// | Module Name        | `bevigil`                         |
-/// | Doc URL            | <https://bevigil.com>             |
+/// | Property           | Value                                    |
+/// |:------------------:|:----------------------------------------:|
+/// | Module Name        | `bevigil`                                |
+/// | Doc URL            | <https://bevigil.com>                    |
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
-/// | Requester          | [`HTTPClient`]                    |
-/// | Extractor          | [`JSONExtractor`]                 |
+/// | Requester          | [`HTTPClient`]                           |
+/// | Extractor          | [`JSONExtractor`]                        |
 pub struct Bevigil {}
 
 impl Bevigil {

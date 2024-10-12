@@ -17,13 +17,13 @@ pub const BUILTWITH_URL: &str = "https://api.builtwith.com/v21/api.json";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                                 |
-/// |:------------------:|:-------------------------------------:|
-/// | Module Name        | `builtwith`                           |
-/// | Doc URL            | <https://api.builtwith.com>           |
+/// | Property           | Value                                        |
+/// |:------------------:|:--------------------------------------------:|
+/// | Module Name        | `builtwith`                                  |
+/// | Doc URL            | <https://api.builtwith.com>                  |
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsQueryParam`] |
-/// | Requester          | [`HTTPClient`]                        |
-/// | Extractor          | [`JSONExtractor`]                     |
+/// | Requester          | [`HTTPClient`]                               |
+/// | Extractor          | [`JSONExtractor`]                            |
 pub struct BuiltWith {}
 
 impl BuiltWith {

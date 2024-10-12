@@ -19,13 +19,13 @@ pub const ZOOMEYE_URL: &str = "https://api.zoomeye.hk/domain/search";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                             |
-/// |:------------------:|:---------------------------------:|
-/// | Module Name        | `zoomeye`                         |
-/// | Doc URL            | <https://www.zoomeye.hk>          |
+/// | Property           | Value                                    |
+/// |:------------------:|:----------------------------------------:|
+/// | Module Name        | `zoomeye`                                |
+/// | Doc URL            | <https://www.zoomeye.hk>                 |
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
-/// | Requester          | [`HTTPClient`]                    |
-/// | Extractor          | [`JSONExtractor`]                 |
+/// | Requester          | [`HTTPClient`]                           |
+/// | Extractor          | [`JSONExtractor`]                        |
 pub struct ZoomEye {}
 
 impl ZoomEye {

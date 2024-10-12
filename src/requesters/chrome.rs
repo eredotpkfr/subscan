@@ -40,9 +40,8 @@ impl ChromeBrowser {
     /// #[tokio::main]
     /// async fn main() {
     ///     let config = RequesterConfig {
-    ///         proxy: None,
-    ///         headers: HeaderMap::default(),
     ///         timeout: Duration::from_secs(60),
+    ///         ..Default::default()
     ///     };
     ///
     ///     let browser = ChromeBrowser::with_config(config);
@@ -130,8 +129,7 @@ impl RequesterInterface for ChromeBrowser {
     ///
     ///     let new_config = RequesterConfig {
     ///         timeout: Duration::from_secs(120),
-    ///         proxy: None,
-    ///         headers: HeaderMap::default(),
+    ///         ..Default::default()
     ///     };
     ///
     ///     browser.configure(new_config.clone()).await;
@@ -164,7 +162,7 @@ impl RequesterInterface for ChromeBrowser {
     ///     let mut browser = ChromeBrowser::default();
     ///     let url = Url::parse("https://foo.com").unwrap();
     ///
-    ///     let content = browser.get_content(url).await;
+    ///     let content = browser.get_request(url).await;
     ///
     ///     // do something with content
     /// }

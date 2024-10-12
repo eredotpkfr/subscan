@@ -19,13 +19,13 @@ pub const CERTSPOTTER_URL: &str = "https://api.certspotter.com/v1/issuances";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                             |
-/// |:------------------:|:---------------------------------:|
-/// | Module Name        | `certspotter`                     |
-/// | Doc URL            | <https://sslmate.com/certspotter> |
+/// | Property           | Value                                    |
+/// |:------------------:|:----------------------------------------:|
+/// | Module Name        | `certspotter`                            |
+/// | Doc URL            | <https://sslmate.com/certspotter>        |
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
-/// | Requester          | [`HTTPClient`]                    |
-/// | Extractor          | [`JSONExtractor`]                 |
+/// | Requester          | [`HTTPClient`]                           |
+/// | Extractor          | [`JSONExtractor`]                        |
 pub struct CertSpotter {}
 
 impl CertSpotter {

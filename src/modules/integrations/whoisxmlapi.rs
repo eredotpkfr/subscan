@@ -18,13 +18,13 @@ pub const WHOISXMLAPI_URL: &str = "https://subdomains.whoisxmlapi.com/api/v1";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                                 |
-/// |:------------------:|:-------------------------------------:|
-/// | Module Name        | `whoisxmlapi`                         |
-/// | Doc URL            | <https://www.whoisxmlapi.com>         |
+/// | Property           | Value                                        |
+/// |:------------------:|:--------------------------------------------:|
+/// | Module Name        | `whoisxmlapi`                                |
+/// | Doc URL            | <https://www.whoisxmlapi.com>                |
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsQueryParam`] |
-/// | Requester          | [`HTTPClient`]                        |
-/// | Extractor          | [`JSONExtractor`]                     |
+/// | Requester          | [`HTTPClient`]                               |
+/// | Extractor          | [`JSONExtractor`]                            |
 pub struct WhoisXMLAPI {}
 
 impl WhoisXMLAPI {

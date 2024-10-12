@@ -19,13 +19,13 @@ pub const BUFFEROVER_URL: &str = "https://tls.bufferover.run";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                             |
-/// |:------------------:|:---------------------------------:|
-/// | Module Name        | `bufferover`                      |
-/// | Doc URL            | <https://tls.bufferover.run>      |
+/// | Property           | Value                                    |
+/// |:------------------:|:----------------------------------------:|
+/// | Module Name        | `bufferover`                             |
+/// | Doc URL            | <https://tls.bufferover.run>             |
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
-/// | Requester          | [`HTTPClient`]                    |
-/// | Extractor          | [`JSONExtractor`]                 |
+/// | Requester          | [`HTTPClient`]                           |
+/// | Extractor          | [`JSONExtractor`]                        |
 pub struct BufferOver {}
 
 impl BufferOver {

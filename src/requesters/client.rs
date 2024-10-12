@@ -86,8 +86,7 @@ impl RequesterInterface for HTTPClient {
     ///
     ///     let new_config = RequesterConfig {
     ///         timeout: Duration::from_secs(120),
-    ///         proxy: None,
-    ///         headers: HeaderMap::default(),
+    ///         ..Default::default()
     ///     };
     ///
     ///     client.configure(new_config.clone()).await;
@@ -120,7 +119,7 @@ impl RequesterInterface for HTTPClient {
     ///     let mut client = HTTPClient::default();
     ///     let url = Url::parse("https://foo.com").unwrap();
     ///
-    ///     let content = client.get_content(url).await;
+    ///     let content = client.get_request(url).await;
     ///
     ///     // do something with content
     /// }
