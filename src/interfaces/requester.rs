@@ -81,6 +81,4 @@ pub trait RequesterInterface: Sync + Send {
     async fn configure(&mut self, config: RequesterConfig);
     /// HTTP GET method implementation to fetch HTML content from given source [`Url`]
     async fn get_request(&self, url: Url) -> Content;
-    /// HTTP POST method implementation to post data to any [`Url`]
-    async fn post_request(&self, url: Url) -> Content;
 }

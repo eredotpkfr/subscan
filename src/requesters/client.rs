@@ -151,8 +151,4 @@ impl RequesterInterface for HTTPClient {
         }
         Content::Empty
     }
-
-    async fn post_request(&self, _url: Url) -> Content {
-        Content::Empty
-    }
 }

@@ -194,8 +194,4 @@ impl RequesterInterface for ChromeBrowser {
 
         Content::String(content.unwrap_or_default())
     }
-
-    async fn post_request(&self, _url: Url) -> Content {
-        Content::Empty
-    }
 }
