@@ -74,7 +74,7 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
 
         loop {
             let url = query.as_url(self.url.clone(), &extra_params);
-            let response = requester.get_request(url).await;
+            let response = requester.get_content(url).await;
             let results = extractor.extract(response, domain).await;
 
             all_results.extend(results.clone());

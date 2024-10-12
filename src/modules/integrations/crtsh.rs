@@ -38,12 +38,11 @@ impl Crtsh {
 
         let generic = GenericIntegrationModule {
             name: CRTSH_MODULE_NAME.into(),
+            auth: AuthenticationMethod::NoAuthentication,
             funcs: GenericIntegrationCoreFuncs {
                 url: Box::new(Self::get_query_url),
                 next: Box::new(Self::get_next_url),
-                request: None,
             },
-            auth: AuthenticationMethod::NoAuthentication,
             components: SubscanModuleCoreComponents {
                 requester: requester.into(),
                 extractor: extractor.into(),

@@ -37,12 +37,11 @@ impl WhoisXMLAPI {
 
         let generic = GenericIntegrationModule {
             name: WHOISXMLAPI_MODULE_NAME.into(),
+            auth: AuthenticationMethod::APIKeyAsQueryParam("apiKey".into()),
             funcs: GenericIntegrationCoreFuncs {
                 url: Box::new(Self::get_query_url),
                 next: Box::new(Self::get_next_url),
-                request: None,
             },
-            auth: AuthenticationMethod::APIKeyAsQueryParam("apiKey".into()),
             components: SubscanModuleCoreComponents {
                 requester: requester.into(),
                 extractor: extractor.into(),

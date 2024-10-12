@@ -37,12 +37,11 @@ impl BinaryEdge {
 
         let generic = GenericIntegrationModule {
             name: BINARYEDGE_MODULE_NAME.into(),
+            auth: AuthenticationMethod::APIKeyAsHeader("X-Key".into()),
             funcs: GenericIntegrationCoreFuncs {
                 url: Box::new(Self::get_query_url),
                 next: Box::new(Self::get_next_url),
-                request: None,
             },
-            auth: AuthenticationMethod::APIKeyAsHeader("X-Key".into()),
             components: SubscanModuleCoreComponents {
                 requester: requester.into(),
                 extractor: extractor.into(),

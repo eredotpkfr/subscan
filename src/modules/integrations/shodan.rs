@@ -37,12 +37,11 @@ impl Shodan {
 
         let generic = GenericIntegrationModule {
             name: SHODAN_MODULE_NAME.into(),
+            auth: AuthenticationMethod::APIKeyAsQueryParam("key".into()),
             funcs: GenericIntegrationCoreFuncs {
                 url: Box::new(Self::get_query_url),
                 next: Box::new(Self::get_next_url),
-                request: None,
             },
-            auth: AuthenticationMethod::APIKeyAsQueryParam("key".into()),
             components: SubscanModuleCoreComponents {
                 requester: requester.into(),
                 extractor: extractor.into(),

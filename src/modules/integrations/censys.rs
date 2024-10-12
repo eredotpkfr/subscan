@@ -38,12 +38,11 @@ impl Censys {
 
         let generic = GenericIntegrationModule {
             name: CENSYS_MODULE_NAME.into(),
+            auth: AuthenticationMethod::APIKeyAsHeader("Authorization".into()),
             funcs: GenericIntegrationCoreFuncs {
                 url: Box::new(Self::get_query_url),
                 next: Box::new(Self::get_next_url),
-                request: None,
             },
-            auth: AuthenticationMethod::APIKeyAsHeader("Authorization".into()),
             components: SubscanModuleCoreComponents {
                 requester: requester.into(),
                 extractor: extractor.into(),

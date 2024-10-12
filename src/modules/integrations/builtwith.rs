@@ -36,12 +36,11 @@ impl BuiltWith {
 
         let generic = GenericIntegrationModule {
             name: BUILTWITH_MODULE_NAME.into(),
+            auth: AuthenticationMethod::APIKeyAsQueryParam("KEY".into()),
             funcs: GenericIntegrationCoreFuncs {
                 url: Box::new(Self::get_query_url),
                 next: Box::new(Self::get_next_url),
-                request: None,
             },
-            auth: AuthenticationMethod::APIKeyAsQueryParam("KEY".into()),
             components: SubscanModuleCoreComponents {
                 requester: requester.into(),
                 extractor: extractor.into(),

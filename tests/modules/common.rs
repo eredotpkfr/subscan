@@ -88,7 +88,6 @@ pub mod mocks {
         let funcs = GenericIntegrationCoreFuncs {
             url: wrap_url_with_mock_func(url),
             next: Box::new(|_, _| None),
-            request: None,
         };
 
         GenericIntegrationModule {

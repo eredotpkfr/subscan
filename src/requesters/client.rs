@@ -119,12 +119,12 @@ impl RequesterInterface for HTTPClient {
     ///     let mut client = HTTPClient::default();
     ///     let url = Url::parse("https://foo.com").unwrap();
     ///
-    ///     let content = client.get_request(url).await;
+    ///     let content = client.get_content(url).await;
     ///
     ///     // do something with content
     /// }
     /// ```
-    async fn get_request(&self, url: Url) -> Content {
+    async fn get_content(&self, url: Url) -> Content {
         let mut builder = self.client.get(url);
 
         // Set basic configurations

@@ -41,7 +41,6 @@ impl AlienVault {
             funcs: GenericIntegrationCoreFuncs {
                 url: Box::new(Self::get_query_url),
                 next: Box::new(Self::get_next_url),
-                request: None,
             },
             components: SubscanModuleCoreComponents {
                 requester: requester.into(),

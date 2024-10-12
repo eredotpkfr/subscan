@@ -36,12 +36,11 @@ impl VirusTotal {
 
         let generic = GenericIntegrationModule {
             name: VIRUSTOTAL_MODULE_NAME.into(),
+            auth: AuthenticationMethod::APIKeyAsHeader("X-APIKey".into()),
             funcs: GenericIntegrationCoreFuncs {
                 url: Box::new(Self::get_query_url),
                 next: Box::new(Self::get_next_url),
-                request: None,
             },
-            auth: AuthenticationMethod::APIKeyAsHeader("X-APIKey".into()),
             components: SubscanModuleCoreComponents {
                 requester: requester.into(),
                 extractor: extractor.into(),

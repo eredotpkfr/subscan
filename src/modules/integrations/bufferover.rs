@@ -38,12 +38,11 @@ impl BufferOver {
 
         let generic = GenericIntegrationModule {
             name: BUFFEROVER_MODULE_NAME.into(),
+            auth: AuthenticationMethod::APIKeyAsHeader("X-API-Key".into()),
             funcs: GenericIntegrationCoreFuncs {
                 url: Box::new(Self::get_query_url),
                 next: Box::new(Self::get_next_url),
-                request: None,
             },
-            auth: AuthenticationMethod::APIKeyAsHeader("X-API-Key".into()),
             components: SubscanModuleCoreComponents {
                 requester: requester.into(),
                 extractor: extractor.into(),
