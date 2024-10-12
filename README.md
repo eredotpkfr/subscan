@@ -15,7 +15,7 @@
   </a>
   <a href="https://app.codecov.io/gh/eredotpkfr/subscan">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/codecov/c/gh/eredotpkfr/subscan?labelColor=dc0000&color=e6e6e6&logo=codecov&logoColor=wihte">
+      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/codecov/c/gh/eredotpkfr/subscan?labelColor=dc0000&color=e6e6e6&logo=codecov&logoColor=white">
       <img alt="Codecov Status" src="https://img.shields.io/codecov/c/gh/eredotpkfr/subscan?labelColor=42445a&color=e6e6e6&logo=codecov&logoColor=white">
     </picture>
   </a>
