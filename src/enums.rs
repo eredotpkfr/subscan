@@ -1,6 +1,9 @@
 use crate::{
     extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor},
-    modules::generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
+    modules::{
+        generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
+        integrations::commoncrawl::CommonCrawl,
+    },
     requesters::{chrome::ChromeBrowser, client::HTTPClient},
     types::env::Credentials,
 };
@@ -30,6 +33,8 @@ pub enum SubscanModuleDispatcher {
     /// engine modules at the same time. Just modules should be implemented as
     /// a [`GenericSearchEngineModule`]
     GenericSearchEngineModule(GenericSearchEngineModule),
+    /// Non-generic `CommonCrawl` integration variant
+    CommonCrawl(CommonCrawl),
 }
 
 /// Dispatcher enumeration to decide extractor types
@@ -125,6 +130,12 @@ pub enum Content {
     /// Empty content type
     #[default]
     Empty,
+}
+
+impl From<String> for Content {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
 }
 
 impl From<&str> for Content {

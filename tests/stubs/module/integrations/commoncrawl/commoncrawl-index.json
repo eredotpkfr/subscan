@@ -1,0 +1,39 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/commoncrawl/index"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": [
+            {
+                "cdx-api": "http://localhost:1111/{{request.pathSegments.[0]}}/cdx-1",
+                "id": "{{now format='yyyy/MM/dd'}}"
+            },
+            {
+                "cdx-api": "http://localhost:1111/{{request.pathSegments.[0]}}/cdx-2",
+                "id": "{{now format='yyyy/MM/dd'}}"
+            },
+            {
+                "cdx-api": "http://localhost:1111/{{request.pathSegments.[0]}}/cdx-3",
+                "id": "{{now offset='-3 years'}}"
+            },
+            {
+                "cdx-api": "http://localhost:1111/{{request.pathSegments.[0]}}/cdx-4",
+                "id": "{{now format='yyyy/MM/dd'}}"
+            },
+            {
+                "no-id-field": "foo"
+            },
+            {
+                "no-cdx-api-field": "foo"
+            }
+        ],
+        "status": 200,
+        "transformers": [
+            "response-template"
+        ]
+    }
+}

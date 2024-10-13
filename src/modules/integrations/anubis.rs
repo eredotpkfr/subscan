@@ -27,6 +27,7 @@ pub const ANUBIS_URL: &str = "https://jonlu.ca/anubis/subdomains";
 /// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
 /// | Requester          | [`HTTPClient`]                             |
 /// | Extractor          | [`JSONExtractor`]                          |
+/// | Generic            | [`GenericIntegrationModule`]               |
 pub struct Anubis {}
 
 impl Anubis {

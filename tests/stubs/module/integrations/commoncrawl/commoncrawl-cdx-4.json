@@ -1,0 +1,19 @@
+{
+    "request": {
+        "method": "GET",
+        "queryParameters": {
+            "url": {
+                "equalTo": "*.foo.com"
+            }
+        },
+        "urlPath": "/commoncrawl/cdx-4"
+    },
+    "response": {
+        "body": "bar.foo.com",
+        "fixedDelayMilliseconds": 100,
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}

@@ -27,6 +27,7 @@ pub const CHAOS_URL: &str = "https://dns.projectdiscovery.io/dns";
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
 /// | Requester          | [`HTTPClient`]                           |
 /// | Extractor          | [`JSONExtractor`]                        |
+/// | Generic            | [`GenericIntegrationModule`]             |
 pub struct Chaos {}
 
 impl Chaos {

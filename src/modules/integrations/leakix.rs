@@ -28,6 +28,7 @@ pub const LEAKIX_URL: &str = "https://leakix.net/api";
 /// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
 /// | Requester          | [`HTTPClient`]                             |
 /// | Extractor          | [`JSONExtractor`]                          |
+/// | Generic            | [`GenericIntegrationModule`]               |
 pub struct Leakix {}
 
 impl Leakix {

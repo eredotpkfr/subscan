@@ -1,6 +1,9 @@
 use crate::{
     enums::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-    modules::generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
+    modules::{
+        generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
+        integrations::commoncrawl::CommonCrawl,
+    },
     types::env::SubscanModuleEnvs,
 };
 use async_trait::async_trait;

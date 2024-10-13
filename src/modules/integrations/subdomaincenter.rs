@@ -28,6 +28,7 @@ pub const SUBDOMAINCENTER_URL: &str = "https://api.subdomain.center";
 /// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
 /// | Requester          | [`HTTPClient`]                             |
 /// | Extractor          | [`JSONExtractor`]                          |
+/// | Generic            | [`GenericIntegrationModule`]               |
 pub struct SubdomainCenter {}
 
 impl SubdomainCenter {
