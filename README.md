@@ -1,8 +1,8 @@
 <!-- markdownlint-disable MD033 MD041 -->
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/eredotpkfr/subscan/blob/main/assets/logo-light.png">
-    <img alt="Subscan Logo" height="105px" src="https://github.com/eredotpkfr/subscan/blob/main/assets/logo-dark.png">
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/eredotpkfr/subscan/blob/badges/assets/logo-light.png">
+    <img alt="Subscan Logo" height="105px" src="https://github.com/eredotpkfr/subscan/blob/badges/assets/logo-dark.png">
   </picture>
 </div>
 <br>
