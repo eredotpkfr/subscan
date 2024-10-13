@@ -27,9 +27,12 @@ pub const COMMONCRAWL_INDEX_URL: &str = "https://index.commoncrawl.org/collinfo.
 /// | Extractor          | [`RegexExtractor`]                         |
 /// | Is Generic?        | [`None`]                                   |
 pub struct CommonCrawl {
-    name: String,
-    url: Url,
-    components: SubscanModuleCoreComponents,
+    /// Module name
+    pub name: String,
+    /// Base index URL
+    pub url: Url,
+    /// Core components
+    pub components: SubscanModuleCoreComponents,
 }
 
 impl CommonCrawl {
@@ -108,12 +111,16 @@ impl SubscanModuleInterface for CommonCrawl {
                     let reader = StreamReader::new(stream);
                     let mut lines = reader.lines();
 
-                    while let Ok(line) = lines.next_line().await {
-                        if let SubdomainExtractorDispatcher::RegexExtractor(ext) = extractor {
-                            if let Some(sub) = ext.extract_one(line.unwrap_or_default(), domain) {
-                                all_results.insert(sub);
+                    if let SubdomainExtractorDispatcher::RegexExtractor(ext) = extractor {
+                        while let Ok(next_line) = lines.next_line().await {
+                            if let Some(line) = next_line {
+                                if let Some(sub) = ext.extract_one(line, domain) {
+                                    all_results.insert(sub);
+                                }
+                            } else {
+                                break;
                             }
-                        };
+                        }
                     }
                 } else {
                     continue;

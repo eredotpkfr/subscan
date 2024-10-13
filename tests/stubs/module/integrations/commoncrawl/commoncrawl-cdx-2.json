@@ -1,0 +1,21 @@
+{
+    "request": {
+        "method": "GET",
+        "queryParameters": {
+            "url": {
+                "equalTo": "*.foo.com"
+            }
+        },
+        "urlPath": "/commoncrawl/cdx-2"
+    },
+    "response": {
+        "body": "baz.foo.com",
+        "headers": {
+            "accept-ranges": "bytes",
+            "connection": "keep-alive",
+            "content-length": 11,
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}
