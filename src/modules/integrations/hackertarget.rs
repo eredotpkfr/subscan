@@ -22,6 +22,7 @@ pub const HACKERTARGET_URL: &str = "https://api.hackertarget.com/hostsearch";
 /// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
 /// | Requester          | [`HTTPClient`]                             |
 /// | Extractor          | [`RegexExtractor`]                         |
+/// | Is Generic?        | [`GenericIntegrationModule`]               |
 pub struct HackerTarget {}
 
 impl HackerTarget {

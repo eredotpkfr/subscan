@@ -12,8 +12,10 @@ const PROXY_PARSE_ERR: &str = "Cannot parse proxy!";
 /// Also its compatible with [`RequesterInterface`]
 #[derive(Default)]
 pub struct HTTPClient {
-    config: RequesterConfig,
-    client: Client,
+    /// HTTP client configurations as a [`RequesterConfig`]
+    pub config: RequesterConfig,
+    /// [`reqwest::Client`] instance
+    pub client: Client,
 }
 
 impl HTTPClient {

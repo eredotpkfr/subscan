@@ -24,6 +24,7 @@ pub const DIGITORUS_SUBDOMAIN_TAG: &str = "main > div:nth-last-child(3) > div > 
 /// | Authentication     | [`AuthenticationMethod::NoAuthentication`]     |
 /// | Requester          | [`HTTPClient`]                                 |
 /// | Extractor          | [`HTMLExtractor`]                              |
+/// | Is Generic?        | [`GenericIntegrationModule`]                   |
 pub struct Digitorus {}
 
 impl Digitorus {

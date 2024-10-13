@@ -109,6 +109,7 @@ pub mod mocks {
             SubscanModuleDispatcher::GenericIntegrationModule(module) => {
                 module.funcs.url = wrap_url_with_mock_func(url)
             }
+            SubscanModuleDispatcher::CommonCrawl(_module) => {}
         }
     }
 }

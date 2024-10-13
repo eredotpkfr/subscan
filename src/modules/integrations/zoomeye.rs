@@ -29,6 +29,7 @@ pub const ZOOMEYE_URL: &str = "https://api.zoomeye.hk/domain/search";
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
 /// | Requester          | [`HTTPClient`]                           |
 /// | Extractor          | [`JSONExtractor`]                        |
+/// | Is Generic?        | [`GenericIntegrationModule`]             |
 pub struct ZoomEye {}
 
 impl ZoomEye {

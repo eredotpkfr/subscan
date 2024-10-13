@@ -24,6 +24,7 @@ pub const SITEDOSSIER_SUBDOMAIN_TAG: &str = "ol > li > a";
 /// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
 /// | Requester          | [`HTTPClient`]                             |
 /// | Extractor          | [`HTMLExtractor`]                          |
+/// | Is Generic?        | [`GenericIntegrationModule`]               |
 pub struct Sitedossier {}
 
 impl Sitedossier {

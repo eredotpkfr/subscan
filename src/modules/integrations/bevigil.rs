@@ -27,6 +27,7 @@ pub const BEVIGIL_URL: &str = "https://osint.bevigil.com/api";
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
 /// | Requester          | [`HTTPClient`]                           |
 /// | Extractor          | [`JSONExtractor`]                        |
+/// | Is Generic?        | [`GenericIntegrationModule`]             |
 pub struct Bevigil {}
 
 impl Bevigil {
