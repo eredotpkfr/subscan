@@ -7,6 +7,7 @@ use reqwest::Url;
 use serde_json::Value;
 use std::{collections::BTreeSet, env};
 use subscan::{
+    enums::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::zoomeye::{ZoomEye, ZOOMEYE_URL},
 };
@@ -40,12 +41,12 @@ async fn get_query_url_test() {
 async fn get_next_url_test() {
     let url = Url::parse(TEST_URL).unwrap();
 
-    let mut next = ZoomEye::get_next_url(url.clone(), Value::Null).unwrap();
+    let mut next = ZoomEye::get_next_url(url.clone(), Content::Empty).unwrap();
     let mut expected = Url::parse(&format!("{TEST_URL}/?page=2")).unwrap();
 
     assert_eq!(next, expected);
 
-    next = ZoomEye::get_next_url(next, Value::Null).unwrap();
+    next = ZoomEye::get_next_url(next, Content::Empty).unwrap();
     expected = Url::parse(&format!("{TEST_URL}/?page=3")).unwrap();
 
     assert_eq!(next, expected);

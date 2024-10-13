@@ -7,6 +7,7 @@ use reqwest::Url;
 use serde_json::Value;
 use std::{collections::BTreeSet, env};
 use subscan::{
+    enums::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::certspotter::{CertSpotter, CERTSPOTTER_URL},
 };
@@ -45,7 +46,7 @@ async fn get_query_url_test() {
 #[tokio::test]
 async fn get_next_url_test() {
     let url = TEST_URL.parse().unwrap();
-    let next = CertSpotter::get_next_url(url, Value::Null);
+    let next = CertSpotter::get_next_url(url, Content::Empty);
 
     assert!(next.is_none());
 }

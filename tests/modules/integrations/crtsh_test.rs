@@ -6,6 +6,7 @@ use crate::common::{
 use serde_json::Value;
 use std::collections::BTreeSet;
 use subscan::{
+    enums::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::crtsh::{Crtsh, CRTSH_URL},
 };
@@ -33,7 +34,7 @@ async fn get_query_url_test() {
 #[tokio::test]
 async fn get_next_url_test() {
     let url = TEST_URL.parse().unwrap();
-    let next = Crtsh::get_next_url(url, Value::Null);
+    let next = Crtsh::get_next_url(url, Content::Empty);
 
     assert!(next.is_none());
 }

@@ -1,5 +1,5 @@
 use crate::{
-    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -55,7 +55,7 @@ impl BinaryEdge {
         format!("{BINARYEDGE_URL}/{domain}")
     }
 
-    pub fn get_next_url(mut url: Url, _content: Value) -> Option<Url> {
+    pub fn get_next_url(mut url: Url, _content: Content) -> Option<Url> {
         let page_param = url.query_pairs().find(|item| item.0 == "page");
 
         if let Some(page) = page_param {

@@ -3,10 +3,9 @@ use crate::common::{
     mocks::generic_integration,
 };
 use reqwest::Url;
-use serde_json::Value;
 use std::env;
 use subscan::{
-    enums::AuthenticationMethod,
+    enums::{AuthenticationMethod, Content},
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     types::env::{Credentials, Env},
 };
@@ -29,7 +28,7 @@ async fn attribute_test() {
     assert!(module.requester().await.is_some());
     assert!(module.extractor().await.is_some());
 
-    assert!((module.funcs.next)(TEST_URL.parse().unwrap(), Value::Null).is_none());
+    assert!((module.funcs.next)(TEST_URL.parse().unwrap(), Content::Empty).is_none());
 }
 
 #[tokio::test]

@@ -1,5 +1,5 @@
 use crate::{
-    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -54,9 +54,9 @@ impl VirusTotal {
         format!("{VIRUSTOTAL_URL}/{domain}/subdomains?limit=250")
     }
 
-    pub fn get_next_url(_url: Url, content: Value) -> Option<Url> {
-        if let Some(next_url) = content["links"]["next"].as_str() {
-            Url::parse(next_url).ok()
+    pub fn get_next_url(_url: Url, content: Content) -> Option<Url> {
+        if let Some(next_url) = content.as_json()["links"]["next"].as_str() {
+            next_url.parse().ok()
         } else {
             None
         }

@@ -7,6 +7,7 @@ use reqwest::Url;
 use serde_json::{json, Value};
 use std::{collections::BTreeSet, env};
 use subscan::{
+    enums::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::censys::{Censys, CENSYS_URL},
 };
@@ -41,11 +42,11 @@ async fn get_next_url_test() {
     let json = json!({"result": {"links": {"next": "foo"}}});
     let expected = Url::parse(&format!("{TEST_URL}/?cursor=foo")).unwrap();
 
-    let mut next = Censys::get_next_url(url.clone(), Value::Null);
+    let mut next = Censys::get_next_url(url.clone(), Content::Empty);
 
     assert!(next.is_none());
 
-    next = Censys::get_next_url(url, json);
+    next = Censys::get_next_url(url, json.into());
 
     assert_eq!(next.unwrap(), expected);
 }

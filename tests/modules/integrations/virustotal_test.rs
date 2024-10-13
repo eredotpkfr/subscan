@@ -7,6 +7,7 @@ use reqwest::Url;
 use serde_json::{json, Value};
 use std::{collections::BTreeSet, env};
 use subscan::{
+    enums::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::virustotal::{VirusTotal, VIRUSTOTAL_URL},
 };
@@ -41,11 +42,11 @@ async fn get_next_url_test() {
     let expected = Url::parse("https://bar.com").unwrap();
     let json = json!({"links": {"next": "https://bar.com"}});
 
-    let mut next = VirusTotal::get_next_url(url.clone(), Value::Null);
+    let mut next = VirusTotal::get_next_url(url.clone(), Content::Empty);
 
     assert!(next.is_none());
 
-    next = VirusTotal::get_next_url(url, json);
+    next = VirusTotal::get_next_url(url, json.into());
 
     assert_eq!(next.unwrap(), expected);
 }

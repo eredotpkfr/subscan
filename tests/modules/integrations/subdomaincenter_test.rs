@@ -7,6 +7,7 @@ use crate::common::{
 };
 use serde_json::Value;
 use subscan::{
+    enums::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::subdomaincenter::{SubdomainCenter, SUBDOMAINCENTER_URL},
 };
@@ -34,7 +35,7 @@ async fn get_query_url_test() {
 #[tokio::test]
 async fn get_next_url_test() {
     let url = TEST_URL.parse().unwrap();
-    let next = SubdomainCenter::get_next_url(url, Value::Null);
+    let next = SubdomainCenter::get_next_url(url, Content::Empty);
 
     assert!(next.is_none());
 }

@@ -1,12 +1,11 @@
 use crate::{
-    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::html::HTMLExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{core::SubscanModuleCoreComponents, func::GenericIntegrationCoreFuncs},
 };
 use reqwest::Url;
-use serde_json::Value;
 
 pub const DIGITORUS_MODULE_NAME: &str = "digitorus";
 pub const DIGITORUS_URL: &str = "https://certificatedetails.com";
@@ -53,7 +52,7 @@ impl Digitorus {
         format!("{DIGITORUS_URL}/{domain}")
     }
 
-    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
+    pub fn get_next_url(_url: Url, _content: Content) -> Option<Url> {
         None
     }
 }

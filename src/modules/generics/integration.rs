@@ -127,7 +127,7 @@ impl SubscanModuleInterface for GenericIntegrationModule {
 
             all_results.extend(news);
 
-            if let Some(next_url) = (self.funcs.next)(url.clone(), content.as_json()) {
+            if let Some(next_url) = (self.funcs.next)(url.clone(), content.clone()) {
                 url = next_url;
             } else {
                 break;

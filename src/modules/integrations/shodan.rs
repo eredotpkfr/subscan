@@ -1,5 +1,5 @@
 use crate::{
-    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -55,8 +55,8 @@ impl Shodan {
         format!("{SHODAN_URL}/dns/domain/{domain}")
     }
 
-    pub fn get_next_url(mut url: Url, content: Value) -> Option<Url> {
-        if let Some(more) = content["more"].as_bool() {
+    pub fn get_next_url(mut url: Url, content: Content) -> Option<Url> {
+        if let Some(more) = content.as_json()["more"].as_bool() {
             if !more {
                 None
             } else {

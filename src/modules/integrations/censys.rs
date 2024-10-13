@@ -1,5 +1,5 @@
 use crate::{
-    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -56,8 +56,8 @@ impl Censys {
         format!("{CENSYS_URL}?q={domain}")
     }
 
-    pub fn get_next_url(mut url: Url, content: Value) -> Option<Url> {
-        if let Some(cursor) = content["result"]["links"]["next"].as_str() {
+    pub fn get_next_url(mut url: Url, content: Content) -> Option<Url> {
+        if let Some(cursor) = content.as_json()["result"]["links"]["next"].as_str() {
             http::update_url_query(&mut url, "cursor", cursor);
             Some(url)
         } else {

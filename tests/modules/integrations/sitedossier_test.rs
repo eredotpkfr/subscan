@@ -2,8 +2,8 @@ use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mocks,
 };
-use serde_json::Value;
 use subscan::{
+    enums::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::sitedossier::{Sitedossier, SITEDOSSIER_URL},
 };
@@ -31,7 +31,7 @@ async fn get_query_url_test() {
 #[tokio::test]
 async fn get_next_url_test() {
     let url = TEST_URL.parse().unwrap();
-    let next = Sitedossier::get_next_url(url, Value::Null);
+    let next = Sitedossier::get_next_url(url, Content::Empty);
 
     assert!(next.is_none());
 }

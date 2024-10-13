@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -59,7 +59,7 @@ impl ZoomEye {
         url.unwrap().to_string()
     }
 
-    pub fn get_next_url(mut url: Url, _content: Value) -> Option<Url> {
+    pub fn get_next_url(mut url: Url, _content: Content) -> Option<Url> {
         let page_param = url.query_pairs().find(|item| item.0 == "page");
 
         if let Some(page) = page_param {
