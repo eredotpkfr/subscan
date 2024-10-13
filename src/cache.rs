@@ -30,6 +30,7 @@ lazy_static! {
         Mutex::new(censys::Censys::dispatcher()),
         Mutex::new(certspotter::CertSpotter::dispatcher()),
         Mutex::new(chaos::Chaos::dispatcher()),
+        Mutex::new(commoncrawl::CommonCrawl::dispatcher()),
         Mutex::new(crtsh::Crtsh::dispatcher()),
         Mutex::new(digitorus::Digitorus::dispatcher()),
         Mutex::new(hackertarget::HackerTarget::dispatcher()),
@@ -41,7 +42,6 @@ lazy_static! {
         Mutex::new(virustotal::VirusTotal::dispatcher()),
         Mutex::new(whoisxmlapi::WhoisXMLAPI::dispatcher()),
         Mutex::new(zoomeye::ZoomEye::dispatcher()),
-        Mutex::new(commoncrawl::CommonCrawl::dispatcher()),
     ];
 }
 
