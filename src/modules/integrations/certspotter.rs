@@ -29,7 +29,7 @@ pub const CERTSPOTTER_URL: &str = "https://api.certspotter.com/v1/issuances";
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
 /// | Requester          | [`HTTPClient`]                           |
 /// | Extractor          | [`JSONExtractor`]                        |
-/// | Is Generic?        | [`GenericIntegrationModule`]             |
+/// | Generic            | [`GenericIntegrationModule`]             |
 pub struct CertSpotter {}
 
 impl CertSpotter {

@@ -28,7 +28,7 @@ pub const THREATCROWD_URL: &str = "http://ci-www.threatcrowd.org/searchApi/v2/do
 /// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
 /// | Requester          | [`HTTPClient`]                             |
 /// | Extractor          | [`JSONExtractor`]                          |
-/// | Is Generic?        | [`GenericIntegrationModule`]               |
+/// | Generic            | [`GenericIntegrationModule`]               |
 pub struct ThreatCrowd {}
 
 impl ThreatCrowd {

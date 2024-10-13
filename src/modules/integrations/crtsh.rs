@@ -29,7 +29,7 @@ pub const CRTSH_URL: &str = "https://crt.sh";
 /// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
 /// | Requester          | [`HTTPClient`]                             |
 /// | Extractor          | [`JSONExtractor`]                          |
-/// | Is Generic?        | [`GenericIntegrationModule`]               |
+/// | Generic            | [`GenericIntegrationModule`]               |
 pub struct Crtsh {}
 
 impl Crtsh {

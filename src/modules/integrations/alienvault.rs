@@ -28,7 +28,7 @@ pub const ALIENVAULT_URL: &str = "https://otx.alienvault.com/api/v1/indicators/d
 /// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
 /// | Requester          | [`HTTPClient`]                             |
 /// | Extractor          | [`JSONExtractor`]                          |
-/// | Is Generic?        | [`GenericIntegrationModule`]               |
+/// | Generic            | [`GenericIntegrationModule`]               |
 pub struct AlienVault {}
 
 impl AlienVault {

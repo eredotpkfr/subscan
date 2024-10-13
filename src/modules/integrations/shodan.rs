@@ -28,7 +28,7 @@ pub const SHODAN_URL: &str = "https://api.shodan.io";
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsQueryParam`] |
 /// | Requester          | [`HTTPClient`]                               |
 /// | Extractor          | [`JSONExtractor`]                            |
-/// | Is Generic?        | [`GenericIntegrationModule`]                 |
+/// | Generic            | [`GenericIntegrationModule`]                 |
 pub struct Shodan {}
 
 impl Shodan {

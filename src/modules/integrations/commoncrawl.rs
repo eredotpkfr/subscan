@@ -1,7 +1,10 @@
 use crate::{
     enums::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
     extractors::regex::RegexExtractor,
-    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
+    interfaces::{
+        extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
+        requester::RequesterInterface,
+    },
     requesters::client::HTTPClient,
     types::core::SubscanModuleCoreComponents,
 };
@@ -25,7 +28,7 @@ pub const COMMONCRAWL_INDEX_URL: &str = "https://index.commoncrawl.org/collinfo.
 /// | Doc URL            | <https://commoncrawl.org>                  |
 /// | Requester          | [`HTTPClient`]                             |
 /// | Extractor          | [`RegexExtractor`]                         |
-/// | Is Generic?        | [`None`]                                   |
+/// | Generic            | [`None`]                                   |
 pub struct CommonCrawl {
     /// Module name
     pub name: String,
@@ -42,15 +45,16 @@ impl CommonCrawl {
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: RegexExtractor = RegexExtractor::default();
 
-        Self {
+        let commoncrawl = Self {
             name: COMMONCRAWL_MODULE_NAME.into(),
             url: url.unwrap(),
             components: SubscanModuleCoreComponents {
                 requester: requester.into(),
                 extractor: extractor.into(),
             },
-        }
-        .into()
+        };
+
+        commoncrawl.into()
     }
 
     pub fn extract_cdx_urls(&self, json: Value, year: &str) -> BTreeSet<String> {
@@ -90,14 +94,13 @@ impl SubscanModuleInterface for CommonCrawl {
         let requester = self.components.requester.lock().await;
         let extractor = &self.components.extractor;
 
-        let year = chrono::Utc::now().year().to_string();
-        let query = format!("*.{}", domain);
-        let content = requester.get_content(self.url.clone()).await;
+        if let RequesterDispatcher::HTTPClient(requester) = &*requester {
+            let year = chrono::Utc::now().year().to_string();
+            let query = format!("*.{}", domain);
+            let content = requester.get_content(self.url.clone()).await;
 
-        for cdx in self.extract_cdx_urls(content.as_json(), &year) {
-            let cdx_url = Url::parse_with_params(&cdx, &[("url", &query)]);
-
-            if let RequesterDispatcher::HTTPClient(requester) = &*requester {
+            for cdx in self.extract_cdx_urls(content.as_json(), &year) {
+                let cdx_url = Url::parse_with_params(&cdx, &[("url", &query)]);
                 let request = requester
                     .client
                     .get(cdx_url.unwrap())
@@ -111,15 +114,11 @@ impl SubscanModuleInterface for CommonCrawl {
                     let reader = StreamReader::new(stream);
                     let mut lines = reader.lines();
 
-                    if let SubdomainExtractorDispatcher::RegexExtractor(ext) = extractor {
-                        while let Ok(next_line) = lines.next_line().await {
-                            if let Some(line) = next_line {
-                                if let Some(sub) = ext.extract_one(line, domain) {
-                                    all_results.insert(sub);
-                                }
-                            } else {
-                                break;
-                            }
+                    while let Ok(next_line) = lines.next_line().await {
+                        if let Some(line) = next_line {
+                            all_results.extend(extractor.extract(line.into(), domain).await);
+                        } else {
+                            break;
                         }
                     }
                 } else {

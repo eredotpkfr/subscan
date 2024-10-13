@@ -25,7 +25,7 @@ pub const GOOGLE_CITE_TAG: &str = "cite";
 /// | Subdomain Selector | `cite`                          |
 /// | Requester          | [`HTTPClient`]                  |
 /// | Extractor          | [`HTMLExtractor`]               |
-/// | Is Generic?        | [`GenericSearchEngineModule`]   |
+/// | Generic            | [`GenericSearchEngineModule`]   |
 pub struct Google {}
 
 impl Google {

@@ -23,7 +23,7 @@ async fn extract_cdx_urls_test() {
             {"no-id-field": TEST_URL},
             {"id": "2024", "cdx-api": TEST_URL},
             {"id": "2024", "cdx-api": TEST_URL},
-            {"id": "2023", "cdx-api": TEST_URL},
+            {"id": "2023", "cdx-api": "https://foo.bar"},
         ]);
         let expected = [TEST_URL.to_string()];
 
@@ -33,7 +33,7 @@ async fn extract_cdx_urls_test() {
 }
 
 #[tokio::test]
-#[stubr::mock("module/integrations/commoncrawl", port = 4444)]
+#[stubr::mock("module/integrations/commoncrawl", port = 1111)]
 async fn run_test() {
     let mut commoncrawl = CommonCrawl::dispatcher();
 

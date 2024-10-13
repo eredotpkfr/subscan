@@ -28,7 +28,7 @@ pub const WHOISXMLAPI_URL: &str = "https://subdomains.whoisxmlapi.com/api/v1";
 /// | Authentication     | [`AuthenticationMethod::APIKeyAsQueryParam`] |
 /// | Requester          | [`HTTPClient`]                               |
 /// | Extractor          | [`JSONExtractor`]                            |
-/// | Is Generic?        | [`GenericIntegrationModule`]                 |
+/// | Generic            | [`GenericIntegrationModule`]                 |
 pub struct WhoisXMLAPI {}
 
 impl WhoisXMLAPI {
