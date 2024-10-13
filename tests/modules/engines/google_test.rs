@@ -11,7 +11,7 @@ async fn run_test() {
 
     mocks::wrap_module_dispatcher_url_field(&mut google, &stubr.path("/search"));
 
-    let result = google.run(TEST_DOMAIN.to_string()).await;
+    let result = google.run(TEST_DOMAIN).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }

@@ -1,11 +1,11 @@
 use crate::{
-    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::regex::RegexExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
+    types::{core::SubscanModuleCoreComponents, func::GenericIntegrationCoreFuncs},
 };
 use reqwest::Url;
-use serde_json::Value;
 
 pub const HACKERTARGET_MODULE_NAME: &str = "hackertarget";
 pub const HACKERTARGET_URL: &str = "https://api.hackertarget.com/hostsearch";
@@ -31,11 +31,15 @@ impl HackerTarget {
 
         let generic = GenericIntegrationModule {
             name: HACKERTARGET_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
             auth: AuthenticationMethod::NoAuthentication,
-            requester: requester.into(),
-            extractor: extractor.into(),
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+            },
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
@@ -45,7 +49,7 @@ impl HackerTarget {
         format!("{HACKERTARGET_URL}/?q={domain}")
     }
 
-    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
+    pub fn get_next_url(_url: Url, _content: Content) -> Option<Url> {
         None
     }
 }

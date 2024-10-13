@@ -1,9 +1,12 @@
 use crate::{
-    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
-    types::core::Subdomain,
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        func::GenericIntegrationCoreFuncs,
+    },
     utils::regex::generate_subdomain_regex,
 };
 use regex::Match;
@@ -35,11 +38,15 @@ impl BufferOver {
 
         let generic = GenericIntegrationModule {
             name: BUFFEROVER_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
             auth: AuthenticationMethod::APIKeyAsHeader("X-API-Key".into()),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+            },
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
@@ -49,11 +56,11 @@ impl BufferOver {
         format!("{BUFFEROVER_URL}/dns?q={domain}")
     }
 
-    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
+    pub fn get_next_url(_url: Url, _content: Content) -> Option<Url> {
         None
     }
 
-    pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
         let mut subs = BTreeSet::new();
         let pattern = generate_subdomain_regex(domain).unwrap();
 

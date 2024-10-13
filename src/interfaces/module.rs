@@ -46,7 +46,7 @@ use tokio::sync::Mutex;
 ///         Some(&self.extractor)
 ///     }
 ///
-///     async fn run(&mut self, domain: String) -> BTreeSet<String> {
+///     async fn run(&mut self, domain: &str) -> BTreeSet<String> {
 ///         BTreeSet::new()
 ///         // do something in `run` method
 ///     }
@@ -68,7 +68,7 @@ use tokio::sync::Mutex;
 ///     assert_eq!(foo.name().await, "foo");
 ///
 ///     // do something with results
-///     let results = foo.run("foo.com".to_string()).await;
+///     let results = foo.run("foo.com").await;
 /// }
 /// ```
 #[async_trait(?Send)]
@@ -89,5 +89,5 @@ pub trait SubscanModuleInterface: Sync + Send {
     async fn extractor(&self) -> Option<&SubdomainExtractorDispatcher>;
     /// Just like a `main` method, when the module run this `run` method will be called.
     /// So this method should do everything
-    async fn run(&mut self, domain: String) -> BTreeSet<String>;
+    async fn run(&mut self, domain: &str) -> BTreeSet<String>;
 }

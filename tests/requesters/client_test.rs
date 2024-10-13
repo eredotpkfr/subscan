@@ -46,11 +46,11 @@ async fn client_configure_test() {
 
 #[tokio::test]
 #[stubr::mock("hello/hello.json")]
-async fn client_get_request_test() {
+async fn client_get_content_test() {
     let client = HTTPClient::default();
     let url = Url::parse(&stubr.path("/hello")).unwrap();
 
-    let content = client.get_request(url).await.as_string();
+    let content = client.get_content(url).await.as_string();
 
     assert_eq!(content, "hello");
 }
@@ -58,7 +58,7 @@ async fn client_get_request_test() {
 #[tokio::test]
 #[stubr::mock("hello/hello-delayed.json")]
 #[should_panic]
-async fn client_get_request_timeout_test() {
+async fn client_get_content_timeout_test() {
     let config = RequesterConfig {
         timeout: Duration::from_millis(500),
         ..Default::default()
@@ -67,12 +67,12 @@ async fn client_get_request_timeout_test() {
     let client = HTTPClient::with_config(config);
     let url = Url::parse(&stubr.path("/hello-delayed")).unwrap();
 
-    client.get_request(url).await.as_json().as_str().unwrap();
+    client.get_content(url).await.as_json().as_str().unwrap();
 }
 
 #[tokio::test]
 #[stubr::mock("hello/hello-with-headers.json")]
-async fn client_get_request_extra_header_test() {
+async fn client_get_content_extra_header_test() {
     let mut config = RequesterConfig::default();
 
     config.add_header(
@@ -87,14 +87,14 @@ async fn client_get_request_extra_header_test() {
     )
     .unwrap();
 
-    let content = client.get_request(url).await.as_string();
+    let content = client.get_content(url).await.as_string();
 
     assert_eq!(content, "hello");
 }
 
 #[tokio::test]
 #[stubr::mock("hello/hello-with-basic-http-auth.json")]
-async fn client_get_request_basic_http_auth_test() {
+async fn client_get_content_basic_http_auth_test() {
     let mut config = RequesterConfig::default();
 
     let credentials = Credentials {
@@ -112,7 +112,7 @@ async fn client_get_request_basic_http_auth_test() {
 
     let client = HTTPClient::with_config(config);
     let url = Url::parse(&stubr.path("/hello-with-basic-http-auth")).unwrap();
-    let content = client.get_request(url).await.as_string();
+    let content = client.get_content(url).await.as_string();
 
     assert_eq!(content, "hello");
 }

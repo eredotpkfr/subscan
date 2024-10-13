@@ -1,9 +1,12 @@
 use crate::{
-    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
-    types::core::Subdomain,
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        func::GenericIntegrationCoreFuncs,
+    },
 };
 use reqwest::Url;
 use serde_json::Value;
@@ -33,11 +36,15 @@ impl VirusTotal {
 
         let generic = GenericIntegrationModule {
             name: VIRUSTOTAL_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
             auth: AuthenticationMethod::APIKeyAsHeader("X-APIKey".into()),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+            },
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
@@ -47,15 +54,15 @@ impl VirusTotal {
         format!("{VIRUSTOTAL_URL}/{domain}/subdomains?limit=250")
     }
 
-    pub fn get_next_url(_url: Url, content: Value) -> Option<Url> {
-        if let Some(next_url) = content["links"]["next"].as_str() {
-            Url::parse(next_url).ok()
+    pub fn get_next_url(_url: Url, content: Content) -> Option<Url> {
+        if let Some(next_url) = content.as_json()["links"]["next"].as_str() {
+            next_url.parse().ok()
         } else {
             None
         }
     }
 
-    pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
         if let Some(passives) = content["data"].as_array() {
             let filter = |item: &Value| Some(item["id"].as_str()?.to_string());
 

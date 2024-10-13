@@ -1,9 +1,12 @@
 use crate::{
-    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
-    types::core::Subdomain,
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        func::GenericIntegrationCoreFuncs,
+    },
     utils::http,
 };
 use reqwest::Url;
@@ -34,11 +37,15 @@ impl Shodan {
 
         let generic = GenericIntegrationModule {
             name: SHODAN_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
             auth: AuthenticationMethod::APIKeyAsQueryParam("key".into()),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+            },
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
@@ -48,8 +55,8 @@ impl Shodan {
         format!("{SHODAN_URL}/dns/domain/{domain}")
     }
 
-    pub fn get_next_url(mut url: Url, content: Value) -> Option<Url> {
-        if let Some(more) = content["more"].as_bool() {
+    pub fn get_next_url(mut url: Url, content: Content) -> Option<Url> {
+        if let Some(more) = content.as_json()["more"].as_bool() {
             if !more {
                 None
             } else {
@@ -70,7 +77,7 @@ impl Shodan {
         }
     }
 
-    pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
         if let Some(subs) = content["subdomains"].as_array() {
             let filter = |item: &Value| Some(format!("{}.{domain}", item.as_str()?));
 

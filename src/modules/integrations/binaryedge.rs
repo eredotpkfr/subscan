@@ -1,9 +1,12 @@
 use crate::{
-    enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
-    types::core::Subdomain,
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        func::GenericIntegrationCoreFuncs,
+    },
     utils::http,
 };
 use reqwest::Url;
@@ -34,11 +37,15 @@ impl BinaryEdge {
 
         let generic = GenericIntegrationModule {
             name: BINARYEDGE_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
             auth: AuthenticationMethod::APIKeyAsHeader("X-Key".into()),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+            },
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
@@ -48,7 +55,7 @@ impl BinaryEdge {
         format!("{BINARYEDGE_URL}/{domain}")
     }
 
-    pub fn get_next_url(mut url: Url, _content: Value) -> Option<Url> {
+    pub fn get_next_url(mut url: Url, _content: Content) -> Option<Url> {
         let page_param = url.query_pairs().find(|item| item.0 == "page");
 
         if let Some(page) = page_param {
@@ -62,7 +69,7 @@ impl BinaryEdge {
         Some(url)
     }
 
-    pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
         if let Some(subs) = content["events"].as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());
 

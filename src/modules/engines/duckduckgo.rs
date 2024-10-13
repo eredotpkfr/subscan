@@ -3,6 +3,7 @@ use crate::{
     extractors::html::HTMLExtractor,
     modules::generics::engine::GenericSearchEngineModule,
     requesters::chrome::ChromeBrowser,
+    types::core::SubscanModuleCoreComponents,
 };
 use reqwest::Url;
 
@@ -37,8 +38,10 @@ impl DuckDuckGo {
             name: DUCKDUCKGO_MODULE_NAME.into(),
             param: DUCKDUCKGO_SEARCH_PARAM.into(),
             url: url.unwrap(),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()

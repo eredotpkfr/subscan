@@ -162,12 +162,12 @@ impl RequesterInterface for ChromeBrowser {
     ///     let mut browser = ChromeBrowser::default();
     ///     let url = Url::parse("https://foo.com").unwrap();
     ///
-    ///     let content = browser.get_request(url).await;
+    ///     let content = browser.get_content(url).await;
     ///
     ///     // do something with content
     /// }
     /// ```
-    async fn get_request(&self, url: Url) -> Content {
+    async fn get_content(&self, url: Url) -> Content {
         let tab = self.browser.new_tab().expect("Cannot create tab!");
         let headers = self.config.headers_as_hashmap();
 

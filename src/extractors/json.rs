@@ -30,8 +30,7 @@ impl JSONExtractor {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
-    ///     let inner = |content: Value, _domain: String| {
+    ///     let inner = |content: Value, _domain: &str| {
     ///         let bar = content["foo"].as_str().unwrap().to_string();
     ///
     ///         [bar].into()
@@ -41,7 +40,7 @@ impl JSONExtractor {
     ///     let extractor = JSONExtractor::new(Box::new(inner));
     ///     let expected = BTreeSet::from(["bar".to_string()]);
     ///
-    ///     assert_eq!(extractor.extract(json, domain).await, expected);
+    ///     assert_eq!(extractor.extract(json, "foo.com").await, expected);
     /// }
     /// ```
     pub fn new(inner: InnerExtractFunc) -> Self {
@@ -67,21 +66,20 @@ impl SubdomainExtractorInterface for JSONExtractor {
     /// #[tokio::main]
     /// async fn main() {
     ///     let content = Content::from(json!({"foo": "bar"}));
-    ///     let domain = "foo.com".to_string();
     ///
-    ///     let func = |item: Value, _domain: String| {
+    ///     let inner = |item: Value, _domain: &str| {
     ///         [
     ///             Subdomain::from(item["foo"].as_str().unwrap())
     ///         ].into()
     ///     };
-    ///     let extractor = JSONExtractor::new(Box::new(func));
+    ///     let extractor = JSONExtractor::new(Box::new(inner));
     ///
-    ///     let result = extractor.extract(content, domain).await;
+    ///     let result = extractor.extract(content, "foo.com").await;
     ///
     ///     assert_eq!(result, [Subdomain::from("bar")].into());
     /// }
     /// ```
-    async fn extract(&self, content: Content, domain: String) -> BTreeSet<Subdomain> {
+    async fn extract(&self, content: Content, domain: &str) -> BTreeSet<Subdomain> {
         (self.inner)(content.as_json(), domain)
     }
 }

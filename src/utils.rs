@@ -11,18 +11,14 @@ pub mod regex {
     /// ```
     /// use subscan::utils::regex::generate_subdomain_regex;
     ///
-    /// let domain = String::from("foo.com");
-    /// let subdomain = String::from("bar.foo.com");
-    /// let no_match = String::from("foo");
-    ///
-    /// let regex_stmt = generate_subdomain_regex(domain).unwrap();
+    /// let regex_stmt = generate_subdomain_regex("foo.com").unwrap();
     ///
     /// assert_eq!(regex_stmt.as_str(), "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+(foo\\.com)");
     ///
-    /// assert!(regex_stmt.find(&subdomain).is_some());
-    /// assert!(regex_stmt.find(&no_match).is_none());
+    /// assert!(regex_stmt.find("bar.foo.com").is_some());
+    /// assert!(regex_stmt.find("foo").is_none());
     /// ```
-    pub fn generate_subdomain_regex(domain: String) -> Result<Regex, Error> {
+    pub fn generate_subdomain_regex(domain: &str) -> Result<Regex, Error> {
         let formatted = format!(
             r"(?:[a-z0-9](?:[a-z0-9-]{{0,61}}[a-z0-9])?\.)+({domain})",
             domain = domain.replace(".", r"\.")
