@@ -61,7 +61,7 @@ impl GenericIntegrationModule {
 
     async fn set_credentials(&self, credentials: Credentials) -> bool {
         if credentials.is_ok() {
-            let mut requester = self.components.requester.lock().await;
+            let requester = &mut *self.components.requester.lock().await;
 
             requester.config().await.set_credentials(credentials);
 
@@ -80,12 +80,13 @@ impl GenericIntegrationModule {
 
     async fn set_apikey_header(&self, name: &str, apikey: Env) -> bool {
         if let Some(apikey) = &apikey.value {
-            let mut requester = self.components.requester.lock().await;
+            let requester = &mut *self.components.requester.lock().await;
 
             let name = HeaderName::from_str(name).unwrap();
             let value = HeaderValue::from_str(apikey).unwrap();
 
             requester.config().await.add_header(name, value);
+
             return true;
         }
         false
@@ -114,7 +115,7 @@ impl SubscanModuleInterface for GenericIntegrationModule {
             return all_results;
         }
 
-        let requester = self.components.requester.lock().await;
+        let requester = &*self.components.requester.lock().await;
         let extractor = &self.components.extractor;
 
         loop {

@@ -64,7 +64,7 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
     }
 
     async fn run(&mut self, domain: &str) -> BTreeSet<String> {
-        let requester = self.components.requester.lock().await;
+        let requester = &*self.components.requester.lock().await;
         let extractor = &self.components.extractor;
 
         let extra_params = [("num".to_string(), 100.to_string())];

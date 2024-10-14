@@ -91,10 +91,10 @@ impl SubscanModuleInterface for CommonCrawl {
     async fn run(&mut self, domain: &str) -> BTreeSet<String> {
         let mut all_results = BTreeSet::new();
 
-        let requester = self.components.requester.lock().await;
+        let requester = &*self.components.requester.lock().await;
         let extractor = &self.components.extractor;
 
-        if let RequesterDispatcher::HTTPClient(requester) = &*requester {
+        if let RequesterDispatcher::HTTPClient(requester) = requester {
             let year = chrono::Utc::now().year().to_string();
             let query = format!("*.{}", domain);
             let content = requester.get_content(self.url.clone()).await;

@@ -40,7 +40,7 @@ async fn authenticate_test_no_auth() {
 
     assert!(module.authenticate(&mut url).await);
 
-    let mut requester = module.requester().await.unwrap().lock().await;
+    let requester = &mut *module.requester().await.unwrap().lock().await;
     let rconfig = requester.config().await;
 
     // Should be not changed anything
@@ -64,7 +64,7 @@ async fn authenticate_test_with_header_auth() {
     // Should be authenticated
     assert!(module.authenticate(&mut url).await);
 
-    let mut requester = module.requester().await.unwrap().lock().await;
+    let requester = &mut *module.requester().await.unwrap().lock().await;
     let rconfig = requester.config().await;
 
     // Check if the API key set on headers
@@ -139,7 +139,7 @@ async fn authenticate_test_with_basic_http_auth_from_credentials() {
     // Should be authenticated
     assert!(module.authenticate(&mut url).await);
 
-    let mut requester = module.requester().await.unwrap().lock().await;
+    let requester = &mut *module.requester().await.unwrap().lock().await;
 
     // Check if the credentials set on requester instance
     assert_eq!(requester.config().await.credentials, credentials);
@@ -163,7 +163,7 @@ async fn authenticate_test_with_basic_http_auth_from_envs() {
     // Should be authenticated
     assert!(module.authenticate(&mut url).await);
 
-    let mut requester = module.requester().await.unwrap().lock().await;
+    let requester = &mut *module.requester().await.unwrap().lock().await;
     let rconfig = requester.config().await;
 
     // Check if the credentials set on requester instance

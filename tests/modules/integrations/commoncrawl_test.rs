@@ -15,9 +15,7 @@ use subscan::{
 
 #[tokio::test]
 async fn extract_cdx_urls_test() {
-    let commoncrawl = CommonCrawl::dispatcher();
-
-    if let SubscanModuleDispatcher::CommonCrawl(module) = commoncrawl {
+    if let SubscanModuleDispatcher::CommonCrawl(module) = CommonCrawl::dispatcher() {
         let json = json!([
             {"no-cdx-api-field": TEST_URL},
             {"no-id-field": TEST_URL},
@@ -40,7 +38,7 @@ async fn run_test() {
     mocks::wrap_module_dispatcher_url_field(&mut commoncrawl, &stubr.path("/commoncrawl/index"));
 
     if let SubscanModuleDispatcher::CommonCrawl(ref mut module) = commoncrawl {
-        let mut requester = module.requester().await.unwrap().lock().await;
+        let requester = &mut *module.requester().await.unwrap().lock().await;
 
         // Set timeout for testing did not get response case
         let config = RequesterConfig {
