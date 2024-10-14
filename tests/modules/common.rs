@@ -111,6 +111,7 @@ pub mod mocks {
                 module.funcs.url = wrap_url_with_mock_func(url)
             }
             SubscanModuleDispatcher::CommonCrawl(module) => module.url = url.parse().unwrap(),
+            SubscanModuleDispatcher::DnsDumpster(module) => module.url = url.parse().unwrap(),
         }
     }
 }

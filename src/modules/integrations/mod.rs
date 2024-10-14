@@ -23,6 +23,8 @@ pub mod commoncrawl;
 pub mod crtsh;
 /// `Digitorus` HTML crawler integration
 pub mod digitorus;
+/// `DnsDumpster` non-generic integration
+pub mod dnsdumpster;
 /// `HackerTarget` HTML crawler integration
 pub mod hackertarget;
 /// `Leakix` API integration
