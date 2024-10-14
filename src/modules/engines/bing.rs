@@ -3,6 +3,7 @@ use crate::{
     extractors::html::HTMLExtractor,
     modules::generics::engine::GenericSearchEngineModule,
     requesters::client::HTTPClient,
+    types::core::SubscanModuleCoreComponents,
 };
 use reqwest::Url;
 
@@ -24,6 +25,7 @@ pub const BING_CITE_TAG: &str = "cite";
 /// | Subdomain Selector | `cite`                        |
 /// | Requester          | [`HTTPClient`]                |
 /// | Extractor          | [`HTMLExtractor`]             |
+/// | Generic            | [`GenericSearchEngineModule`] |
 pub struct Bing {}
 
 impl Bing {
@@ -37,8 +39,10 @@ impl Bing {
             name: BING_MODULE_NAME.into(),
             param: BING_SEARCH_PARAM.into(),
             url: url.unwrap(),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()

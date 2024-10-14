@@ -12,8 +12,10 @@ const PROXY_PARSE_ERR: &str = "Cannot parse proxy!";
 /// Also its compatible with [`RequesterInterface`]
 #[derive(Default)]
 pub struct HTTPClient {
-    config: RequesterConfig,
-    client: Client,
+    /// HTTP client configurations as a [`RequesterConfig`]
+    pub config: RequesterConfig,
+    /// [`reqwest::Client`] instance
+    pub client: Client,
 }
 
 impl HTTPClient {
@@ -30,9 +32,8 @@ impl HTTPClient {
     /// #[tokio::main]
     /// async fn main() {
     ///     let config = RequesterConfig {
-    ///         proxy: None,
-    ///         headers: HeaderMap::default(),
     ///         timeout: Duration::from_secs(60),
+    ///         ..Default::default()
     ///     };
     ///
     ///     let client = HTTPClient::with_config(config);
@@ -87,8 +88,7 @@ impl RequesterInterface for HTTPClient {
     ///
     ///     let new_config = RequesterConfig {
     ///         timeout: Duration::from_secs(120),
-    ///         proxy: None,
-    ///         headers: HeaderMap::default(),
+    ///         ..Default::default()
     ///     };
     ///
     ///     client.configure(new_config.clone()).await;
@@ -127,21 +127,29 @@ impl RequesterInterface for HTTPClient {
     /// }
     /// ```
     async fn get_content(&self, url: Url) -> Content {
-        let rbuilder = self.client.get(url);
-        let request = rbuilder
+        let mut builder = self.client.get(url);
+
+        // Set basic configurations
+        builder = builder
             .timeout(self.config.timeout)
-            .headers(self.config.headers.clone())
-            .build()
-            .expect(REQUEST_BUILD_ERR);
+            .headers(self.config.headers.clone());
+
+        // Set basic HTTP authentication if credentials provided
+        if self.config.credentials.is_ok() {
+            let username = self.config.credentials.username.value.clone();
+            let password = self.config.credentials.password.value.clone();
+
+            builder = builder.basic_auth(username.unwrap(), password);
+        }
+
+        let request = builder.build().expect(REQUEST_BUILD_ERR);
 
         if let Ok(response) = self.client.execute(request).await {
             if let Ok(content) = response.text().await {
-                Content::String(content)
-            } else {
-                Content::Empty
+                return Content::String(content);
             }
-        } else {
-            Content::Empty
+            return Content::Empty;
         }
+        Content::Empty
     }
 }

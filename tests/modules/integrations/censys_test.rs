@@ -7,6 +7,7 @@ use reqwest::Url;
 use serde_json::{json, Value};
 use std::{collections::BTreeSet, env};
 use subscan::{
+    enums::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::censys::{Censys, CENSYS_URL},
 };
@@ -20,7 +21,7 @@ async fn run_test() {
     env::set_var(&env_name, "censys-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut censys, &stubr.path("/censys"));
 
-    let result = censys.run(TEST_DOMAIN.to_string()).await;
+    let result = censys.run(TEST_DOMAIN).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 
@@ -41,11 +42,11 @@ async fn get_next_url_test() {
     let json = json!({"result": {"links": {"next": "foo"}}});
     let expected = Url::parse(&format!("{TEST_URL}/?cursor=foo")).unwrap();
 
-    let mut next = Censys::get_next_url(url.clone(), Value::Null);
+    let mut next = Censys::get_next_url(url.clone(), Content::Empty);
 
     assert!(next.is_none());
 
-    next = Censys::get_next_url(url, json);
+    next = Censys::get_next_url(url, json.into());
 
     assert_eq!(next.unwrap(), expected);
 }
@@ -53,8 +54,8 @@ async fn get_next_url_test() {
 #[tokio::test]
 async fn extract_test() {
     let json = read_stub("module/integrations/censys.json")["response"]["jsonBody"].clone();
-    let extracted = Censys::extract(json, TEST_DOMAIN.to_string());
-    let not_extracted = Censys::extract(Value::Null, TEST_DOMAIN.to_string());
+    let extracted = Censys::extract(json, TEST_DOMAIN);
+    let not_extracted = Censys::extract(Value::Null, TEST_DOMAIN);
 
     assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(not_extracted, BTreeSet::new());

@@ -4,7 +4,7 @@ use crate::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
-    types::query::SearchQueryParam,
+    types::{core::SubscanModuleCoreComponents, query::SearchQueryParam},
 };
 use async_trait::async_trait;
 use reqwest::Url;
@@ -45,10 +45,8 @@ pub struct GenericSearchEngineModule {
     pub url: Url,
     /// Search engine search query parameter
     pub param: SearchQueryParam,
-    /// Requester object instance for HTTP requests
-    pub requester: Mutex<RequesterDispatcher>,
-    /// Any extractor object to extract subdomain from content
-    pub extractor: SubdomainExtractorDispatcher,
+    /// Core components
+    pub components: SubscanModuleCoreComponents,
 }
 
 #[async_trait(?Send)]
@@ -58,24 +56,26 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
     }
 
     async fn requester(&self) -> Option<&Mutex<RequesterDispatcher>> {
-        Some(&self.requester)
+        Some(&self.components.requester)
     }
 
     async fn extractor(&self) -> Option<&SubdomainExtractorDispatcher> {
-        Some(&self.extractor)
+        Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: String) -> BTreeSet<String> {
-        let requester = self.requester.lock().await;
+    async fn run(&mut self, domain: &str) -> BTreeSet<String> {
+        let requester = &*self.components.requester.lock().await;
+        let extractor = &self.components.extractor;
+
         let extra_params = [("num".to_string(), 100.to_string())];
 
-        let mut query = self.param.to_search_query(&domain, "site:");
+        let mut query = self.param.to_search_query(domain, "site:");
         let mut all_results = BTreeSet::new();
 
         loop {
             let url = query.as_url(self.url.clone(), &extra_params);
             let response = requester.get_content(url).await;
-            let results = self.extractor.extract(response, domain.clone()).await;
+            let results = extractor.extract(response, domain).await;
 
             all_results.extend(results.clone());
 

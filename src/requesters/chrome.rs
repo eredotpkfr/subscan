@@ -8,8 +8,10 @@ use reqwest::Url;
 /// Chrome requester struct, send HTTP requests via Chrome browser.
 /// Also its compatible with [`RequesterInterface`]
 pub struct ChromeBrowser {
-    config: RequesterConfig,
-    browser: Browser,
+    /// Chrome browser request configurations as a [`RequesterConfig`]
+    pub config: RequesterConfig,
+    /// [`ChromeBrowser`] instance
+    pub browser: Browser,
 }
 
 impl Default for ChromeBrowser {
@@ -40,9 +42,8 @@ impl ChromeBrowser {
     /// #[tokio::main]
     /// async fn main() {
     ///     let config = RequesterConfig {
-    ///         proxy: None,
-    ///         headers: HeaderMap::default(),
     ///         timeout: Duration::from_secs(60),
+    ///         ..Default::default()
     ///     };
     ///
     ///     let browser = ChromeBrowser::with_config(config);
@@ -82,12 +83,12 @@ impl ChromeBrowser {
     /// }
     /// ```
     pub fn default_options<'a>() -> LaunchOptions<'a> {
-        LaunchOptions::default_builder()
-            .headless(true)
-            .sandbox(false)
-            .enable_gpu(false)
-            .build()
-            .unwrap()
+        LaunchOptions {
+            headless: true,
+            sandbox: false,
+            enable_gpu: false,
+            ..Default::default()
+        }
     }
 }
 
@@ -130,8 +131,7 @@ impl RequesterInterface for ChromeBrowser {
     ///
     ///     let new_config = RequesterConfig {
     ///         timeout: Duration::from_secs(120),
-    ///         proxy: None,
-    ///         headers: HeaderMap::default(),
+    ///         ..Default::default()
     ///     };
     ///
     ///     browser.configure(new_config.clone()).await;
@@ -173,8 +173,17 @@ impl RequesterInterface for ChromeBrowser {
         let tab = self.browser.new_tab().expect("Cannot create tab!");
         let headers = self.config.headers_as_hashmap();
 
+        // Set basic configurations
         tab.set_default_timeout(self.config.timeout);
         tab.set_extra_http_headers(headers).unwrap();
+
+        // Set basic HTTP authentication if credentials provided
+        if self.config.credentials.is_ok() {
+            let username = self.config.credentials.username.value.clone();
+            let password = self.config.credentials.password.value.clone();
+
+            tab.authenticate(username, password).unwrap();
+        }
 
         tab.navigate_to(url.to_string().as_str()).unwrap();
         tab.wait_until_navigated().unwrap();

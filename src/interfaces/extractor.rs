@@ -28,7 +28,7 @@ use std::collections::BTreeSet;
 ///
 /// #[async_trait]
 /// impl SubdomainExtractorInterface for CustomExtractor {
-///     async fn extract(&self, content: Content, domain: String) -> BTreeSet<Subdomain> {
+///     async fn extract(&self, content: Content, domain: &str) -> BTreeSet<Subdomain> {
 ///         let sub = content.as_string().replace("-", "");
 ///
 ///         [Subdomain::from(sub)].into()
@@ -38,11 +38,9 @@ use std::collections::BTreeSet;
 /// #[tokio::main]
 /// async fn main() {
 ///     let content = Content::from("--foo.com--");
-///     let domain = String::from("foo.com");
-///
 ///     let extractor = CustomExtractor {};
 ///
-///     let result = extractor.extract(content, domain).await;
+///     let result = extractor.extract(content, "foo.com").await;
 ///
 ///     assert_eq!(result, [Subdomain::from("foo.com")].into());
 /// }
@@ -52,5 +50,5 @@ use std::collections::BTreeSet;
 pub trait SubdomainExtractorInterface: Send + Sync {
     /// Generic extract method, it should extract subdomain addresses
     /// from given [`String`] content
-    async fn extract(&self, content: Content, domain: String) -> BTreeSet<Subdomain>;
+    async fn extract(&self, content: Content, domain: &str) -> BTreeSet<Subdomain>;
 }

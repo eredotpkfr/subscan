@@ -3,6 +3,7 @@ use crate::{
     extractors::html::HTMLExtractor,
     modules::generics::engine::GenericSearchEngineModule,
     requesters::client::HTTPClient,
+    types::core::SubscanModuleCoreComponents,
 };
 use reqwest::Url;
 
@@ -24,6 +25,7 @@ pub const YAHOO_CITE_TAG: &str = "ol > li > div > div > h3 > a > span";
 /// | Subdomain Selector | `ol > li > div > div > h3 > a > span` |
 /// | Requester          | [`HTTPClient`]                        |
 /// | Extractor          | [`HTMLExtractor`]                     |
+/// | Generic            | [`GenericSearchEngineModule`]         |
 pub struct Yahoo {}
 
 impl Yahoo {
@@ -38,8 +40,10 @@ impl Yahoo {
             name: YAHOO_MODULE_NAME.into(),
             param: YAHOO_SEARCH_PARAM.into(),
             url: url.unwrap(),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()

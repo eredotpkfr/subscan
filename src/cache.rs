@@ -4,8 +4,8 @@ use crate::{
         engines::{bing, duckduckgo, google, yahoo},
         integrations::{
             alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys, certspotter,
-            chaos, crtsh, digitorus, hackertarget, leakix, shodan, sitedossier, subdomaincenter,
-            threatcrowd, virustotal, whoisxmlapi, zoomeye,
+            chaos, commoncrawl, crtsh, digitorus, hackertarget, leakix, shodan, sitedossier,
+            subdomaincenter, threatcrowd, virustotal, whoisxmlapi, zoomeye,
         },
     },
 };
@@ -30,6 +30,7 @@ lazy_static! {
         Mutex::new(censys::Censys::dispatcher()),
         Mutex::new(certspotter::CertSpotter::dispatcher()),
         Mutex::new(chaos::Chaos::dispatcher()),
+        Mutex::new(commoncrawl::CommonCrawl::dispatcher()),
         Mutex::new(crtsh::Crtsh::dispatcher()),
         Mutex::new(digitorus::Digitorus::dispatcher()),
         Mutex::new(hackertarget::HackerTarget::dispatcher()),
@@ -65,8 +66,7 @@ pub mod modules {
     /// async fn main() {
     ///     let new_config = RequesterConfig {
     ///         timeout: Duration::from_secs(120),
-    ///         proxy: None,
-    ///         headers: HeaderMap::default(),
+    ///         ..Default::default()
     ///     };
     ///
     ///     modules::configure_all_requesters(new_config);

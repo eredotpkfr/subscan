@@ -1,11 +1,14 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
-    types::core::Subdomain,
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        func::GenericIntegrationCoreFuncs,
+    },
 };
 use reqwest::Url;
 use serde_json::Value;
@@ -18,13 +21,14 @@ pub const SUBDOMAINCENTER_URL: &str = "https://api.subdomain.center";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                           |
-/// |:------------------:|:-------------------------------:|
-/// | Module Name        | `subdomaincenter`               |
-/// | Doc URL            | <https://www.subdomain.center>  |
-/// | Authentication     | [`APIAuthMethod::NoAuth`]       |
-/// | Requester          | [`HTTPClient`]                  |
-/// | Extractor          | [`JSONExtractor`]               |
+/// | Property           | Value                                      |
+/// |:------------------:|:------------------------------------------:|
+/// | Module Name        | `subdomaincenter`                          |
+/// | Doc URL            | <https://www.subdomain.center>             |
+/// | Authentication     | [`AuthenticationMethod::NoAuthentication`] |
+/// | Requester          | [`HTTPClient`]                             |
+/// | Extractor          | [`JSONExtractor`]                          |
+/// | Generic            | [`GenericIntegrationModule`]               |
 pub struct SubdomainCenter {}
 
 impl SubdomainCenter {
@@ -34,11 +38,15 @@ impl SubdomainCenter {
 
         let generic = GenericIntegrationModule {
             name: SUBDOMAINCENTER_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::NoAuth,
-            requester: requester.into(),
-            extractor: extractor.into(),
+            auth: AuthenticationMethod::NoAuthentication,
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+            },
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
@@ -48,11 +56,11 @@ impl SubdomainCenter {
         format!("{SUBDOMAINCENTER_URL}/?domain={domain}")
     }
 
-    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
+    pub fn get_next_url(_url: Url, _content: Content) -> Option<Url> {
         None
     }
 
-    pub fn extract(content: Value, _domain: String) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
         if let Some(passives) = content.as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());
 

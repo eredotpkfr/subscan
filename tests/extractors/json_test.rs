@@ -13,7 +13,7 @@ use subscan::{
 async fn extract_test() {
     let json = read_testdata("json/subdomains.json");
 
-    let inner_parser = |json: Value, _domain: String| {
+    let inner_parser = |json: Value, _domain: &str| {
         if let Some(subs) = json["data"]["subdomains"].as_array() {
             let filter = |json: &Value| Some(json["subdomain"].as_str().unwrap().to_string());
 
@@ -23,11 +23,10 @@ async fn extract_test() {
         }
     };
 
-    let domain = TEST_DOMAIN.to_string();
     let extractor = JSONExtractor::new(Box::new(inner_parser));
 
-    let result = extractor.extract(json, domain.clone()).await;
-    let no_result = extractor.extract(Content::default(), domain).await;
+    let result = extractor.extract(json, TEST_DOMAIN).await;
+    let no_result = extractor.extract(Content::default(), TEST_DOMAIN).await;
 
     let expected = BTreeSet::from([
         TEST_BAR_SUBDOMAIN.to_string(),

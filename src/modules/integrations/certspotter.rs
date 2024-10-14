@@ -1,9 +1,12 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
-    types::core::Subdomain,
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        func::GenericIntegrationCoreFuncs,
+    },
     utils::regex::generate_subdomain_regex,
 };
 use regex::Match;
@@ -19,13 +22,14 @@ pub const CERTSPOTTER_URL: &str = "https://api.certspotter.com/v1/issuances";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                             |
-/// |:------------------:|:---------------------------------:|
-/// | Module Name        | `certspotter`                     |
-/// | Doc URL            | <https://sslmate.com/certspotter> |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`] |
-/// | Requester          | [`HTTPClient`]                    |
-/// | Extractor          | [`JSONExtractor`]                 |
+/// | Property           | Value                                    |
+/// |:------------------:|:----------------------------------------:|
+/// | Module Name        | `certspotter`                            |
+/// | Doc URL            | <https://sslmate.com/certspotter>        |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
+/// | Requester          | [`HTTPClient`]                           |
+/// | Extractor          | [`JSONExtractor`]                        |
+/// | Generic            | [`GenericIntegrationModule`]             |
 pub struct CertSpotter {}
 
 impl CertSpotter {
@@ -35,11 +39,15 @@ impl CertSpotter {
 
         let generic = GenericIntegrationModule {
             name: CERTSPOTTER_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsHeader("Authorization".into()),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            auth: AuthenticationMethod::APIKeyAsHeader("Authorization".into()),
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+            },
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
@@ -57,11 +65,11 @@ impl CertSpotter {
         url.unwrap().to_string()
     }
 
-    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
+    pub fn get_next_url(_url: Url, _content: Content) -> Option<Url> {
         None
     }
 
-    pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
         let mut subs = BTreeSet::new();
 
         if let Some(results) = content.as_array() {

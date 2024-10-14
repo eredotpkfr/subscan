@@ -17,7 +17,7 @@ async fn main() {
         let mut module = item.lock().await;
         let requester = module.requester().await.unwrap();
 
-        if module.name().await != "zoomeye" {
+        if module.name().await != "commoncrawl" {
             continue;
         }
 
@@ -29,7 +29,7 @@ async fn main() {
 
         println!("Running...{}({})", module.name().await, cli.domain.clone());
 
-        let res = module.run(cli.domain.clone()).await;
+        let res = module.run(&cli.domain).await;
 
         println!("{:#?}\nTotal: {}", res, res.len());
     }

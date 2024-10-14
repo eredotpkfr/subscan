@@ -1,9 +1,12 @@
 use crate::{
-    enums::{APIAuthMethod, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
-    types::core::Subdomain,
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        func::GenericIntegrationCoreFuncs,
+    },
 };
 use reqwest::Url;
 use serde_json::Value;
@@ -17,13 +20,14 @@ pub const CHAOS_URL: &str = "https://dns.projectdiscovery.io/dns";
 /// It uses [`GenericIntegrationModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                               |
-/// |:------------------:|:-----------------------------------:|
-/// | Module Name        | `chaos`                             |
-/// | Doc URL            | <https://cloud.projectdiscovery.io> |
-/// | Authentication     | [`APIAuthMethod::APIKeyAsHeader`]   |
-/// | Requester          | [`HTTPClient`]                      |
-/// | Extractor          | [`JSONExtractor`]                   |
+/// | Property           | Value                                    |
+/// |:------------------:|:----------------------------------------:|
+/// | Module Name        | `chaos`                                  |
+/// | Doc URL            | <https://cloud.projectdiscovery.io>      |
+/// | Authentication     | [`AuthenticationMethod::APIKeyAsHeader`] |
+/// | Requester          | [`HTTPClient`]                           |
+/// | Extractor          | [`JSONExtractor`]                        |
+/// | Generic            | [`GenericIntegrationModule`]             |
 pub struct Chaos {}
 
 impl Chaos {
@@ -33,11 +37,15 @@ impl Chaos {
 
         let generic = GenericIntegrationModule {
             name: CHAOS_MODULE_NAME.into(),
-            url: Box::new(Self::get_query_url),
-            next: Box::new(Self::get_next_url),
-            auth: APIAuthMethod::APIKeyAsHeader("Authorization".into()),
-            requester: requester.into(),
-            extractor: extractor.into(),
+            auth: AuthenticationMethod::APIKeyAsHeader("Authorization".into()),
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+            },
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
         };
 
         generic.into()
@@ -47,11 +55,11 @@ impl Chaos {
         format!("{CHAOS_URL}/{domain}/subdomains")
     }
 
-    pub fn get_next_url(_url: Url, _content: Value) -> Option<Url> {
+    pub fn get_next_url(_url: Url, _content: Content) -> Option<Url> {
         None
     }
 
-    pub fn extract(content: Value, domain: String) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
         if let Some(subs) = content["subdomains"].as_array() {
             let filter = |item: &Value| Some(format!("{}.{}", item.as_str()?, domain));
 

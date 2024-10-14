@@ -7,36 +7,41 @@ use std::time::Duration;
 use subscan::{
     interfaces::requester::RequesterInterface,
     requesters::client::HTTPClient,
-    types::config::{RequesterConfig, DEFAULT_HTTP_TIMEOUT},
+    types::{
+        config::RequesterConfig,
+        env::{Credentials, Env},
+    },
 };
 
 #[tokio::test]
 async fn client_configure_test() {
     let mut client = HTTPClient::default();
-    let mut config = client.config().await;
 
-    let new_headers = HeaderMap::from_iter([
+    let headers = HeaderMap::from_iter([
         (USER_AGENT, HeaderValue::from_static("foo")),
         (CONTENT_LENGTH, HeaderValue::from_static("20")),
     ]);
-
-    let new_config = RequesterConfig {
-        headers: new_headers.clone(),
-        timeout: Duration::from_secs(120),
-        proxy: Some(TEST_URL.to_string()),
+    let credentials = Credentials {
+        username: Env {
+            name: "USERNAME".into(),
+            value: Some("foo".to_string()),
+        },
+        password: Env {
+            name: "PASSWORD".into(),
+            value: Some("bar".to_string()),
+        },
     };
 
-    assert_eq!(config.timeout, DEFAULT_HTTP_TIMEOUT);
-    assert_eq!(config.headers.len(), 0);
-    assert_eq!(config.proxy, None);
+    let new_config = RequesterConfig {
+        headers,
+        timeout: Duration::from_secs(120),
+        proxy: Some(TEST_URL.to_string()),
+        credentials,
+    };
 
     client.configure(new_config.clone()).await;
-    config = client.config().await;
 
-    assert_eq!(config.timeout, new_config.timeout);
-    assert_eq!(config.headers, new_config.headers);
-    assert_eq!(config.headers.len(), new_headers.len());
-    assert_eq!(config.proxy, new_config.proxy);
+    assert_eq!(client.config().await.clone(), new_config);
 }
 
 #[tokio::test]
@@ -56,8 +61,7 @@ async fn client_get_content_test() {
 async fn client_get_content_timeout_test() {
     let config = RequesterConfig {
         timeout: Duration::from_millis(500),
-        headers: HeaderMap::default(),
-        proxy: None,
+        ..Default::default()
     };
 
     let client = HTTPClient::with_config(config);
@@ -83,6 +87,31 @@ async fn client_get_content_extra_header_test() {
     )
     .unwrap();
 
+    let content = client.get_content(url).await.as_string();
+
+    assert_eq!(content, "hello");
+}
+
+#[tokio::test]
+#[stubr::mock("hello/hello-with-basic-http-auth.json")]
+async fn client_get_content_basic_http_auth_test() {
+    let mut config = RequesterConfig::default();
+
+    let credentials = Credentials {
+        username: Env {
+            name: "USERNAME".into(),
+            value: Some("foo".to_string()),
+        },
+        password: Env {
+            name: "PASSWORD".into(),
+            value: Some("bar".to_string()),
+        },
+    };
+
+    config.set_credentials(credentials);
+
+    let client = HTTPClient::with_config(config);
+    let url = Url::parse(&stubr.path("/hello-with-basic-http-auth")).unwrap();
     let content = client.get_content(url).await.as_string();
 
     assert_eq!(content, "hello");

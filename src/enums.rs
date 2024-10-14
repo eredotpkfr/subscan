@@ -1,7 +1,11 @@
 use crate::{
     extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor},
-    modules::generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
+    modules::{
+        generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
+        integrations::commoncrawl::CommonCrawl,
+    },
     requesters::{chrome::ChromeBrowser, client::HTTPClient},
+    types::env::Credentials,
 };
 use enum_dispatch::enum_dispatch;
 use serde_json::Value;
@@ -29,6 +33,8 @@ pub enum SubscanModuleDispatcher {
     /// engine modules at the same time. Just modules should be implemented as
     /// a [`GenericSearchEngineModule`]
     GenericSearchEngineModule(GenericSearchEngineModule),
+    /// Non-generic `CommonCrawl` integration variant
+    CommonCrawl(CommonCrawl),
 }
 
 /// Dispatcher enumeration to decide extractor types
@@ -70,38 +76,47 @@ pub enum RequesterDispatcher {
     HTTPClient(HTTPClient),
 }
 
-/// Authentication methods for API calls.
-/// [`GenericIntegrationModule`] uses them to apply
-/// correct auth method. See the method descriptions to
-/// learn how it works
+/// Authentication methods for API calls or HTTP requests. [`GenericIntegrationModule`]
+/// uses them to apply correct auth method. See the method descriptions to learn how it works
 #[derive(PartialEq)]
-pub enum APIAuthMethod {
+pub enum AuthenticationMethod {
     /// Some APIs uses request headers to get API key. If this auth type selected API key
     /// will add in request headers with a given header key
     APIKeyAsHeader(String),
     /// This auth type uses when API require API key as a query param. If this method chose
     /// API key will be added in URL as a query param with given parameter key
     APIKeyAsQueryParam(String),
+    /// Use basic HTTP authentication method. If the credentials are not provided, module
+    /// tries to fetch from environment variables using pre-formatted
+    /// (see [`format_env`](crate::utils::env::format_env)) variable names. Module specific
+    /// variable names looks like `SUBSCAN_FOO_USERNAME`, `SUBSCAN_FOO_PASSWORD`
+    BasicHTTPAuthentication(Credentials),
     /// This auth type does nothing for auth
-    NoAuth,
+    NoAuthentication,
 }
 
-impl APIAuthMethod {
+impl From<Credentials> for AuthenticationMethod {
+    fn from(credentials: Credentials) -> Self {
+        Self::BasicHTTPAuthentication(credentials)
+    }
+}
+
+impl AuthenticationMethod {
     /// Checks the any auth method selector or not
     ///
     /// # Examples
     ///
     /// ```
-    /// use subscan::enums::APIAuthMethod;
+    /// use subscan::enums::AuthenticationMethod;
     ///
-    /// let as_header = APIAuthMethod::APIKeyAsHeader("X-API-Key".to_string());
-    /// let no_auth = APIAuthMethod::NoAuth;
+    /// let as_header = AuthenticationMethod::APIKeyAsHeader("X-API-Key".to_string());
+    /// let no_auth = AuthenticationMethod::NoAuthentication;
     ///
     /// assert!(as_header.is_set());
     /// assert!(!no_auth.is_set());
     /// ```
     pub fn is_set(&self) -> bool {
-        self != &Self::NoAuth
+        self != &Self::NoAuthentication
     }
 }
 
@@ -115,6 +130,12 @@ pub enum Content {
     /// Empty content type
     #[default]
     Empty,
+}
+
+impl From<String> for Content {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
 }
 
 impl From<&str> for Content {

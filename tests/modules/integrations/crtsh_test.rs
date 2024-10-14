@@ -6,6 +6,7 @@ use crate::common::{
 use serde_json::Value;
 use std::collections::BTreeSet;
 use subscan::{
+    enums::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::crtsh::{Crtsh, CRTSH_URL},
 };
@@ -17,7 +18,7 @@ async fn run_test() {
 
     mocks::wrap_module_dispatcher_url_field(&mut crtsh, &stubr.path("/crtsh"));
 
-    let result = crtsh.run(TEST_DOMAIN.to_string()).await;
+    let result = crtsh.run(TEST_DOMAIN).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }
@@ -33,7 +34,7 @@ async fn get_query_url_test() {
 #[tokio::test]
 async fn get_next_url_test() {
     let url = TEST_URL.parse().unwrap();
-    let next = Crtsh::get_next_url(url, Value::Null);
+    let next = Crtsh::get_next_url(url, Content::Empty);
 
     assert!(next.is_none());
 }
@@ -41,8 +42,8 @@ async fn get_next_url_test() {
 #[tokio::test]
 async fn extract_test() {
     let json = read_stub("module/integrations/crtsh.json")["response"]["jsonBody"].clone();
-    let extracted = Crtsh::extract(json, TEST_DOMAIN.to_string());
-    let not_extracted = Crtsh::extract(Value::Null, TEST_DOMAIN.to_string());
+    let extracted = Crtsh::extract(json, TEST_DOMAIN);
+    let not_extracted = Crtsh::extract(Value::Null, TEST_DOMAIN);
 
     assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(not_extracted, BTreeSet::new());

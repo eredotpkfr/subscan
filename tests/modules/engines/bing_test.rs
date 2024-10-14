@@ -11,7 +11,7 @@ async fn run_test() {
 
     mocks::wrap_module_dispatcher_url_field(&mut bing, &stubr.path("/search"));
 
-    let result = bing.run(TEST_DOMAIN.to_string()).await;
+    let result = bing.run(TEST_DOMAIN).await;
 
     assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
 }

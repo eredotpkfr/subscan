@@ -1,0 +1,21 @@
+{
+    "request": {
+        "basicAuth": {
+            "password": "bar",
+            "username": "foo"
+        },
+        "method": "GET",
+        "urlPath": "/subdomains"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "subdomains": [
+                "bar.foo.com"
+            ]
+        },
+        "status": 200
+    }
+}

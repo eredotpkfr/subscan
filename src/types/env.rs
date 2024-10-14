@@ -2,7 +2,7 @@ use crate::utils::env::format_env;
 use dotenvy;
 
 /// Struct that stores any environment variable value with its name
-#[derive(Debug)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Env {
     /// Environment variable name as a string, it look like `FOO_APIKEY`
     pub name: String,
@@ -29,12 +29,23 @@ impl From<&str> for Env {
 }
 
 /// Store basic HTTP authentication credentials as a environment
-#[derive(Debug)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Credentials {
     /// Username as a [`Env`]
     pub username: Env,
     /// Password as a [`Env`]
     pub password: Env,
+}
+
+impl From<&str> for Credentials {
+    /// Fetch credentials from environment variables by module name. See the [`format_env`]
+    /// for details
+    fn from(name: &str) -> Self {
+        Self {
+            username: format_env(name, "username").into(),
+            password: format_env(name, "password").into(),
+        }
+    }
 }
 
 impl Credentials {
@@ -97,10 +108,7 @@ impl From<&str> for SubscanModuleEnvs {
         Self {
             host: format_env(name, "host").into(),
             apikey: format_env(name, "apikey").into(),
-            credentials: Credentials {
-                username: format_env(name, "username").into(),
-                password: format_env(name, "password").into(),
-            },
+            credentials: name.into(),
         }
     }
 }
