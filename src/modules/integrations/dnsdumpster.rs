@@ -99,10 +99,6 @@ impl SubscanModuleInterface for DnsDumpster {
             let cookie = format!("csrftoken={token}; Domain=dnsdumpster.com");
             let headers = HeaderMap::from_iter([
                 (
-                    HeaderName::from_static("content-type"),
-                    HeaderValue::from_static("application/x-www-form-urlencoded"),
-                ),
-                (
                     HeaderName::from_static("referer"),
                     HeaderValue::from_static(DNSDUMPSTER_URL),
                 ),
