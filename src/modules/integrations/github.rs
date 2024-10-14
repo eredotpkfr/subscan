@@ -98,13 +98,7 @@ impl SubscanModuleInterface for GitHub {
         let mut all_results = BTreeSet::new();
 
         let envs = self.envs().await;
-
-        let params = &[
-            ("per_page", "100"),
-            ("q", domain),
-            ("sort", "created"),
-            ("order", "asc"),
-        ];
+        let query = format!("per_page=100&q={domain}&sort=created&order=asc");
 
         let requester = &mut *self.components.requester.lock().await;
         let extractor = &self.components.extractor;
@@ -113,9 +107,9 @@ impl SubscanModuleInterface for GitHub {
         let auth = format!("token {}", envs.apikey.value.unwrap_or_default());
 
         rconfig.add_header(AUTHORIZATION, HeaderValue::from_str(&auth).unwrap());
+        self.url.set_query(Some(&query));
 
-        let url = Url::parse_with_params(GITHUB_API_URL, params).unwrap();
-        let content = requester.get_content(url).await;
+        let content = requester.get_content(self.url.clone()).await;
 
         for raw_url in self.get_html_urls(content).await {
             let raw_content = requester.get_content(raw_url.clone()).await;
