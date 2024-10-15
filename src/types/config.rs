@@ -1,9 +1,6 @@
-use crate::{cli::Cli, types::env::Credentials};
+use crate::{cli::Cli, config::DEFAULT_HTTP_TIMEOUT, types::env::Credentials};
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
 use std::{collections::HashMap, time::Duration};
-
-/// Default HTTP timeout as a [`Duration`]
-pub const DEFAULT_HTTP_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// Type definition for store [`RequesterInterface`](crate::interfaces::requester::RequesterInterface)
 /// configurations in a struct. Also it has helpful
