@@ -14,6 +14,7 @@ pub type GetQueryUrlFunc = Box<dyn Fn(&str) -> String + Sync + Send>;
 /// uses this function to get next query URL for fetch API fully
 pub type GetNextUrlFunc = Box<dyn Fn(Url, Content) -> Option<Url> + Sync + Send>;
 
+/// Container for generic integration module functions
 pub struct GenericIntegrationCoreFuncs {
     pub url: GetQueryUrlFunc,
     pub next: GetNextUrlFunc,

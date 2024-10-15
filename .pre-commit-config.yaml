@@ -35,6 +35,13 @@ repos:
       - id: cargo-check
       - id: clippy
 
+  - repo: https://github.com/EmbarkStudios/cargo-deny
+    rev: 0.16.1
+    hooks:
+      - id: cargo-deny
+        name: cargo-deny
+        args: ["--all-features", "--log-level", "error", "check"]
+
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
     rev: v9.18.0
     hooks:
@@ -58,9 +65,8 @@ repos:
       - id: markdownlint
         name: markdownlint
 
-  - repo: https://github.com/EmbarkStudios/cargo-deny
-    rev: 0.16.1
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.20.1
     hooks:
-      - id: cargo-deny
-        name: check cargo dependencies
-        args: ["--all-features", "--log-level", "error", "check"]
+      - id: gitleaks
+        name: gitleaks

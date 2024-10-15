@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/dnsdumpster-no-token"
+    },
+    "response": {
+        "body": "foo",
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}
