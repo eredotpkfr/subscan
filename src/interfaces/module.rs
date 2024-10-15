@@ -2,7 +2,7 @@ use crate::{
     enums::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
     modules::{
         generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
-        integrations::{commoncrawl::CommonCrawl, dnsdumpster::DnsDumpster},
+        integrations::{commoncrawl::CommonCrawl, dnsdumpster::DnsDumpster, github::GitHub},
     },
     types::env::SubscanModuleEnvs,
 };

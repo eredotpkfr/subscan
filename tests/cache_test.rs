@@ -29,7 +29,7 @@ mod modules {
         let credentials = Credentials {
             username: Env {
                 name: "USERNAME".into(),
-                value: Some("foo".to_string()),
+                value: Some("foo".into()),
             },
             password: Env {
                 name: "PASSWORD".into(),
@@ -40,8 +40,8 @@ mod modules {
         let old_config = RequesterConfig::default();
         let new_config = RequesterConfig {
             timeout: Duration::from_secs(120),
+            proxy: Some(TEST_URL.into()),
             headers,
-            proxy: Some(TEST_URL.to_string()),
             credentials,
         };
 

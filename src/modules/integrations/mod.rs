@@ -25,6 +25,8 @@ pub mod crtsh;
 pub mod digitorus;
 /// `DnsDumpster` non-generic integration
 pub mod dnsdumpster;
+/// `GitHub` non-generic integration
+pub mod github;
 /// `HackerTarget` HTML crawler integration
 pub mod hackertarget;
 /// `Leakix` API integration
