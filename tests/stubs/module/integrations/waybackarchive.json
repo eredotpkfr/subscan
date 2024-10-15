@@ -1,0 +1,30 @@
+{
+    "request": {
+        "method": "GET",
+        "queryParameters": {
+            "collapse": {
+                "equalTo": "urlkey"
+            },
+            "fl": {
+                "equalTo": "original"
+            },
+            "output": {
+                "equalTo": "txt"
+            },
+            "url": {
+                "equalTo": "*.foo.com/*"
+            }
+        },
+        "urlPath": "/waybackarchive"
+    },
+    "response": {
+        "body": "bar.foo.com\nbaz.foo.com",
+        "headers": {
+            "accept-ranges": "bytes",
+            "connection": "keep-alive",
+            "content-length": 23,
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}

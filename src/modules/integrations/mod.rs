@@ -45,6 +45,8 @@ pub mod subdomaincenter;
 pub mod threatcrowd;
 /// `VirusTotal` API integration, API key required
 pub mod virustotal;
+/// `WaybackArchive` non-generic integration
+pub mod waybackarchive;
 /// `WhoisXMLAPI` API integration, API key required
 pub mod whoisxmlapi;
 /// `ZoomEye` API integration, API key required

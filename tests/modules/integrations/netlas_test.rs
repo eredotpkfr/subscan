@@ -17,10 +17,9 @@ async fn run_test() {
     env::set_var(&env_name, "netlas-api-key");
     mocks::wrap_module_dispatcher_url_field(&mut netlas, &stubr.uri());
 
-    assert_eq!(
-        netlas.run(TEST_DOMAIN).await,
-        [TEST_BAR_SUBDOMAIN.to_string()].into()
-    );
+    let results = netlas.run(TEST_DOMAIN).await;
+
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.to_string()].into());
 
     env::remove_var(env_name);
 }

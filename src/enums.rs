@@ -4,6 +4,7 @@ use crate::{
         generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
         integrations::{
             commoncrawl::CommonCrawl, dnsdumpster::DnsDumpster, github::GitHub, netlas::Netlas,
+            waybackarchive::WaybackArchive,
         },
     },
     requesters::{chrome::ChromeBrowser, client::HTTPClient},
@@ -43,6 +44,8 @@ pub enum SubscanModuleDispatcher {
     GitHub(GitHub),
     /// Non-generic `Netlas` API integration variant
     Netlas(Netlas),
+    /// Non-generic `WaybackArchive` integration variant
+    WaybackArchive(WaybackArchive),
 }
 
 /// Dispatcher enumeration to decide extractor types

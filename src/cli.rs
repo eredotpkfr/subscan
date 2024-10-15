@@ -1,3 +1,4 @@
+use crate::config::DEFAULT_HTTP_TIMEOUT;
 use clap::Parser;
 
 /// Data structure for CLI, stores configurations to be
@@ -18,7 +19,7 @@ pub struct Cli {
     )]
     pub user_agent: String,
     /// HTTP timeout value as a seconds
-    #[arg(short, long, default_value_t = 10)]
+    #[arg(short, long, default_value_t = DEFAULT_HTTP_TIMEOUT.as_secs())]
     pub timeout: u64,
     /// HTTP proxy
     #[arg(short, long, default_value = None)]
