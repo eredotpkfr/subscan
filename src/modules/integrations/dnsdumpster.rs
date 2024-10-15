@@ -89,7 +89,7 @@ impl SubscanModuleInterface for DnsDumpster {
     }
 
     async fn run(&mut self, domain: &str) -> BTreeSet<String> {
-        let requester = &*self.components.requester.lock().await;
+        let requester = &mut *self.components.requester.lock().await;
         let extractor = &self.components.extractor;
 
         let content = requester.get_content(self.url.clone()).await;
@@ -117,11 +117,14 @@ impl SubscanModuleInterface for DnsDumpster {
                 ("user", "free"),
             ];
 
+            requester.config.headers.extend(headers);
+
             let request = requester
                 .client
                 .post(self.url.clone())
                 .form(params)
-                .headers(headers)
+                .timeout(requester.config.timeout)
+                .headers(requester.config.headers.clone())
                 .build()
                 .unwrap();
 
