@@ -1,0 +1,22 @@
+{
+    "request": {
+        "headers": {
+            "APIKEY": {
+                "equalTo": "securitytrails-api-key"
+            }
+        },
+        "method": "GET",
+        "urlPath": "/securitytrails"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "status": 200,
+            "subdomains": [
+                "bar"
+            ]
+        }
+    }
+}
