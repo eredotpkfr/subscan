@@ -31,6 +31,8 @@ pub mod github;
 pub mod hackertarget;
 /// `Leakix` API integration
 pub mod leakix;
+/// `Netlas` non-generic API integration, API key required
+pub mod netlas;
 /// `Shodan` API integration, API key required
 pub mod shodan;
 /// `Sitedossier` HTML crawler integration
