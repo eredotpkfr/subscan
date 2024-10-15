@@ -6,7 +6,7 @@ use crate::{
             alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys, certspotter,
             chaos, commoncrawl, crtsh, digitorus, dnsdumpster, github, hackertarget, leakix,
             netlas, securitytrails, shodan, sitedossier, subdomaincenter, threatcrowd, virustotal,
-            whoisxmlapi, zoomeye,
+            waybackarchive, whoisxmlapi, zoomeye,
         },
     },
 };
@@ -45,6 +45,7 @@ lazy_static! {
         Mutex::new(subdomaincenter::SubdomainCenter::dispatcher()),
         Mutex::new(threatcrowd::ThreatCrowd::dispatcher()),
         Mutex::new(virustotal::VirusTotal::dispatcher()),
+        Mutex::new(waybackarchive::WaybackArchive::dispatcher()),
         Mutex::new(whoisxmlapi::WhoisXMLAPI::dispatcher()),
         Mutex::new(zoomeye::ZoomEye::dispatcher()),
     ];

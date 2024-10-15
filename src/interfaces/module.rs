@@ -4,6 +4,7 @@ use crate::{
         generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
         integrations::{
             commoncrawl::CommonCrawl, dnsdumpster::DnsDumpster, github::GitHub, netlas::Netlas,
+            waybackarchive::WaybackArchive,
         },
     },
     types::env::SubscanModuleEnvs,

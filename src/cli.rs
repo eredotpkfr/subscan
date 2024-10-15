@@ -18,7 +18,7 @@ pub struct Cli {
     )]
     pub user_agent: String,
     /// HTTP timeout value as a seconds
-    #[arg(short, long, default_value_t = 10)]
+    #[arg(short, long, default_value_t = 30)]
     pub timeout: u64,
     /// HTTP proxy
     #[arg(short, long, default_value = None)]
