@@ -1,0 +1,18 @@
+{
+    "request": {
+        "headers": {
+            "Authorization": {
+                "equalTo": "token github-api-key"
+            }
+        },
+        "method": "GET",
+        "urlPath": "/github-code-search/results"
+    },
+    "response": {
+        "body": "this is bar.foo.com content",
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}

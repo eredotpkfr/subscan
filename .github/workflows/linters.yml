@@ -26,7 +26,7 @@ jobs:
       - name: Run clippy
         run: make clippy
 
-  lint-docs:
+  rust-lint-docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

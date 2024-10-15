@@ -1,0 +1,44 @@
+{
+    "request": {
+        "headers": {
+            "Authorization": {
+                "equalTo": "token github-api-key"
+            }
+        },
+        "method": "GET",
+        "queryParameters": {
+            "order": {
+                "equalTo": "asc"
+            },
+            "per_page": {
+                "equalTo": "100"
+            },
+            "q": {
+                "equalTo": "foo.com"
+            },
+            "sort": {
+                "equalTo": "created"
+            }
+        },
+        "urlPath": "/github-code-search"
+    },
+    "response": {
+        "headers": {
+            "content-type": "text/html"
+        },
+        "jsonBody": {
+            "items": [
+                {
+                    "html_url": "http://localhost:2222/{{request.pathSegments.[0]}}/results"
+                },
+                {
+                    "no_html_url": "foo"
+                }
+            ]
+        },
+        "status": 200,
+        "transformers": [
+            "response-template"
+        ]
+    }
+}
