@@ -2,7 +2,9 @@ use crate::{
     extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor},
     modules::{
         generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
-        integrations::{commoncrawl::CommonCrawl, dnsdumpster::DnsDumpster, github::GitHub},
+        integrations::{
+            commoncrawl::CommonCrawl, dnsdumpster::DnsDumpster, github::GitHub, netlas::Netlas,
+        },
     },
     requesters::{chrome::ChromeBrowser, client::HTTPClient},
     types::env::Credentials,
@@ -39,6 +41,8 @@ pub enum SubscanModuleDispatcher {
     DnsDumpster(DnsDumpster),
     /// Non-generic `GitHub` integration variant
     GitHub(GitHub),
+    /// Non-generic `Netlas` API integration variant
+    Netlas(Netlas),
 }
 
 /// Dispatcher enumeration to decide extractor types

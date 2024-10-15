@@ -1,0 +1,36 @@
+{
+    "request": {
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "fields": [
+                        "*"
+                    ],
+                    "q": "domain:(domain:*.foo.com AND NOT domain:foo.com)",
+                    "size": 1,
+                    "source_type": "include"
+                }
+            }
+        ],
+        "headers": {
+            "X-API-Key": {
+                "equalTo": "netlas-api-key"
+            }
+        },
+        "method": "POST",
+        "urlPath": "/api/domains/download/"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": [
+            {
+                "data": {
+                    "domain": "bar.foo.com"
+                }
+            }
+        ],
+        "status": 200
+    }
+}

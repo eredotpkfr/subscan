@@ -12,7 +12,7 @@ clap = { version = "4.5.20", features = ["derive"] }
 tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread", "tokio-macros"] }
 tokio-util = "0.7.12"
 futures = "0.3.31"
-reqwest = { version = "0.12.8", features = ["stream"] }
+reqwest = { version = "0.12.8", features = ["json", "stream"] }
 headless_chrome = { version = "1.0.15", features = ["fetch"] }
 scraper = "0.20.0"
 regex = "1.11.0"

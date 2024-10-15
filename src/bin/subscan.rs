@@ -17,7 +17,7 @@ async fn main() {
         let mut module = item.lock().await;
         let requester = module.requester().await.unwrap();
 
-        if module.name().await != "github" {
+        if module.name().await != "netlas" {
             continue;
         }
 

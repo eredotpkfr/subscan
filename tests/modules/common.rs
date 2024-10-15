@@ -113,6 +113,7 @@ pub mod mocks {
             SubscanModuleDispatcher::CommonCrawl(module) => module.url = url.parse().unwrap(),
             SubscanModuleDispatcher::DnsDumpster(module) => module.url = url.parse().unwrap(),
             SubscanModuleDispatcher::GitHub(module) => module.url = url.parse().unwrap(),
+            SubscanModuleDispatcher::Netlas(module) => module.url = url.parse().unwrap(),
         }
     }
 }
