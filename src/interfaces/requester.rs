@@ -22,6 +22,7 @@ use reqwest::Url;
 /// use subscan::interfaces::requester::RequesterInterface;
 /// use subscan::types::config::RequesterConfig;
 /// use subscan::enums::Content;
+/// use subscan::config::DEFAULT_HTTP_TIMEOUT;
 /// use reqwest::Url;
 /// use async_trait::async_trait;
 /// use serde_json::Value;
@@ -58,7 +59,7 @@ use reqwest::Url;
 ///
 ///     assert_eq!(content.as_string(), "foo");
 ///     assert_eq!(config.proxy, None);
-///     assert_eq!(config.timeout.as_secs(), 10);
+///     assert_eq!(config.timeout, DEFAULT_HTTP_TIMEOUT);
 ///     assert_eq!(config.headers.len(), 0);
 ///
 ///     // Configure with new config instance
