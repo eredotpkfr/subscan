@@ -1,0 +1,20 @@
+{
+    "request": {
+        "headers": {
+            "X-API-Key": {
+                "equalTo": "netlas-api-key"
+            }
+        },
+        "method": "GET",
+        "urlPath": "/netlas-no-count"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "no-count": "foo"
+        },
+        "status": 200
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "request": {
+        "headers": {
+            "X-API-Key": {
+                "equalTo": "netlas-api-key"
+            }
+        },
+        "method": "GET",
+        "queryParameters": {
+            "q": {
+                "equalTo": "domain:*.foo.com AND NOT domain:foo.com"
+            }
+        },
+        "urlPath": "/api/domains_count/"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "count": 1
+        },
+        "status": 200
+    }
+}
