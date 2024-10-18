@@ -4,9 +4,9 @@ use crate::{
         engines::{bing, duckduckgo, google, yahoo},
         integrations::{
             alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys, certspotter,
-            chaos, commoncrawl, crtsh, digitorus, dnsdumpster, github, hackertarget, leakix,
-            netlas, securitytrails, shodan, sitedossier, subdomaincenter, threatcrowd, virustotal,
-            waybackarchive, whoisxmlapi, zoomeye,
+            chaos, commoncrawl, crtsh, digitorus, dnsdumpster, dnsrepo, github, hackertarget,
+            leakix, netlas, securitytrails, shodan, sitedossier, subdomaincenter, threatcrowd,
+            virustotal, waybackarchive, whoisxmlapi, zoomeye,
         },
     },
 };
@@ -35,6 +35,7 @@ lazy_static! {
         Mutex::new(crtsh::Crtsh::dispatcher()),
         Mutex::new(digitorus::Digitorus::dispatcher()),
         Mutex::new(dnsdumpster::DnsDumpster::dispatcher()),
+        Mutex::new(dnsrepo::DnsRepo::dispatcher()),
         Mutex::new(github::GitHub::dispatcher()),
         Mutex::new(hackertarget::HackerTarget::dispatcher()),
         Mutex::new(leakix::Leakix::dispatcher()),

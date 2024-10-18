@@ -62,8 +62,9 @@ impl GenericIntegrationModule {
     async fn set_credentials(&self, credentials: Credentials) -> bool {
         if credentials.is_ok() {
             let requester = &mut *self.components.requester.lock().await;
+            let rconfig = requester.config().await;
 
-            requester.config().await.set_credentials(credentials);
+            rconfig.set_credentials(credentials);
 
             return true;
         }
@@ -73,6 +74,7 @@ impl GenericIntegrationModule {
     async fn set_apikey_param(&self, url: &mut Url, param: &str, apikey: Env) -> bool {
         if let Some(apikey) = &apikey.value {
             http::update_url_query(url, param, apikey);
+
             return true;
         }
         false
@@ -81,11 +83,12 @@ impl GenericIntegrationModule {
     async fn set_apikey_header(&self, name: &str, apikey: Env) -> bool {
         if let Some(apikey) = &apikey.value {
             let requester = &mut *self.components.requester.lock().await;
+            let rconfig = requester.config().await;
 
             let name = HeaderName::from_str(name).unwrap();
             let value = HeaderValue::from_str(apikey).unwrap();
 
-            requester.config().await.add_header(name, value);
+            rconfig.add_header(name, value);
 
             return true;
         }
