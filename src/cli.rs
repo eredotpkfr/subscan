@@ -1,4 +1,4 @@
-use crate::config::DEFAULT_HTTP_TIMEOUT;
+use crate::config::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
 use clap::Parser;
 
 /// Data structure for CLI, stores configurations to be
@@ -10,13 +10,7 @@ pub struct Cli {
     #[arg(short, long)]
     pub domain: String,
     /// User-Agent header value for HTTP requests
-    #[arg(
-        short,
-        long,
-        default_value = "Mozilla/5.0 (Macintosh; \
-            Intel Mac OS X 10_15_7) AppleWebKit/537.36  \
-            (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-    )]
+    #[arg(short, long, default_value = DEFAULT_USER_AGENT)]
     pub user_agent: String,
     /// HTTP timeout value as a seconds
     #[arg(short, long, default_value_t = DEFAULT_HTTP_TIMEOUT.as_secs())]
