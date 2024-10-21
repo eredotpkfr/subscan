@@ -1,6 +1,44 @@
-use crate::{cli::Cli, config::DEFAULT_HTTP_TIMEOUT, types::env::Credentials};
+use crate::{
+    cli::Cli,
+    config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
+    types::env::Credentials,
+};
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
 use std::{collections::HashMap, time::Duration};
+
+#[derive(Debug)]
+pub struct SubscanConfig {
+    /// Concurrency level, count of threads
+    pub concurrency: u64,
+    /// User-Agent header value for HTTP requests
+    pub user_agent: HeaderValue,
+    /// HTTP timeout value as a seconds
+    pub timeout: Duration,
+    /// HTTP proxy
+    pub proxy: Option<String>,
+}
+
+impl Default for SubscanConfig {
+    fn default() -> Self {
+        Self {
+            concurrency: DEFAULT_CONCURRENCY,
+            timeout: DEFAULT_HTTP_TIMEOUT,
+            user_agent: HeaderValue::from_static(DEFAULT_USER_AGENT),
+            proxy: None,
+        }
+    }
+}
+
+impl From<Cli> for SubscanConfig {
+    fn from(cli: Cli) -> Self {
+        Self {
+            concurrency: cli.concurrency,
+            user_agent: HeaderValue::from_str(&cli.user_agent).unwrap(),
+            timeout: Duration::from_secs(cli.timeout),
+            proxy: cli.proxy.clone(),
+        }
+    }
+}
 
 /// Type definition for store [`RequesterInterface`](crate::interfaces::requester::RequesterInterface)
 /// configurations in a struct. Also it has helpful
@@ -28,41 +66,13 @@ impl Default for RequesterConfig {
     }
 }
 
-impl From<&Cli> for RequesterConfig {
-    /// Build [`RequesterConfig`] object from given
-    /// [`Cli`] object
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use std::time::Duration;
-    /// use reqwest::header::USER_AGENT;
-    /// use subscan::cli::Cli;
-    /// use subscan::types::config::RequesterConfig;
-    ///
-    /// let cli = Cli {
-    ///     domain: String::from("foo.com"),
-    ///     timeout: 120,
-    ///     user_agent: String::from("bar"),
-    ///     proxy: None,
-    /// };
-    ///
-    /// let config = RequesterConfig::from(&cli);
-    /// let user_agent = config.headers.get(USER_AGENT).unwrap();
-    ///
-    /// assert_eq!(config.timeout.as_secs(), cli.timeout);
-    /// assert_eq!(config.proxy, cli.proxy);
-    /// assert_eq!(user_agent.to_str().unwrap(), cli.user_agent);
-    /// ```
-    fn from(cli: &Cli) -> Self {
+impl From<&SubscanConfig> for RequesterConfig {
+    fn from(config: &SubscanConfig) -> Self {
         Self {
-            headers: HeaderMap::from_iter([(
-                USER_AGENT,
-                HeaderValue::from_str(&cli.user_agent).unwrap(),
-            )]),
-            timeout: Duration::from_secs(cli.timeout),
-            proxy: cli.proxy.clone(),
-            ..Default::default()
+            headers: HeaderMap::from_iter([(USER_AGENT, config.user_agent.clone())]),
+            timeout: config.timeout,
+            proxy: config.proxy.clone(),
+            credentials: Credentials::default(),
         }
     }
 }

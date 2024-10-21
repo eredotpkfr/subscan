@@ -20,3 +20,28 @@ pub mod requesters;
 pub mod types;
 /// Utilities for the handle different stuff things
 pub mod utils;
+
+use crate::{cli::Cli, types::config::SubscanConfig};
+
+#[derive(Default)]
+pub struct Subscan {
+    pub config: SubscanConfig,
+}
+
+impl From<Cli> for Subscan {
+    fn from(cli: Cli) -> Self {
+        Self { config: cli.into() }
+    }
+}
+
+impl From<SubscanConfig> for Subscan {
+    fn from(config: SubscanConfig) -> Self {
+        Self { config }
+    }
+}
+
+impl Subscan {
+    pub fn new(config: SubscanConfig) -> Self {
+        Self { config }
+    }
+}

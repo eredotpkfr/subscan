@@ -1,4 +1,4 @@
-use crate::config::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
+use crate::config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
 use clap::Parser;
 
 /// Data structure for CLI, stores configurations to be
@@ -9,6 +9,9 @@ pub struct Cli {
     /// Target domain address to be enumerated
     #[arg(short, long)]
     pub domain: String,
+    /// Concurrency level, count of threads
+    #[arg(short, long, default_value_t = DEFAULT_CONCURRENCY)]
+    pub concurrency: u64,
     /// User-Agent header value for HTTP requests
     #[arg(short, long, default_value = DEFAULT_USER_AGENT)]
     pub user_agent: String,
