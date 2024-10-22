@@ -1,17 +1,14 @@
-use crate::config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
-use clap::Parser;
+use crate::config::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
+use clap::Args;
 
-/// Data structure for CLI, stores configurations to be
-/// used on run-time
-#[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
-pub struct Cli {
+/// Run command to start any module
+#[derive(Args, Clone, Debug)]
+pub struct ModuleRunSubCommandArgs {
+    /// Module name to be run
+    pub name: String,
     /// Target domain address to be enumerated
     #[arg(short, long)]
     pub domain: String,
-    /// Concurrency level, count of threads (default: [`DEFAULT_CONCURRENCY`])
-    #[arg(short, long, default_value_t = DEFAULT_CONCURRENCY)]
-    pub concurrency: u64,
     /// User-Agent header value for HTTP requests (default: [`DEFAULT_USER_AGENT`])
     #[arg(short, long, default_value = DEFAULT_USER_AGENT)]
     pub user_agent: String,

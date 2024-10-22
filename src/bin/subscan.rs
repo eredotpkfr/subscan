@@ -1,12 +1,30 @@
 use clap::Parser;
-use subscan::{cli::Cli, Subscan};
+use subscan::{
+    cli::{
+        commands::{module::ModuleSubCommands, Commands},
+        Cli,
+    },
+    Subscan,
+};
 
 #[tokio::main]
 async fn main() {
     let cli = Cli::parse();
-    let subscan = Subscan::from(cli);
+    let subscan = Subscan::from(cli.clone());
 
-    println!("{:#?}", subscan.config);
+    match cli.command {
+        Commands::Module(module) => match module.command {
+            ModuleSubCommands::List(_) => {}
+            ModuleSubCommands::Get(_) => {}
+            ModuleSubCommands::Run(args) => {
+                println!("{} {}", args.name, args.domain);
+            }
+        },
+        Commands::Scan(_) => {
+            println!("{:#?}", subscan.config);
+        }
+        Commands::Brute(_) => {}
+    }
 
     // cache::modules::configure_all_requesters(config).await;
 

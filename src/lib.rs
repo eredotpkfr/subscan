@@ -1,4 +1,4 @@
-/// In-memory cache module to store all modules
+/// In-memory cache to store all modules
 pub mod cache;
 /// Includes CLI components
 pub mod cli;

@@ -1,5 +1,8 @@
 use crate::{
-    cli::Cli,
+    cli::{
+        commands::{module::ModuleSubCommands, Commands},
+        Cli,
+    },
     config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
     types::env::Credentials,
 };
@@ -32,11 +35,26 @@ impl Default for SubscanConfig {
 
 impl From<Cli> for SubscanConfig {
     fn from(cli: Cli) -> Self {
-        Self {
-            concurrency: cli.concurrency,
-            user_agent: HeaderValue::from_str(&cli.user_agent).unwrap(),
-            timeout: Duration::from_secs(cli.timeout),
-            proxy: cli.proxy.clone(),
+        match cli.command {
+            Commands::Module(module) => match module.command {
+                ModuleSubCommands::List(_) | ModuleSubCommands::Get(_) => Self::default(),
+                ModuleSubCommands::Run(args) => Self {
+                    user_agent: HeaderValue::from_str(&args.user_agent).unwrap(),
+                    timeout: Duration::from_secs(args.timeout),
+                    proxy: args.proxy,
+                    ..Default::default()
+                },
+            },
+            Commands::Scan(args) => Self {
+                user_agent: HeaderValue::from_str(&args.user_agent).unwrap(),
+                timeout: Duration::from_secs(args.timeout),
+                proxy: args.proxy,
+                concurrency: args.concurrency,
+            },
+            Commands::Brute(args) => Self {
+                concurrency: args.concurrency,
+                ..Default::default()
+            },
         }
     }
 }
