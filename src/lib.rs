@@ -63,7 +63,7 @@ impl Subscan {
         }
     }
 
-    pub async fn init(&self) {
+    async fn init(&self) {
         let rconfig = self.config.clone().into();
         let inner = || async { self.manager.configure(rconfig).await };
 
