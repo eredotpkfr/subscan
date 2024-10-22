@@ -21,28 +21,66 @@ pub mod types;
 /// Utilities for the handle different stuff things
 pub mod utils;
 
-use crate::{cli::Cli, types::config::SubscanConfig};
+use crate::{
+    cache::CacheManager, cli::Cli, interfaces::module::SubscanModuleInterface,
+    types::config::SubscanConfig,
+};
+use enums::SubscanModuleDispatcher;
+use tokio::sync::{Mutex, OnceCell};
+
+static INIT: OnceCell<()> = OnceCell::const_new();
 
 /// Main `Subscan` object definition
 #[derive(Default)]
 pub struct Subscan {
     pub config: SubscanConfig,
+    pub manager: CacheManager,
 }
 
 impl From<Cli> for Subscan {
     fn from(cli: Cli) -> Self {
-        Self { config: cli.into() }
+        Self {
+            config: cli.into(),
+            manager: CacheManager::default(),
+        }
     }
 }
 
 impl From<SubscanConfig> for Subscan {
     fn from(config: SubscanConfig) -> Self {
-        Self { config }
+        Self {
+            config,
+            manager: CacheManager::default(),
+        }
     }
 }
 
 impl Subscan {
     pub fn new(config: SubscanConfig) -> Self {
-        Self { config }
+        Self {
+            config,
+            manager: CacheManager::default(),
+        }
+    }
+
+    pub async fn init(&self) {
+        let rconfig = self.config.clone().into();
+        let inner = || async { self.manager.configure(rconfig).await };
+
+        INIT.get_or_init(inner).await;
+    }
+
+    pub async fn module(&self, name: &str) -> Option<&Mutex<SubscanModuleDispatcher>> {
+        self.manager.module(name).await
+    }
+
+    pub async fn run(&self, name: &str, domain: &str) {
+        self.init().await;
+
+        let module = self.module(name).await.expect("Not found!");
+
+        for res in module.lock().await.run(domain).await {
+            println!("{}", res);
+        }
     }
 }

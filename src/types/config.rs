@@ -1,6 +1,10 @@
 use crate::{
     cli::{
-        commands::{module::ModuleSubCommands, Commands},
+        commands::{
+            module::{run::ModuleRunSubCommandArgs, ModuleSubCommands},
+            scan::ScanCommandArgs,
+            Commands,
+        },
         Cli,
     },
     config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
@@ -10,14 +14,14 @@ use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
 use std::{collections::HashMap, time::Duration};
 
 /// `Subscan` configurations as a struct type
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct SubscanConfig {
     /// Concurrency level, count of threads (default: [`DEFAULT_CONCURRENCY`])
     pub concurrency: u64,
     /// User-Agent header value for HTTP requests (default: [`DEFAULT_USER_AGENT`])
-    pub user_agent: HeaderValue,
+    pub user_agent: String,
     /// HTTP timeout value as a seconds (default: [`DEFAULT_HTTP_TIMEOUT`])
-    pub timeout: Duration,
+    pub timeout: u64,
     /// HTTP proxy (default: [`None`])
     pub proxy: Option<String>,
 }
@@ -26,9 +30,31 @@ impl Default for SubscanConfig {
     fn default() -> Self {
         Self {
             concurrency: DEFAULT_CONCURRENCY,
-            timeout: DEFAULT_HTTP_TIMEOUT,
-            user_agent: HeaderValue::from_static(DEFAULT_USER_AGENT),
+            timeout: DEFAULT_HTTP_TIMEOUT.as_secs(),
+            user_agent: DEFAULT_USER_AGENT.into(),
             proxy: None,
+        }
+    }
+}
+
+impl From<ModuleRunSubCommandArgs> for SubscanConfig {
+    fn from(args: ModuleRunSubCommandArgs) -> Self {
+        Self {
+            user_agent: args.user_agent,
+            timeout: args.timeout,
+            proxy: args.proxy,
+            concurrency: DEFAULT_CONCURRENCY,
+        }
+    }
+}
+
+impl From<ScanCommandArgs> for SubscanConfig {
+    fn from(args: ScanCommandArgs) -> Self {
+        Self {
+            user_agent: args.user_agent,
+            timeout: args.timeout,
+            proxy: args.proxy,
+            concurrency: args.concurrency,
         }
     }
 }
@@ -38,23 +64,10 @@ impl From<Cli> for SubscanConfig {
         match cli.command {
             Commands::Module(module) => match module.command {
                 ModuleSubCommands::List(_) | ModuleSubCommands::Get(_) => Self::default(),
-                ModuleSubCommands::Run(args) => Self {
-                    user_agent: HeaderValue::from_str(&args.user_agent).unwrap(),
-                    timeout: Duration::from_secs(args.timeout),
-                    proxy: args.proxy,
-                    ..Default::default()
-                },
+                ModuleSubCommands::Run(args) => args.into(),
             },
-            Commands::Scan(args) => Self {
-                user_agent: HeaderValue::from_str(&args.user_agent).unwrap(),
-                timeout: Duration::from_secs(args.timeout),
-                proxy: args.proxy,
-                concurrency: args.concurrency,
-            },
-            Commands::Brute(args) => Self {
-                concurrency: args.concurrency,
-                ..Default::default()
-            },
+            Commands::Scan(args) => args.into(),
+            Commands::Brute(_) => Self::default(),
         }
     }
 }
@@ -85,11 +98,14 @@ impl Default for RequesterConfig {
     }
 }
 
-impl From<&SubscanConfig> for RequesterConfig {
-    fn from(config: &SubscanConfig) -> Self {
+impl From<SubscanConfig> for RequesterConfig {
+    fn from(config: SubscanConfig) -> Self {
         Self {
-            headers: HeaderMap::from_iter([(USER_AGENT, config.user_agent.clone())]),
-            timeout: config.timeout,
+            headers: HeaderMap::from_iter([(
+                USER_AGENT,
+                HeaderValue::from_str(&config.user_agent).unwrap(),
+            )]),
+            timeout: Duration::from_secs(config.timeout),
             proxy: config.proxy.clone(),
             credentials: Credentials::default(),
         }

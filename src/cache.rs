@@ -1,5 +1,6 @@
 use crate::{
     enums::SubscanModuleDispatcher,
+    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::{
         engines::{bing, duckduckgo, google, yahoo},
         integrations::{
@@ -9,12 +10,15 @@ use crate::{
             virustotal, waybackarchive, whoisxmlapi, zoomeye,
         },
     },
+    types::config::RequesterConfig,
 };
 use lazy_static::lazy_static;
+use std::slice::Iter;
 use tokio::sync::Mutex;
 
 lazy_static! {
     /// All `Subscan` modules are stores in this in-memory [`Vec`] as a [`SubscanModuleDispatcher`]
+    #[derive(Default)]
     pub static ref ALL_MODULES: Vec<Mutex<SubscanModuleDispatcher>> = vec![
         // Search engines
         Mutex::new(bing::Bing::dispatcher()),
@@ -52,12 +56,54 @@ lazy_static! {
     ];
 }
 
-/// Module to manage modules that already cached in-memory cache
-pub mod modules {
-    use crate::{
-        interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
-        types::config::RequesterConfig,
-    };
+#[derive(Default)]
+pub struct CacheManager(ALL_MODULES);
+
+impl CacheManager {
+    /// Get module by name
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use subscan::cache::CacheManager;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let manager = CacheManager::default();
+    ///     let google = manager.module("google").await;
+    ///
+    ///     // Do something with module
+    /// }
+    /// ```
+    pub async fn module(&self, name: &str) -> Option<&Mutex<SubscanModuleDispatcher>> {
+        for module in self.iter().await {
+            if module.lock().await.name().await == name {
+                return Some(module);
+            }
+        }
+
+        None
+    }
+
+    /// Iterate over cached modules
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use subscan::cache::CacheManager;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let manager = CacheManager::default();
+    ///
+    ///     for module in manager.iter().await {
+    ///         // Iterate over modules
+    ///     }
+    /// }
+    /// ```
+    pub async fn iter(&self) -> Iter<Mutex<SubscanModuleDispatcher>> {
+        self.0.iter()
+    }
 
     /// Configure all modules requester objects that has any requester
     ///
@@ -65,9 +111,8 @@ pub mod modules {
     ///
     /// ```no_run
     /// use std::time::Duration;
-    /// use subscan::cache::modules;
+    /// use subscan::cache::CacheManager;
     /// use subscan::types::config::RequesterConfig;
-    /// use reqwest::header::HeaderMap;
     ///
     /// #[tokio::main]
     /// async fn main() {
@@ -76,16 +121,16 @@ pub mod modules {
     ///         ..Default::default()
     ///     };
     ///
-    ///     modules::configure_all_requesters(new_config);
+    ///     let manager = CacheManager::default();
+    ///
+    ///     manager.configure(new_config).await;
     ///
     ///     // configured all modules requester objects
     /// }
     /// ```
-    pub async fn configure_all_requesters(config: RequesterConfig) {
-        for module in super::ALL_MODULES.iter() {
-            let module = module.lock().await;
-
-            if let Some(requester) = module.requester().await {
+    pub async fn configure(&self, config: RequesterConfig) {
+        for module in self.iter().await {
+            if let Some(requester) = module.lock().await.requester().await {
                 requester.lock().await.configure(config.clone()).await
             }
         }
