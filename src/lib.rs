@@ -23,6 +23,7 @@ pub mod utils;
 
 use crate::{cli::Cli, types::config::SubscanConfig};
 
+/// Main `Subscan` object definition
 #[derive(Default)]
 pub struct Subscan {
     pub config: SubscanConfig,

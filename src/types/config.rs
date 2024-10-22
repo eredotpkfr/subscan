@@ -6,15 +6,16 @@ use crate::{
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
 use std::{collections::HashMap, time::Duration};
 
+/// `Subscan` configurations as a struct type
 #[derive(Debug)]
 pub struct SubscanConfig {
-    /// Concurrency level, count of threads
+    /// Concurrency level, count of threads (default: [`DEFAULT_CONCURRENCY`])
     pub concurrency: u64,
-    /// User-Agent header value for HTTP requests
+    /// User-Agent header value for HTTP requests (default: [`DEFAULT_USER_AGENT`])
     pub user_agent: HeaderValue,
-    /// HTTP timeout value as a seconds
+    /// HTTP timeout value as a seconds (default: [`DEFAULT_HTTP_TIMEOUT`])
     pub timeout: Duration,
-    /// HTTP proxy
+    /// HTTP proxy (default: [`None`])
     pub proxy: Option<String>,
 }
 
