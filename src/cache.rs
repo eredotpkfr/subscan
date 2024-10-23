@@ -17,7 +17,6 @@ use tokio::sync::Mutex;
 
 lazy_static! {
     /// All `Subscan` modules are stores in this in-memory [`Vec`] as a [`SubscanModuleDispatcher`]
-    #[derive(Default)]
     pub static ref ALL_MODULES: Vec<Mutex<SubscanModuleDispatcher>> = vec![
         // Search engines
         Mutex::new(bing::Bing::dispatcher()),
@@ -56,7 +55,7 @@ lazy_static! {
 }
 
 #[derive(Default)]
-pub struct CacheManager(ALL_MODULES);
+pub struct CacheManager {}
 
 impl CacheManager {
     /// Get module by name
@@ -103,7 +102,7 @@ impl CacheManager {
     /// }
     /// ````
     pub async fn modules(&self) -> &Vec<Mutex<SubscanModuleDispatcher>> {
-        &self.0
+        &ALL_MODULES
     }
 
     /// Configure all modules requester objects that has any requester
