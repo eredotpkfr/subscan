@@ -48,6 +48,35 @@ pub enum SubscanModuleDispatcher {
     WaybackArchive(WaybackArchive),
 }
 
+impl SubscanModuleDispatcher {
+    /// Returns [`true`] if module implemented as a generic module
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::modules::integrations::github::GitHub;
+    /// use subscan::modules::engines::google::Google;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let github = GitHub::dispatcher();
+    ///     let google = Google::dispatcher();
+    ///
+    ///     assert!(!github.is_generic().await);
+    ///     assert!(google.is_generic().await);
+    /// }
+    ///
+    ///
+    /// ```
+    pub async fn is_generic(&self) -> bool {
+        matches!(
+            self,
+            SubscanModuleDispatcher::GenericIntegrationModule(_)
+                | SubscanModuleDispatcher::GenericSearchEngineModule(_)
+        )
+    }
+}
+
 /// Dispatcher enumeration to decide extractor types
 ///
 /// It allows to made static type dispatching instead of dynamic dispatch and speed up performance.
@@ -59,7 +88,7 @@ pub enum SubdomainExtractorDispatcher {
     HTMLExtractor(HTMLExtractor),
     /// Regex extractor type allows to extract subdomain addresses from string content with a
     /// regex pattern by given domain address. See the [`RegexExtractor`] for technical details
-    /// and examples usages
+    /// and example usages
     RegexExtractor(RegexExtractor),
     /// JSON extractor type can extract subdomains from JSON content. In this type head up point
     /// is to know that created as a wrapper struct to be compatible with
@@ -68,6 +97,17 @@ pub enum SubdomainExtractorDispatcher {
     /// [`JSONExtractor`] struct and [`InnerExtractFunc`](crate::types::func::InnerExtractFunc)
     /// type for examples and technical details
     JSONExtractor(JSONExtractor),
+}
+
+#[allow(clippy::to_string_trait_impl)]
+impl ToString for SubdomainExtractorDispatcher {
+    fn to_string(&self) -> String {
+        match self {
+            SubdomainExtractorDispatcher::HTMLExtractor(_) => "HTMLExtractor".into(),
+            SubdomainExtractorDispatcher::RegexExtractor(_) => "RegexExtractor".into(),
+            SubdomainExtractorDispatcher::JSONExtractor(_) => "JSONExtractor".into(),
+        }
+    }
 }
 
 /// Dispatcher enumeration to decide requester types
@@ -85,6 +125,16 @@ pub enum RequesterDispatcher {
     ///  pages or user interface. Just send HTTP requests via [`reqwest`]. See the [`HTTPClient`]
     /// struct definition for examples and technical details
     HTTPClient(HTTPClient),
+}
+
+#[allow(clippy::to_string_trait_impl)]
+impl ToString for RequesterDispatcher {
+    fn to_string(&self) -> String {
+        match self {
+            RequesterDispatcher::ChromeBrowser(_) => "ChromeBrowser".into(),
+            RequesterDispatcher::HTTPClient(_) => "HTTPClient".into(),
+        }
+    }
 }
 
 /// Authentication methods for API calls or HTTP requests. [`GenericIntegrationModule`]

@@ -17,7 +17,7 @@ mod modules {
             ..Default::default()
         };
 
-        for module in manager.iter().await {
+        for module in manager.modules().await.iter() {
             if let Some(requester) = module.lock().await.requester().await {
                 assert_eq!(requester.lock().await.config().await, &old_config);
             }
@@ -25,7 +25,7 @@ mod modules {
 
         manager.configure(new_config.clone()).await;
 
-        for module in manager.iter().await {
+        for module in manager.modules().await.iter() {
             if let Some(requester) = module.lock().await.requester().await {
                 assert_eq!(requester.lock().await.config().await, &new_config);
             }

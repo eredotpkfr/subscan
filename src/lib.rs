@@ -70,14 +70,29 @@ impl Subscan {
         INIT.get_or_init(inner).await;
     }
 
-    pub async fn module(&self, name: &str) -> Option<&Mutex<SubscanModuleDispatcher>> {
-        self.manager.module(name).await
+    pub async fn module(&self, name: &str) -> &Mutex<SubscanModuleDispatcher> {
+        self.manager.module(name).await.expect("Module not found!")
+    }
+
+    pub async fn modules(&self) -> &Vec<Mutex<SubscanModuleDispatcher>> {
+        self.manager.modules().await
+    }
+
+    pub async fn scan(&self, domain: &str) {
+        self.init().await;
+
+        for module in self.modules().await.iter() {
+            println!("Running...{}", module.lock().await.name().await);
+            for sub in module.lock().await.run(domain).await {
+                println!("{}", sub);
+            }
+        }
     }
 
     pub async fn run(&self, name: &str, domain: &str) {
         self.init().await;
 
-        let module = self.module(name).await.expect("Not found!");
+        let module = self.module(name).await;
 
         for res in module.lock().await.run(domain).await {
             println!("{}", res);

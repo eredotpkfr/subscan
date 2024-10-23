@@ -13,7 +13,6 @@ use crate::{
     types::config::RequesterConfig,
 };
 use lazy_static::lazy_static;
-use std::slice::Iter;
 use tokio::sync::Mutex;
 
 lazy_static! {
@@ -72,20 +71,19 @@ impl CacheManager {
     ///     let manager = CacheManager::default();
     ///     let google = manager.module("google").await;
     ///
-    ///     // Do something with module
+    ///     // do something with module
     /// }
     /// ```
     pub async fn module(&self, name: &str) -> Option<&Mutex<SubscanModuleDispatcher>> {
-        for module in self.iter().await {
+        for module in self.modules().await.iter() {
             if module.lock().await.name().await == name {
                 return Some(module);
             }
         }
-
         None
     }
 
-    /// Iterate over cached modules
+    /// Get in-memory modules cache
     ///
     /// # Examples
     ///
@@ -93,16 +91,19 @@ impl CacheManager {
     /// use subscan::cache::CacheManager;
     ///
     /// #[tokio::main]
-    /// async fn main() {
+    /// async fn main () {
     ///     let manager = CacheManager::default();
+    ///     let modules = manager.modules().await;
     ///
-    ///     for module in manager.iter().await {
-    ///         // Iterate over modules
+    ///     for module in modules.iter() {
+    ///         let module = module.lock().await;
+    ///
+    ///         // do something with module
     ///     }
     /// }
-    /// ```
-    pub async fn iter(&self) -> Iter<Mutex<SubscanModuleDispatcher>> {
-        self.0.iter()
+    /// ````
+    pub async fn modules(&self) -> &Vec<Mutex<SubscanModuleDispatcher>> {
+        &self.0
     }
 
     /// Configure all modules requester objects that has any requester
@@ -129,7 +130,7 @@ impl CacheManager {
     /// }
     /// ```
     pub async fn configure(&self, config: RequesterConfig) {
-        for module in self.iter().await {
+        for module in self.modules().await.iter() {
             if let Some(requester) = module.lock().await.requester().await {
                 requester.lock().await.configure(config.clone()).await
             }

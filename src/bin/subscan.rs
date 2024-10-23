@@ -12,17 +12,22 @@ async fn main() {
     let cli = Cli::parse();
     let subscan = Subscan::from(cli.clone());
 
+    cli.banner();
+
     match cli.command {
         Commands::Module(module) => match module.command {
-            ModuleSubCommands::List(_) => {}
-            ModuleSubCommands::Get(_) => {}
+            ModuleSubCommands::List(list) => {
+                list.as_table(subscan.modules().await).await;
+            }
+            ModuleSubCommands::Get(get) => {
+                get.as_table(subscan.module(&get.name).await).await;
+            }
             ModuleSubCommands::Run(args) => {
-                println!("{:#?}", subscan.config);
                 subscan.run(&args.name, &args.domain).await;
             }
         },
-        Commands::Scan(_) => {
-            println!("{:#?}", subscan.config);
+        Commands::Scan(args) => {
+            subscan.scan(&args.domain).await;
         }
         Commands::Brute(_) => {}
     }
