@@ -17,7 +17,7 @@ pub struct Cli {
 }
 
 impl Cli {
-    pub fn banner(&self) {
+    pub async fn banner(&self) {
         println!("{}", banner());
     }
 }

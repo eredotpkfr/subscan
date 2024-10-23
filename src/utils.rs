@@ -24,7 +24,6 @@ pub mod cli {
             FdBwbd -> "Name",
             FdBwbd -> "Requester",
             FdBwbd -> "Extractor",
-            FdBwbd -> "API Key Environment",
             FdBwbd -> "Is Generic?",
         ];
 
@@ -52,8 +51,6 @@ pub mod cli {
     /// }
     /// ```
     pub async fn module_as_table_row(module: &SubscanModuleDispatcher) -> Row {
-        let envs = module.envs().await;
-
         let requester = if let Some(instance) = module.requester().await {
             instance.lock().await.to_string()
         } else {
@@ -70,7 +67,6 @@ pub mod cli {
             module.name().await,
             requester,
             extractor,
-            envs.apikey.name,
             module.is_generic().await
         ]
     }
