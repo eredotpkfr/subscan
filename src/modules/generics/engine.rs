@@ -49,7 +49,7 @@ pub struct GenericSearchEngineModule {
     pub components: SubscanModuleCoreComponents,
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl SubscanModuleInterface for GenericSearchEngineModule {
     async fn name(&self) -> &str {
         &self.name

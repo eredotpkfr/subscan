@@ -1,6 +1,76 @@
-use crate::{cli::Cli, config::DEFAULT_HTTP_TIMEOUT, types::env::Credentials};
+use crate::{
+    cli::{
+        commands::{
+            module::{run::ModuleRunSubCommandArgs, ModuleSubCommands},
+            scan::ScanCommandArgs,
+            Commands,
+        },
+        Cli,
+    },
+    config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
+    types::env::Credentials,
+};
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
 use std::{collections::HashMap, time::Duration};
+
+/// `Subscan` configurations as a struct type
+#[derive(Clone, Debug)]
+pub struct SubscanConfig {
+    /// Concurrency level, count of threads (default: [`DEFAULT_CONCURRENCY`])
+    pub concurrency: u64,
+    /// User-Agent header value for HTTP requests (default: [`DEFAULT_USER_AGENT`])
+    pub user_agent: String,
+    /// HTTP timeout value as a seconds (default: [`DEFAULT_HTTP_TIMEOUT`])
+    pub timeout: u64,
+    /// HTTP proxy (default: [`None`])
+    pub proxy: Option<String>,
+}
+
+impl Default for SubscanConfig {
+    fn default() -> Self {
+        Self {
+            concurrency: DEFAULT_CONCURRENCY,
+            timeout: DEFAULT_HTTP_TIMEOUT.as_secs(),
+            user_agent: DEFAULT_USER_AGENT.into(),
+            proxy: None,
+        }
+    }
+}
+
+impl From<ModuleRunSubCommandArgs> for SubscanConfig {
+    fn from(args: ModuleRunSubCommandArgs) -> Self {
+        Self {
+            user_agent: args.user_agent,
+            timeout: args.timeout,
+            proxy: args.proxy,
+            concurrency: DEFAULT_CONCURRENCY,
+        }
+    }
+}
+
+impl From<ScanCommandArgs> for SubscanConfig {
+    fn from(args: ScanCommandArgs) -> Self {
+        Self {
+            user_agent: args.user_agent,
+            timeout: args.timeout,
+            proxy: args.proxy,
+            concurrency: args.concurrency,
+        }
+    }
+}
+
+impl From<Cli> for SubscanConfig {
+    fn from(cli: Cli) -> Self {
+        match cli.command {
+            Commands::Module(module) => match module.command {
+                ModuleSubCommands::List(_) | ModuleSubCommands::Get(_) => Self::default(),
+                ModuleSubCommands::Run(args) => args.into(),
+            },
+            Commands::Scan(args) => args.into(),
+            Commands::Brute(_) => Self::default(),
+        }
+    }
+}
 
 /// Type definition for store [`RequesterInterface`](crate::interfaces::requester::RequesterInterface)
 /// configurations in a struct. Also it has helpful
@@ -28,41 +98,16 @@ impl Default for RequesterConfig {
     }
 }
 
-impl From<&Cli> for RequesterConfig {
-    /// Build [`RequesterConfig`] object from given
-    /// [`Cli`] object
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use std::time::Duration;
-    /// use reqwest::header::USER_AGENT;
-    /// use subscan::cli::Cli;
-    /// use subscan::types::config::RequesterConfig;
-    ///
-    /// let cli = Cli {
-    ///     domain: String::from("foo.com"),
-    ///     timeout: 120,
-    ///     user_agent: String::from("bar"),
-    ///     proxy: None,
-    /// };
-    ///
-    /// let config = RequesterConfig::from(&cli);
-    /// let user_agent = config.headers.get(USER_AGENT).unwrap();
-    ///
-    /// assert_eq!(config.timeout.as_secs(), cli.timeout);
-    /// assert_eq!(config.proxy, cli.proxy);
-    /// assert_eq!(user_agent.to_str().unwrap(), cli.user_agent);
-    /// ```
-    fn from(cli: &Cli) -> Self {
+impl From<SubscanConfig> for RequesterConfig {
+    fn from(config: SubscanConfig) -> Self {
         Self {
             headers: HeaderMap::from_iter([(
                 USER_AGENT,
-                HeaderValue::from_str(&cli.user_agent).unwrap(),
+                HeaderValue::from_str(&config.user_agent).unwrap(),
             )]),
-            timeout: Duration::from_secs(cli.timeout),
-            proxy: cli.proxy.clone(),
-            ..Default::default()
+            timeout: Duration::from_secs(config.timeout),
+            proxy: config.proxy.clone(),
+            credentials: Credentials::default(),
         }
     }
 }

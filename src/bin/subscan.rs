@@ -1,36 +1,34 @@
 use clap::Parser;
 use subscan::{
-    cache::{self, ALL_MODULES},
-    cli::Cli,
-    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
-    types::config::RequesterConfig,
+    cli::{
+        commands::{module::ModuleSubCommands, Commands},
+        Cli,
+    },
+    Subscan,
 };
 
 #[tokio::main]
 async fn main() {
     let cli = Cli::parse();
-    let config = RequesterConfig::from(&cli);
+    let subscan = Subscan::from(cli.clone());
 
-    cache::modules::configure_all_requesters(config).await;
+    cli.banner().await;
 
-    for item in ALL_MODULES.iter() {
-        let mut module = item.lock().await;
-        let requester = module.requester().await.unwrap();
-
-        if module.name().await != "dnsrepo" {
-            continue;
+    match cli.command {
+        Commands::Module(module) => match module.command {
+            ModuleSubCommands::List(list) => {
+                list.as_table(subscan.modules().await).await;
+            }
+            ModuleSubCommands::Get(get) => {
+                get.as_table(subscan.module(&get.name).await).await;
+            }
+            ModuleSubCommands::Run(args) => {
+                subscan.run(&args.name, &args.domain).await;
+            }
+        },
+        Commands::Scan(args) => {
+            subscan.scan(&args.domain).await;
         }
-
-        println!(
-            "{:#?} {:p}",
-            requester.lock().await.config().await,
-            requester,
-        );
-
-        println!("Running...{}({})", module.name().await, cli.domain.clone());
-
-        let res = module.run(&cli.domain).await;
-
-        println!("{:#?}\nTotal: {}", res, res.len());
+        Commands::Brute(_) => {}
     }
 }

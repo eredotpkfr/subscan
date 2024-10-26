@@ -53,7 +53,7 @@ impl WaybackArchive {
     }
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl SubscanModuleInterface for WaybackArchive {
     async fn name(&self) -> &str {
         &self.name

@@ -1,3 +1,77 @@
+/// Helpful functions that uses CLI related things
+pub mod cli {
+    use crate::{enums::SubscanModuleDispatcher, interfaces::module::SubscanModuleInterface};
+    use prettytable::{format::consts::FORMAT_NO_LINESEP_WITH_TITLE, row, Row, Table};
+
+    /// Creates table for module representation
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::utils::cli;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let table = cli::create_module_table().await;
+    ///
+    ///     assert!(table.is_empty());
+    /// }
+    /// ```
+    pub async fn create_module_table() -> Table {
+        let mut table = Table::new();
+
+        let titles = row![
+            FdBwbd -> "Name",
+            FdBwbd -> "Requester",
+            FdBwbd -> "Extractor",
+            FdBwbd -> "Is Generic?",
+        ];
+
+        table.set_format(*FORMAT_NO_LINESEP_WITH_TITLE);
+        table.set_titles(titles);
+        table
+    }
+
+    /// Converts module object to module table row representation
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::utils::cli;
+    /// use subscan::modules::engines::google::Google;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let module = Google::dispatcher();
+    ///     let mut table = cli::create_module_table().await;
+    ///
+    ///     table.add_row(cli::module_as_table_row(&module).await);
+    ///
+    ///     assert!(!table.is_empty());
+    /// }
+    /// ```
+    pub async fn module_as_table_row(module: &SubscanModuleDispatcher) -> Row {
+        let requester = if let Some(instance) = module.requester().await {
+            instance.lock().await.to_string()
+        } else {
+            "None".into()
+        };
+
+        let extractor = if let Some(instance) = module.extractor().await {
+            instance.to_string()
+        } else {
+            "None".into()
+        };
+
+        row![
+            module.name().await,
+            requester,
+            extractor,
+            module.is_generic().await
+        ]
+    }
+}
+
 /// Helpful regex utilities listed in this module
 pub mod regex {
     use core::result::Result;

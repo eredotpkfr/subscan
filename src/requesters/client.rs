@@ -49,7 +49,7 @@ impl HTTPClient {
     }
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl RequesterInterface for HTTPClient {
     /// Get requester config object as a [`RequesterConfig`]
     ///

@@ -31,7 +31,7 @@ use reqwest::Url;
 ///     config: RequesterConfig
 /// }
 ///
-/// #[async_trait(?Send)]
+/// #[async_trait]
 /// impl RequesterInterface for CustomRequester {
 ///     async fn config(&mut self) -> &mut RequesterConfig {
 ///         &mut self.config
@@ -73,7 +73,7 @@ use reqwest::Url;
 ///     assert_eq!(requester.config().await.timeout.as_secs(), 120);
 /// }
 /// ```
-#[async_trait(?Send)]
+#[async_trait]
 #[enum_dispatch]
 pub trait RequesterInterface: Sync + Send {
     /// Returns requester configurations as a [`RequesterConfig`] object

@@ -1,18 +1,18 @@
 use crate::config::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
-use clap::Parser;
+use clap::Args;
 
-/// Data structure for CLI, stores configurations to be
-/// used on run-time
-#[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
-pub struct Cli {
+/// Run command to start any module
+#[derive(Args, Clone, Debug)]
+pub struct ModuleRunSubCommandArgs {
+    /// Module name to be run
+    pub name: String,
     /// Target domain address to be enumerated
     #[arg(short, long)]
     pub domain: String,
-    /// User-Agent header value for HTTP requests
+    /// User-Agent header value for HTTP requests (default: [`DEFAULT_USER_AGENT`])
     #[arg(short, long, default_value = DEFAULT_USER_AGENT)]
     pub user_agent: String,
-    /// HTTP timeout value as a seconds
+    /// HTTP timeout value as a seconds (default: [`DEFAULT_HTTP_TIMEOUT`])
     #[arg(short, long, default_value_t = DEFAULT_HTTP_TIMEOUT.as_secs())]
     pub timeout: u64,
     /// HTTP proxy

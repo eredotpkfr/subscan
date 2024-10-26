@@ -80,7 +80,7 @@ impl GitHub {
     }
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl SubscanModuleInterface for GitHub {
     async fn name(&self) -> &str {
         &self.name
