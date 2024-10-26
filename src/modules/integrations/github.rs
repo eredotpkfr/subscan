@@ -98,23 +98,26 @@ impl SubscanModuleInterface for GitHub {
         let mut all_results = BTreeSet::new();
 
         let envs = self.envs().await;
-        let query = format!("per_page=100&q={domain}&sort=created&order=asc");
 
-        let requester = &mut *self.components.requester.lock().await;
-        let extractor = &self.components.extractor;
+        if let Some(apikey) = envs.apikey.value {
+            let query = format!("per_page=100&q={domain}&sort=created&order=asc");
 
-        let rconfig = requester.config().await;
-        let auth = format!("token {}", envs.apikey.value.unwrap_or_default());
+            let requester = &mut *self.components.requester.lock().await;
+            let extractor = &self.components.extractor;
 
-        rconfig.add_header(AUTHORIZATION, HeaderValue::from_str(&auth).unwrap());
-        self.url.set_query(Some(&query));
+            let rconfig = requester.config().await;
+            let auth = HeaderValue::from_str(&format!("token {}", apikey));
 
-        let content = requester.get_content(self.url.clone()).await;
+            rconfig.add_header(AUTHORIZATION, auth.unwrap());
+            self.url.set_query(Some(&query));
 
-        for raw_url in self.get_html_urls(content).await {
-            let raw_content = requester.get_content(raw_url.clone()).await;
+            let content = requester.get_content(self.url.clone()).await;
 
-            all_results.extend(extractor.extract(raw_content, domain).await);
+            for raw_url in self.get_html_urls(content).await {
+                let raw_content = requester.get_content(raw_url.clone()).await;
+
+                all_results.extend(extractor.extract(raw_content, domain).await);
+            }
         }
 
         all_results
