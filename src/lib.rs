@@ -11,6 +11,8 @@ pub mod enums;
 pub mod extractors;
 /// Trait implementations
 pub mod interfaces;
+/// Logger utilities
+pub mod logger;
 /// All modules listed under this module, core components for subscan
 pub mod modules;
 /// `Subscan` worker pool definitions, allows to run modules as asynchronously
@@ -94,7 +96,7 @@ impl Subscan {
         pool.clone().join().await;
 
         for res in pool.results().await {
-            println!("{}", res);
+            log::debug!("{res}");
         }
     }
 
@@ -104,7 +106,7 @@ impl Subscan {
         let module = self.module(name).await;
 
         for res in module.lock().await.run(domain).await {
-            println!("{}", res);
+            log::debug!("{res}");
         }
     }
 }

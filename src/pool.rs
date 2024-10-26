@@ -51,7 +51,7 @@ impl SubscanModuleRunner {
         while let Ok(module) = self.receiver.try_recv() {
             let mut module = module.lock().await;
 
-            println!("Running...{}({})", module.name().await, domain);
+            log::info!("Running...{}", module.name().await);
 
             results.lock().await.extend(module.run(&domain).await);
         }

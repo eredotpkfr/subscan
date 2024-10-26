@@ -12,6 +12,7 @@ async fn main() {
     let cli = Cli::parse();
     let subscan = Subscan::from(cli.clone());
 
+    cli.init().await;
     cli.banner().await;
 
     match cli.command {

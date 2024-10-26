@@ -11,12 +11,16 @@ readme = "README.md"
 async-trait = "0.1.83"
 chrono = "0.4.38"
 clap = { version = "4.5.20", features = ["derive"] }
+clap-verbosity-flag = "2.2.2"
+colog = "1.3.0"
 dotenvy = "0.15.7"
 enum_dispatch = "0.3.13"
+env_logger = "0.11.5"
 flume = "0.11.1"
 futures = "0.3.31"
 headless_chrome = { version = "1.0.15", features = ["fetch"] }
 lazy_static = "1.5.0"
+log = "0.4.22"
 prettytable-rs = "0.10.0"
 regex = "1.11.0"
 reqwest = { version = "0.12.8", features = ["json", "stream"] }
