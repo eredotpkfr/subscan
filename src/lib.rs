@@ -87,12 +87,11 @@ impl Subscan {
 
         let pool = SubscanModuleRunnerPool::new(domain.to_string());
 
-        pool.clone().spawn_runners(self.config.concurrency).await;
-
         for module in self.modules().await.iter() {
             pool.clone().submit(module.clone()).await;
         }
 
+        pool.clone().spawn_runners(self.config.concurrency).await;
         pool.clone().join().await;
 
         for res in pool.results().await {
