@@ -12,7 +12,7 @@ pub struct SubscanModuleRunner {
     receiver: Receiver<SubscanModule>,
 }
 
-/// Runner pool to run multiple  [`SubscanModuleRunner`]
+/// Runner pool to run multiple [`SubscanModuleRunner`]
 pub struct SubscanModuleRunnerPool {
     results: Arc<Mutex<BTreeSet<Subdomain>>>,
     domain: String,
