@@ -68,7 +68,7 @@ impl Netlas {
     }
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl SubscanModuleInterface for Netlas {
     async fn name(&self) -> &str {
         &self.name

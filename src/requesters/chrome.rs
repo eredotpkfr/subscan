@@ -62,11 +62,11 @@ impl ChromeBrowser {
     /// instance, the default options are listed in the
     /// table below
     ///
-    /// | Property   | Default Value |
-    /// |:----------:|:-------------:|
-    /// | headless   | `true`        |
-    /// | sandbox    | `false`       |
-    /// | enable_gpu | `false`       |
+    /// | Property   | Default Value   |
+    /// |:----------:|:---------------:|
+    /// | headless   | [`true`]        |
+    /// | sandbox    | [`false`]       |
+    /// | enable_gpu | [`false`]       |
     ///
     /// # Examples
     ///
@@ -92,7 +92,7 @@ impl ChromeBrowser {
     }
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl RequesterInterface for ChromeBrowser {
     /// Get requester config object as a [`RequesterConfig`]
     ///

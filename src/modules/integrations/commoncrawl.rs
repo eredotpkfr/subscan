@@ -74,7 +74,7 @@ impl CommonCrawl {
     }
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl SubscanModuleInterface for CommonCrawl {
     async fn name(&self) -> &str {
         &self.name

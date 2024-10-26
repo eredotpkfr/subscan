@@ -8,23 +8,24 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+async-trait = "0.1.83"
+chrono = "0.4.38"
 clap = { version = "4.5.20", features = ["derive"] }
+dotenvy = "0.15.7"
+enum_dispatch = "0.3.13"
+flume = "0.11.1"
+futures = "0.3.31"
+headless_chrome = { version = "1.0.15", features = ["fetch"] }
+lazy_static = "1.5.0"
+prettytable-rs = "0.10.0"
+regex = "1.11.0"
+reqwest = { version = "0.12.8", features = ["json", "stream"] }
+scraper = "0.20.0"
+serde_json = "1.0.132"
 tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread", "tokio-macros"] }
 tokio-util = "0.7.12"
-futures = "0.3.31"
-reqwest = { version = "0.12.8", features = ["json", "stream"] }
-headless_chrome = { version = "1.0.15", features = ["fetch"] }
-scraper = "0.20.0"
-regex = "1.11.0"
-serde_json = "1.0.132"
-async-trait = "0.1.83"
-lazy_static = "1.5.0"
-enum_dispatch = "0.3.13"
-dotenvy = "0.15.7"
-chrono = "0.4.38"
-prettytable-rs = "0.10.0"
 
 [dev-dependencies]
-md5 = "0.7.0"
 automod = "1.0.14"
+md5 = "0.7.0"
 stubr = "0.6.2"

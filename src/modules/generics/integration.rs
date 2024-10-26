@@ -96,7 +96,7 @@ impl GenericIntegrationModule {
     }
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl SubscanModuleInterface for GenericIntegrationModule {
     async fn name(&self) -> &str {
         &self.name

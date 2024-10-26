@@ -254,7 +254,7 @@ impl Content {
             Self::Empty => Value::Null,
         }
     }
-    /// Returns `true` if content is empty otherwise `false`
+    /// Returns [`true`] if content is empty otherwise [`false`]
     ///
     /// # Examples
     ///

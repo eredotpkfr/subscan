@@ -13,6 +13,8 @@ pub mod extractors;
 pub mod interfaces;
 /// All modules listed under this module, core components for subscan
 pub mod modules;
+/// `Subscan` worker pool definitions, allows to run modules as asynchronously
+pub mod pool;
 /// HTTP requesters listed under this module
 /// like [`requesters::chrome`], [`requesters::client`], etc.
 pub mod requesters;
@@ -22,10 +24,10 @@ pub mod types;
 pub mod utils;
 
 use crate::{
-    cache::CacheManager, cli::Cli, interfaces::module::SubscanModuleInterface,
-    types::config::SubscanConfig,
+    cache::CacheManager, cli::Cli, enums::SubscanModuleDispatcher,
+    interfaces::module::SubscanModuleInterface, pool::SubscanModuleRunnerPool,
+    types::config::SubscanConfig, types::core::SubscanModule,
 };
-use enums::SubscanModuleDispatcher;
 use tokio::sync::{Mutex, OnceCell};
 
 static INIT: OnceCell<()> = OnceCell::const_new();
@@ -74,18 +76,25 @@ impl Subscan {
         self.manager.module(name).await.expect("Module not found!")
     }
 
-    pub async fn modules(&self) -> &Vec<Mutex<SubscanModuleDispatcher>> {
+    pub async fn modules(&self) -> &Vec<SubscanModule> {
         self.manager.modules().await
     }
 
     pub async fn scan(&self, domain: &str) {
         self.init().await;
 
+        let pool = SubscanModuleRunnerPool::new(domain.to_string());
+
+        pool.clone().spawn_runners(self.config.concurrency).await;
+
         for module in self.modules().await.iter() {
-            println!("Running...{}", module.lock().await.name().await);
-            for sub in module.lock().await.run(domain).await {
-                println!("{}", sub);
-            }
+            pool.clone().submit(module.clone()).await;
+        }
+
+        pool.clone().join().await;
+
+        for res in pool.results().await {
+            println!("{}", res);
         }
     }
 

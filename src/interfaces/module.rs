@@ -38,7 +38,7 @@ use tokio::sync::Mutex;
 ///     pub extractor: SubdomainExtractorDispatcher,
 /// }
 ///
-/// #[async_trait(?Send)]
+/// #[async_trait]
 /// impl SubscanModuleInterface for FooModule {
 ///     async fn name(&self) -> &str {
 ///         &"foo"
@@ -77,7 +77,7 @@ use tokio::sync::Mutex;
 ///     let results = foo.run("foo.com").await;
 /// }
 /// ```
-#[async_trait(?Send)]
+#[async_trait]
 #[enum_dispatch]
 pub trait SubscanModuleInterface: Sync + Send {
     /// Returns module name, name should clarify what does module
