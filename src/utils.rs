@@ -64,10 +64,10 @@ pub mod cli {
         };
 
         row![
-            module.name().await,
-            requester,
-            extractor,
-            module.is_generic().await
+            Fw -> module.name().await,
+            Fw -> requester,
+            Fw -> extractor,
+            Fw -> module.is_generic().await
         ]
     }
 }
