@@ -4,7 +4,6 @@ use subscan::{
 };
 
 const TEST_DOMAIN: &str = "foo.com";
-const TEST_BAR_SUBDOMAIN: &str = "bar.foo.com";
 
 #[tokio::test]
 #[stubr::mock("module/engines/google.json")]
