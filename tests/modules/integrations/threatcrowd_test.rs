@@ -21,7 +21,7 @@ async fn run_test() {
 
     let result = threatcrowd.run(TEST_DOMAIN).await;
 
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }
 
 #[tokio::test]

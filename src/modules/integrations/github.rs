@@ -1,12 +1,17 @@
 use crate::{
-    enums::{Content, RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+    enums::{
+        Content, RequesterDispatcher,
+        SkipReason::NotAuthenticated,
+        SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+        SubscanModuleStatus::{Failed, Finished},
+    },
     extractors::regex::RegexExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     requesters::client::HTTPClient,
-    types::core::SubscanModuleCoreComponents,
+    types::core::{SubscanModuleCoreComponents, SubscanModuleResult},
 };
 use async_trait::async_trait;
 use reqwest::{
@@ -69,14 +74,14 @@ impl GitHub {
         None
     }
 
-    pub async fn get_html_urls(&self, content: Content) -> BTreeSet<Url> {
+    pub async fn get_html_urls(&self, content: Content) -> Option<BTreeSet<Url>> {
         if let Some(items) = content.as_json()["items"].as_array() {
             let filter = |item: &Value| self.get_raw_url(item);
 
-            return items.iter().filter_map(filter).collect();
+            return Some(items.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        None
     }
 }
 
@@ -94,8 +99,8 @@ impl SubscanModuleInterface for GitHub {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> BTreeSet<String> {
-        let mut all_results = BTreeSet::new();
+    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+        let mut result: SubscanModuleResult = self.name().await.into();
 
         let envs = self.envs().await;
 
@@ -113,13 +118,19 @@ impl SubscanModuleInterface for GitHub {
 
             let content = requester.get_content(self.url.clone()).await;
 
-            for raw_url in self.get_html_urls(content).await {
-                let raw_content = requester.get_content(raw_url.clone()).await;
+            if let Some(raws) = self.get_html_urls(content).await {
+                for raw_url in raws {
+                    let raw_content = requester.get_content(raw_url.clone()).await;
 
-                all_results.extend(extractor.extract(raw_content, domain).await);
+                    result.extend(extractor.extract(raw_content, domain).await);
+                }
+
+                return result.with_status(Finished).await;
             }
+
+            return result.with_status(Failed("not get raw URLs".into())).await;
         }
 
-        all_results
+        result.with_status(NotAuthenticated.into()).await
     }
 }

@@ -1,12 +1,15 @@
 use crate::{
-    enums::{Content, RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+    enums::{
+        Content, RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+        SubscanModuleStatus::{Failed, Finished},
+    },
     extractors::html::HTMLExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     requesters::client::HTTPClient,
-    types::core::SubscanModuleCoreComponents,
+    types::core::{SubscanModuleCoreComponents, SubscanModuleResult},
 };
 use async_trait::async_trait;
 use regex::Regex;
@@ -14,7 +17,6 @@ use reqwest::{
     header::{HeaderMap, HeaderName, HeaderValue},
     Url,
 };
-use std::collections::BTreeSet;
 use tokio::sync::Mutex;
 
 pub const DNSDUMPSTER_MODULE_NAME: &str = "dnsdumpster";
@@ -88,7 +90,9 @@ impl SubscanModuleInterface for DnsDumpster {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> BTreeSet<String> {
+    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+        let mut result: SubscanModuleResult = self.name().await.into();
+
         let requester = &mut *self.components.requester.lock().await;
         let extractor = &self.components.extractor;
 
@@ -130,11 +134,13 @@ impl SubscanModuleInterface for DnsDumpster {
 
             if let Ok(response) = requester.client.execute(request).await {
                 if let Ok(content) = response.text().await {
-                    return extractor.extract(content.into(), domain).await;
+                    result.extend(extractor.extract(content.into(), domain).await);
+
+                    return result.with_status(Finished).await;
                 }
             }
         }
 
-        [].into()
+        result.with_status(Failed("not get token".into())).await
     }
 }

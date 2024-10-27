@@ -23,5 +23,5 @@ async fn run_test() {
         TEST_BAZ_SUBDOMAIN.to_string(),
     ]);
 
-    assert_eq!(results, expected);
+    assert_eq!(results.subdomains, expected);
 }

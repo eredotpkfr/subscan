@@ -19,7 +19,7 @@ async fn run_test() {
 
     let results = netlas.run(TEST_DOMAIN).await;
 
-    assert_eq!(results, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(results.subdomains, [TEST_BAR_SUBDOMAIN.to_string()].into());
 
     env::remove_var(env_name);
 }
@@ -32,7 +32,7 @@ async fn run_test_no_count() {
     mocks::wrap_module_dispatcher_url_field(&mut netlas, &stubr.uri());
 
     // Test no count response
-    assert_eq!(netlas.run(TEST_DOMAIN).await, [].into());
+    assert_eq!(netlas.run(TEST_DOMAIN).await.subdomains, [].into());
 }
 
 #[tokio::test]

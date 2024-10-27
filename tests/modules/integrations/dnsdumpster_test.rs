@@ -25,7 +25,7 @@ async fn run_test_no_token() {
 
     mocks::wrap_module_dispatcher_url_field(&mut dnsdumpster, &stubr.path("/dnsdumpster-no-token"));
 
-    assert_eq!(dnsdumpster.run(TEST_DOMAIN).await, [].into());
+    assert_eq!(dnsdumpster.run(TEST_DOMAIN).await.subdomains, [].into());
 }
 
 #[tokio::test]
@@ -40,5 +40,5 @@ async fn run_test_with_token() {
 
     let results = dnsdumpster.run(TEST_DOMAIN).await;
 
-    assert_eq!(results, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(results.subdomains, [TEST_BAR_SUBDOMAIN.to_string()].into());
 }

@@ -25,12 +25,17 @@ pub mod types;
 /// Utilities for the handle different stuff things
 pub mod utils;
 
+use std::collections::BTreeSet;
+
 use crate::{
-    cache::CacheManager, cli::Cli, enums::SubscanModuleDispatcher,
-    interfaces::module::SubscanModuleInterface, pool::SubscanModuleRunnerPool,
-    types::config::SubscanConfig, types::core::SubscanModule,
+    cache::CacheManager,
+    cli::Cli,
+    interfaces::module::SubscanModuleInterface,
+    pool::SubscanModuleRunnerPool,
+    types::config::SubscanConfig,
+    types::core::{Subdomain, SubscanModule},
 };
-use tokio::sync::{Mutex, OnceCell};
+use tokio::sync::OnceCell;
 
 static INIT: OnceCell<()> = OnceCell::const_new();
 
@@ -74,7 +79,7 @@ impl Subscan {
         INIT.get_or_init(inner).await;
     }
 
-    pub async fn module(&self, name: &str) -> &Mutex<SubscanModuleDispatcher> {
+    pub async fn module(&self, name: &str) -> &SubscanModule {
         self.manager.module(name).await.expect("Module not found!")
     }
 
@@ -82,10 +87,13 @@ impl Subscan {
         self.manager.modules().await
     }
 
-    pub async fn scan(&self, domain: &str) {
+    pub async fn scan(&self, domain: &str) -> BTreeSet<Subdomain> {
         self.init().await;
 
+        let start = chrono::Utc::now().format("%H:%M:%S");
         let pool = SubscanModuleRunnerPool::new(domain.to_string());
+
+        log::info!("Started scan on {} ({})", domain, start);
 
         for module in self.modules().await.iter() {
             pool.clone().submit(module.clone()).await;
@@ -94,18 +102,27 @@ impl Subscan {
         pool.clone().spawn_runners(self.config.concurrency).await;
         pool.clone().join().await;
 
-        for res in pool.results().await {
-            log::debug!("{res}");
-        }
+        [].into()
     }
 
-    pub async fn run(&self, name: &str, domain: &str) {
+    pub async fn run(&self, name: &str, domain: &str) -> BTreeSet<Subdomain> {
         self.init().await;
 
+        let start = chrono::Utc::now().format("%H:%M:%S");
+        let pool = SubscanModuleRunnerPool::new(domain.to_string());
         let module = self.module(name).await;
 
-        for res in module.lock().await.run(domain).await {
-            log::debug!("{res}");
-        }
+        log::info!(
+            "Running {} module on {} ({})",
+            module.lock().await.name().await,
+            domain,
+            start
+        );
+
+        pool.clone().submit(module.clone()).await;
+        pool.clone().spawn_runners(1).await;
+        pool.clone().join().await;
+
+        [].into()
     }
 }

@@ -22,7 +22,7 @@ async fn run_test() {
 
     let result = whoisxmlapi.run(TEST_DOMAIN).await;
 
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
     env::remove_var(env_name);
 }

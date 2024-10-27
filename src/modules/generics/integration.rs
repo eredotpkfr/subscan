@@ -1,11 +1,14 @@
 use crate::{
-    enums::{AuthenticationMethod, RequesterDispatcher, SubdomainExtractorDispatcher},
+    enums::{
+        AuthenticationMethod, RequesterDispatcher, SkipReason::NotAuthenticated,
+        SubdomainExtractorDispatcher, SubscanModuleStatus::Finished,
+    },
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     types::{
-        core::SubscanModuleCoreComponents,
+        core::{SubscanModuleCoreComponents, SubscanModuleResult},
         env::{Credentials, Env},
         func::GenericIntegrationCoreFuncs,
     },
@@ -16,7 +19,7 @@ use reqwest::{
     header::{HeaderName, HeaderValue},
     Url,
 };
-use std::{collections::BTreeSet, str::FromStr};
+use std::str::FromStr;
 use tokio::sync::Mutex;
 
 /// Generic integration module
@@ -110,12 +113,12 @@ impl SubscanModuleInterface for GenericIntegrationModule {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> BTreeSet<String> {
+    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+        let mut result: SubscanModuleResult = self.name().await.into();
         let mut url: Url = (self.funcs.url)(domain).parse().unwrap();
-        let mut all_results = BTreeSet::new();
 
         if self.auth.is_set() && !self.authenticate(&mut url).await {
-            return all_results;
+            return result.with_status(NotAuthenticated.into()).await;
         }
 
         let requester = &*self.components.requester.lock().await;
@@ -129,7 +132,7 @@ impl SubscanModuleInterface for GenericIntegrationModule {
                 break;
             }
 
-            all_results.extend(news);
+            result.extend(news);
 
             if let Some(next_url) = (self.funcs.next)(url.clone(), content.clone()) {
                 url = next_url;
@@ -138,6 +141,6 @@ impl SubscanModuleInterface for GenericIntegrationModule {
             }
         }
 
-        all_results
+        result.with_status(Finished).await
     }
 }

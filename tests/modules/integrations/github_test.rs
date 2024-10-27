@@ -29,8 +29,11 @@ async fn get_html_urls_test() {
         let json = json!({"items": [{"html_url": "https://github.com/foo/blob/bar"}]});
         let expected = Url::parse("https://raw.githubusercontent.com/foo/bar").unwrap();
 
-        assert_eq!(module.get_html_urls(Content::Empty).await, [].into());
-        assert_eq!(module.get_html_urls(json.into()).await, [expected].into());
+        assert_eq!(module.get_html_urls(Content::Empty).await, None);
+        assert_eq!(
+            module.get_html_urls(json.into()).await.unwrap(),
+            [expected].into()
+        );
     }
 }
 
@@ -45,7 +48,7 @@ async fn run_test() {
 
     let results = github.run(TEST_DOMAIN).await;
 
-    assert_eq!(results, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(results.subdomains, [TEST_BAR_SUBDOMAIN.to_string()].into());
 
     env::remove_var(env_name);
 }

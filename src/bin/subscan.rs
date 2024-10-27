@@ -28,7 +28,9 @@ async fn main() {
             }
         },
         Commands::Scan(args) => {
-            subscan.scan(&args.domain).await;
+            for sub in subscan.scan(&args.domain).await {
+                log::debug!("{}", sub);
+            }
         }
         Commands::Brute(_) => {}
     }

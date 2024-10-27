@@ -1,80 +1,80 @@
+use colored::Colorize;
 use flume::{Receiver, Sender};
 use tokio::{sync::Mutex, task::JoinSet};
 
 use crate::{
+    enums::SubscanModuleStatus,
     interfaces::module::SubscanModuleInterface,
-    types::core::{Subdomain, SubscanModule},
+    types::core::{SubscanModule, SubscanModuleResult, UnboundedFlumeChannel},
 };
 use std::{collections::BTreeSet, sync::Arc};
 
-/// Module runner, basically listens given async channel and runs incoming `Subscan` modules
-pub struct SubscanModuleRunner {
-    receiver: Receiver<SubscanModule>,
+/// Container for input channel, stores receiver and sender instances
+pub struct SubscanModuleRunnerPoolInputChannel {
+    pub tx: Sender<SubscanModule>,
+    pub rx: Receiver<SubscanModule>,
 }
 
-/// Runner pool to run multiple [`SubscanModuleRunner`]
-pub struct SubscanModuleRunnerPool {
-    results: Arc<Mutex<BTreeSet<Subdomain>>>,
-    domain: String,
-    runners: Mutex<JoinSet<()>>,
-    input_tx: Sender<SubscanModule>,
-    input_rx: Receiver<SubscanModule>,
-}
-
-impl SubscanModuleRunner {
-    pub fn new(receiver: Receiver<SubscanModule>) -> Arc<Self> {
-        Arc::new(Self { receiver })
-    }
-
-    /// Start listening on given async channel and handle incoming modules from channel
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::pool::SubscanModuleRunner;
-    /// use subscan::types::core::SubscanModule;
-    /// use std::{sync::Arc, collections::BTreeSet};
-    /// use tokio::sync::Mutex;
-    /// use flume;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let (tx, rx) = flume::unbounded::<SubscanModule>();
-    ///     let runner = SubscanModuleRunner::new(rx);
-    ///     let results = Arc::new(Mutex::new(BTreeSet::new()));
-    ///
-    ///     // start to listen rx channel
-    ///     runner.run("foo.com".into(), results).await
-    /// }
-    /// ```
-    pub async fn run(self: Arc<Self>, domain: String, results: Arc<Mutex<BTreeSet<Subdomain>>>) {
-        while let Ok(module) = self.receiver.try_recv() {
-            let mut module = module.lock().await;
-
-            log::info!("Running...{}", module.name().await);
-
-            results.lock().await.extend(module.run(&domain).await);
+impl From<UnboundedFlumeChannel> for SubscanModuleRunnerPoolInputChannel {
+    fn from(channel: UnboundedFlumeChannel) -> Self {
+        Self {
+            tx: channel.0,
+            rx: channel.1,
         }
     }
+}
+
+/// Runner pool to run multiple [`SubscanModuleRunnerPool::runner`]
+pub struct SubscanModuleRunnerPool {
+    domain: String,
+    results: Mutex<BTreeSet<SubscanModuleResult>>,
+    runners: Mutex<JoinSet<()>>,
+    input: SubscanModuleRunnerPoolInputChannel,
 }
 
 impl SubscanModuleRunnerPool {
     pub fn new(domain: String) -> Arc<Self> {
         let runners = Mutex::new(JoinSet::new());
-        let results = Arc::new(Mutex::new(BTreeSet::new()));
+        let results = Mutex::new(BTreeSet::new());
 
-        let (input_tx, input_rx) = flume::unbounded::<SubscanModule>();
+        let input = flume::unbounded::<SubscanModule>().into();
 
         Arc::new(Self {
-            results,
             domain,
+            results,
             runners,
-            input_tx,
-            input_rx,
+            input,
         })
     }
 
-    /// Start multiple [`SubscanModuleRunner`] instance in a async pool
+    /// [`SubscanModule`] runner method, simply calls `.run(` method
+    pub async fn runner(self: Arc<Self>) {
+        while let Ok(module) = self.input.rx.try_recv() {
+            let mut module = module.lock().await;
+
+            let result = module.run(&self.domain).await;
+            let (name, status) = (module.name().await, result.status.to_string());
+
+            self.results.lock().await.insert(result.clone());
+
+            match result.status {
+                SubscanModuleStatus::Started => {
+                    log::info!("{:.<25}{:.>35}", name.white(), status.white())
+                }
+                SubscanModuleStatus::Finished => {
+                    log::info!("{:.<25}{:.>35}", name.white(), status.white())
+                }
+                SubscanModuleStatus::Skipped(_) => {
+                    log::warn!("{:.<25}{:.>35}", name.yellow(), status.yellow())
+                }
+                SubscanModuleStatus::Failed(_) => {
+                    log::error!("{:.<25}{:.>35}", name.red(), status.red())
+                }
+            }
+        }
+    }
+
+    /// Start multiple [`SubscanModuleRunnerPool::runner`] instance in a async pool
     ///
     /// # Examples
     ///
@@ -93,14 +93,11 @@ impl SubscanModuleRunnerPool {
     /// ```
     pub async fn spawn_runners(self: Arc<Self>, count: u64) {
         for _ in 0..count {
-            let mut runners = self.runners.lock().await;
-            let runner = SubscanModuleRunner::new(self.input_rx.clone());
-
-            runners.spawn(runner.run(self.domain.clone(), self.results.clone()));
+            self.runners.lock().await.spawn(self.clone().runner());
         }
     }
 
-    /// Returns pool size, count of [`SubscanModuleRunner`] that spawned
+    /// Returns pool size, count of [`SubscanModuleRunnerPool::runner`] that spawned
     ///
     /// # Examples
     ///
@@ -121,7 +118,7 @@ impl SubscanModuleRunnerPool {
         self.runners.lock().await.len()
     }
 
-    /// Returns [`true`] if any [`SubscanModuleRunner`] spawned otherwise [`false`]
+    /// Returns [`true`] if any [`SubscanModuleRunnerPool::runner`] spawned otherwise [`false`]
     ///
     /// # Examples
     ///
@@ -144,7 +141,7 @@ impl SubscanModuleRunnerPool {
         self.runners.lock().await.is_empty()
     }
 
-    /// Submit [`SubscanModule`] into pool to be ran by ayn [`SubscanModuleRunner`] that
+    /// Submit [`SubscanModule`] into pool to be ran by ayn [`SubscanModuleRunnerPool::runner`] that
     /// have not any module its on
     ///
     /// # Examples
@@ -168,10 +165,14 @@ impl SubscanModuleRunnerPool {
     /// }
     /// ```
     pub async fn submit(self: Arc<Self>, module: SubscanModule) {
-        self.input_tx.send(module).unwrap();
+        self.input.tx.send(module).unwrap();
     }
 
-    /// Join all [`SubscanModuleRunner`] in main thread
+    /// Join all [`SubscanModuleRunnerPool::runner`] in main thread
+    ///
+    /// # Panics
+    ///
+    /// If any error encountered while joining
     pub async fn join(self: Arc<Self>) {
         let mut runners = self.runners.lock().await;
 
@@ -182,8 +183,8 @@ impl SubscanModuleRunnerPool {
         }
     }
 
-    /// Returns results
-    pub async fn results(self: Arc<Self>) -> BTreeSet<Subdomain> {
+    /// Get all results grouped by module name
+    pub async fn results(&self) -> BTreeSet<SubscanModuleResult> {
         self.results.lock().await.clone()
     }
 }

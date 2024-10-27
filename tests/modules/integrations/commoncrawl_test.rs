@@ -25,8 +25,11 @@ async fn extract_cdx_urls_test() {
         ]);
         let expected = [TEST_URL.to_string()];
 
-        assert_eq!(module.extract_cdx_urls(Value::Null, "2024"), [].into());
-        assert_eq!(module.extract_cdx_urls(json, "2024"), expected.into());
+        assert_eq!(module.extract_cdx_urls(Value::Null, "2024"), None);
+        assert_eq!(
+            module.extract_cdx_urls(json, "2024").unwrap(),
+            expected.into()
+        );
     }
 }
 
@@ -55,5 +58,5 @@ async fn run_test() {
         TEST_BAZ_SUBDOMAIN.to_string(),
     ]);
 
-    assert_eq!(results, expected);
+    assert_eq!(results.subdomains, expected);
 }
