@@ -56,7 +56,7 @@ impl SubscanModuleRunnerPool {
             let mut module = module.lock().await;
 
             let result = module.run(&self.domain).await;
-            let (name, status) = (module.name().await, result.status.as_log().await);
+            let (name, status) = (module.name().await, result.status.with_reason().await);
 
             self.results.lock().await.insert(result.clone());
 

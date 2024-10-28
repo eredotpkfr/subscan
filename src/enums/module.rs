@@ -71,12 +71,12 @@ impl SubscanModuleStatus {
     ///     let started = SubscanModuleStatus::Started;
     ///     let failed = SubscanModuleStatus::Failed("foo".into());
     ///
-    ///     assert_eq!(skipped.as_log().await, "[not authenticated SKIPPED]");
-    ///     assert_eq!(started.as_log().await, "[STARTED]");
-    ///     assert_eq!(failed.as_log().await, "[foo FAILED]");
+    ///     assert_eq!(skipped.with_reason().await, "[not authenticated SKIPPED]");
+    ///     assert_eq!(started.with_reason().await, "[STARTED]");
+    ///     assert_eq!(failed.with_reason().await, "[foo FAILED]");
     /// }
     /// ```
-    pub async fn as_log(&self) -> String {
+    pub async fn with_reason(&self) -> String {
         match self {
             SubscanModuleStatus::Skipped(reason) => {
                 format!("[{} {}]", reason, self)
