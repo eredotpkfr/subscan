@@ -16,13 +16,13 @@ use std::{collections::HashMap, time::Duration};
 /// `Subscan` configurations as a struct type
 #[derive(Clone, Debug)]
 pub struct SubscanConfig {
-    /// Concurrency level, count of threads (default: [`DEFAULT_CONCURRENCY`])
+    /// Concurrency level, count of threads
     pub concurrency: u64,
-    /// User-Agent header value for HTTP requests (default: [`DEFAULT_USER_AGENT`])
+    /// User-Agent header value for HTTP requests
     pub user_agent: String,
-    /// HTTP timeout value as a seconds (default: [`DEFAULT_HTTP_TIMEOUT`])
+    /// HTTP timeout value as a seconds
     pub timeout: u64,
-    /// HTTP proxy (default: [`None`])
+    /// HTTP proxy
     pub proxy: Option<String>,
 }
 
@@ -79,7 +79,7 @@ impl From<Cli> for SubscanConfig {
 pub struct RequesterConfig {
     /// Stores header values for HTTP requests as a [`HeaderMap`]
     pub headers: HeaderMap,
-    /// HTTP request timeout value as a secs (default: `10`)
+    /// HTTP request timeout value as a secs
     pub timeout: Duration,
     /// Proxy server for HTTP requests
     pub proxy: Option<String>,
