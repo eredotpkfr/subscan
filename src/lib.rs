@@ -16,7 +16,7 @@ pub mod logger;
 /// All modules listed under this module, core components for subscan
 pub mod modules;
 /// `Subscan` worker pool definitions, allows to run modules as asynchronously
-pub mod pool;
+pub mod pools;
 /// HTTP requesters listed under this module
 /// like [`requesters::chrome`], [`requesters::client`], etc.
 pub mod requesters;
@@ -31,7 +31,7 @@ use crate::{
     cache::CacheManager,
     cli::Cli,
     interfaces::module::SubscanModuleInterface,
-    pool::SubscanModuleRunnerPool,
+    pools::runner::SubscanModuleRunnerPool,
     types::config::SubscanConfig,
     types::core::{Subdomain, SubscanModule},
 };

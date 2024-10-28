@@ -1,6 +1,6 @@
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher, modules::engines::google::Google,
-    pool::SubscanModuleRunnerPool, types::core::SubscanModule,
+    pools::runner::SubscanModuleRunnerPool, types::core::SubscanModule,
 };
 
 const TEST_DOMAIN: &str = "foo.com";

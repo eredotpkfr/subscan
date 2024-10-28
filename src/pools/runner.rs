@@ -82,7 +82,7 @@ impl SubscanModuleRunnerPool {
     /// # Examples
     ///
     /// ```
-    /// use subscan::pool::SubscanModuleRunnerPool;
+    /// use subscan::pools::runner::SubscanModuleRunnerPool;
     ///
     /// #[tokio::main]
     /// async fn main() {
@@ -105,7 +105,7 @@ impl SubscanModuleRunnerPool {
     /// # Examples
     ///
     /// ```
-    /// use subscan::pool::SubscanModuleRunnerPool;
+    /// use subscan::pools::runner::SubscanModuleRunnerPool;
     ///
     /// #[tokio::main]
     /// async fn main() {
@@ -126,7 +126,7 @@ impl SubscanModuleRunnerPool {
     /// # Examples
     ///
     /// ```
-    /// use subscan::pool::SubscanModuleRunnerPool;
+    /// use subscan::pools::runner::SubscanModuleRunnerPool;
     ///
     /// #[tokio::main]
     /// async fn main() {
@@ -151,7 +151,7 @@ impl SubscanModuleRunnerPool {
     ///
     /// ```no_run
     /// use subscan::types::core::SubscanModule;
-    /// use subscan::pool::SubscanModuleRunnerPool;
+    /// use subscan::pools::runner::SubscanModuleRunnerPool;
     /// use subscan::modules::engines::google::Google;
     ///
     /// #[tokio::main]
