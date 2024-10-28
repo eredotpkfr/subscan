@@ -1,3 +1,4 @@
+use super::module::SubscanModuleResult;
 use crate::{
     enums::module::SubscanModuleStatus,
     types::{
@@ -87,10 +88,10 @@ impl SubscanScanResult {
     /// async fn main() {
     ///     let mut result: SubscanScanResult = "foo.com".into();
     ///
-    ///     result.add_status("one", SubscanModuleStatus::Started).await;
-    ///     result.add_status("two", SkipReason::NotAuthenticated.into()).await;
-    ///     result.add_status("three", SubscanModuleStatus::Finished).await;
-    ///     result.add_status("four", SubscanModuleStatus::Failed("bar".into())).await;
+    ///     result.add_status("one", &SubscanModuleStatus::Started).await;
+    ///     result.add_status("two", &SkipReason::NotAuthenticated.into()).await;
+    ///     result.add_status("three", &SubscanModuleStatus::Finished).await;
+    ///     result.add_status("four", &SubscanModuleStatus::Failed("bar".into())).await;
     ///
     ///     assert_eq!(result.metadata.started.len(), 1);
     ///     assert_eq!(result.metadata.skipped.len(), 1);
@@ -98,7 +99,7 @@ impl SubscanScanResult {
     ///     assert_eq!(result.metadata.failed.len(), 1);
     /// }
     /// ```
-    pub async fn add_status(&mut self, module: &str, status: SubscanModuleStatus) -> bool {
+    pub async fn add_status(&mut self, module: &str, status: &SubscanModuleStatus) -> bool {
         match status {
             SubscanModuleStatus::Started => self.metadata.started.insert(module.to_string()),
             SubscanModuleStatus::Skipped(_) => self.metadata.skipped.insert(module.to_string()),
@@ -128,5 +129,34 @@ impl SubscanScanResult {
     /// ```
     pub async fn add_statistic(&mut self, stats: SubscanModuleStatistics) {
         self.statistics.push(stats);
+    }
+
+    /// Update scan results with any module result, that merges all subdomains and
+    /// statistics into [`SubscanScanResult`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::result::scan::SubscanScanResult;
+    /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
+    /// use subscan::types::result::module::SubscanModuleResult;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut scan_result: SubscanScanResult = "foo.com".into();
+    ///     let module_result: SubscanModuleResult = "foo".into();
+    ///
+    ///     scan_result.update_with_module_result(module_result).await;
+    ///
+    ///     assert_eq!(scan_result.statistics.len(), 1);
+    ///     assert_eq!(scan_result.metadata.started.len(), 1);
+    ///     assert_eq!(scan_result.results.len(), 0);
+    ///     assert_eq!(scan_result.total, 0);
+    /// }
+    /// ```
+    pub async fn update_with_module_result(&mut self, result: SubscanModuleResult) {
+        self.add_status(&result.module, &result.status).await;
+        self.add_statistic(result.stats()).await;
+        self.extend(result.subdomains);
     }
 }

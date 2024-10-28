@@ -97,8 +97,8 @@ impl SubscanModuleResult {
     ///     assert_eq!(finished.stats().status, SubscanModuleStatus::Finished);
     /// }
     /// ```
-    pub fn stats(self) -> SubscanModuleStatistics {
-        self.into()
+    pub fn stats(&self) -> SubscanModuleStatistics {
+        self.clone().into()
     }
 
     /// Update [`SubscanModuleResult::finished_at`] field and return itself

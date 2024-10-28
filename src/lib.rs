@@ -101,11 +101,7 @@ impl Subscan {
         pool.clone().join().await;
 
         for subresult in pool.results().await {
-            let stats = subresult.clone().stats();
-
-            result.add_status(&stats.module, stats.clone().status).await;
-            result.add_statistic(stats).await;
-            result.extend(subresult.subdomains);
+            result.update_with_module_result(subresult).await;
         }
 
         result.with_finished().await
@@ -132,11 +128,7 @@ impl Subscan {
         pool.clone().join().await;
 
         for subresult in pool.results().await {
-            let stats = subresult.clone().stats();
-
-            result.add_status(&stats.module, stats.clone().status).await;
-            result.add_statistic(stats).await;
-            result.extend(subresult.subdomains);
+            result.update_with_module_result(subresult).await;
         }
 
         result.with_finished().await
