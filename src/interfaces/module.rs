@@ -7,7 +7,7 @@ use crate::{
             waybackarchive::WaybackArchive,
         },
     },
-    types::{core::SubscanModuleResult, env::SubscanModuleEnvs},
+    types::{env::SubscanModuleEnvs, result::SubscanModuleResult},
 };
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;

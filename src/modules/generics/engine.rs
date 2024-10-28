@@ -5,8 +5,7 @@ use crate::{
         requester::RequesterInterface,
     },
     types::{
-        core::{SubscanModuleCoreComponents, SubscanModuleResult},
-        query::SearchQueryParam,
+        core::SubscanModuleCoreComponents, query::SearchQueryParam, result::SubscanModuleResult,
     },
 };
 use async_trait::async_trait;

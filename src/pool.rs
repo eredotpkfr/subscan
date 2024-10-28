@@ -5,7 +5,10 @@ use tokio::{sync::Mutex, task::JoinSet};
 use crate::{
     enums::SubscanModuleStatus,
     interfaces::module::SubscanModuleInterface,
-    types::core::{SubscanModule, SubscanModuleResult, UnboundedFlumeChannel},
+    types::{
+        core::{SubscanModule, UnboundedFlumeChannel},
+        result::SubscanModuleResult,
+    },
 };
 use std::{collections::BTreeSet, sync::Arc};
 

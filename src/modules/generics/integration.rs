@@ -8,9 +8,10 @@ use crate::{
         requester::RequesterInterface,
     },
     types::{
-        core::{SubscanModuleCoreComponents, SubscanModuleResult},
+        core::SubscanModuleCoreComponents,
         env::{Credentials, Env},
         func::GenericIntegrationCoreFuncs,
+        result::SubscanModuleResult,
     },
     utils::http,
 };

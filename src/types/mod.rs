@@ -8,3 +8,5 @@ pub mod env;
 pub mod func;
 /// Query types for search engines
 pub mod query;
+/// `Subscan` module result types
+pub mod result;

@@ -9,7 +9,10 @@ use crate::{
         requester::RequesterInterface,
     },
     requesters::client::HTTPClient,
-    types::core::{Subdomain, SubscanModuleCoreComponents, SubscanModuleResult},
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        result::SubscanModuleResult,
+    },
 };
 use async_trait::async_trait;
 use reqwest::{

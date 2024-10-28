@@ -11,7 +11,7 @@ use crate::{
         requester::RequesterInterface,
     },
     requesters::client::HTTPClient,
-    types::core::{SubscanModuleCoreComponents, SubscanModuleResult},
+    types::{core::SubscanModuleCoreComponents, result::SubscanModuleResult},
 };
 use async_trait::async_trait;
 use reqwest::{
