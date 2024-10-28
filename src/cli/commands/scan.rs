@@ -22,7 +22,7 @@ pub struct ScanCommandArgs {
     /// HTTP proxy
     #[arg(short, long, default_value = None)]
     pub proxy: Option<String>,
-    /// Output format (default: [`OutputFormat::TXT`])
+    /// Output format
     #[arg(value_enum, short, long, default_value_t = OutputFormat::TXT)]
     pub output: OutputFormat,
 }
