@@ -6,3 +6,5 @@ pub mod content;
 pub mod dispatchers;
 /// Module related enumerations
 pub mod module;
+/// Output format options
+pub mod output;

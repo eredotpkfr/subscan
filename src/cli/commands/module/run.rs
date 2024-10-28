@@ -1,4 +1,7 @@
-use crate::config::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
+use crate::{
+    config::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
+    enums::output::OutputFormat,
+};
 use clap::Args;
 
 /// Run command to start any module
@@ -18,4 +21,7 @@ pub struct ModuleRunSubCommandArgs {
     /// HTTP proxy
     #[arg(short, long, default_value = None)]
     pub proxy: Option<String>,
+    /// Output format (default: [`OutputFormat::TXT`])
+    #[arg(value_enum, short, long, default_value_t = OutputFormat::TXT)]
+    pub output: OutputFormat,
 }

@@ -15,8 +15,9 @@ pub struct Cli {
     /// Container for subcommands
     #[command(subcommand)]
     pub command: Commands,
+    /// Verbosity flag
     #[command(flatten)]
-    verbose: Verbosity<InfoLevel>,
+    pub verbose: Verbosity<InfoLevel>,
 }
 
 impl Cli {
