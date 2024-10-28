@@ -1,7 +1,7 @@
 use crate::{
     enums::{
-        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
-        SubscanModuleStatus::Finished,
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        module::SubscanModuleStatus::Finished,
     },
     extractors::regex::RegexExtractor,
     interfaces::{extractor::SubdomainExtractorInterface, module::SubscanModuleInterface},

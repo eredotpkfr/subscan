@@ -7,7 +7,7 @@ use reqwest::Url;
 use serde_json::{json, Value};
 use std::{collections::BTreeSet, env};
 use subscan::{
-    enums::Content,
+    enums::content::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::censys::{Censys, CENSYS_URL},
 };

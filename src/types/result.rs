@@ -1,4 +1,4 @@
-use crate::{enums::SubscanModuleStatus, types::core::Subdomain};
+use crate::{enums::module::SubscanModuleStatus, types::core::Subdomain};
 use chrono::{DateTime, TimeDelta, Utc};
 use std::collections::BTreeSet;
 
@@ -41,7 +41,7 @@ impl SubscanModuleResult {
     ///
     /// ```
     /// use subscan::types::result::SubscanModuleResult;
-    /// use subscan::enums::SubscanModuleStatus;
+    /// use subscan::enums::module::SubscanModuleStatus;
     ///
     /// #[tokio::main]
     /// async fn main() {
@@ -102,7 +102,7 @@ impl SubscanModuleResult {
     ///
     /// ```
     /// use subscan::types::result::SubscanModuleResult;
-    /// use subscan::enums::SubscanModuleStatus;
+    /// use subscan::enums::module::SubscanModuleStatus;
     ///
     /// #[tokio::main]
     /// async fn main() {
@@ -125,7 +125,7 @@ impl SubscanModuleResult {
     ///
     /// ```
     /// use subscan::types::result::SubscanModuleResult;
-    /// use subscan::enums::SubscanModuleStatus;
+    /// use subscan::enums::module::SubscanModuleStatus;
     ///
     /// #[tokio::main]
     /// async fn main() {

@@ -1,5 +1,7 @@
 use crate::{
-    enums::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+    enums::dispatchers::{
+        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    },
     modules::{
         generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
         integrations::{
@@ -27,9 +29,9 @@ use tokio::sync::Mutex;
 /// use std::collections::BTreeSet;
 /// use subscan::interfaces::module::SubscanModuleInterface;
 /// use subscan::requesters::client::HTTPClient;
-/// use subscan::types::core::SubscanModuleResult;
+/// use subscan::types::result::SubscanModuleResult;
 /// use subscan::extractors::regex::RegexExtractor;
-/// use subscan::enums::{RequesterDispatcher, SubdomainExtractorDispatcher};
+/// use subscan::enums::dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher};
 /// use async_trait::async_trait;
 /// use tokio::sync::Mutex;
 ///

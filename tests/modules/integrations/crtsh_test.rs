@@ -6,7 +6,7 @@ use crate::common::{
 use serde_json::Value;
 use std::collections::BTreeSet;
 use subscan::{
-    enums::Content,
+    enums::content::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::crtsh::{Crtsh, CRTSH_URL},
 };

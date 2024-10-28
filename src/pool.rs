@@ -3,7 +3,7 @@ use flume::{Receiver, Sender};
 use tokio::{sync::Mutex, task::JoinSet};
 
 use crate::{
-    enums::SubscanModuleStatus,
+    enums::module::SubscanModuleStatus,
     interfaces::module::SubscanModuleInterface,
     types::{
         core::{SubscanModule, UnboundedFlumeChannel},

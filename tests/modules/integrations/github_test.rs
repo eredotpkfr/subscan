@@ -7,7 +7,7 @@ use crate::common::{
 use reqwest::Url;
 use serde_json::{json, Value};
 use subscan::{
-    enums::{Content, SubscanModuleDispatcher},
+    enums::{content::Content, dispatchers::SubscanModuleDispatcher},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::github::GitHub,
 };

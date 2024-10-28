@@ -1,7 +1,7 @@
 use crate::common::constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN};
 use std::collections::BTreeSet;
 use subscan::{
-    enums::Content, extractors::regex::RegexExtractor,
+    enums::content::Content, extractors::regex::RegexExtractor,
     interfaces::extractor::SubdomainExtractorInterface,
 };
 

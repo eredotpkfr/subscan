@@ -3,7 +3,7 @@ use crate::common::{
     mocks,
 };
 use subscan::{
-    enums::Content,
+    enums::content::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::dnsrepo::{DnsRepo, DNSREPO_URL},
 };

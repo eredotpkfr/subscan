@@ -3,7 +3,7 @@ use crate::common::{
     mocks,
 };
 use subscan::{
-    enums::{Content, SubscanModuleDispatcher},
+    enums::{content::Content, dispatchers::SubscanModuleDispatcher},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::dnsdumpster::DnsDumpster,
 };

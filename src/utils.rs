@@ -1,6 +1,8 @@
 /// Helpful functions that uses CLI related things
 pub mod cli {
-    use crate::{enums::SubscanModuleDispatcher, interfaces::module::SubscanModuleInterface};
+    use crate::{
+        enums::dispatchers::SubscanModuleDispatcher, interfaces::module::SubscanModuleInterface,
+    };
     use prettytable::{format::consts::FORMAT_NO_LINESEP_WITH_TITLE, row, Row, Table};
 
     /// Creates table for module representation

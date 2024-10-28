@@ -1,5 +1,5 @@
 use super::core::Subdomain;
-use crate::enums::Content;
+use crate::enums::content::Content;
 use reqwest::Url;
 use serde_json::Value;
 use std::collections::BTreeSet;

@@ -1,5 +1,5 @@
 use crate::{
-    enums::{Content, SubdomainExtractorDispatcher},
+    enums::{content::Content, dispatchers::SubdomainExtractorDispatcher},
     extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor},
     types::core::Subdomain,
 };
@@ -21,7 +21,7 @@ use std::collections::BTreeSet;
 /// use std::collections::BTreeSet;
 /// use subscan::interfaces::extractor::SubdomainExtractorInterface;
 /// use subscan::types::core::Subdomain;
-/// use subscan::enums::Content;
+/// use subscan::enums::content::Content;
 /// use async_trait::async_trait;
 ///
 /// pub struct CustomExtractor {}

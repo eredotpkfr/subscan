@@ -1,7 +1,7 @@
 use crate::{
     enums::{
-        RequesterDispatcher, SkipReason::NotAuthenticated, SubdomainExtractorDispatcher,
-        SubscanModuleDispatcher, SubscanModuleStatus::Finished,
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        module::{SkipReason::NotAuthenticated, SubscanModuleStatus::Finished},
     },
     extractors::json::JSONExtractor,
     interfaces::{

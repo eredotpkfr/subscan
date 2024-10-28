@@ -3,7 +3,7 @@ use crate::common::{
     mocks,
 };
 use subscan::{
-    enums::SubscanModuleDispatcher, interfaces::module::SubscanModuleInterface,
+    enums::dispatchers::SubscanModuleDispatcher, interfaces::module::SubscanModuleInterface,
     modules::engines::duckduckgo::DuckDuckGo, requesters::client::HTTPClient,
 };
 use tokio::sync::Mutex;

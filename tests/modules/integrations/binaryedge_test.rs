@@ -7,7 +7,7 @@ use reqwest::Url;
 use serde_json::Value;
 use std::{collections::BTreeSet, env};
 use subscan::{
-    enums::Content,
+    enums::content::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::binaryedge::{BinaryEdge, BINARYEDGE_URL},
 };

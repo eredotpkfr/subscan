@@ -9,7 +9,7 @@ pub mod funcs {
     use super::constants::READ_ERROR;
     use std::fs;
     use std::path::{Path, PathBuf};
-    use subscan::enums::Content;
+    use subscan::enums::content::Content;
 
     fn testdata_path() -> PathBuf {
         Path::new(env!("CARGO_MANIFEST_DIR")).join("testing/testdata")

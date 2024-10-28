@@ -7,7 +7,7 @@ use crate::common::{
 };
 use serde_json::{json, Value};
 use subscan::{
-    enums::SubscanModuleDispatcher,
+    enums::dispatchers::SubscanModuleDispatcher,
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::integrations::commoncrawl::CommonCrawl,
     types::config::RequesterConfig,

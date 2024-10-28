@@ -1,9 +1,11 @@
 use crate::{
     enums::{
-        Content, RequesterDispatcher,
-        SkipReason::NotAuthenticated,
-        SubdomainExtractorDispatcher, SubscanModuleDispatcher,
-        SubscanModuleStatus::{Failed, Finished},
+        content::Content,
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        module::{
+            SkipReason::NotAuthenticated,
+            SubscanModuleStatus::{Failed, Finished},
+        },
     },
     extractors::regex::RegexExtractor,
     interfaces::{

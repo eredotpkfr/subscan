@@ -1,5 +1,5 @@
 use subscan::{
-    enums::SubscanModuleDispatcher, modules::engines::google::Google,
+    enums::dispatchers::SubscanModuleDispatcher, modules::engines::google::Google,
     pool::SubscanModuleRunnerPool, types::core::SubscanModule,
 };
 

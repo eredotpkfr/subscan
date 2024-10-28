@@ -1,7 +1,8 @@
 use crate::{
     enums::{
-        AuthenticationMethod, RequesterDispatcher, SkipReason::NotAuthenticated,
-        SubdomainExtractorDispatcher, SubscanModuleStatus::Finished,
+        auth::AuthenticationMethod,
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
+        module::{SkipReason::NotAuthenticated, SubscanModuleStatus::Finished},
     },
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,

@@ -1,7 +1,8 @@
 use crate::{
     enums::{
-        Content, RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
-        SubscanModuleStatus::{Failed, Finished},
+        content::Content,
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        module::SubscanModuleStatus::{Failed, Finished},
     },
     extractors::html::HTMLExtractor,
     interfaces::{

@@ -1,5 +1,9 @@
 use crate::{
-    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{
+        auth::AuthenticationMethod,
+        content::Content,
+        dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
+    },
     extractors::html::HTMLExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,

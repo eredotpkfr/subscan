@@ -7,7 +7,7 @@ use crate::common::{
 };
 use serde_json::Value;
 use subscan::{
-    enums::Content,
+    enums::content::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::threatcrowd::{ThreatCrowd, THREATCROWD_URL},
 };

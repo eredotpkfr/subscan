@@ -37,7 +37,10 @@ pub mod mocks {
     use super::funcs::md5_hex;
     use super::*;
     use subscan::{
-        enums::{AuthenticationMethod, RequesterDispatcher, SubscanModuleDispatcher},
+        enums::{
+            auth::AuthenticationMethod,
+            dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
+        },
         extractors::{json::JSONExtractor, regex::RegexExtractor},
         modules::generics::{
             engine::GenericSearchEngineModule, integration::GenericIntegrationModule,

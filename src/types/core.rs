@@ -1,4 +1,6 @@
-use crate::enums::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher};
+use crate::enums::dispatchers::{
+    RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+};
 use flume::{Receiver, Sender};
 use std::sync::Arc;
 use tokio::sync::Mutex;

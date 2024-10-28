@@ -5,7 +5,7 @@ use crate::common::{
 use reqwest::Url;
 use std::env;
 use subscan::{
-    enums::{AuthenticationMethod, Content},
+    enums::{auth::AuthenticationMethod, content::Content},
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     types::env::{Credentials, Env},
 };
