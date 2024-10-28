@@ -31,7 +31,7 @@ use crate::{
     types::core::SubscanModule,
 };
 use tokio::sync::OnceCell;
-use types::result::SubscanScanResult;
+use types::result::scan::SubscanScanResult;
 
 static INIT: OnceCell<()> = OnceCell::const_new();
 

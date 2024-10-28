@@ -11,7 +11,7 @@ use crate::{
     requesters::client::HTTPClient,
     types::{
         core::{Subdomain, SubscanModuleCoreComponents},
-        result::SubscanModuleResult,
+        result::module::SubscanModuleResult,
     },
 };
 use async_trait::async_trait;

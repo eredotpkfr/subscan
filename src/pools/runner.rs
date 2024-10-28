@@ -7,7 +7,7 @@ use crate::{
     interfaces::module::SubscanModuleInterface,
     types::{
         core::{SubscanModule, UnboundedFlumeChannel},
-        result::SubscanModuleResult,
+        result::module::SubscanModuleResult,
     },
 };
 use std::{collections::BTreeSet, sync::Arc};

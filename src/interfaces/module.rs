@@ -9,7 +9,7 @@ use crate::{
             waybackarchive::WaybackArchive,
         },
     },
-    types::{env::SubscanModuleEnvs, result::SubscanModuleResult},
+    types::{env::SubscanModuleEnvs, result::module::SubscanModuleResult},
 };
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
@@ -29,7 +29,7 @@ use tokio::sync::Mutex;
 /// use std::collections::BTreeSet;
 /// use subscan::interfaces::module::SubscanModuleInterface;
 /// use subscan::requesters::client::HTTPClient;
-/// use subscan::types::result::SubscanModuleResult;
+/// use subscan::types::result::module::SubscanModuleResult;
 /// use subscan::extractors::regex::RegexExtractor;
 /// use subscan::enums::dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher};
 /// use async_trait::async_trait;

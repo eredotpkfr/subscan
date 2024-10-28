@@ -12,7 +12,7 @@ use crate::{
         core::SubscanModuleCoreComponents,
         env::{Credentials, Env},
         func::GenericIntegrationCoreFuncs,
-        result::SubscanModuleResult,
+        result::module::SubscanModuleResult,
     },
     utils::http,
 };
