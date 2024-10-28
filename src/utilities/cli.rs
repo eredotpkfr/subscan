@@ -8,7 +8,7 @@ use prettytable::{format::consts::FORMAT_NO_LINESEP_WITH_TITLE, row, Row, Table}
 /// # Examples
 ///
 /// ```
-/// use subscan::utils::cli;
+/// use subscan::utilities::cli;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -37,7 +37,7 @@ pub async fn create_module_table() -> Table {
 /// # Examples
 ///
 /// ```
-/// use subscan::utils::cli;
+/// use subscan::utilities::cli;
 /// use subscan::modules::engines::google::Google;
 ///
 /// #[tokio::main]

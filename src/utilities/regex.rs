@@ -7,7 +7,7 @@ use regex::{Error, Regex};
 /// # Examples
 ///
 /// ```
-/// use subscan::utils::regex::generate_subdomain_regex;
+/// use subscan::utilities::regex::generate_subdomain_regex;
 ///
 /// let regex_stmt = generate_subdomain_regex("foo.com").unwrap();
 ///

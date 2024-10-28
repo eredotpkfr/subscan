@@ -11,7 +11,7 @@ use crate::{
         core::{Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
-    utils::{http, regex::generate_subdomain_regex},
+    utilities::{http, regex::generate_subdomain_regex},
 };
 use regex::Match;
 use reqwest::Url;

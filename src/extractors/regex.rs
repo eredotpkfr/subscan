@@ -1,6 +1,6 @@
 use crate::{
     enums::content::Content, interfaces::extractor::SubdomainExtractorInterface,
-    types::core::Subdomain, utils::regex::generate_subdomain_regex,
+    types::core::Subdomain, utilities::regex::generate_subdomain_regex,
 };
 use async_trait::async_trait;
 use regex::Match;

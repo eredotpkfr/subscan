@@ -6,7 +6,7 @@ use crate::config::SUBSCAN_ENV_NAMESPACE;
 /// # Examples
 ///
 /// ```
-/// use subscan::utils::env::format_env;
+/// use subscan::utilities::env::format_env;
 ///
 /// #[tokio::main]
 /// async fn main() {

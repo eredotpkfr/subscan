@@ -1,4 +1,4 @@
-use crate::utils::serializers::{dt_to_string_method, td_num_seconds_method};
+use crate::utilities::serializers::{dt_to_string_method, td_num_seconds_method};
 use chrono::{DateTime, TimeDelta, Utc};
 use serde::Serialize;
 use std::collections::BTreeSet;

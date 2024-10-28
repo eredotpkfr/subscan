@@ -7,7 +7,7 @@ use reqwest::Url;
 /// # Examples
 ///
 /// ```
-/// use subscan::utils::http::update_url_query;
+/// use subscan::utilities::http::update_url_query;
 /// use reqwest::Url;
 ///
 /// let mut url: Url = "https://foo.com".parse().unwrap();

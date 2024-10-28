@@ -1,4 +1,4 @@
-use crate::{types::core::SubscanModule, utils::cli};
+use crate::{types::core::SubscanModule, utilities::cli};
 use clap::Args;
 
 /// List command to list implemented modules

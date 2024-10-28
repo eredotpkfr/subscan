@@ -14,7 +14,7 @@ use crate::{
         func::GenericIntegrationCoreFuncs,
         result::module::SubscanModuleResult,
     },
-    utils::http,
+    utilities::http,
 };
 use async_trait::async_trait;
 use reqwest::{

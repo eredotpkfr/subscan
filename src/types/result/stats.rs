@@ -1,7 +1,7 @@
 use crate::{
     enums::module::SubscanModuleStatus,
     types::result::module::SubscanModuleResult,
-    utils::serializers::{dt_to_string_method, td_num_seconds_method},
+    utilities::serializers::{dt_to_string_method, td_num_seconds_method},
 };
 use chrono::{DateTime, TimeDelta, Utc};
 use serde::Serialize;

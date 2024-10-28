@@ -12,7 +12,7 @@ pub enum AuthenticationMethod {
     APIKeyAsQueryParam(String),
     /// Use basic HTTP authentication method. If the credentials are not provided, module
     /// tries to fetch from environment variables using pre-formatted
-    /// (see [`format_env`](crate::utils::env::format_env)) variable names. Module specific
+    /// (see [`format_env`](crate::utilities::env::format_env)) variable names. Module specific
     /// variable names looks like `SUBSCAN_FOO_USERNAME`, `SUBSCAN_FOO_PASSWORD`
     BasicHTTPAuthentication(Credentials),
     /// This auth type does nothing for auth

@@ -23,7 +23,7 @@ pub mod requesters;
 /// Project core type definitions
 pub mod types;
 /// Utilities for the handle different stuff things
-pub mod utils;
+pub mod utilities;
 
 use crate::{
     cache::CacheManager, cli::Cli, interfaces::module::SubscanModuleInterface,

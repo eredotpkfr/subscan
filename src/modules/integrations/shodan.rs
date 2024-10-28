@@ -11,7 +11,7 @@ use crate::{
         core::{Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
-    utils::http,
+    utilities::http,
 };
 use reqwest::Url;
 use serde_json::Value;
