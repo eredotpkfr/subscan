@@ -1,7 +1,8 @@
+use serde::Serialize;
 use std::fmt::Display;
 
 /// Module skip reasons
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Serialize)]
 pub enum SkipReason {
     /// If could not authenticated, this reason can be used
     NotAuthenticated,
@@ -32,6 +33,15 @@ pub enum SubscanModuleStatus {
 impl From<SkipReason> for SubscanModuleStatus {
     fn from(reason: SkipReason) -> Self {
         Self::Skipped(reason)
+    }
+}
+
+impl Serialize for SubscanModuleStatus {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(&self.to_string())
     }
 }
 
