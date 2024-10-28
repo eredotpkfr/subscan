@@ -124,7 +124,7 @@ impl Subscan {
         );
 
         pool.clone().submit(module.clone()).await;
-        pool.clone().spawn_runners(self.config.concurrency).await;
+        pool.clone().spawn_runners(1).await;
         pool.clone().join().await;
 
         for subresult in pool.results().await {
