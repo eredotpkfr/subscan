@@ -187,6 +187,31 @@ impl SubscanModuleRunnerPool {
     }
 
     /// Get all subscan module results
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use subscan::types::core::SubscanModule;
+    /// use subscan::pools::runner::SubscanModuleRunnerPool;
+    /// use subscan::modules::engines::google::Google;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let pool = SubscanModuleRunnerPool::new("foo.com".into());
+    ///     let module = SubscanModule::from(Google::dispatcher());
+    ///
+    ///     // spawn runners that listen async channel
+    ///     pool.clone().spawn_runners(1).await;
+    ///     // submit module into pool
+    ///     pool.clone().submit(module).await;
+    ///     // join all runners in main thread
+    ///     pool.clone().join().await;
+    ///
+    ///     for results in pool.results().await {
+    ///         // do something with module result
+    ///     }
+    /// }
+    /// ```
     pub async fn results(&self) -> BTreeSet<SubscanModuleResult> {
         self.results.lock().await.clone()
     }
