@@ -7,7 +7,7 @@ use tokio::sync::Mutex;
 
 /// Core subdomain data type
 pub type Subdomain = String;
-/// `Subscan`` module type wrapper
+/// `Subscan` module type wrapper
 pub type SubscanModule = Arc<Mutex<SubscanModuleDispatcher>>;
 
 impl From<SubscanModuleDispatcher> for SubscanModule {
