@@ -1,5 +1,7 @@
 use crate::{
-    enums::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+    enums::dispatchers::{
+        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    },
     modules::{
         generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
         integrations::{
@@ -7,11 +9,10 @@ use crate::{
             waybackarchive::WaybackArchive,
         },
     },
-    types::env::SubscanModuleEnvs,
+    types::{env::SubscanModuleEnvs, result::module::SubscanModuleResult},
 };
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
-use std::collections::BTreeSet;
 use tokio::sync::Mutex;
 
 /// Generic `subscan` module trait definition to implement
@@ -28,8 +29,9 @@ use tokio::sync::Mutex;
 /// use std::collections::BTreeSet;
 /// use subscan::interfaces::module::SubscanModuleInterface;
 /// use subscan::requesters::client::HTTPClient;
+/// use subscan::types::result::module::SubscanModuleResult;
 /// use subscan::extractors::regex::RegexExtractor;
-/// use subscan::enums::{RequesterDispatcher, SubdomainExtractorDispatcher};
+/// use subscan::enums::dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher};
 /// use async_trait::async_trait;
 /// use tokio::sync::Mutex;
 ///
@@ -52,9 +54,9 @@ use tokio::sync::Mutex;
 ///         Some(&self.extractor)
 ///     }
 ///
-///     async fn run(&mut self, domain: &str) -> BTreeSet<String> {
+///     async fn run(&mut self, domain: &str) -> SubscanModuleResult {
 ///         // do something in `run` method
-///         [].into()
+///         self.name().await.into()
 ///     }
 /// }
 ///
@@ -95,5 +97,5 @@ pub trait SubscanModuleInterface: Sync + Send {
     async fn extractor(&self) -> Option<&SubdomainExtractorDispatcher>;
     /// Just like a `main` method, when the module run this `run` method will be called.
     /// So this method should do everything
-    async fn run(&mut self, domain: &str) -> BTreeSet<String>;
+    async fn run(&mut self, domain: &str) -> SubscanModuleResult;
 }

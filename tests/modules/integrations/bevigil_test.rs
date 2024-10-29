@@ -6,7 +6,7 @@ use crate::common::{
 use serde_json::Value;
 use std::{collections::BTreeSet, env};
 use subscan::{
-    enums::Content,
+    enums::content::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::bevigil::{Bevigil, BEVIGIL_URL},
 };
@@ -22,7 +22,7 @@ async fn run_test() {
 
     let result = bevigil.run(TEST_DOMAIN).await;
 
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
     env::remove_var(env_name);
 }

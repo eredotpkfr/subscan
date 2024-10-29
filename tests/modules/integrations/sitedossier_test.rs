@@ -3,7 +3,7 @@ use crate::common::{
     mocks,
 };
 use subscan::{
-    enums::Content,
+    enums::content::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::sitedossier::{Sitedossier, SITEDOSSIER_URL},
 };
@@ -17,7 +17,7 @@ async fn run_test() {
 
     let result = sitedossier.run(TEST_DOMAIN).await;
 
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }
 
 #[tokio::test]

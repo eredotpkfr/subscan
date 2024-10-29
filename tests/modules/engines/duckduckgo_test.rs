@@ -3,7 +3,7 @@ use crate::common::{
     mocks,
 };
 use subscan::{
-    enums::SubscanModuleDispatcher, interfaces::module::SubscanModuleInterface,
+    enums::dispatchers::SubscanModuleDispatcher, interfaces::module::SubscanModuleInterface,
     modules::engines::duckduckgo::DuckDuckGo, requesters::client::HTTPClient,
 };
 use tokio::sync::Mutex;
@@ -22,5 +22,5 @@ async fn run_test() {
 
     let result = duckduckgo.run(TEST_DOMAIN).await;
 
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }

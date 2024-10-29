@@ -1,7 +1,11 @@
 use std::collections::BTreeSet;
 
 use crate::{
-    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{
+        auth::AuthenticationMethod,
+        content::Content,
+        dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
+    },
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -9,7 +13,7 @@ use crate::{
         core::{Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
-    utils::http,
+    utilities::http,
 };
 use reqwest::Url;
 use serde_json::Value;

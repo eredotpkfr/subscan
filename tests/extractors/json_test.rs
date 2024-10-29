@@ -5,7 +5,7 @@ use crate::common::{
 use serde_json::Value;
 use std::collections::BTreeSet;
 use subscan::{
-    enums::Content, extractors::json::JSONExtractor,
+    enums::content::Content, extractors::json::JSONExtractor,
     interfaces::extractor::SubdomainExtractorInterface,
 };
 

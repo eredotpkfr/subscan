@@ -12,6 +12,7 @@ async fn main() {
     let cli = Cli::parse();
     let subscan = Subscan::from(cli.clone());
 
+    cli.init().await;
     cli.banner().await;
 
     match cli.command {
@@ -23,11 +24,13 @@ async fn main() {
                 get.as_table(subscan.module(&get.name).await).await;
             }
             ModuleSubCommands::Run(args) => {
-                subscan.run(&args.name, &args.domain).await;
+                let result = subscan.run(&args.name, &args.domain).await;
+                println!("{}", serde_json::to_string_pretty(&result).unwrap());
             }
         },
         Commands::Scan(args) => {
-            subscan.scan(&args.domain).await;
+            let result = subscan.scan(&args.domain).await;
+            println!("{}", serde_json::to_string_pretty(&result).unwrap());
         }
         Commands::Brute(_) => {}
     }

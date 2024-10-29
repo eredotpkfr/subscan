@@ -1,14 +1,17 @@
 use crate::{
-    enums::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        module::SubscanModuleStatus::Finished,
+    },
     extractors::regex::RegexExtractor,
     interfaces::{extractor::SubdomainExtractorInterface, module::SubscanModuleInterface},
     requesters::client::HTTPClient,
-    types::core::SubscanModuleCoreComponents,
+    types::{core::SubscanModuleCoreComponents, result::module::SubscanModuleResult},
 };
 use async_trait::async_trait;
 use futures::TryStreamExt;
 use reqwest::Url;
-use std::{collections::BTreeSet, io::Error};
+use std::io::Error;
 use tokio::{io::AsyncBufReadExt, sync::Mutex};
 use tokio_util::io::StreamReader;
 
@@ -67,8 +70,8 @@ impl SubscanModuleInterface for WaybackArchive {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> BTreeSet<String> {
-        let mut all_results = BTreeSet::new();
+    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+        let mut result: SubscanModuleResult = self.name().await.into();
 
         let requester = &*self.components.requester.lock().await;
         let extractor = &self.components.extractor;
@@ -93,7 +96,7 @@ impl SubscanModuleInterface for WaybackArchive {
 
                 while let Ok(next_line) = lines.next_line().await {
                     if let Some(line) = next_line {
-                        all_results.extend(extractor.extract(line.into(), domain).await);
+                        result.extend(extractor.extract(line.into(), domain).await);
                     } else {
                         break;
                     }
@@ -101,6 +104,6 @@ impl SubscanModuleInterface for WaybackArchive {
             }
         }
 
-        all_results
+        result.with_status(Finished).await
     }
 }

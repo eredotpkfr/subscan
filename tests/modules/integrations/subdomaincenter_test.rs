@@ -7,7 +7,7 @@ use crate::common::{
 };
 use serde_json::Value;
 use subscan::{
-    enums::Content,
+    enums::content::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::subdomaincenter::{SubdomainCenter, SUBDOMAINCENTER_URL},
 };
@@ -21,7 +21,7 @@ async fn run_test() {
 
     let result = subdomaincenter.run(TEST_DOMAIN).await;
 
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }
 
 #[tokio::test]

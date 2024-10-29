@@ -1,5 +1,5 @@
 use crate::{
-    enums::{RequesterDispatcher, SubscanModuleDispatcher},
+    enums::dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     extractors::html::HTMLExtractor,
     modules::generics::engine::GenericSearchEngineModule,
     requesters::chrome::ChromeBrowser,

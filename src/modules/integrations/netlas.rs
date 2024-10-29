@@ -1,12 +1,18 @@
 use crate::{
-    enums::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        module::{SkipReason::NotAuthenticated, SubscanModuleStatus::Finished},
+    },
     extractors::json::JSONExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     requesters::client::HTTPClient,
-    types::core::{Subdomain, SubscanModuleCoreComponents},
+    types::{
+        core::{Subdomain, SubscanModuleCoreComponents},
+        result::module::SubscanModuleResult,
+    },
 };
 use async_trait::async_trait;
 use reqwest::{
@@ -82,7 +88,9 @@ impl SubscanModuleInterface for Netlas {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> BTreeSet<String> {
+    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+        let mut result: SubscanModuleResult = self.name().await.into();
+
         let requester = &mut *self.components.requester.lock().await;
         let extractor = &self.components.extractor;
 
@@ -122,11 +130,13 @@ impl SubscanModuleInterface for Netlas {
 
             if let Ok(response) = requester.client.execute(request).await {
                 if let Ok(content) = response.text().await {
-                    return extractor.extract(content.into(), domain).await;
+                    result.extend(extractor.extract(content.into(), domain).await);
+
+                    return result.with_status(Finished).await;
                 }
             }
         }
 
-        [].into()
+        result.with_status(NotAuthenticated.into()).await
     }
 }

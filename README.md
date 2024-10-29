@@ -21,6 +21,14 @@
     </picture>
   </a>
 
+  <a href="https://github.com/eredotpkfr/subscan/blob/main/LICENSE">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/github/license/eredotpkfr/subscan?labelColor=ff3030&color=e6e6e6">
+      <img alt="Codecov Status" src="https://img.shields.io/github/license/eredotpkfr/subscan?labelColor=42445a&color=e6e6e6">
+    </picture>
+  </a>
+</div>
+<div align="center">
   <a href="https://pre-commit.com/">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white&color=e6e6e6&labelColor=ff3030">
@@ -32,13 +40,6 @@
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/protected%20by-gitleaks-blue?color=e6e6e6&labelColor=ff3030">
       <img alt="Codecov Status" src="https://img.shields.io/badge/protected%20by-gitleaks-blue?color=e6e6e6&labelColor=42445a">
-    </picture>
-  </a>
-
-  <a href="https://github.com/eredotpkfr/subscan/blob/main/LICENSE">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/github/license/eredotpkfr/subscan?labelColor=ff3030&color=e6e6e6">
-      <img alt="Codecov Status" src="https://img.shields.io/github/license/eredotpkfr/subscan?labelColor=42445a&color=e6e6e6">
     </picture>
   </a>
 </div>

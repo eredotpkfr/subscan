@@ -1,12 +1,19 @@
 use crate::{
-    enums::{Content, RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+    enums::{
+        content::Content,
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        module::{
+            SkipReason::NotAuthenticated,
+            SubscanModuleStatus::{Failed, Finished},
+        },
+    },
     extractors::regex::RegexExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     requesters::client::HTTPClient,
-    types::core::SubscanModuleCoreComponents,
+    types::{core::SubscanModuleCoreComponents, result::module::SubscanModuleResult},
 };
 use async_trait::async_trait;
 use reqwest::{
@@ -69,14 +76,14 @@ impl GitHub {
         None
     }
 
-    pub async fn get_html_urls(&self, content: Content) -> BTreeSet<Url> {
+    pub async fn get_html_urls(&self, content: Content) -> Option<BTreeSet<Url>> {
         if let Some(items) = content.as_json()["items"].as_array() {
             let filter = |item: &Value| self.get_raw_url(item);
 
-            return items.iter().filter_map(filter).collect();
+            return Some(items.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        None
     }
 }
 
@@ -94,29 +101,38 @@ impl SubscanModuleInterface for GitHub {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> BTreeSet<String> {
-        let mut all_results = BTreeSet::new();
+    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+        let mut result: SubscanModuleResult = self.name().await.into();
 
         let envs = self.envs().await;
-        let query = format!("per_page=100&q={domain}&sort=created&order=asc");
 
-        let requester = &mut *self.components.requester.lock().await;
-        let extractor = &self.components.extractor;
+        if let Some(apikey) = envs.apikey.value {
+            let query = format!("per_page=100&q={domain}&sort=created&order=asc");
 
-        let rconfig = requester.config().await;
-        let auth = format!("token {}", envs.apikey.value.unwrap_or_default());
+            let requester = &mut *self.components.requester.lock().await;
+            let extractor = &self.components.extractor;
 
-        rconfig.add_header(AUTHORIZATION, HeaderValue::from_str(&auth).unwrap());
-        self.url.set_query(Some(&query));
+            let rconfig = requester.config().await;
+            let auth = HeaderValue::from_str(&format!("token {}", apikey));
 
-        let content = requester.get_content(self.url.clone()).await;
+            rconfig.add_header(AUTHORIZATION, auth.unwrap());
+            self.url.set_query(Some(&query));
 
-        for raw_url in self.get_html_urls(content).await {
-            let raw_content = requester.get_content(raw_url.clone()).await;
+            let content = requester.get_content(self.url.clone()).await;
 
-            all_results.extend(extractor.extract(raw_content, domain).await);
+            if let Some(raws) = self.get_html_urls(content).await {
+                for raw_url in raws {
+                    let raw_content = requester.get_content(raw_url.clone()).await;
+
+                    result.extend(extractor.extract(raw_content, domain).await);
+                }
+
+                return result.with_status(Finished).await;
+            }
+
+            return result.with_status(Failed("not get raw URLs".into())).await;
         }
 
-        all_results
+        result.with_status(NotAuthenticated.into()).await
     }
 }

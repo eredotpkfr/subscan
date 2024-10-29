@@ -7,7 +7,7 @@ use reqwest::Url;
 use serde_json::Value;
 use std::{collections::BTreeSet, env};
 use subscan::{
-    enums::Content,
+    enums::content::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::binaryedge::{BinaryEdge, BINARYEDGE_URL},
 };
@@ -23,7 +23,7 @@ async fn run_test() {
 
     let result = binaryedge.run(TEST_DOMAIN).await;
 
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
     env::remove_var(env_name);
 }

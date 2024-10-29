@@ -1,5 +1,5 @@
 use crate::{
-    enums::Content, extractors::regex::RegexExtractor,
+    enums::content::Content, extractors::regex::RegexExtractor,
     interfaces::extractor::SubdomainExtractorInterface, types::core::Subdomain,
 };
 use async_trait::async_trait;
@@ -58,7 +58,7 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     /// use subscan::extractors::html::HTMLExtractor;
     /// use subscan::interfaces::extractor::SubdomainExtractorInterface;
     /// use subscan::types::core::Subdomain;
-    /// use subscan::enums::Content;
+    /// use subscan::enums::content::Content;
     ///
     /// #[tokio::main]
     /// async fn main() {

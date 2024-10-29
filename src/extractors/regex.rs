@@ -1,6 +1,6 @@
 use crate::{
-    enums::Content, interfaces::extractor::SubdomainExtractorInterface, types::core::Subdomain,
-    utils::regex::generate_subdomain_regex,
+    enums::content::Content, interfaces::extractor::SubdomainExtractorInterface,
+    types::core::Subdomain, utilities::regex::generate_subdomain_regex,
 };
 use async_trait::async_trait;
 use regex::Match;
@@ -61,7 +61,7 @@ impl SubdomainExtractorInterface for RegexExtractor {
     /// use subscan::extractors::regex::RegexExtractor;
     /// use subscan::interfaces::extractor::SubdomainExtractorInterface;
     /// use subscan::types::core::Subdomain;
-    /// use subscan::enums::Content;
+    /// use subscan::enums::content::Content;
     ///
     /// #[tokio::main]
     /// async fn main() {

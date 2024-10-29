@@ -1,4 +1,4 @@
-use crate::utils::env::format_env;
+use crate::utilities::env::format_env;
 use dotenvy;
 
 /// Struct that stores any environment variable value with its name

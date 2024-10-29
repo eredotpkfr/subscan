@@ -1,4 +1,4 @@
-use crate::{enums::SubscanModuleDispatcher, utils::cli};
+use crate::{enums::dispatchers::SubscanModuleDispatcher, utilities::cli};
 use clap::Args;
 use tokio::sync::Mutex;
 

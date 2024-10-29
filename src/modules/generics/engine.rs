@@ -1,14 +1,19 @@
 use crate::{
-    enums::{RequesterDispatcher, SubdomainExtractorDispatcher},
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
+        module::SubscanModuleStatus::Finished,
+    },
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
-    types::{core::SubscanModuleCoreComponents, query::SearchQueryParam},
+    types::{
+        core::SubscanModuleCoreComponents, query::SearchQueryParam,
+        result::module::SubscanModuleResult,
+    },
 };
 use async_trait::async_trait;
 use reqwest::Url;
-use std::collections::BTreeSet;
 use tokio::sync::Mutex;
 
 /// Generic search engine module that enumerates subdomain addresses by using dorking technique
@@ -63,27 +68,28 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> BTreeSet<String> {
+    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+        let mut result: SubscanModuleResult = self.name().await.into();
+
         let requester = &*self.components.requester.lock().await;
         let extractor = &self.components.extractor;
 
         let extra_params = [("num".to_string(), 100.to_string())];
 
         let mut query = self.param.to_search_query(domain, "site:");
-        let mut all_results = BTreeSet::new();
 
         loop {
             let url = query.as_url(self.url.clone(), &extra_params);
             let response = requester.get_content(url).await;
-            let results = extractor.extract(response, domain).await;
+            let news = extractor.extract(response, domain).await;
 
-            all_results.extend(results.clone());
+            result.extend(news.clone());
 
-            if !query.update_many(results.clone()) {
+            if !query.update_many(news.clone()) {
                 break;
             }
         }
 
-        all_results
+        result.with_status(Finished).await
     }
 }

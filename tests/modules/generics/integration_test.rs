@@ -5,7 +5,7 @@ use crate::common::{
 use reqwest::Url;
 use std::env;
 use subscan::{
-    enums::{AuthenticationMethod, Content},
+    enums::{auth::AuthenticationMethod, content::Content},
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     types::env::{Credentials, Env},
 };
@@ -194,7 +194,7 @@ async fn run_test_no_auth() {
 
     let result = module.run(TEST_DOMAIN).await;
 
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }
 
 #[tokio::test]
@@ -209,7 +209,7 @@ async fn run_test_with_header_auth() {
 
     let result = module.run(TEST_DOMAIN).await;
 
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
     env::remove_var(env_name);
 }
@@ -226,7 +226,7 @@ async fn run_test_with_query_auth() {
 
     let result = module.run(TEST_DOMAIN).await;
 
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
     env::remove_var(env_name);
 }
@@ -249,7 +249,7 @@ async fn run_test_with_basic_http_auth() {
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
     let result = module.run(TEST_DOMAIN).await;
 
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }
 
 #[tokio::test]
@@ -258,5 +258,5 @@ async fn run_test_with_not_authenticated() {
     let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
 
-    assert!(module.run(TEST_DOMAIN).await.is_empty());
+    assert!(module.run(TEST_DOMAIN).await.subdomains.is_empty());
 }

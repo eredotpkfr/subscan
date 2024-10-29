@@ -1,5 +1,9 @@
 use crate::{
-    enums::{AuthenticationMethod, Content, RequesterDispatcher, SubscanModuleDispatcher},
+    enums::{
+        auth::AuthenticationMethod,
+        content::Content,
+        dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
+    },
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -7,7 +11,7 @@ use crate::{
         core::{Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
-    utils::regex::generate_subdomain_regex,
+    utilities::regex::generate_subdomain_regex,
 };
 use regex::Match;
 use reqwest::Url;

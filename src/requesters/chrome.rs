@@ -1,5 +1,6 @@
 use crate::{
-    enums::Content, interfaces::requester::RequesterInterface, types::config::RequesterConfig,
+    enums::content::Content, interfaces::requester::RequesterInterface,
+    types::config::RequesterConfig,
 };
 use async_trait::async_trait;
 use headless_chrome::{browser::LaunchOptions, Browser};
@@ -185,7 +186,7 @@ impl RequesterInterface for ChromeBrowser {
             tab.authenticate(username, password).unwrap();
         }
 
-        tab.navigate_to(url.to_string().as_str()).unwrap();
+        tab.navigate_to(url.to_string().as_str()).ok();
         tab.wait_until_navigated().unwrap();
 
         let content = tab.get_content().ok();

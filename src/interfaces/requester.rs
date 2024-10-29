@@ -1,5 +1,5 @@
 use crate::{
-    enums::{Content, RequesterDispatcher},
+    enums::{content::Content, dispatchers::RequesterDispatcher},
     requesters::{chrome::ChromeBrowser, client::HTTPClient},
     types::config::RequesterConfig,
 };
@@ -21,7 +21,7 @@ use reqwest::Url;
 /// use std::time::Duration;
 /// use subscan::interfaces::requester::RequesterInterface;
 /// use subscan::types::config::RequesterConfig;
-/// use subscan::enums::Content;
+/// use subscan::enums::content::Content;
 /// use subscan::config::DEFAULT_HTTP_TIMEOUT;
 /// use reqwest::Url;
 /// use async_trait::async_trait;

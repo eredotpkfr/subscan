@@ -1,12 +1,15 @@
 use crate::{
-    enums::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        module::SubscanModuleStatus::{Failed, Finished},
+    },
     extractors::regex::RegexExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     requesters::client::HTTPClient,
-    types::core::SubscanModuleCoreComponents,
+    types::{core::SubscanModuleCoreComponents, result::module::SubscanModuleResult},
 };
 use async_trait::async_trait;
 use chrono::Datelike;
@@ -57,7 +60,7 @@ impl CommonCrawl {
         commoncrawl.into()
     }
 
-    pub fn extract_cdx_urls(&self, json: Value, year: &str) -> BTreeSet<String> {
+    pub fn extract_cdx_urls(&self, json: Value, year: &str) -> Option<BTreeSet<String>> {
         if let Some(indexes) = json.as_array() {
             let filter = |item: &Value| {
                 if item["id"].as_str()?.contains(year) {
@@ -67,10 +70,10 @@ impl CommonCrawl {
                 }
             };
 
-            return indexes.iter().filter_map(filter).collect();
+            return Some(indexes.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        None
     }
 }
 
@@ -88,8 +91,8 @@ impl SubscanModuleInterface for CommonCrawl {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> BTreeSet<String> {
-        let mut all_results = BTreeSet::new();
+    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+        let mut result: SubscanModuleResult = self.name().await.into();
 
         let requester = &*self.components.requester.lock().await;
         let extractor = &self.components.extractor;
@@ -99,34 +102,38 @@ impl SubscanModuleInterface for CommonCrawl {
             let query = format!("*.{}", domain);
             let content = requester.get_content(self.url.clone()).await;
 
-            for cdx in self.extract_cdx_urls(content.as_json(), &year) {
-                let cdx_url = Url::parse_with_params(&cdx, &[("url", &query)]);
-                let request = requester
-                    .client
-                    .get(cdx_url.unwrap())
-                    .timeout(requester.config.timeout)
-                    .headers(requester.config.headers.clone())
-                    .build()
-                    .unwrap();
+            if let Some(cdxs) = self.extract_cdx_urls(content.as_json(), &year) {
+                for cdx in cdxs {
+                    let cdx_url = Url::parse_with_params(&cdx, &[("url", &query)]);
+                    let request = requester
+                        .client
+                        .get(cdx_url.unwrap())
+                        .timeout(requester.config.timeout)
+                        .headers(requester.config.headers.clone())
+                        .build()
+                        .unwrap();
 
-                if let Ok(response) = requester.client.execute(request).await {
-                    let stream = response.bytes_stream().map_err(Error::other);
-                    let reader = StreamReader::new(stream);
-                    let mut lines = reader.lines();
+                    if let Ok(response) = requester.client.execute(request).await {
+                        let stream = response.bytes_stream().map_err(Error::other);
+                        let reader = StreamReader::new(stream);
+                        let mut lines = reader.lines();
 
-                    while let Ok(next_line) = lines.next_line().await {
-                        if let Some(line) = next_line {
-                            all_results.extend(extractor.extract(line.into(), domain).await);
-                        } else {
-                            break;
+                        while let Ok(next_line) = lines.next_line().await {
+                            if let Some(line) = next_line {
+                                result.extend(extractor.extract(line.into(), domain).await);
+                            } else {
+                                break;
+                            }
                         }
+                    } else {
+                        continue;
                     }
-                } else {
-                    continue;
                 }
+            } else {
+                return result.with_status(Failed("not get cdx URLs".into())).await;
             }
         }
 
-        all_results
+        result.with_status(Finished).await
     }
 }

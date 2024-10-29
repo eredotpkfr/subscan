@@ -52,6 +52,7 @@ lazy_static! {
     ];
 }
 
+/// Manage cache module
 #[derive(Default)]
 pub struct CacheManager {}
 

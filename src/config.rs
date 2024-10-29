@@ -1,5 +1,7 @@
 use std::time::Duration;
 
+/// `Subscan` banner module path
+pub const SUBSCAN_BANNER_LOG_TARGET: &str = "subscan::banner";
 /// `Subscan` environment variable namespace
 pub const SUBSCAN_ENV_NAMESPACE: &str = "SUBSCAN";
 /// Concurrency level, count of threads

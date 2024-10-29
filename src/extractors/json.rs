@@ -1,5 +1,5 @@
 use crate::{
-    enums::Content,
+    enums::content::Content,
     interfaces::extractor::SubdomainExtractorInterface,
     types::{core::Subdomain, func::InnerExtractFunc},
 };
@@ -24,7 +24,7 @@ impl JSONExtractor {
     /// ```
     /// use subscan::extractors::json::JSONExtractor;
     /// use subscan::interfaces::extractor::SubdomainExtractorInterface;
-    /// use subscan::enums::Content;
+    /// use subscan::enums::content::Content;
     /// use std::collections::BTreeSet;
     /// use serde_json::{Value, json};
     ///
@@ -59,7 +59,7 @@ impl SubdomainExtractorInterface for JSONExtractor {
     /// use subscan::extractors::json::JSONExtractor;
     /// use subscan::interfaces::extractor::SubdomainExtractorInterface;
     /// use subscan::types::core::Subdomain;
-    /// use subscan::enums::Content;
+    /// use subscan::enums::content::Content;
     /// use std::collections::BTreeSet;
     /// use serde_json::{Value, json};
     ///
