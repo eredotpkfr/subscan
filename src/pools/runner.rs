@@ -186,7 +186,7 @@ impl SubscanModuleRunnerPool {
         }
     }
 
-    /// Get all results grouped by module name
+    /// Get all subscan module results
     pub async fn results(&self) -> BTreeSet<SubscanModuleResult> {
         self.results.lock().await.clone()
     }
