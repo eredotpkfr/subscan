@@ -4,6 +4,8 @@ pub mod config;
 pub mod core;
 /// Types that related environments
 pub mod env;
+/// Filter definitions
+pub mod filters;
 /// Function type definitions
 pub mod func;
 /// Query types for search engines

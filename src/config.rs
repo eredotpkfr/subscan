@@ -14,3 +14,5 @@ pub const DEFAULT_USER_AGENT: &str = "\
     AppleWebKit/537.36 (KHTML, like Gecko) \
     Chrome/129.0.0.0 Safari/537.36 \
 ";
+/// Asterisk character to indicate all modules
+pub const ASTERISK: &str = "*";

@@ -8,6 +8,7 @@ use crate::{
         Cli,
     },
     config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
+    enums::cache::CacheFilter,
     types::env::Credentials,
 };
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
@@ -24,6 +25,8 @@ pub struct SubscanConfig {
     pub timeout: u64,
     /// HTTP proxy
     pub proxy: Option<String>,
+    /// Cache filter
+    pub filter: CacheFilter,
 }
 
 impl Default for SubscanConfig {
@@ -33,6 +36,7 @@ impl Default for SubscanConfig {
             timeout: DEFAULT_HTTP_TIMEOUT.as_secs(),
             user_agent: DEFAULT_USER_AGENT.into(),
             proxy: None,
+            filter: CacheFilter::default(),
         }
     }
 }
@@ -43,7 +47,7 @@ impl From<ModuleRunSubCommandArgs> for SubscanConfig {
             user_agent: args.user_agent,
             timeout: args.timeout,
             proxy: args.proxy,
-            concurrency: DEFAULT_CONCURRENCY,
+            ..Default::default()
         }
     }
 }
@@ -51,10 +55,11 @@ impl From<ModuleRunSubCommandArgs> for SubscanConfig {
 impl From<ScanCommandArgs> for SubscanConfig {
     fn from(args: ScanCommandArgs) -> Self {
         Self {
-            user_agent: args.user_agent,
+            user_agent: args.user_agent.clone(),
             timeout: args.timeout,
-            proxy: args.proxy,
+            proxy: args.proxy.clone(),
             concurrency: args.concurrency,
+            filter: args.filter(),
         }
     }
 }
