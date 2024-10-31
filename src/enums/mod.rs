@@ -1,5 +1,7 @@
 /// Authentication variants
 pub mod auth;
+/// Cache related enumerations
+pub mod cache;
 /// Content types
 pub mod content;
 /// Dispatcher definitions

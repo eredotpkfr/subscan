@@ -6,12 +6,15 @@ use std::fmt::Display;
 pub enum SkipReason {
     /// If could not authenticated, this reason can be used
     NotAuthenticated,
+    /// Skipped by user
+    SkippedByUser,
 }
 
 impl Display for SkipReason {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             SkipReason::NotAuthenticated => write!(f, "not authenticated"),
+            SkipReason::SkippedByUser => write!(f, "skipped by user"),
         }
     }
 }

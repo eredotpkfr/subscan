@@ -26,9 +26,9 @@ pub mod types;
 pub mod utilities;
 
 use crate::{
-    cache::CacheManager, cli::Cli, interfaces::module::SubscanModuleInterface,
-    pools::runner::SubscanModuleRunnerPool, types::config::SubscanConfig,
-    types::core::SubscanModule,
+    cache::CacheManager, cli::Cli, enums::module::SkipReason::SkippedByUser,
+    interfaces::module::SubscanModuleInterface, pools::runner::SubscanModuleRunnerPool,
+    types::config::SubscanConfig, types::core::SubscanModule,
 };
 use tokio::sync::OnceCell;
 use types::result::scan::SubscanScanResult;
@@ -88,13 +88,21 @@ impl Subscan {
 
         let mut result: SubscanScanResult = domain.to_string().into();
 
-        let started = result.metadata.started_at.format("%H:%M:%S");
+        let started = result.metadata.started_at.format("%H:%M:%S %Z");
         let pool = SubscanModuleRunnerPool::new(domain.to_string());
 
         log::info!("Started scan on {} ({})", domain, started);
 
-        for module in self.modules().await.iter() {
-            pool.clone().submit(module.clone()).await;
+        for module in self.modules().await {
+            let binding = module.lock().await;
+            let name = binding.name().await;
+
+            if !self.config.filter.is_filtered(name).await {
+                pool.clone().submit(module.clone()).await;
+            } else {
+                result.add_status(name, &SkippedByUser.into()).await;
+                utilities::log::status(name, SkippedByUser.into()).await;
+            }
         }
 
         pool.clone().spawn_runners(self.config.concurrency).await;
@@ -112,7 +120,7 @@ impl Subscan {
 
         let mut result: SubscanScanResult = domain.to_string().into();
 
-        let started = result.metadata.started_at.format("%H:%M:%S");
+        let started = result.metadata.started_at.format("%H:%M:%S %Z");
         let pool = SubscanModuleRunnerPool::new(domain.to_string());
         let module = self.module(name).await;
 

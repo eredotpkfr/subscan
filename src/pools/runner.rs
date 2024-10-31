@@ -1,14 +1,13 @@
-use colored::Colorize;
 use flume::{Receiver, Sender};
 use tokio::{sync::Mutex, task::JoinSet};
 
 use crate::{
-    enums::module::SubscanModuleStatus,
     interfaces::module::SubscanModuleInterface,
     types::{
         core::{SubscanModule, UnboundedFlumeChannel},
         result::module::SubscanModuleResult,
     },
+    utilities,
 };
 use std::{collections::BTreeSet, sync::Arc};
 
@@ -53,27 +52,11 @@ impl SubscanModuleRunnerPool {
     /// [`SubscanModule`] runner method, simply calls `.run(` method
     pub async fn runner(self: Arc<Self>) {
         while let Ok(module) = self.input.rx.try_recv() {
-            let mut module = module.lock().await;
-
-            let result = module.run(&self.domain).await;
-            let (name, status) = (module.name().await, result.status.with_reason().await);
+            let result = module.lock().await.run(&self.domain).await;
 
             self.results.lock().await.insert(result.clone());
 
-            match result.status {
-                SubscanModuleStatus::Started => {
-                    log::info!("{:.<25}{:.>35}", name.white(), status.white())
-                }
-                SubscanModuleStatus::Finished => {
-                    log::info!("{:.<25}{:.>35}", name.white(), status.white())
-                }
-                SubscanModuleStatus::Skipped(_) => {
-                    log::warn!("{:.<25}{:.>35}", name.yellow(), status.yellow())
-                }
-                SubscanModuleStatus::Failed(_) => {
-                    log::error!("{:.<25}{:.>35}", name.red(), status.red())
-                }
-            }
+            utilities::log::result(result).await;
         }
     }
 
