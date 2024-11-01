@@ -6,15 +6,17 @@ use serde::Serializer;
 /// # Examples
 ///
 /// ```
-/// use serde_json::json;
+/// use subscan::utilities::serializers::dt_to_string_method;
 /// use chrono::DateTime;
+/// use serde_json::Serializer;
 ///
-/// let json = json!({
-///     "time": DateTime::UNIX_EPOCH.to_string(),
-/// });
-/// let expected = "{\"time\":\"1970-01-01 00:00:00 UTC\"}";
+/// let mut buffer = Vec::new();
+/// let mut serializer = Serializer::new(&mut buffer);
 ///
-/// assert_eq!(serde_json::to_string(&json).unwrap(), expected);
+/// let serialized = dt_to_string_method(&DateTime::UNIX_EPOCH, &mut serializer);
+/// let expected = "\"1970-01-01 00:00:00 UTC\"";
+///
+/// assert_eq!(String::from_utf8(buffer).unwrap(), expected);
 /// ```
 pub fn dt_to_string_method<S>(dt: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error>
 where
@@ -28,15 +30,16 @@ where
 /// # Examples
 ///
 /// ```
-/// use serde_json::json;
+/// use subscan::utilities::serializers::td_num_seconds_method;
 /// use chrono::TimeDelta;
+/// use serde_json::Serializer;
 ///
-/// let json = json!({
-///     "seconds": TimeDelta::zero().num_seconds(),
-/// });
-/// let expected = "{\"seconds\":0}";
+/// let mut buffer = Vec::new();
+/// let mut serializer = Serializer::new(&mut buffer);
 ///
-/// assert_eq!(serde_json::to_string(&json).unwrap(), expected);
+/// let serialized = td_num_seconds_method(&TimeDelta::zero(), &mut serializer);
+///
+/// assert_eq!(String::from_utf8(buffer).unwrap(), "0");
 /// ```
 pub fn td_num_seconds_method<S>(td: &TimeDelta, serializer: S) -> Result<S::Ok, S::Error>
 where
