@@ -20,6 +20,22 @@ pub enum AuthenticationMethod {
 }
 
 impl From<Credentials> for AuthenticationMethod {
+    /// Create authentication method from [`Credentials`]
+    ///
+    /// # Examples
+    /// ```
+    /// use subscan::enums::auth::AuthenticationMethod;
+    /// use subscan::types::env::Credentials;
+    /// use subscan::types::env::Env;
+    ///
+    /// let credentials = Credentials {
+    ///     username: Env { name: "USERNAME".into(), value: Some("foo".to_string())},
+    ///     password: Env { name: "PASSWORD".into(), value: Some("bar".to_string())},
+    /// };
+    ///
+    /// let auth = AuthenticationMethod::from(credentials);
+    /// ```
+    /// let credentials = "foo".into()
     fn from(credentials: Credentials) -> Self {
         Self::BasicHTTPAuthentication(credentials)
     }

@@ -27,18 +27,6 @@ pub struct SubscanScanResultMetadata {
     pub elapsed: TimeDelta,
 }
 
-impl From<String> for SubscanScanResultMetadata {
-    fn from(target: String) -> Self {
-        Self {
-            target,
-            started_at: Utc::now(),
-            finished_at: Utc::now(),
-            elapsed: TimeDelta::zero(),
-            ..Default::default()
-        }
-    }
-}
-
 impl From<&str> for SubscanScanResultMetadata {
     fn from(target: &str) -> Self {
         Self {

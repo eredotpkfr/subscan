@@ -40,6 +40,20 @@ impl From<SkipReason> for SubscanModuleStatus {
 }
 
 impl Serialize for SubscanModuleStatus {
+    /// Serialize object to string for JSON outputs
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::enums::module::SubscanModuleStatus;
+    /// use serde_json::json;
+    ///
+    /// let json = json!({
+    ///     "status": SubscanModuleStatus::Finished,
+    /// });
+    ///
+    /// assert_eq!(serde_json::to_string(&json).unwrap(), "{\"status\":\"FINISHED\"}");
+    /// ```
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -71,11 +85,16 @@ impl SubscanModuleStatus {
     /// #[tokio::main]
     /// async fn main() {
     ///     let skipped: SubscanModuleStatus = SkipReason::NotAuthenticated.into();
+    ///     let skipped_by_user: SubscanModuleStatus = SkipReason::SkippedByUser.into();
+    ///
     ///     let started = SubscanModuleStatus::Started;
+    ///     let finished = SubscanModuleStatus::Finished;
     ///     let failed = SubscanModuleStatus::Failed("foo".into());
     ///
     ///     assert_eq!(skipped.with_reason().await, "[not authenticated SKIPPED]");
+    ///     assert_eq!(skipped_by_user.with_reason().await, "[skipped by user SKIPPED]");
     ///     assert_eq!(started.with_reason().await, "[STARTED]");
+    ///     assert_eq!(finished.with_reason().await, "[FINISHED]");
     ///     assert_eq!(failed.with_reason().await, "[foo FAILED]");
     /// }
     /// ```
