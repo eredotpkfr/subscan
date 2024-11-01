@@ -2,7 +2,7 @@ use std::env;
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mocks,
+    funcs, mocks,
 };
 use reqwest::Url;
 use serde_json::{json, Value};
@@ -38,8 +38,20 @@ async fn get_html_urls_test() {
 }
 
 #[tokio::test]
-#[stubr::mock("module/integrations/github", port = 2222)]
 async fn run_test() {
+    let (stubs, templates) = (
+        "module/integrations/github",
+        vec!["github-code-search-template.json"],
+    );
+
+    let (tmp, port) = funcs::create_tmp_stubs_with_port(stubs, templates);
+
+    let config = stubr::Config {
+        port: Some(port),
+        ..Default::default()
+    };
+
+    let stubr = stubr::Stubr::start_with(tmp.clone(), config).await;
     let mut github = GitHub::dispatcher();
     let env_name = github.envs().await.apikey.name;
 
@@ -50,5 +62,6 @@ async fn run_test() {
 
     assert_eq!(results.subdomains, [TEST_BAR_SUBDOMAIN.to_string()].into());
 
+    tokio::fs::remove_dir_all(tmp).await.unwrap();
     env::remove_var(env_name);
 }

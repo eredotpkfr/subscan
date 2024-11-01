@@ -14,11 +14,23 @@ pub mod constants {
 pub mod funcs {
     use super::constants::READ_ERROR;
     use serde_json::Value;
-    use std::fs;
-    use std::path::{Path, PathBuf};
+    use std::{
+        fs::{self, File},
+        io::Write,
+        net::TcpListener,
+        path::{Path, PathBuf},
+    };
 
     fn stubs_path() -> PathBuf {
         Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/stubs")
+    }
+
+    fn get_random_port() -> u16 {
+        TcpListener::bind("127.0.0.1:0")
+            .unwrap()
+            .local_addr()
+            .unwrap()
+            .port()
     }
 
     pub fn md5_hex(target: String) -> String {
@@ -30,6 +42,34 @@ pub mod funcs {
         let content = fs::read_to_string(file_path).expect(READ_ERROR);
 
         serde_json::from_str(&content).unwrap()
+    }
+
+    pub fn create_tmp_stubs_with_port(stubs: &str, templates: Vec<&str>) -> (PathBuf, u16) {
+        let stubs_path = stubs_path().join(stubs);
+        let tmp_path = stubs_path.join("tmp");
+        let port = get_random_port();
+
+        fs::create_dir_all(tmp_path.clone()).unwrap();
+
+        for dir in stubs_path.read_dir().unwrap() {
+            if let Ok(stub) = dir {
+                if stub.path().is_file() {
+                    let file_name = stub.file_name();
+
+                    if templates.contains(&file_name.to_str().unwrap()) {
+                        let template = fs::read_to_string(stub.path()).unwrap();
+                        let filled_stub = template.replace("{{port}}", &port.to_string());
+                        let mut tmp_stub = File::create(tmp_path.join(file_name)).unwrap();
+
+                        tmp_stub.write_all(filled_stub.as_bytes()).unwrap();
+                    } else {
+                        fs::copy(stub.path(), tmp_path.join(file_name)).unwrap();
+                    }
+                }
+            }
+        }
+
+        (tmp_path, port)
     }
 }
 
