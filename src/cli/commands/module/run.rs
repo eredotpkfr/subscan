@@ -5,7 +5,7 @@ use crate::{
 use clap::Args;
 
 /// Run command to start any module
-#[derive(Args, Clone, Debug)]
+#[derive(Args, Clone, Debug, Default)]
 pub struct ModuleRunSubCommandArgs {
     /// Module name to be run
     pub name: String,

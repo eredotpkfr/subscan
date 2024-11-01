@@ -5,7 +5,7 @@ use crate::{
 use clap::Args;
 
 /// Scan command arguments
-#[derive(Args, Clone, Debug)]
+#[derive(Args, Clone, Debug, Default)]
 pub struct ScanCommandArgs {
     /// Target domain address to be enumerated
     #[arg(short, long)]

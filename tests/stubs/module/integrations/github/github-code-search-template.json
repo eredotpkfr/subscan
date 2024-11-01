@@ -29,7 +29,7 @@
         "jsonBody": {
             "items": [
                 {
-                    "html_url": "http://localhost:2222/{{request.pathSegments.[0]}}/results"
+                    "html_url": "http://127.0.0.1:{{port}}/{{request.pathSegments.[0]}}/results"
                 },
                 {
                     "no_html_url": "foo"

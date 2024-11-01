@@ -23,15 +23,6 @@ pub struct SubscanScanResult {
     pub total: usize,
 }
 
-impl From<String> for SubscanScanResult {
-    fn from(target: String) -> Self {
-        Self {
-            metadata: target.into(),
-            ..Default::default()
-        }
-    }
-}
-
 impl From<&str> for SubscanScanResult {
     fn from(target: &str) -> Self {
         Self {

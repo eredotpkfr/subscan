@@ -30,6 +30,20 @@ pub struct SubscanConfig {
 }
 
 impl Default for SubscanConfig {
+    /// Create [`SubscanConfig`] with defaults
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::config::SubscanConfig;
+    /// use subscan::config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
+    ///
+    /// let config = SubscanConfig::default();
+    ///
+    /// assert_eq!(config.concurrency, DEFAULT_CONCURRENCY);
+    /// assert_eq!(config.timeout, DEFAULT_HTTP_TIMEOUT.as_secs());
+    /// assert_eq!(config.user_agent, DEFAULT_USER_AGENT);
+    /// ```
     fn default() -> Self {
         Self {
             concurrency: DEFAULT_CONCURRENCY,
@@ -42,6 +56,23 @@ impl Default for SubscanConfig {
 }
 
 impl From<ModuleRunSubCommandArgs> for SubscanConfig {
+    /// Create [`SubscanConfig`] from [`ModuleRunSubCommandArgs`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::config::SubscanConfig;
+    /// use subscan::cli::commands::module::run::ModuleRunSubCommandArgs;
+    /// use subscan::enums::output::OutputFormat;
+    ///
+    /// let args = ModuleRunSubCommandArgs {
+    ///     timeout: 120,
+    ///     ..Default::default()
+    /// };
+    /// let config = SubscanConfig::from(args.clone());
+    ///
+    /// assert_eq!(config.timeout, args.timeout);
+    /// ```
     fn from(args: ModuleRunSubCommandArgs) -> Self {
         Self {
             user_agent: args.user_agent,
@@ -53,6 +84,22 @@ impl From<ModuleRunSubCommandArgs> for SubscanConfig {
 }
 
 impl From<ScanCommandArgs> for SubscanConfig {
+    /// Create [`SubscanConfig`] from [`ScanCommandArgs`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::config::SubscanConfig;
+    /// use subscan::cli::commands::scan::ScanCommandArgs;
+    ///
+    /// let args = ScanCommandArgs {
+    ///     timeout: 120,
+    ///     ..Default::default()
+    /// };
+    /// let config = SubscanConfig::from(args.clone());
+    ///
+    /// assert_eq!(config.timeout, args.timeout);
+    /// ```
     fn from(args: ScanCommandArgs) -> Self {
         Self {
             user_agent: args.user_agent.clone(),
@@ -104,6 +151,19 @@ impl Default for RequesterConfig {
 }
 
 impl From<SubscanConfig> for RequesterConfig {
+    /// Create [`RequesterConfig`] from [`SubscanConfig`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::config::SubscanConfig;
+    /// use subscan::types::config::RequesterConfig;
+    ///
+    /// let config = SubscanConfig::default();
+    /// let rconfig = RequesterConfig::from(config.clone());
+    ///
+    /// assert_eq!(rconfig.timeout.as_secs(), config.timeout);
+    /// ```
     fn from(config: SubscanConfig) -> Self {
         Self {
             headers: HeaderMap::from_iter([(

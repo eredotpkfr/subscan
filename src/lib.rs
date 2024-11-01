@@ -86,7 +86,7 @@ impl Subscan {
     pub async fn scan(&self, domain: &str) -> SubscanScanResult {
         self.init().await;
 
-        let mut result: SubscanScanResult = domain.to_string().into();
+        let mut result: SubscanScanResult = domain.into();
 
         let started = result.metadata.started_at.format("%H:%M:%S %Z");
         let pool = SubscanModuleRunnerPool::new(domain.to_string());
@@ -118,7 +118,7 @@ impl Subscan {
     pub async fn run(&self, name: &str, domain: &str) -> SubscanScanResult {
         self.init().await;
 
-        let mut result: SubscanScanResult = domain.to_string().into();
+        let mut result: SubscanScanResult = domain.into();
 
         let started = result.metadata.started_at.format("%H:%M:%S %Z");
         let pool = SubscanModuleRunnerPool::new(domain.to_string());

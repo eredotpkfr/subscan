@@ -20,6 +20,17 @@ impl From<String> for Env {
 }
 
 impl From<&str> for Env {
+    /// Try to fetch environment from given string
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::env::Env;
+    ///
+    /// let env = Env::from("foo");
+    ///
+    /// assert_eq!(env.name, "FOO");
+    /// ```
     fn from(value: &str) -> Self {
         Self {
             name: value.to_uppercase(),
