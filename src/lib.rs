@@ -135,10 +135,9 @@ impl Subscan {
         pool.clone().spawn_runners(1).await;
         pool.clone().join().await;
 
-        for subresult in pool.results().await {
-            result.update_with_module_result(subresult).await;
-        }
+        let subresult = pool.results().await.pop_first().unwrap();
 
+        result.update_with_module_result(subresult).await;
         result.with_finished().await
     }
 }
