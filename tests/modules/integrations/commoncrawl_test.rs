@@ -35,10 +35,8 @@ async fn extract_cdx_urls_test() {
 
 #[tokio::test]
 async fn run_test() {
-    let (stubs, templates) = (
-        "module/integrations/commoncrawl",
-        vec!["commoncrawl-index-template.json"],
-    );
+    let stubs = "module/integrations/commoncrawl";
+    let templates = vec!["commoncrawl-index-template.json"];
 
     let (tmp, port) = funcs::create_tmp_stubs_with_port(stubs, templates);
 

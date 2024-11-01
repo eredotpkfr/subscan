@@ -39,10 +39,8 @@ async fn get_html_urls_test() {
 
 #[tokio::test]
 async fn run_test() {
-    let (stubs, templates) = (
-        "module/integrations/github",
-        vec!["github-code-search-template.json"],
-    );
+    let stubs = "module/integrations/github";
+    let templates = vec!["github-code-search-template.json"];
 
     let (tmp, port) = funcs::create_tmp_stubs_with_port(stubs, templates);
 
@@ -52,6 +50,7 @@ async fn run_test() {
     };
 
     let stubr = stubr::Stubr::start_with(tmp.clone(), config).await;
+
     let mut github = GitHub::dispatcher();
     let env_name = github.envs().await.apikey.name;
 

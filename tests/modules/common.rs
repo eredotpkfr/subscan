@@ -54,16 +54,16 @@ pub mod funcs {
         for dir in stubs_path.read_dir().unwrap() {
             if let Ok(stub) = dir {
                 if stub.path().is_file() {
-                    let file_name = stub.file_name();
+                    let name = stub.file_name();
 
-                    if templates.contains(&file_name.to_str().unwrap()) {
+                    if templates.contains(&name.to_str().unwrap()) {
                         let template = fs::read_to_string(stub.path()).unwrap();
                         let filled_stub = template.replace("{{port}}", &port.to_string());
-                        let mut tmp_stub = File::create(tmp_path.join(file_name)).unwrap();
+                        let mut tmp_stub = File::create(tmp_path.join(name)).unwrap();
 
                         tmp_stub.write_all(filled_stub.as_bytes()).unwrap();
                     } else {
-                        fs::copy(stub.path(), tmp_path.join(file_name)).unwrap();
+                        fs::copy(stub.path(), tmp_path.join(name)).unwrap();
                     }
                 }
             }
