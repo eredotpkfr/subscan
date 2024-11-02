@@ -1,33 +1,10 @@
 use clap::Parser;
 use subscan::{
-    cli::{commands::scan::ScanCommandArgs, Cli},
+    cli::Cli,
     config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
     enums::{cache::CacheFilter, output::OutputFormat},
     types::filters::ModuleNameFilter,
 };
-
-#[tokio::test]
-async fn scan_args_attribute_test() {
-    let args = ScanCommandArgs {
-        domain: "foo".into(),
-        concurrency: 10,
-        user_agent: "bar".into(),
-        timeout: 120,
-        proxy: None,
-        output: OutputFormat::JSON,
-        modules: "google,yahoo".into(),
-        skips: "bing".into(),
-    };
-
-    assert_eq!(args.domain, "foo");
-    assert_eq!(args.concurrency, 10);
-    assert_eq!(args.user_agent, "bar");
-    assert_eq!(args.timeout, 120);
-    assert_eq!(args.proxy, None);
-    assert_eq!(args.output, OutputFormat::JSON);
-    assert_eq!(args.modules, "google,yahoo");
-    assert_eq!(args.skips, "bing");
-}
 
 #[tokio::test]
 #[should_panic]

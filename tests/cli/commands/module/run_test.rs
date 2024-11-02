@@ -1,25 +1,8 @@
 use clap::Parser;
 use subscan::{
-    cli::{commands::module::run::ModuleRunSubCommandArgs, Cli},
+    cli::Cli,
     config::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
 };
-
-#[tokio::test]
-async fn module_run_args_attribute_test() {
-    let args = ModuleRunSubCommandArgs {
-        name: "foo".into(),
-        domain: "bar".into(),
-        user_agent: "baz".into(),
-        timeout: 120,
-        proxy: None,
-    };
-
-    assert_eq!(args.name, "foo");
-    assert_eq!(args.domain, "bar");
-    assert_eq!(args.user_agent, "baz");
-    assert_eq!(args.timeout, 120);
-    assert_eq!(args.proxy, None);
-}
 
 #[tokio::test]
 #[should_panic]

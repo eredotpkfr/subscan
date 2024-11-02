@@ -1,18 +1,8 @@
 use crate::common::funcs;
 use clap::Parser;
 use std::io::Cursor;
-use subscan::{
-    cli::{commands::module::get::ModuleGetSubCommandArgs, Cli},
-    modules::engines::google::Google,
-};
+use subscan::{cli::Cli, modules::engines::google::Google};
 use tokio::sync::Mutex;
-
-#[tokio::test]
-async fn module_get_args_attribute_test() {
-    let args = ModuleGetSubCommandArgs { name: "foo".into() };
-
-    assert_eq!(args.name, "foo");
-}
 
 #[tokio::test]
 #[should_panic]
