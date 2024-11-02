@@ -1,4 +1,4 @@
-use crate::{config::DEFAULT_CONCURRENCY, enums::output::OutputFormat};
+use crate::{constants::DEFAULT_CONCURRENCY, enums::output::OutputFormat};
 use clap::Args;
 
 /// Brute force attack command arguments

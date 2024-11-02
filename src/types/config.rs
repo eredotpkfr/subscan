@@ -7,7 +7,7 @@ use crate::{
         },
         Cli,
     },
-    config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
+    constants::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
     enums::cache::CacheFilter,
     types::env::Credentials,
 };
@@ -36,7 +36,7 @@ impl Default for SubscanConfig {
     ///
     /// ```
     /// use subscan::types::config::SubscanConfig;
-    /// use subscan::config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
+    /// use subscan::constants::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
     ///
     /// let config = SubscanConfig::default();
     ///

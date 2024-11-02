@@ -1,4 +1,4 @@
-use crate::config::SUBSCAN_BANNER_LOG_TARGET;
+use crate::constants::SUBSCAN_BANNER_LOG_TARGET;
 use colog::format::{CologStyle, DefaultCologStyle};
 use env_logger::fmt::Formatter;
 use log::{LevelFilter, Record};

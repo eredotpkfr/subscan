@@ -1,7 +1,7 @@
 use clap::Parser;
 use subscan::{
     cli::Cli,
-    config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
+    constants::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
     enums::{cache::CacheFilter, output::OutputFormat},
     types::filters::ModuleNameFilter,
 };

@@ -1,4 +1,4 @@
-use crate::config::SUBSCAN_ENV_NAMESPACE;
+use crate::constants::SUBSCAN_ENV_NAMESPACE;
 
 /// Formats given module name and environment variable name with [`SUBSCAN_ENV_NAMESPACE`]
 /// prefix, returns fully generated environment variable name
