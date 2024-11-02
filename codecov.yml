@@ -15,7 +15,6 @@ coverage: # https://docs.codecov.com/docs/codecovyml-reference#coverage
     patch: off
 
 ignore:
-  - "src/cli"
   - "src/lib.rs"
   - "src/logger.rs"
   - "src/bin/subscan.rs"

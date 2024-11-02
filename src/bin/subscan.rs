@@ -1,4 +1,5 @@
 use clap::Parser;
+use std::io;
 use subscan::{
     cli::{
         commands::{module::ModuleSubCommands, Commands},
@@ -11,6 +12,7 @@ use subscan::{
 async fn main() {
     let cli = Cli::parse();
     let subscan = Subscan::from(cli.clone());
+    let out = &mut io::stdout();
 
     cli.init().await;
     cli.banner().await;
@@ -18,10 +20,10 @@ async fn main() {
     match cli.command {
         Commands::Module(module) => match module.command {
             ModuleSubCommands::List(list) => {
-                list.as_table(subscan.modules().await).await;
+                list.as_table(subscan.modules().await, out).await;
             }
             ModuleSubCommands::Get(get) => {
-                get.as_table(subscan.module(&get.name).await).await;
+                get.as_table(subscan.module(&get.name).await, out).await;
             }
             ModuleSubCommands::Run(args) => {
                 let result = subscan.run(&args.name, &args.domain).await;
