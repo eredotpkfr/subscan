@@ -61,10 +61,12 @@ impl SubscanScanResult {
         }
     }
 
-    fn save_csv(&self, path: &str) {
+    pub fn save_csv(&self, path: &str) {
         let mut file = File::create(path).expect("Failed to create CSV file");
-        // CSV formatında veriyi kaydet
-        writeln!(file, "Data not implemented for CSV yet.").expect("Failed to write to CSV file");
+        writeln!(file, "Subdomains").expect("Failed to write header to CSV file");
+        for subdomain in &self.results {
+            writeln!(file, "{}", subdomain).expect("Failed to write to CSV file");
+        }
     }
 }
 
