@@ -41,8 +41,8 @@ impl SubscanScanResult {
             "JSON" => self
                 .save_json(filepath.to_str().unwrap())
                 .expect("Failed to save JSON"),
-            "TXT" => self.save_txt(),
-            "CSV" => self.save_csv(),
+            "TXT" => self.save_txt(filepath.to_str().unwrap()),
+            "CSV" => self.save_csv(filepath.to_str().unwrap()),
             _ => panic!("Unsupported format"),
         }
     }
@@ -54,12 +54,17 @@ impl SubscanScanResult {
         Ok(())
     }
 
-    fn save_txt(&self) {
-        println!("TXT not supported yet");
+    pub fn save_txt(&self, path: &str) {
+        let mut file = File::create(path).expect("Failed to create TXT file");
+        for subdomain in &self.results {
+            writeln!(file, "{}", subdomain).expect("Failed to write to TXT file");
+        }
     }
 
-    fn save_csv(&self) {
-        println!("CSV not supported yet");
+    fn save_csv(&self, path: &str) {
+        let mut file = File::create(path).expect("Failed to create CSV file");
+        // CSV formatında veriyi kaydet
+        writeln!(file, "Data not implemented for CSV yet.").expect("Failed to write to CSV file");
     }
 }
 
