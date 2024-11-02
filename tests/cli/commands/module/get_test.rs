@@ -1,3 +1,4 @@
+use crate::common::funcs;
 use clap::Parser;
 use std::io::Cursor;
 use subscan::{cli::Cli, modules::engines::google::Google};
@@ -33,7 +34,7 @@ async fn module_get_test() {
                 let result = String::from_utf8(out.into_inner()).unwrap();
 
                 assert_eq!(args.name, "google");
-                assert_eq!(result, expected);
+                assert_eq!(funcs::fix_new_lines(&result), expected);
             }
             _ => panic!("Expected ModuleSubCommands::Get"),
         },

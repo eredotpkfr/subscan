@@ -1,6 +1,8 @@
 use clap::Parser;
-use subscan::cli::Cli;
-use subscan::config::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
+use subscan::{
+    cli::Cli,
+    config::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
+};
 
 #[tokio::test]
 #[should_panic]

@@ -1,6 +1,6 @@
 use crate::types::filters::ModuleNameFilter;
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub enum CacheFilter {
     /// Do nothing to eliminate modules from cache
     #[default]

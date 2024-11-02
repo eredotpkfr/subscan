@@ -1,4 +1,4 @@
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ModuleNameFilter {
     pub valids: Vec<String>,
     pub invalids: Vec<String>,

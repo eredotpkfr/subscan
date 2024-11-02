@@ -9,12 +9,12 @@ async fn cli_parse_error_test() {
 
 #[tokio::test]
 async fn verbosity_test() {
-    let args = vec!["subscan", "scan", "-d", "foo.com", "-qq"];
+    let args = vec!["subscan", "scan", "-d", "foo.com", "-qqqq"];
     let cli = Cli::try_parse_from(args).unwrap();
 
     cli.init().await;
     cli.banner().await;
 
-    assert_eq!(cli.verbose.is_present(), true);
-    assert_eq!(cli.verbose.to_string(), "1");
+    assert!(cli.verbose.is_present());
+    assert_eq!(cli.verbose.to_string(), "0");
 }

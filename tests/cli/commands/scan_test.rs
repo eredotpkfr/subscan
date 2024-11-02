@@ -1,6 +1,10 @@
 use clap::Parser;
-use subscan::config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
-use subscan::{cli::Cli, enums::output::OutputFormat};
+use subscan::{
+    cli::Cli,
+    config::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
+    enums::{cache::CacheFilter, output::OutputFormat},
+    types::filters::ModuleNameFilter,
+};
 
 #[tokio::test]
 #[should_panic]
@@ -54,6 +58,62 @@ async fn scan_args_test() {
             assert_eq!(args.modules, "google,yahoo");
             assert_eq!(args.skips, "commoncrawl");
             assert_eq!(args.output, OutputFormat::CSV);
+        }
+        _ => panic!("Expected Commands::Scan"),
+    }
+}
+
+#[tokio::test]
+async fn scan_args_no_filter_test() {
+    let args = vec!["subscan", "scan", "-d", "foo.com"];
+    let cli = Cli::try_parse_from(args).unwrap();
+
+    match cli.command {
+        subscan::cli::commands::Commands::Scan(args) => {
+            assert_eq!(args.filter(), CacheFilter::NoFilter);
+        }
+        _ => panic!("Expected Commands::Scan"),
+    }
+}
+
+#[tokio::test]
+async fn scan_args_with_module_name_filter_invalids_test() {
+    let args = vec!["subscan", "scan", "-d", "foo.com", "--skips", "foo"];
+    let cli = Cli::try_parse_from(args).unwrap();
+
+    match cli.command {
+        subscan::cli::commands::Commands::Scan(args) => {
+            let expected = ModuleNameFilter {
+                valids: vec![],
+                invalids: vec!["foo".into()],
+            };
+
+            assert_eq!(args.filter(), CacheFilter::FilterByName(expected));
+        }
+        _ => panic!("Expected Commands::Scan"),
+    }
+}
+
+#[tokio::test]
+async fn scan_args_with_module_name_filter_valids_test() {
+    #[rustfmt::skip]
+    let args = vec![
+        "subscan",
+        "scan",
+        "-d", "foo.com",
+        "--modules", "foo",
+        "--skips", "bar"
+    ];
+    let cli = Cli::try_parse_from(args).unwrap();
+
+    match cli.command {
+        subscan::cli::commands::Commands::Scan(args) => {
+            let expected = ModuleNameFilter {
+                valids: vec!["foo".into()],
+                invalids: vec!["bar".into()],
+            };
+
+            assert_eq!(args.filter(), CacheFilter::FilterByName(expected));
         }
         _ => panic!("Expected Commands::Scan"),
     }
