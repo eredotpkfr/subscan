@@ -32,7 +32,7 @@ async fn main() {
         },
         Commands::Scan(args) => {
             let result = subscan.scan(&args.domain).await;
-            println!("{}", serde_json::to_string_pretty(&result).unwrap());
+            result.save(&args.output.to_string(), &args.domain);
         }
         Commands::Brute(_) => {}
     }

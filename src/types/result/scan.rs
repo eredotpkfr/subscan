@@ -9,6 +9,10 @@ use crate::{
 use chrono::Utc;
 use serde::Serialize;
 use std::collections::BTreeSet;
+use std::fs;
+use std::fs::File;
+use std::io::Write;
+use std::path::Path;
 
 /// `Subscan` scan result
 #[derive(Clone, Default, Serialize)]
@@ -21,6 +25,42 @@ pub struct SubscanScanResult {
     pub results: BTreeSet<Subdomain>,
     /// Total count of discovered subdomains
     pub total: usize,
+}
+impl SubscanScanResult {
+    pub fn save(&self, output: &str, domain: &str) {
+        let data_dir = Path::new("data");
+        if !data_dir.exists() {
+            fs::create_dir_all(data_dir).expect("Couldn't create data directory");
+        }
+
+        let now = Utc::now().format("%Y-%m-%d");
+        let filename = format!("{}_{}.{}", now, domain, output.to_lowercase());
+        let filepath = data_dir.join(filename);
+
+        match output.to_uppercase().as_str() {
+            "JSON" => self
+                .save_json(filepath.to_str().unwrap())
+                .expect("Failed to save JSON"),
+            "TXT" => self.save_txt(),
+            "CSV" => self.save_csv(),
+            _ => panic!("Unsupported format"),
+        }
+    }
+
+    fn save_json(&self, path: &str) -> std::io::Result<()> {
+        let json_content = serde_json::to_string_pretty(&self).expect("Failed to serialize JSON");
+        let mut file = File::create(path)?;
+        file.write_all(json_content.as_bytes())?;
+        Ok(())
+    }
+
+    fn save_txt(&self) {
+        println!("TXT not supported yet");
+    }
+
+    fn save_csv(&self) {
+        println!("CSV not supported yet");
+    }
 }
 
 impl From<&str> for SubscanScanResult {
