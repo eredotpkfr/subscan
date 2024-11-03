@@ -11,10 +11,11 @@ use chrono::Utc;
 use csv::Writer;
 use serde::Serialize;
 use serde_json;
-use std::error::Error;
-use std::fs::File;
-use std::io::Write;
-use std::{collections::BTreeSet, io};
+use std::{
+    collections::BTreeSet,
+    fs::File,
+    io::{self, Write},
+};
 
 /// `Subscan` scan result
 #[derive(Clone, Default, Serialize)]
@@ -43,9 +44,9 @@ impl SubscanScanResult {
             .expect("Failed to create output file");
 
         match output {
-            OutputFormat::TXT => self.save_txt(file).expect("Failed to save TXT"),
-            OutputFormat::CSV => self.save_csv(file).expect("Failed to save CSV"),
-            OutputFormat::JSON => self.save_json(file).expect("Failed to save JSON"),
+            OutputFormat::TXT => self.save_txt(file),
+            OutputFormat::CSV => self.save_csv(file),
+            OutputFormat::JSON => self.save_json(file),
         }
     }
 
@@ -53,29 +54,29 @@ impl SubscanScanResult {
         File::create(filename)
     }
 
-    fn save_json<W: Write>(&self, mut writer: W) -> io::Result<()> {
-        let json_content = serde_json::to_string_pretty(&self)?;
-        writer.write_all(json_content.as_bytes())?;
-        Ok(())
+    fn save_json<W: Write>(&self, mut writer: W) {
+        let json_content = serde_json::to_string_pretty(&self).expect("Failed to serialize JSON");
+        writer
+            .write_all(json_content.as_bytes())
+            .expect("Failed to write JSON");
     }
 
-    fn save_txt<W: Write>(&self, mut writer: W) -> io::Result<()> {
+    fn save_txt<W: Write>(&self, mut writer: W) {
         for subdomain in &self.results {
-            writeln!(writer, "{}", subdomain)?;
+            writeln!(writer, "{}", subdomain).expect("Failed to write TXT line");
         }
-        Ok(())
     }
 
-    fn save_csv<W: Write>(&self, writer: W) -> Result<(), Box<dyn Error>> {
+    fn save_csv<W: Write>(&self, writer: W) {
         let mut wtr = Writer::from_writer(writer);
-        wtr.write_record(&["subdomains"])?;
+        wtr.write_record(&["subdomains"])
+            .expect("Failed to write CSV header");
 
         for subdomain in &self.results {
-            wtr.write_record(&[subdomain])?;
+            wtr.write_record(&[subdomain])
+                .expect("Failed to write CSV record");
         }
-        wtr.flush()?;
-
-        Ok(())
+        wtr.flush().expect("Failed to flush CSV writer");
     }
 }
 
