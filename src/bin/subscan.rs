@@ -31,8 +31,7 @@ async fn main() {
             }
         },
         Commands::Scan(args) => {
-            let result = subscan.scan(&args.domain).await;
-            result.save(&args.output.to_string(), &args.domain);
+            subscan.scan(&args.domain).await.save(&args.output);
         }
         Commands::Brute(_) => {}
     }
