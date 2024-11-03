@@ -15,17 +15,16 @@ pub mod funcs {
     use super::constants::READ_ERROR;
     use serde_json::Value;
     use std::{
-        fs::{self, File},
-        io::Write,
+        fs,
         net::TcpListener,
         path::{Path, PathBuf},
     };
 
-    fn stubs_path() -> PathBuf {
+    pub fn stubs_path() -> PathBuf {
         Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/stubs")
     }
 
-    fn get_random_port() -> u16 {
+    pub fn get_random_port() -> u16 {
         TcpListener::bind("127.0.0.1:0")
             .unwrap()
             .local_addr()
@@ -43,31 +42,84 @@ pub mod funcs {
 
         serde_json::from_str(&content).unwrap()
     }
+}
 
-    pub fn create_tmp_stubs_with_port(stubs: &str, templates: Vec<&str>) -> (PathBuf, u16) {
-        let stubs_path = stubs_path().join(stubs);
-        let tmp_path = stubs_path.join("tmp");
-        let port = get_random_port();
+pub mod stub {
+    use super::funcs::{get_random_port, stubs_path};
+    use std::{
+        fs::{self, File},
+        io::Write,
+        path::PathBuf,
+    };
+    use tempfile::{tempdir_in, TempDir};
+    use tokio::sync::OnceCell;
 
-        fs::create_dir_all(tmp_path.clone()).unwrap();
+    pub struct TmpStubManager<'a> {
+        pub tmp: TempDir,
+        pub stubs: PathBuf,
+        pub templates: Vec<&'a str>,
+        pub port: u16,
+        pub init: OnceCell<()>,
+    }
 
-        for entry in stubs_path.read_dir().unwrap().flatten() {
-            if entry.path().is_file() {
-                let name = entry.file_name();
+    impl<'a> From<(&'a str, Vec<&'a str>)> for TmpStubManager<'a> {
+        fn from(tuple: (&'a str, Vec<&'a str>)) -> Self {
+            Self::new(tuple.0, tuple.1)
+        }
+    }
 
-                if templates.contains(&name.to_str().unwrap()) {
-                    let template = fs::read_to_string(entry.path()).unwrap();
-                    let filled_stub = template.replace("{{port}}", &port.to_string());
-                    let mut tmp_stub = File::create(tmp_path.join(name)).unwrap();
+    impl<'a> TmpStubManager<'a> {
+        pub fn new(stubs: &'a str, templates: Vec<&'a str>) -> Self {
+            let stubs = stubs_path().join(stubs);
+            let tmp = tempdir_in(stubs.clone()).unwrap();
+            let port = get_random_port();
+            let init = OnceCell::new();
 
-                    tmp_stub.write_all(filled_stub.as_bytes()).unwrap();
-                } else {
-                    fs::copy(entry.path(), tmp_path.join(name)).unwrap();
-                }
+            Self {
+                tmp,
+                stubs,
+                templates,
+                port,
+                init,
             }
         }
 
-        (tmp_path, port)
+        pub async fn port(&self) -> u16 {
+            self.init().await;
+            self.port
+        }
+
+        pub async fn tmp(&self) -> &str {
+            self.init().await;
+            self.tmp.path().to_str().unwrap()
+        }
+
+        async fn init(&self) {
+            self.init
+                .get_or_init(|| async {
+                    for entry in self.stubs.read_dir().unwrap().flatten() {
+                        if entry.path().is_file() {
+                            let name = entry.file_name();
+                            let target_path = self.tmp.path().join(&name);
+
+                            if self.templates.contains(&name.to_str().unwrap()) {
+                                self.fill_port(entry.path(), target_path).await;
+                            } else {
+                                fs::copy(entry.path(), target_path).unwrap();
+                            }
+                        }
+                    }
+                })
+                .await;
+        }
+
+        async fn fill_port(&self, input: PathBuf, output: PathBuf) {
+            let template = fs::read_to_string(input).unwrap();
+            let filled_stub = template.replace("{{port}}", &self.port.to_string());
+            let mut tmp_stub = File::create(output).unwrap();
+
+            tmp_stub.write_all(filled_stub.as_bytes()).unwrap();
+        }
     }
 }
 
