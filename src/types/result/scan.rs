@@ -1,4 +1,5 @@
 use super::module::SubscanModuleResult;
+use crate::enums::output::OutputFormat;
 use crate::{
     enums::module::SubscanModuleStatus,
     types::{
@@ -7,12 +8,13 @@ use crate::{
     },
 };
 use chrono::Utc;
+use csv::Writer;
 use serde::Serialize;
-use std::collections::BTreeSet;
-use std::fs;
+use serde_json;
+use std::error::Error;
 use std::fs::File;
 use std::io::Write;
-use std::path::Path;
+use std::{collections::BTreeSet, io};
 
 /// `Subscan` scan result
 #[derive(Clone, Default, Serialize)]
@@ -26,47 +28,54 @@ pub struct SubscanScanResult {
     /// Total count of discovered subdomains
     pub total: usize,
 }
+
 impl SubscanScanResult {
-    pub fn save(&self, output: &str, domain: &str) {
-        let data_dir = Path::new("data");
-        if !data_dir.exists() {
-            fs::create_dir_all(data_dir).expect("Couldn't create data directory");
-        }
-
+    pub fn save(&self, output: &OutputFormat) {
         let now = Utc::now().format("%Y-%m-%d");
-        let filename = format!("{}_{}.{}", now, domain, output.to_lowercase());
-        let filepath = data_dir.join(filename);
+        let filename = match output {
+            OutputFormat::TXT => format!("{}_{}.txt", now, self.metadata.target),
+            OutputFormat::CSV => format!("{}_{}.csv", now, self.metadata.target),
+            OutputFormat::JSON => format!("{}_{}.json", now, self.metadata.target),
+        };
 
-        match output.to_uppercase().as_str() {
-            "JSON" => self
-                .save_json(filepath.to_str().unwrap())
-                .expect("Failed to save JSON"),
-            "TXT" => self.save_txt(filepath.to_str().unwrap()),
-            "CSV" => self.save_csv(filepath.to_str().unwrap()),
-            _ => panic!("Unsupported format"),
+        let file = self
+            .get_output_file(&filename)
+            .expect("Failed to create output file");
+
+        match output {
+            OutputFormat::TXT => self.save_txt(file).expect("Failed to save TXT"),
+            OutputFormat::CSV => self.save_csv(file).expect("Failed to save CSV"),
+            OutputFormat::JSON => self.save_json(file).expect("Failed to save JSON"),
         }
     }
 
-    fn save_json(&self, path: &str) -> std::io::Result<()> {
-        let json_content = serde_json::to_string_pretty(&self).expect("Failed to serialize JSON");
-        let mut file = File::create(path)?;
-        file.write_all(json_content.as_bytes())?;
+    fn get_output_file(&self, filename: &str) -> io::Result<File> {
+        File::create(filename)
+    }
+
+    fn save_json<W: Write>(&self, mut writer: W) -> io::Result<()> {
+        let json_content = serde_json::to_string_pretty(&self)?;
+        writer.write_all(json_content.as_bytes())?;
         Ok(())
     }
 
-    pub fn save_txt(&self, path: &str) {
-        let mut file = File::create(path).expect("Failed to create TXT file");
+    fn save_txt<W: Write>(&self, mut writer: W) -> io::Result<()> {
         for subdomain in &self.results {
-            writeln!(file, "{}", subdomain).expect("Failed to write to TXT file");
+            writeln!(writer, "{}", subdomain)?;
         }
+        Ok(())
     }
 
-    pub fn save_csv(&self, path: &str) {
-        let mut file = File::create(path).expect("Failed to create CSV file");
-        writeln!(file, "Subdomains").expect("Failed to write header to CSV file");
+    fn save_csv<W: Write>(&self, writer: W) -> Result<(), Box<dyn Error>> {
+        let mut wtr = Writer::from_writer(writer);
+        wtr.write_record(&["subdomains"])?;
+
         for subdomain in &self.results {
-            writeln!(file, "{}", subdomain).expect("Failed to write to CSV file");
+            wtr.write_record(&[subdomain])?;
         }
+        wtr.flush()?;
+
+        Ok(())
     }
 }
 
