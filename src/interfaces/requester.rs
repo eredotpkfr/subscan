@@ -22,7 +22,7 @@ use reqwest::Url;
 /// use subscan::interfaces::requester::RequesterInterface;
 /// use subscan::types::config::RequesterConfig;
 /// use subscan::enums::content::Content;
-/// use subscan::config::DEFAULT_HTTP_TIMEOUT;
+/// use subscan::constants::DEFAULT_HTTP_TIMEOUT;
 /// use reqwest::Url;
 /// use async_trait::async_trait;
 /// use serde_json::Value;

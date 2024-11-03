@@ -1,5 +1,5 @@
 use crate::{
-    config::{ASTERISK, DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
+    constants::{ASTERISK, DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
     enums::{cache::CacheFilter, output::OutputFormat},
 };
 use clap::Args;

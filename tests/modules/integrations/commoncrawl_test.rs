@@ -3,7 +3,8 @@ use std::collections::BTreeSet;
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    funcs, mocks,
+    mocks,
+    stub::TempStubManager,
 };
 use serde_json::{json, Value};
 use subscan::{
@@ -37,16 +38,14 @@ async fn extract_cdx_urls_test() {
 async fn run_test() {
     let stubs = "module/integrations/commoncrawl";
     let templates = vec!["commoncrawl-index-template.json"];
-
-    let (tmp, port) = funcs::create_tmp_stubs_with_port(stubs, templates);
+    let manager: TempStubManager = (stubs, templates).into();
 
     let config = stubr::Config {
-        port: Some(port),
+        port: Some(manager.port().await),
         ..Default::default()
     };
 
-    let stubr = stubr::Stubr::start_with(tmp.clone(), config).await;
-
+    let stubr = stubr::Stubr::start_with(manager.temp().await, config).await;
     let mut commoncrawl = CommonCrawl::dispatcher();
 
     mocks::wrap_module_dispatcher_url_field(&mut commoncrawl, &stubr.path("/commoncrawl/index"));
@@ -70,6 +69,4 @@ async fn run_test() {
     ]);
 
     assert_eq!(results.subdomains, expected);
-
-    tokio::fs::remove_dir_all(tmp).await.unwrap();
 }

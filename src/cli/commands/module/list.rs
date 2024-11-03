@@ -1,18 +1,19 @@
 use crate::{types::core::SubscanModule, utilities::cli};
 use clap::Args;
+use std::io::Write;
 
 /// List command to list implemented modules
 #[derive(Args, Clone, Debug)]
 pub struct ModuleListSubCommandArgs {}
 
 impl ModuleListSubCommandArgs {
-    pub async fn as_table(&self, modules: &Vec<SubscanModule>) {
+    pub async fn as_table<W: Write>(&self, modules: &Vec<SubscanModule>, out: &mut W) {
         let mut table = cli::create_module_table().await;
 
         for module in modules {
             table.add_row(cli::module_as_table_row(&*module.lock().await).await);
         }
 
-        table.printstd();
+        table.print(out).unwrap();
     }
 }

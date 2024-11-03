@@ -20,12 +20,7 @@ use prettytable::{format::consts::FORMAT_NO_LINESEP_WITH_TITLE, row, Row, Table}
 pub async fn create_module_table() -> Table {
     let mut table = Table::new();
 
-    let titles = row![
-        FdBwbd -> "Name",
-        FdBwbd -> "Requester",
-        FdBwbd -> "Extractor",
-        FdBwbd -> "Is Generic?",
-    ];
+    let titles = row!["Name", "Requester", "Extractor", "Is Generic?",];
 
     table.set_format(*FORMAT_NO_LINESEP_WITH_TITLE);
     table.set_titles(titles);
@@ -64,9 +59,9 @@ pub async fn module_as_table_row(module: &SubscanModuleDispatcher) -> Row {
     };
 
     row![
-        Fw -> module.name().await,
-        Fw -> requester,
-        Fw -> extractor,
-        Fw -> module.is_generic().await
+        module.name().await,
+        requester,
+        extractor,
+        module.is_generic().await
     ]
 }
