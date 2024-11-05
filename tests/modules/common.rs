@@ -208,6 +208,7 @@ pub mod mocks {
             SubscanModuleDispatcher::GitHub(module) => module.url = url.parse().unwrap(),
             SubscanModuleDispatcher::Netlas(module) => module.url = url.parse().unwrap(),
             SubscanModuleDispatcher::WaybackArchive(module) => module.url = url.parse().unwrap(),
+            SubscanModuleDispatcher::ZoneTransfer(_) => {}
         }
     }
 }

@@ -8,6 +8,7 @@ use crate::{
             commoncrawl::CommonCrawl, dnsdumpster::DnsDumpster, github::GitHub, netlas::Netlas,
             waybackarchive::WaybackArchive,
         },
+        zonetransfer::ZoneTransfer,
     },
     types::{env::SubscanModuleEnvs, result::module::SubscanModuleResult},
 };
