@@ -1,5 +1,3 @@
-use std::{net::SocketAddr, str::FromStr};
-
 use crate::{
     enums::{
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
@@ -19,6 +17,7 @@ use hickory_resolver::{
     config::{NameServerConfig, NameServerConfigGroup, Protocol::Tcp},
     system_conf,
 };
+use std::{net::SocketAddr, str::FromStr};
 use tokio::{net::TcpStream as TokioTcpStream, sync::Mutex};
 
 pub const ZONETRANSFER_MODULE_NAME: &str = "zonetransfer";
@@ -45,7 +44,7 @@ impl ZoneTransfer {
         zonetransfer.into()
     }
 
-    async fn get_default_name_server(&self) -> Option<NameServerConfig> {
+    async fn get_default_ns(&self) -> Option<NameServerConfig> {
         let tcp = |ns: &&NameServerConfig| ns.protocol == Tcp;
 
         if let Ok((config, _)) = system_conf::read_system_conf() {
@@ -71,7 +70,7 @@ impl ZoneTransfer {
     }
 
     async fn get_ns_records_as_ip(&self, domain: &str) -> Option<Vec<SocketAddr>> {
-        let default_ns = self.get_default_name_server().await?;
+        let default_ns = self.get_default_ns().await?;
 
         let mut ip_addresses = vec![];
         let mut client = self.get_async_client(default_ns.socket_addr).await?;
