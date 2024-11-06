@@ -10,11 +10,7 @@ use chrono::Utc;
 use csv::Writer;
 use serde::Serialize;
 use serde_json;
-use std::{
-    collections::BTreeSet,
-    fs::File,
-    io::{self, Write},
-};
+use std::{collections::BTreeSet, fs::File, io::Write};
 
 /// `Subscan` scan result
 #[derive(Clone, Default, Serialize)]
@@ -30,7 +26,17 @@ pub struct SubscanScanResult {
 }
 
 impl SubscanScanResult {
-    pub fn save(&self, output: &OutputFormat) {
+    pub async fn save(&self, output: &OutputFormat) {
+        let file = self.get_output_file(output).await;
+
+        match output {
+            OutputFormat::TXT => self.save_txt(file).await,
+            OutputFormat::CSV => self.save_csv(file).await,
+            OutputFormat::JSON => self.save_json(file).await,
+        }
+    }
+
+    async fn get_output_file(&self, output: &OutputFormat) -> File {
         let now = Utc::now().format("%Y-%m-%d");
         let filename = match output {
             OutputFormat::TXT => format!("{}_{}.txt", now, self.metadata.target),
@@ -38,44 +44,29 @@ impl SubscanScanResult {
             OutputFormat::JSON => format!("{}_{}.json", now, self.metadata.target),
         };
 
-        let file = self
-            .get_output_file(&filename)
-            .expect("Failed to create output file");
-
-        match output {
-            OutputFormat::TXT => self.save_txt(file),
-            OutputFormat::CSV => self.save_csv(file),
-            OutputFormat::JSON => self.save_json(file),
-        }
+        File::create(filename).unwrap()
     }
 
-    fn get_output_file(&self, filename: &str) -> io::Result<File> {
-        File::create(filename)
+    async fn save_json<W: Write>(&self, mut writer: W) {
+        let json_content = serde_json::to_string_pretty(&self).unwrap();
+
+        writer.write_all(json_content.as_bytes()).unwrap()
     }
 
-    fn save_json<W: Write>(&self, mut writer: W) {
-        let json_content = serde_json::to_string_pretty(&self).expect("Failed to serialize JSON");
-        writer
-            .write_all(json_content.as_bytes())
-            .expect("Failed to write JSON");
-    }
-
-    fn save_txt<W: Write>(&self, mut writer: W) {
+    async fn save_txt<W: Write>(&self, mut writer: W) {
         for subdomain in &self.results {
-            writeln!(writer, "{}", subdomain).expect("Failed to write TXT line");
+            writeln!(writer, "{}", subdomain).unwrap();
         }
     }
 
-    fn save_csv<W: Write>(&self, writer: W) {
-        let mut wtr = Writer::from_writer(writer);
-        wtr.write_record(&["subdomains"])
-            .expect("Failed to write CSV header");
+    async fn save_csv<W: Write>(&self, writer: W) {
+        let mut writer = Writer::from_writer(writer);
+
+        writer.serialize("subdomains").unwrap();
 
         for subdomain in &self.results {
-            wtr.write_record(&[subdomain])
-                .expect("Failed to write CSV record");
+            writer.serialize(subdomain).unwrap()
         }
-        wtr.flush().expect("Failed to flush CSV writer");
     }
 }
 
