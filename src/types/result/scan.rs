@@ -1,7 +1,6 @@
 use super::module::SubscanModuleResult;
-use crate::enums::output::OutputFormat;
 use crate::{
-    enums::module::SubscanModuleStatus,
+    enums::{module::SubscanModuleStatus, output::OutputFormat},
     types::{
         core::Subdomain,
         result::{metadata::SubscanScanResultMetadata, stats::SubscanModuleStatistics},
