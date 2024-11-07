@@ -1,6 +1,6 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mocks,
+    mock::funcs,
 };
 use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::yahoo::Yahoo};
 
@@ -9,7 +9,7 @@ use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::yaho
 async fn run_test() {
     let mut yahoo = Yahoo::dispatcher();
 
-    mocks::wrap_module_dispatcher_url_field(&mut yahoo, &stubr.path("/search"));
+    funcs::wrap_module_dispatcher_url_field(&mut yahoo, &stubr.path("/search"));
 
     let result = yahoo.run(TEST_DOMAIN).await;
 

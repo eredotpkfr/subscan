@@ -1,6 +1,6 @@
 use crate::common::{
     constants::{TEST_API_KEY, TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    mocks::generic_integration,
+    mock::modules::generic_integration,
 };
 use reqwest::Url;
 use std::env;

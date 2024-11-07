@@ -1,6 +1,6 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    mocks::generic_search_engine,
+    mock::modules::generic_search_engine,
 };
 use subscan::interfaces::module::SubscanModuleInterface;
 

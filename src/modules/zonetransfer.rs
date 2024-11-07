@@ -44,17 +44,20 @@ impl ZoneTransfer {
         zonetransfer.into()
     }
 
-    async fn get_default_ns(&self) -> Option<NameServerConfig> {
+    pub async fn get_default_ns(&self) -> Option<NameServerConfig> {
         let tcp = |ns: &&NameServerConfig| ns.protocol == Tcp;
 
         if let Ok((config, _)) = system_conf::read_system_conf() {
             config.name_servers().iter().find(tcp).cloned()
         } else {
-            NameServerConfigGroup::google().iter().find(tcp).cloned()
+            NameServerConfigGroup::cloudflare()
+                .iter()
+                .find(tcp)
+                .cloned()
         }
     }
 
-    async fn get_async_client(&self, server: SocketAddr) -> Option<AsyncClient> {
+    pub async fn get_async_client(&self, server: SocketAddr) -> Option<AsyncClient> {
         type WrappedStream = AsyncIoTokioAsStd<TokioTcpStream>;
 
         let (stream, sender) = TcpClientStream::<WrappedStream>::new(server);
@@ -69,11 +72,9 @@ impl ZoneTransfer {
         }
     }
 
-    async fn get_ns_records_as_ip(&self, domain: &str) -> Option<Vec<SocketAddr>> {
-        let default_ns = self.get_default_ns().await?;
-
+    pub async fn get_ns_as_ip(&self, server: SocketAddr, domain: &str) -> Option<Vec<SocketAddr>> {
         let mut ip_addresses = vec![];
-        let mut client = self.get_async_client(default_ns.socket_addr).await?;
+        let mut client = self.get_async_client(server).await?;
 
         let name = Name::from_str(domain).unwrap();
         let ns_response = client.query(name, DNSClass::IN, RecordType::NS);
@@ -83,7 +84,7 @@ impl ZoneTransfer {
             let a_response = client.query(name, DNSClass::IN, RecordType::A).await;
 
             for answer in a_response.ok()?.answers() {
-                let with_port = format!("{}:53", answer.data()?);
+                let with_port = format!("{}:{}", answer.data()?, server.port());
                 let socketaddr = SocketAddr::from_str(&with_port);
 
                 ip_addresses.push(socketaddr.ok()?)
@@ -93,7 +94,7 @@ impl ZoneTransfer {
         Some(ip_addresses)
     }
 
-    async fn attempt_zone_transfer(&self, server: SocketAddr, domain: &str) -> Vec<Subdomain> {
+    pub async fn attempt_zone_transfer(&self, server: SocketAddr, domain: &str) -> Vec<Subdomain> {
         let mut client = self.get_async_client(server).await.unwrap();
         let mut subs = vec![];
 
@@ -135,8 +136,9 @@ impl SubscanModuleInterface for ZoneTransfer {
 
     async fn run(&mut self, domain: &str) -> SubscanModuleResult {
         let mut result: SubscanModuleResult = self.name().await.into();
+        let server = self.get_default_ns().await.unwrap().socket_addr;
 
-        if let Some(ips) = self.get_ns_records_as_ip(domain).await {
+        if let Some(ips) = self.get_ns_as_ip(server, domain).await {
             for ip in ips {
                 result.extend(self.attempt_zone_transfer(ip, domain).await);
             }

@@ -2,8 +2,8 @@ use std::env;
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mocks,
-    stub::TempStubManager,
+    mock::funcs,
+    stub::StubTemplateManager,
 };
 use reqwest::Url;
 use serde_json::{json, Value};
@@ -42,7 +42,7 @@ async fn get_html_urls_test() {
 async fn run_test() {
     let stubs = "module/integrations/github";
     let templates = vec!["github-code-search-template.json"];
-    let manager: TempStubManager = (stubs, templates).into();
+    let manager: StubTemplateManager = (stubs, templates).into();
 
     let config = stubr::Config {
         port: Some(manager.port().await),
@@ -54,7 +54,7 @@ async fn run_test() {
     let env_name = github.envs().await.apikey.name;
 
     env::set_var(&env_name, "github-api-key");
-    mocks::wrap_module_dispatcher_url_field(&mut github, &stubr.path("/github-code-search"));
+    funcs::wrap_module_dispatcher_url_field(&mut github, &stubr.path("/github-code-search"));
 
     let results = github.run(TEST_DOMAIN).await;
 

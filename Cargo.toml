@@ -22,6 +22,7 @@ futures = "0.3.31"
 headless_chrome = { version = "1.0.15", features = ["fetch"] }
 hickory-client = { version = "0.24.1", default-features = false }
 hickory-resolver = "0.24.1"
+itertools = "0.13.0"
 lazy_static = "1.5.0"
 log = "0.4.22"
 prettytable-rs = "0.10.0"
@@ -35,6 +36,7 @@ tokio-util = "0.7.12"
 
 [dev-dependencies]
 automod = "1.0.14"
+hickory-server = "0.24.1"
 md5 = "0.7.0"
 stubr = "0.6.2"
 tempfile = "3.13.0"

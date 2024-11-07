@@ -2,8 +2,8 @@ use std::{collections::BTreeSet, env};
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    funcs::read_stub,
-    mocks,
+    mock::funcs,
+    utils::read_stub,
 };
 use serde_json::Value;
 use subscan::{
@@ -19,7 +19,7 @@ async fn run_test() {
     let env_name = securitytrails.envs().await.apikey.name;
 
     env::set_var(&env_name, "securitytrails-api-key");
-    mocks::wrap_module_dispatcher_url_field(&mut securitytrails, &stubr.path("/securitytrails"));
+    funcs::wrap_module_dispatcher_url_field(&mut securitytrails, &stubr.path("/securitytrails"));
 
     let result = securitytrails.run(TEST_DOMAIN).await;
 

@@ -1,6 +1,6 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mocks,
+    mock::funcs,
 };
 use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::google::Google};
 
@@ -9,7 +9,7 @@ use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::goog
 async fn run_test() {
     let mut google = Google::dispatcher();
 
-    mocks::wrap_module_dispatcher_url_field(&mut google, &stubr.path("/search"));
+    funcs::wrap_module_dispatcher_url_field(&mut google, &stubr.path("/search"));
 
     let result = google.run(TEST_DOMAIN).await;
 

@@ -2,8 +2,8 @@ use std::collections::BTreeSet;
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    funcs::read_stub,
-    mocks,
+    mock::funcs,
+    utils::read_stub,
 };
 use serde_json::Value;
 use subscan::{
@@ -17,7 +17,7 @@ use subscan::{
 async fn run_test() {
     let mut anubis = Anubis::dispatcher();
 
-    mocks::wrap_module_dispatcher_url_field(&mut anubis, &stubr.path("/anubis"));
+    funcs::wrap_module_dispatcher_url_field(&mut anubis, &stubr.path("/anubis"));
 
     let result = anubis.run(TEST_DOMAIN).await;
 

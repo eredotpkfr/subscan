@@ -2,8 +2,8 @@ use std::{collections::BTreeSet, env};
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    funcs::read_stub,
-    mocks,
+    mock::funcs,
+    utils::read_stub,
 };
 use serde_json::Value;
 use subscan::{interfaces::module::SubscanModuleInterface, modules::integrations::netlas::Netlas};
@@ -15,7 +15,7 @@ async fn run_test() {
     let env_name = netlas.envs().await.apikey.name;
 
     env::set_var(&env_name, "netlas-api-key");
-    mocks::wrap_module_dispatcher_url_field(&mut netlas, &stubr.uri());
+    funcs::wrap_module_dispatcher_url_field(&mut netlas, &stubr.uri());
 
     let results = netlas.run(TEST_DOMAIN).await;
 
@@ -29,7 +29,7 @@ async fn run_test() {
 async fn run_test_no_count() {
     let mut netlas = Netlas::dispatcher();
 
-    mocks::wrap_module_dispatcher_url_field(&mut netlas, &stubr.uri());
+    funcs::wrap_module_dispatcher_url_field(&mut netlas, &stubr.uri());
 
     // Test no count response
     assert_eq!(netlas.run(TEST_DOMAIN).await.subdomains, [].into());

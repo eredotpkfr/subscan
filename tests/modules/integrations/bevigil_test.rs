@@ -1,7 +1,7 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    funcs::read_stub,
-    mocks,
+    mock::funcs,
+    utils::read_stub,
 };
 use serde_json::Value;
 use std::{collections::BTreeSet, env};
@@ -18,7 +18,7 @@ async fn run_test() {
     let env_name = bevigil.envs().await.apikey.name;
 
     env::set_var(&env_name, "bevigil-api-key");
-    mocks::wrap_module_dispatcher_url_field(&mut bevigil, &stubr.path("/bevigil"));
+    funcs::wrap_module_dispatcher_url_field(&mut bevigil, &stubr.path("/bevigil"));
 
     let result = bevigil.run(TEST_DOMAIN).await;
 

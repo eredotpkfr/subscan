@@ -1,7 +1,7 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    funcs::read_stub,
-    mocks,
+    mock::funcs,
+    utils::read_stub,
 };
 use serde_json::Value;
 use std::collections::BTreeSet;
@@ -16,7 +16,7 @@ use subscan::{
 async fn run_test() {
     let mut leakix = Leakix::dispatcher();
 
-    mocks::wrap_module_dispatcher_url_field(&mut leakix, &stubr.path("/leakix"));
+    funcs::wrap_module_dispatcher_url_field(&mut leakix, &stubr.path("/leakix"));
 
     let result = leakix.run(TEST_DOMAIN).await;
 

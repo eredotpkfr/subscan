@@ -2,7 +2,7 @@ use std::collections::BTreeSet;
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
-    mocks,
+    mock::funcs,
 };
 use subscan::{
     interfaces::module::SubscanModuleInterface,
@@ -14,7 +14,7 @@ use subscan::{
 async fn run_test() {
     let mut waybackarchive = WaybackArchive::dispatcher();
 
-    mocks::wrap_module_dispatcher_url_field(&mut waybackarchive, &stubr.path("/waybackarchive"));
+    funcs::wrap_module_dispatcher_url_field(&mut waybackarchive, &stubr.path("/waybackarchive"));
 
     let results = waybackarchive.run(TEST_DOMAIN).await;
 
