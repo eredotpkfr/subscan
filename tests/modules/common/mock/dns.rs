@@ -118,8 +118,13 @@ impl MockDNSHandler {
             IpAddr::V6(ipv6) => RData::AAAA(AAAA(ipv6)),
         };
 
-        let name = Name::from_utf8("bar.foo.com").unwrap();
-        let records = vec![Record::from_rdata(name, 60, rdata)];
+        let name_one = Name::from_utf8("bar.foo.com").unwrap();
+        let name_two = Name::from_utf8("*.foo.com").unwrap();
+
+        let records = vec![
+            Record::from_rdata(name_one, 60, rdata.clone()),
+            Record::from_rdata(name_two, 60, rdata),
+        ];
         let response = builder.build(header, records.iter(), &[], &[], &[]);
 
         responder.send_response(response).await.ok()

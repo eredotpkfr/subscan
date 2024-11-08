@@ -5,7 +5,7 @@ use crate::{
     },
     interfaces::module::SubscanModuleInterface,
     types::{core::Subdomain, result::module::SubscanModuleResult},
-    utilities::net,
+    utilities::{net, regex},
 };
 use async_trait::async_trait;
 use hickory_client::{
@@ -85,6 +85,7 @@ impl ZoneTransfer {
     }
 
     pub async fn attempt_zone_transfer(&self, server: SocketAddr, domain: &str) -> Vec<Subdomain> {
+        let pattern = regex::generate_subdomain_regex(domain).unwrap();
         let mut client = self.get_async_client(server).await.unwrap();
         let mut subs = vec![];
 
@@ -100,7 +101,9 @@ impl ZoneTransfer {
                         let name = answer.name().to_string();
                         let sub = name.strip_suffix(".").unwrap_or(&name);
 
-                        subs.push(sub.to_string());
+                        if let Some(matches) = pattern.find(sub) {
+                            subs.push(matches.as_str().to_lowercase());
+                        }
                     }
                 }
             }
