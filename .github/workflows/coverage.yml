@@ -20,6 +20,13 @@ jobs:
       - uses: taiki-e/install-action@cargo-llvm-cov
       - uses: Swatinem/rust-cache@v2
 
+      - name: Install llvm-symbolizer
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y gnupg curl
+          curl -fsSL https://apt.llvm.org/llvm.sh | sudo bash
+          sudo apt-get install llvm-symbolizer llvm lld -y
+
       - name: Generate code coverage
         run: |
           cargo +nightly llvm-cov \
