@@ -6,6 +6,8 @@ pub mod env;
 pub mod http;
 /// Logging utilities
 pub mod log;
+/// Network utilities
+pub mod net;
 /// Regex utilities
 pub mod regex;
 /// JSON serializer utilities
