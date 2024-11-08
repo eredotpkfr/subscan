@@ -22,7 +22,7 @@ use tokio::net::TcpListener;
 
 pub struct MockDNSServer {
     pub handler: MockDNSHandler,
-    pub port: u16,
+    pub socket: SocketAddr,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -32,19 +32,19 @@ pub struct MockDNSHandler {
 
 impl MockDNSServer {
     pub fn new(domain: &str) -> Self {
-        Self {
-            handler: MockDNSHandler::new(domain),
-            port: get_random_port(),
-        }
-    }
+        let port = get_random_port();
+        let socket = SocketAddr::from_str(&format!("{LOCAL_HOST}:{}", port));
+        let zone = Name::from_str(domain).unwrap();
 
-    pub async fn socket_addr(&self) -> SocketAddr {
-        SocketAddr::from_str(&format!("{LOCAL_HOST}:{}", self.port)).unwrap()
+        Self {
+            handler: MockDNSHandler::new(zone.into()),
+            socket: socket.unwrap(),
+        }
     }
 
     pub async fn start(&self) {
         let mut server = ServerFuture::new(self.handler.clone());
-        let listener = TcpListener::bind(self.socket_addr().await).await.unwrap();
+        let listener = TcpListener::bind(self.socket).await.unwrap();
 
         server.register_listener(listener, Duration::from_secs(10));
         server.block_until_done().await.unwrap()
@@ -52,10 +52,8 @@ impl MockDNSServer {
 }
 
 impl MockDNSHandler {
-    pub fn new(zone: &str) -> Self {
-        Self {
-            zone: LowerName::from(Name::from_str(zone).unwrap()),
-        }
+    pub fn new(zone: LowerName) -> Self {
+        Self { zone }
     }
 
     async fn handle_zone<R: ResponseHandler>(

@@ -18,7 +18,7 @@ async fn get_async_client_test() {
 
     let zonetransfer = ZoneTransfer::dispatcher();
     let server = MockDNSServer::new(TEST_DOMAIN);
-    let addr = server.socket_addr().await;
+    let addr = server.socket;
 
     tokio::spawn(async move {
         notift_two.notify_one();
@@ -49,7 +49,7 @@ async fn get_ns_as_ip_test() {
 
     let zonetransfer = ZoneTransfer::dispatcher();
     let server = MockDNSServer::new(TEST_DOMAIN);
-    let addr = server.socket_addr().await;
+    let addr = server.socket;
 
     tokio::spawn(async move {
         notift_two.notify_one();
@@ -73,7 +73,7 @@ async fn attempt_zone_transfer_test() {
 
     let zonetransfer = ZoneTransfer::dispatcher();
     let server = MockDNSServer::new(TEST_DOMAIN);
-    let addr = server.socket_addr().await;
+    let addr = server.socket;
 
     tokio::spawn(async move {
         notift_two.notify_one();
@@ -110,7 +110,7 @@ async fn run_test() {
 
     let zonetransfer = ZoneTransfer::dispatcher();
     let server = MockDNSServer::new(TEST_DOMAIN);
-    let addr = server.socket_addr().await;
+    let addr = server.socket;
 
     tokio::spawn(async move {
         notift_two.notify_one();
