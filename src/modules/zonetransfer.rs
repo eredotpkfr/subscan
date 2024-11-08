@@ -11,7 +11,7 @@ use async_trait::async_trait;
 use hickory_client::{
     client::{AsyncClient, ClientHandle},
     proto::iocompat::AsyncIoTokioAsStd,
-    rr::{domain::Name, DNSClass, RecordType},
+    rr::{domain::Name, DNSClass, Record, RecordType},
     tcp::TcpClientStream,
 };
 use hickory_resolver::config::NameServerConfig;
@@ -49,19 +49,16 @@ impl ZoneTransfer {
         type WrappedStream = AsyncIoTokioAsStd<TokioTcpStream>;
 
         let (stream, sender) = TcpClientStream::<WrappedStream>::new(server);
-        let client = AsyncClient::new(stream, sender, None);
+        let result = AsyncClient::new(stream, sender, None).await;
 
-        if let Ok((client, bg)) = client.await {
+        result.ok().map(|(client, bg)| {
             tokio::spawn(bg);
-
-            Some(client)
-        } else {
-            None
-        }
+            client
+        })
     }
 
     pub async fn get_ns_as_ip(&self, server: SocketAddr, domain: &str) -> Option<Vec<SocketAddr>> {
-        let mut ip_addresses = vec![];
+        let mut ips = vec![];
         let mut client = self.get_async_client(server).await?;
 
         let name = Name::from_str(domain).unwrap();
@@ -71,15 +68,20 @@ impl ZoneTransfer {
             let name = Name::from_str(&answer.data()?.as_ns()?.to_utf8()).ok()?;
             let a_response = client.query(name, DNSClass::IN, RecordType::A).await;
 
-            for answer in a_response.ok()?.answers() {
-                let with_port = format!("{}:{}", answer.data()?, server.port());
-                let socketaddr = SocketAddr::from_str(&with_port);
+            let with_port = |answer: &Record| Some(format!("{}:{}", answer.data()?, server.port()));
+            let as_ip = |with_port: String| SocketAddr::from_str(&with_port).ok();
 
-                ip_addresses.push(socketaddr.ok()?)
-            }
+            ips.extend(
+                a_response
+                    .ok()?
+                    .answers()
+                    .iter()
+                    .filter_map(with_port)
+                    .filter_map(as_ip),
+            );
         }
 
-        Some(ip_addresses)
+        Some(ips)
     }
 
     pub async fn attempt_zone_transfer(&self, server: SocketAddr, domain: &str) -> Vec<Subdomain> {
@@ -87,9 +89,9 @@ impl ZoneTransfer {
         let mut subs = vec![];
 
         let name = Name::from_str(domain).unwrap();
-        let axfr_response = client.query(name, DNSClass::IN, RecordType::AXFR).await;
+        let axfr_response = client.query(name, DNSClass::IN, RecordType::AXFR);
 
-        if let Ok(response) = axfr_response {
+        if let Ok(response) = axfr_response.await {
             for answer in response.answers() {
                 if let Some(data) = answer.data() {
                     let rtype = data.record_type();
@@ -134,9 +136,7 @@ impl SubscanModuleInterface for ZoneTransfer {
 
             result.with_status(Finished).await
         } else {
-            result
-                .with_status(Failed("not get default ns".into()))
-                .await
+            result.with_status(Failed("no default ns".into())).await
         }
     }
 }

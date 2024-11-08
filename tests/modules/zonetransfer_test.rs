@@ -100,7 +100,7 @@ async fn run_failed_test() {
 
     let result = zonetransfer.run(TEST_DOMAIN).await;
 
-    assert_eq!(result.status, Failed("not get default ns".into()));
+    assert_eq!(result.status, Failed("no default ns".into()));
 }
 
 #[tokio::test]
