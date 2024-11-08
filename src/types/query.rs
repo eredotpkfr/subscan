@@ -142,7 +142,7 @@ impl SearchQuery {
         let formatted = format!(".{}", self.domain);
 
         if let Some(stripped) = sub.strip_suffix(&formatted) {
-            self.state.insert(format!("-{}", stripped))
+            self.state.insert(format!("-{}", stripped.trim()))
         } else {
             false
         }
@@ -191,8 +191,9 @@ impl SearchQuery {
     /// assert_eq!(query.as_search_str(), "site:foo.com");
     ///
     /// query.update("bar.foo.com".into());
+    /// query.update("baz.foo.com".into());
     ///
-    /// assert_eq!(query.as_search_str(), "site:foo.com -bar")
+    /// assert_eq!(query.as_search_str(), "site:foo.com -bar -baz")
     /// ````
     pub fn as_search_str(&mut self) -> String {
         let suffix = self.state.iter().join(" ");
@@ -200,7 +201,7 @@ impl SearchQuery {
         if suffix.is_empty() {
             format!("{}{}", self.prefix, self.domain)
         } else {
-            format!("{}{} {}", self.prefix, self.domain, suffix)
+            format!("{}{} {}", self.prefix, self.domain, suffix.trim())
         }
     }
 

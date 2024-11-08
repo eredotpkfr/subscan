@@ -1,0 +1,16 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/commoncrawl/index-no-data"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {},
+        "status": 200,
+        "transformers": [
+            "response-template"
+        ]
+    }
+}

@@ -89,10 +89,11 @@ impl SubscanModuleInterface for Netlas {
     }
 
     async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+        let mut url = self.url.clone();
         let mut result: SubscanModuleResult = self.name().await.into();
 
-        let requester = &mut *self.components.requester.lock().await;
-        let extractor = &self.components.extractor;
+        let requester = &mut *self.requester().await.unwrap().lock().await;
+        let extractor = self.extractor().await.unwrap();
 
         let apikey = self.envs().await.apikey.value.unwrap_or_default();
         let query = format!("domain:*.{domain} AND NOT domain:{domain}");
@@ -102,15 +103,15 @@ impl SubscanModuleInterface for Netlas {
             HeaderValue::from_str(&apikey).unwrap(),
         );
 
-        self.url.set_path("api/domains_count/");
-        self.url.set_query(Some(&format!("q={query}")));
+        url.set_path("api/domains_count/");
+        url.set_query(Some(&format!("q={query}")));
 
-        let json = requester.get_content(self.url.clone()).await.as_json();
+        let json = requester.get_content(url.clone()).await.as_json();
         let count = json["count"].as_i64();
 
         if let (Some(count), RequesterDispatcher::HTTPClient(requester)) = (count, requester) {
-            self.url.set_query(None);
-            self.url.set_path("api/domains/download/");
+            url.set_query(None);
+            url.set_path("api/domains/download/");
 
             let body = json!({
                 "q": format!("domain:(domain:*.{domain} AND NOT domain:{domain})"),
@@ -121,7 +122,7 @@ impl SubscanModuleInterface for Netlas {
 
             let request = requester
                 .client
-                .post(self.url.clone())
+                .post(url)
                 .json(&body)
                 .timeout(requester.config.timeout)
                 .headers(requester.config.headers.clone())

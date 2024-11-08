@@ -23,7 +23,7 @@ pub struct ScanCommandArgs {
     #[arg(short, long, default_value = None)]
     pub proxy: Option<String>,
     /// Output format
-    #[arg(value_enum, short, long, default_value_t = OutputFormat::TXT)]
+    #[arg(value_enum, short, long, default_value_t = OutputFormat::JSON)]
     pub output: OutputFormat,
     /// Comma separated list of modules to run
     #[arg(short, long, default_value = ASTERISK)]

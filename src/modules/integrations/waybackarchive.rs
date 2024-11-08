@@ -71,19 +71,20 @@ impl SubscanModuleInterface for WaybackArchive {
     }
 
     async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+        let mut url = self.url.clone();
         let mut result: SubscanModuleResult = self.name().await.into();
 
-        let requester = &*self.components.requester.lock().await;
-        let extractor = &self.components.extractor;
+        let requester = &*self.requester().await.unwrap().lock().await;
+        let extractor = self.extractor().await.unwrap();
 
         if let RequesterDispatcher::HTTPClient(requester) = requester {
             let query = format!("url=*.{domain}/*&output=txt&fl=original&collapse=urlkey");
 
-            self.url.set_query(Some(&query));
+            url.set_query(Some(&query));
 
             let request = requester
                 .client
-                .get(self.url.clone())
+                .get(url)
                 .timeout(requester.config.timeout)
                 .headers(requester.config.headers.clone())
                 .build()

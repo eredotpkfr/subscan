@@ -94,10 +94,10 @@ impl SubscanModuleInterface for CommonCrawl {
     async fn run(&mut self, domain: &str) -> SubscanModuleResult {
         let mut result: SubscanModuleResult = self.name().await.into();
 
-        let requester = &*self.components.requester.lock().await;
-        let extractor = &self.components.extractor;
+        let requester = self.requester().await.unwrap().lock().await;
+        let extractor = self.extractor().await.unwrap();
 
-        if let RequesterDispatcher::HTTPClient(requester) = requester {
+        if let RequesterDispatcher::HTTPClient(requester) = &*requester {
             let year = chrono::Utc::now().year().to_string();
             let query = format!("*.{}", domain);
             let content = requester.get_content(self.url.clone()).await;

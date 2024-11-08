@@ -8,7 +8,7 @@ use crate::common::{
 };
 use serde_json::{json, Value};
 use subscan::{
-    enums::dispatchers::SubscanModuleDispatcher,
+    enums::{dispatchers::SubscanModuleDispatcher, module::SubscanModuleStatus::Failed},
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::integrations::commoncrawl::CommonCrawl,
     types::config::RequesterConfig,
@@ -69,4 +69,20 @@ async fn run_test() {
     ]);
 
     assert_eq!(results.subdomains, expected);
+}
+
+#[tokio::test]
+#[stubr::mock("module/integrations/commoncrawl/commoncrawl-index-no-data.json")]
+async fn run_failed_test() {
+    let mut commoncrawl = CommonCrawl::dispatcher();
+
+    funcs::wrap_module_dispatcher_url_field(
+        &mut commoncrawl,
+        &stubr.path("/commoncrawl/index-no-data"),
+    );
+
+    let results = commoncrawl.run(TEST_DOMAIN).await;
+
+    assert_eq!(results.status, Failed("not get cdx URLs".into()));
+    assert_eq!(results.subdomains, [].into());
 }

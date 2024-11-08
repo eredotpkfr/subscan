@@ -8,7 +8,11 @@ use crate::common::{
 use reqwest::Url;
 use serde_json::{json, Value};
 use subscan::{
-    enums::{content::Content, dispatchers::SubscanModuleDispatcher},
+    enums::{
+        content::Content,
+        dispatchers::SubscanModuleDispatcher,
+        module::{SkipReason::NotAuthenticated, SubscanModuleStatus::Failed},
+    },
     interfaces::module::SubscanModuleInterface,
     modules::integrations::github::GitHub,
 };
@@ -59,6 +63,39 @@ async fn run_test() {
     let results = github.run(TEST_DOMAIN).await;
 
     assert_eq!(results.subdomains, [TEST_BAR_SUBDOMAIN.to_string()].into());
+
+    env::remove_var(env_name);
+}
+
+#[tokio::test]
+#[stubr::mock("module/integrations/github")]
+async fn run_not_authenticated_test() {
+    let mut github = GitHub::dispatcher();
+
+    funcs::wrap_module_dispatcher_url_field(&mut github, &stubr.path("/github-code-search"));
+
+    let results = github.run(TEST_DOMAIN).await;
+
+    assert_eq!(results.status, NotAuthenticated.into());
+    assert_eq!(results.subdomains, [].into());
+}
+
+#[tokio::test]
+#[stubr::mock("module/integrations/github/github-code-search-no-data.json")]
+async fn run_failed_test() {
+    let mut github = GitHub::dispatcher();
+    let env_name = github.envs().await.apikey.name;
+
+    env::set_var(&env_name, "github-api-key");
+    funcs::wrap_module_dispatcher_url_field(
+        &mut github,
+        &stubr.path("/github-code-search-no-data"),
+    );
+
+    let results = github.run(TEST_DOMAIN).await;
+
+    assert_eq!(results.status, Failed("not get raw URLs".into()));
+    assert_eq!(results.subdomains, [].into());
 
     env::remove_var(env_name);
 }

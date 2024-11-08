@@ -33,14 +33,31 @@ pub async fn create_module_table() -> Table {
 ///
 /// ```
 /// use subscan::utilities::cli;
-/// use subscan::modules::engines::google::Google;
+/// use subscan::modules::engines::{
+///     google::Google,
+///     duckduckgo::DuckDuckGo
+/// };
+/// use subscan::modules::zonetransfer::ZoneTransfer;
+/// use subscan::modules::integrations::{
+///     alienvault::AlienVault,
+///     commoncrawl::CommonCrawl
+/// };
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let module = Google::dispatcher();
+///     let modules = vec![
+///         Google::dispatcher(),
+///         DuckDuckGo::dispatcher(),
+///         ZoneTransfer::dispatcher(),
+///         AlienVault::dispatcher(),
+///         CommonCrawl::dispatcher()
+///     ];
+///
 ///     let mut table = cli::create_module_table().await;
 ///
-///     table.add_row(cli::module_as_table_row(&module).await);
+///     for module in modules {
+///         table.add_row(cli::module_as_table_row(&module).await);
+///     }
 ///
 ///     assert!(!table.is_empty());
 /// }
