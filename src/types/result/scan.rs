@@ -27,8 +27,8 @@ pub struct SubscanScanResult {
 }
 
 impl SubscanScanResult {
-    pub async fn save(&self, output: &OutputFormat) {
-        let file = self.get_output_file(output).await;
+    pub async fn save(&self, output: &OutputFormat) -> String {
+        let (file, filename) = self.get_output_file(output).await;
 
         match output {
             OutputFormat::TXT => self.save_txt(file).await,
@@ -36,9 +36,13 @@ impl SubscanScanResult {
             OutputFormat::JSON => self.save_json(file).await,
             OutputFormat::HTML => self.save_html(file).await,
         }
+
+        log::info!("Scan results saved to {filename}");
+
+        filename
     }
 
-    async fn get_output_file(&self, output: &OutputFormat) -> File {
+    async fn get_output_file(&self, output: &OutputFormat) -> (File, String) {
         let now = Utc::now().timestamp();
         let filename = match output {
             OutputFormat::TXT => format!("{}_{}.txt", self.metadata.target, now),
@@ -47,7 +51,7 @@ impl SubscanScanResult {
             OutputFormat::HTML => format!("{}_{}.html", self.metadata.target, now),
         };
 
-        File::create(filename).unwrap()
+        (File::create(filename.clone()).unwrap(), filename)
     }
 
     async fn save_txt<W: Write>(&self, mut writer: W) {
@@ -83,6 +87,12 @@ impl SubscanScanResult {
         }
 
         table.print_html(&mut writer).unwrap()
+    }
+
+    pub async fn log(&self) {
+        for subdomain in &self.results {
+            log::info!("{}", subdomain);
+        }
     }
 }
 
