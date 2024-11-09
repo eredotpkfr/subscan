@@ -31,7 +31,7 @@ use crate::{
     types::config::SubscanConfig, types::core::SubscanModule,
 };
 use tokio::sync::OnceCell;
-use types::result::scan::SubscanScanResult;
+use types::result::scan::ScanResult;
 
 static INIT: OnceCell<()> = OnceCell::const_new();
 
@@ -83,10 +83,10 @@ impl Subscan {
         self.manager.modules().await
     }
 
-    pub async fn scan(&self, domain: &str) -> SubscanScanResult {
+    pub async fn scan(&self, domain: &str) -> ScanResult {
         self.init().await;
 
-        let mut result: SubscanScanResult = domain.into();
+        let mut result: ScanResult = domain.into();
 
         let started = result.metadata.started_at.format("%H:%M:%S %Z");
         let pool = SubscanModuleRunnerPool::new(domain.to_string());
@@ -115,10 +115,10 @@ impl Subscan {
         result.with_finished().await
     }
 
-    pub async fn run(&self, name: &str, domain: &str) -> SubscanScanResult {
+    pub async fn run(&self, name: &str, domain: &str) -> ScanResult {
         self.init().await;
 
-        let mut result: SubscanScanResult = domain.into();
+        let mut result: ScanResult = domain.into();
 
         let started = result.metadata.started_at.format("%H:%M:%S %Z");
         let pool = SubscanModuleRunnerPool::new(domain.to_string());

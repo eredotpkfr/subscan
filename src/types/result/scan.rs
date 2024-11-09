@@ -3,7 +3,7 @@ use crate::{
     enums::{module::SubscanModuleStatus, output::OutputFormat},
     types::{
         core::Subdomain,
-        result::{metadata::SubscanScanResultMetadata, stats::SubscanModuleStatistics},
+        result::{metadata::ScanResultMetadata, stats::SubscanModuleStatistics},
     },
 };
 use chrono::Utc;
@@ -15,9 +15,9 @@ use std::{collections::BTreeSet, fs::File, io::Write};
 
 /// `Subscan` scan result
 #[derive(Clone, Default, Serialize)]
-pub struct SubscanScanResult {
+pub struct ScanResult {
     /// Scan metadata
-    pub metadata: SubscanScanResultMetadata,
+    pub metadata: ScanResultMetadata,
     /// Module statistics
     pub statistics: Vec<SubscanModuleStatistics>,
     /// Subscans that have been discovered
@@ -26,7 +26,7 @@ pub struct SubscanScanResult {
     pub total: usize,
 }
 
-impl SubscanScanResult {
+impl ScanResult {
     pub async fn save(&self, output: &OutputFormat) -> String {
         let (file, filename) = self.get_output_file(output).await;
 
@@ -96,7 +96,7 @@ impl SubscanScanResult {
     }
 }
 
-impl From<&str> for SubscanScanResult {
+impl From<&str> for ScanResult {
     fn from(target: &str) -> Self {
         Self {
             metadata: target.into(),
@@ -105,24 +105,24 @@ impl From<&str> for SubscanScanResult {
     }
 }
 
-impl Extend<Subdomain> for SubscanScanResult {
+impl Extend<Subdomain> for ScanResult {
     fn extend<T: IntoIterator<Item = Subdomain>>(&mut self, iter: T) {
         self.results.extend(iter);
     }
 }
 
-impl SubscanScanResult {
+impl ScanResult {
     /// Update `finished_at`, `elapsed` and `total` fields and returns itself
     ///
     /// # Examples
     ///
     /// ```
-    /// use subscan::types::result::scan::SubscanScanResult;
+    /// use subscan::types::result::scan::ScanResult;
     /// use std::collections::BTreeSet;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let mut result: SubscanScanResult = "foo.com".into();
+    ///     let mut result: ScanResult = "foo.com".into();
     ///
     ///     result.extend(BTreeSet::from_iter(["bar.foo.com".into()]));
     ///
@@ -145,12 +145,12 @@ impl SubscanScanResult {
     /// # Examples
     ///
     /// ```
-    /// use subscan::types::result::scan::SubscanScanResult;
+    /// use subscan::types::result::scan::ScanResult;
     /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let mut result: SubscanScanResult = "foo.com".into();
+    ///     let mut result: ScanResult = "foo.com".into();
     ///
     ///     result.add_status("one", &SubscanModuleStatus::Started).await;
     ///     result.add_status("two", &SkipReason::NotAuthenticated.into()).await;
@@ -172,18 +172,18 @@ impl SubscanScanResult {
         }
     }
 
-    /// Add module statistics on [`SubscanScanResult`]
+    /// Add module statistics on [`ScanResult`]
     ///
     /// # Examples
     ///
     /// ```
-    /// use subscan::types::result::scan::SubscanScanResult;
+    /// use subscan::types::result::scan::ScanResult;
     /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
     /// use subscan::types::result::module::SubscanModuleResult;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let mut scan_result: SubscanScanResult = "foo.com".into();
+    ///     let mut scan_result: ScanResult = "foo.com".into();
     ///     let module_result: SubscanModuleResult = "foo".into();
     ///
     ///     scan_result.add_statistic(module_result.into()).await;
@@ -196,18 +196,18 @@ impl SubscanScanResult {
     }
 
     /// Update scan results with any module result, that merges all subdomains and
-    /// statistics into [`SubscanScanResult`]
+    /// statistics into [`ScanResult`]
     ///
     /// # Examples
     ///
     /// ```
-    /// use subscan::types::result::scan::SubscanScanResult;
+    /// use subscan::types::result::scan::ScanResult;
     /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
     /// use subscan::types::result::module::SubscanModuleResult;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let mut scan_result: SubscanScanResult = "foo.com".into();
+    ///     let mut scan_result: ScanResult = "foo.com".into();
     ///     let module_result: SubscanModuleResult = "foo".into();
     ///
     ///     scan_result.update_with_module_result(module_result).await;

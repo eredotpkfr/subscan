@@ -5,11 +5,11 @@ use std::{
     collections::BTreeSet,
     fs::{read_to_string, remove_file},
 };
-use subscan::{enums::output::OutputFormat, types::result::scan::SubscanScanResult};
+use subscan::{enums::output::OutputFormat, types::result::scan::ScanResult};
 
 #[tokio::test]
 async fn save_txt_test() {
-    let mut result: SubscanScanResult = "foo.com".into();
+    let mut result: ScanResult = "foo.com".into();
     let subs = BTreeSet::from_iter(["bar.foo.com".into()]);
 
     result.extend(subs);
@@ -25,7 +25,7 @@ async fn save_txt_test() {
 
 #[tokio::test]
 async fn save_csv_test() {
-    let mut result: SubscanScanResult = "foo.com".into();
+    let mut result: ScanResult = "foo.com".into();
     let subs = BTreeSet::from_iter(["bar.foo.com".into()]);
 
     result.extend(subs);
@@ -46,7 +46,7 @@ async fn save_csv_test() {
 
 #[tokio::test]
 async fn save_json_test() {
-    let mut result: SubscanScanResult = "foo.com".into();
+    let mut result: ScanResult = "foo.com".into();
     let subs = BTreeSet::from_iter(["bar.foo.com".into()]);
 
     result.extend(subs);
@@ -67,7 +67,7 @@ async fn save_json_test() {
 
 #[tokio::test]
 async fn save_html_test() {
-    let mut result: SubscanScanResult = "foo.com".into();
+    let mut result: ScanResult = "foo.com".into();
     let subs = BTreeSet::from_iter(["bar.foo.com".into()]);
 
     result.extend(subs);
