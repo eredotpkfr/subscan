@@ -1,5 +1,6 @@
 use crate::{
     extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor},
+    interfaces::module::SubscanModuleInterface,
     modules::{
         generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
         integrations::{
@@ -11,6 +12,7 @@ use crate::{
     requesters::{chrome::ChromeBrowser, client::HTTPClient},
 };
 use enum_dispatch::enum_dispatch;
+use prettytable::{row, Row};
 
 /// Dispatcher enumeration to decide module types
 ///
@@ -75,6 +77,63 @@ impl SubscanModuleDispatcher {
             SubscanModuleDispatcher::GenericIntegrationModule(_)
                 | SubscanModuleDispatcher::GenericSearchEngineModule(_)
         )
+    }
+
+    /// Converts module object to module table row representation
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::utilities::cli;
+    /// use subscan::modules::engines::{
+    ///     google::Google,
+    ///     duckduckgo::DuckDuckGo
+    /// };
+    /// use subscan::modules::zonetransfer::ZoneTransfer;
+    /// use subscan::modules::integrations::{
+    ///     alienvault::AlienVault,
+    ///     commoncrawl::CommonCrawl
+    /// };
+    /// use prettytable::table;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let modules = vec![
+    ///         Google::dispatcher(),
+    ///         DuckDuckGo::dispatcher(),
+    ///         ZoneTransfer::dispatcher(),
+    ///         AlienVault::dispatcher(),
+    ///         CommonCrawl::dispatcher()
+    ///     ];
+    ///
+    ///     let mut table = cli::create_module_table().await;
+    ///
+    ///     for module in modules {
+    ///         table.add_row(module.as_table_row().await);
+    ///     }
+    ///
+    ///     assert!(!table.is_empty());
+    /// }
+    /// ```
+    pub async fn as_table_row(&self) -> Row {
+        let requester = if let Some(instance) = self.requester().await {
+            instance.lock().await.to_string()
+        } else {
+            "None".into()
+        };
+
+        let extractor = if let Some(instance) = self.extractor().await {
+            instance.to_string()
+        } else {
+            "None".into()
+        };
+
+        row![
+            self.name().await,
+            requester,
+            extractor,
+            self.is_generic().await
+        ]
     }
 }
 

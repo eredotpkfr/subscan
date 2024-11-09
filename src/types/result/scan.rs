@@ -8,6 +8,7 @@ use crate::{
 };
 use chrono::Utc;
 use csv::Writer;
+use prettytable::{format::consts::FORMAT_NO_LINESEP_WITH_TITLE, row, table};
 use serde::Serialize;
 use serde_json;
 use std::{collections::BTreeSet, fs::File, io::Write};
@@ -33,24 +34,20 @@ impl SubscanScanResult {
             OutputFormat::TXT => self.save_txt(file).await,
             OutputFormat::CSV => self.save_csv(file).await,
             OutputFormat::JSON => self.save_json(file).await,
+            OutputFormat::HTML => self.save_html(file).await,
         }
     }
 
     async fn get_output_file(&self, output: &OutputFormat) -> File {
-        let now = Utc::now().format("%Y-%m-%d");
+        let now = Utc::now().timestamp();
         let filename = match output {
-            OutputFormat::TXT => format!("{}_{}.txt", now, self.metadata.target),
-            OutputFormat::CSV => format!("{}_{}.csv", now, self.metadata.target),
-            OutputFormat::JSON => format!("{}_{}.json", now, self.metadata.target),
+            OutputFormat::TXT => format!("{}_{}.txt", self.metadata.target, now),
+            OutputFormat::CSV => format!("{}_{}.csv", self.metadata.target, now),
+            OutputFormat::JSON => format!("{}_{}.json", self.metadata.target, now),
+            OutputFormat::HTML => format!("{}_{}.html", self.metadata.target, now),
         };
 
         File::create(filename).unwrap()
-    }
-
-    async fn save_json<W: Write>(&self, mut writer: W) {
-        let json_content = serde_json::to_string_pretty(&self).unwrap();
-
-        writer.write_all(json_content.as_bytes()).unwrap()
     }
 
     async fn save_txt<W: Write>(&self, mut writer: W) {
@@ -67,6 +64,25 @@ impl SubscanScanResult {
         for subdomain in &self.results {
             writer.serialize(subdomain).unwrap()
         }
+    }
+
+    async fn save_json<W: Write>(&self, mut writer: W) {
+        let json_content = serde_json::to_string_pretty(&self).unwrap();
+
+        writer.write_all(json_content.as_bytes()).unwrap()
+    }
+
+    async fn save_html<W: Write>(&self, mut writer: W) {
+        let mut table = table!();
+
+        table.set_titles(row!["subdomain"]);
+        table.set_format(*FORMAT_NO_LINESEP_WITH_TITLE);
+
+        for subdomain in &self.results {
+            table.add_row(row![subdomain]);
+        }
+
+        table.print_html(&mut writer).unwrap()
     }
 }
 
