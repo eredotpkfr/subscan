@@ -59,10 +59,9 @@ async fn get_ns_as_ip_test() {
     notify_one.notified().await;
 
     if let SubscanModuleDispatcher::ZoneTransfer(zonetransfer) = zonetransfer {
-        assert_eq!(
-            zonetransfer.get_ns_as_ip(addr, TEST_DOMAIN).await.unwrap(),
-            [addr]
-        );
+        let ips = zonetransfer.get_ns_as_ip(addr, TEST_DOMAIN).await;
+
+        assert_eq!(ips.unwrap(), [addr]);
     }
 }
 
@@ -83,10 +82,9 @@ async fn attempt_zone_transfer_test() {
     notify_one.notified().await;
 
     if let SubscanModuleDispatcher::ZoneTransfer(zonetransfer) = zonetransfer {
-        assert_eq!(
-            zonetransfer.attempt_zone_transfer(addr, TEST_DOMAIN).await,
-            vec![TEST_BAR_SUBDOMAIN]
-        );
+        let subs = zonetransfer.attempt_zone_transfer(addr, TEST_DOMAIN).await;
+
+        assert_eq!(subs, [TEST_BAR_SUBDOMAIN]);
     }
 }
 
@@ -108,7 +106,7 @@ async fn run_test() {
     let notify_one = Arc::new(Notify::new());
     let notift_two = notify_one.clone();
 
-    let zonetransfer = ZoneTransfer::dispatcher();
+    let mut zonetransfer = ZoneTransfer::dispatcher();
     let server = MockDNSServer::new(TEST_DOMAIN);
     let addr = server.socket;
 
@@ -119,12 +117,11 @@ async fn run_test() {
 
     notify_one.notified().await;
 
-    if let SubscanModuleDispatcher::ZoneTransfer(mut zonetransfer) = zonetransfer {
+    if let SubscanModuleDispatcher::ZoneTransfer(ref mut zonetransfer) = zonetransfer {
         zonetransfer.ns = Some(NameServerConfig::new(addr, Protocol::Tcp));
-
-        assert_eq!(
-            zonetransfer.run(TEST_DOMAIN).await.subdomains,
-            [TEST_BAR_SUBDOMAIN.into()].into()
-        );
     }
+
+    let result = zonetransfer.run(TEST_DOMAIN).await;
+
+    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }

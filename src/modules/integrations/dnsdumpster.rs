@@ -95,7 +95,7 @@ impl SubscanModuleInterface for DnsDumpster {
         let mut result: SubscanModuleResult = self.name().await.into();
 
         let requester = &mut *self.requester().await.unwrap().lock().await;
-        let extractor = &self.extractor().await.unwrap();
+        let extractor = self.extractor().await.unwrap();
 
         let content = requester.get_content(self.url.clone()).await;
         let token = self.get_csrf_token(content).await;
