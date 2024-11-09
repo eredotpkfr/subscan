@@ -19,7 +19,7 @@ async fn run_test() {
     let env_name = censys.envs().await.apikey.name;
 
     env::set_var(&env_name, "censys-api-key");
-    funcs::wrap_module_dispatcher_url_field(&mut censys, &stubr.path("/censys"));
+    funcs::wrap_module_url(&mut censys, &stubr.path("/censys"));
 
     let result = censys.run(TEST_DOMAIN).await;
 

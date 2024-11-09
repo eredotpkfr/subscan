@@ -17,7 +17,7 @@ use subscan::{
 async fn run_test() {
     let mut anubis = Anubis::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut anubis, &stubr.path("/anubis"));
+    funcs::wrap_module_url(&mut anubis, &stubr.path("/anubis"));
 
     let result = anubis.run(TEST_DOMAIN).await;
 

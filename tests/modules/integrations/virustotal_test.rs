@@ -19,7 +19,7 @@ async fn run_test() {
     let env_name = virustotal.envs().await.apikey.name;
 
     env::set_var(&env_name, "virustotal-api-key");
-    funcs::wrap_module_dispatcher_url_field(&mut virustotal, &stubr.path("/virustotal"));
+    funcs::wrap_module_url(&mut virustotal, &stubr.path("/virustotal"));
 
     let result = virustotal.run(TEST_DOMAIN).await;
 

@@ -15,7 +15,7 @@ async fn run_test() {
     let env_name = netlas.envs().await.apikey.name;
 
     env::set_var(&env_name, "netlas-api-key");
-    funcs::wrap_module_dispatcher_url_field(&mut netlas, &stubr.uri());
+    funcs::wrap_module_url(&mut netlas, &stubr.uri());
 
     let results = netlas.run(TEST_DOMAIN).await;
 
@@ -29,7 +29,7 @@ async fn run_test() {
 async fn run_test_no_count() {
     let mut netlas = Netlas::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut netlas, &stubr.uri());
+    funcs::wrap_module_url(&mut netlas, &stubr.uri());
 
     // Test no count response
     assert_eq!(netlas.run(TEST_DOMAIN).await.subdomains, [].into());

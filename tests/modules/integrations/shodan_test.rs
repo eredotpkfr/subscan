@@ -19,7 +19,7 @@ async fn run_test() {
     let env_name = shodan.envs().await.apikey.name;
 
     env::set_var(&env_name, "shodan-api-key");
-    funcs::wrap_module_dispatcher_url_field(&mut shodan, &stubr.path("/shodan"));
+    funcs::wrap_module_url(&mut shodan, &stubr.path("/shodan"));
 
     let result = shodan.run(TEST_DOMAIN).await;
 

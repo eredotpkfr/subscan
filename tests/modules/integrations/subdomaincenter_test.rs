@@ -17,7 +17,7 @@ use subscan::{
 async fn run_test() {
     let mut subdomaincenter = SubdomainCenter::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut subdomaincenter, &stubr.path("/subdomaincenter"));
+    funcs::wrap_module_url(&mut subdomaincenter, &stubr.path("/subdomaincenter"));
 
     let result = subdomaincenter.run(TEST_DOMAIN).await;
 

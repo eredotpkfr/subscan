@@ -4,6 +4,7 @@ use std::{
     fs,
     net::TcpListener,
     path::{Path, PathBuf},
+    thread,
 };
 
 pub fn stubs_path() -> PathBuf {
@@ -20,6 +21,10 @@ pub fn get_random_port() -> u16 {
 
 pub fn md5_hex(target: String) -> String {
     format!("{:x}", md5::compute(target))
+}
+
+pub fn current_thread_hex() -> String {
+    md5_hex(thread::current().name().unwrap().to_uppercase())
 }
 
 pub fn read_stub(path: &str) -> Value {

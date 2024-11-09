@@ -13,7 +13,7 @@ use subscan::{
 async fn run_test() {
     let mut dnsrepo = DnsRepo::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut dnsrepo, &stubr.path("/dnsrepo"));
+    funcs::wrap_module_url(&mut dnsrepo, &stubr.path("/dnsrepo"));
 
     let result = dnsrepo.run(TEST_DOMAIN).await;
 

@@ -17,7 +17,7 @@ use subscan::{
 async fn run_test() {
     let mut alienvault = AlienVault::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut alienvault, &stubr.path("/alienvault"));
+    funcs::wrap_module_url(&mut alienvault, &stubr.path("/alienvault"));
 
     let result = alienvault.run(TEST_DOMAIN).await;
 

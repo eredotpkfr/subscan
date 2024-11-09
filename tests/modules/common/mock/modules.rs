@@ -1,8 +1,8 @@
 use super::funcs::wrap_url_with_mock_func;
-use crate::common::utils::md5_hex;
+use crate::common::utils::current_thread_hex;
 use reqwest::Url;
 use serde_json::Value;
-use std::{collections::BTreeSet, thread};
+use std::collections::BTreeSet;
 use subscan::{
     enums::{auth::AuthenticationMethod, dispatchers::RequesterDispatcher},
     extractors::{json::JSONExtractor, regex::RegexExtractor},
@@ -17,12 +17,10 @@ use subscan::{
 pub fn generic_search_engine(url: &str) -> GenericSearchEngineModule {
     let requester = RequesterDispatcher::HTTPClient(HTTPClient::default());
     let extractor = RegexExtractor::default();
-
     let url = Url::parse(url);
-    let thread_name = thread::current().name().unwrap().to_uppercase();
 
     GenericSearchEngineModule {
-        name: md5_hex(thread_name),
+        name: current_thread_hex(),
         url: url.unwrap(),
         param: SearchQueryParam::from("q"),
         components: SubscanModuleCoreComponents {
@@ -45,10 +43,9 @@ pub fn generic_integration(url: &str, auth: AuthenticationMethod) -> GenericInte
 
     let requester = RequesterDispatcher::HTTPClient(HTTPClient::default());
     let extractor = JSONExtractor::new(Box::new(parse));
-    let thread_name = thread::current().name().unwrap().to_uppercase();
 
     GenericIntegrationModule {
-        name: md5_hex(thread_name),
+        name: current_thread_hex(),
         auth,
         funcs: GenericIntegrationCoreFuncs {
             url: wrap_url_with_mock_func(url),

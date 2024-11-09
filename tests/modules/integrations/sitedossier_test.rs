@@ -13,7 +13,7 @@ use subscan::{
 async fn run_test() {
     let mut sitedossier = Sitedossier::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut sitedossier, &stubr.path("/sitedossier"));
+    funcs::wrap_module_url(&mut sitedossier, &stubr.path("/sitedossier"));
 
     let result = sitedossier.run(TEST_DOMAIN).await;
 

@@ -19,7 +19,7 @@ async fn run_test() {
     let env_name = securitytrails.envs().await.apikey.name;
 
     env::set_var(&env_name, "securitytrails-api-key");
-    funcs::wrap_module_dispatcher_url_field(&mut securitytrails, &stubr.path("/securitytrails"));
+    funcs::wrap_module_url(&mut securitytrails, &stubr.path("/securitytrails"));
 
     let result = securitytrails.run(TEST_DOMAIN).await;
 

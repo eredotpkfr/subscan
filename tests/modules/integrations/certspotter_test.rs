@@ -19,7 +19,7 @@ async fn run_test() {
     let env_name = certspotter.envs().await.apikey.name;
 
     env::set_var(&env_name, "certspotter-api-key");
-    funcs::wrap_module_dispatcher_url_field(&mut certspotter, &stubr.path("/certspotter"));
+    funcs::wrap_module_url(&mut certspotter, &stubr.path("/certspotter"));
 
     let result = certspotter.run(TEST_DOMAIN).await;
 
