@@ -4,6 +4,7 @@ use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     mock::funcs,
     stub::StubTemplateManager,
+    utils::current_thread_hex,
 };
 use reqwest::Url;
 use serde_json::{json, Value};
@@ -55,7 +56,7 @@ async fn run_test() {
     let mut github = GitHub::dispatcher();
 
     // Izolate non-generic module environment variables
-    funcs::wrap_module_name(&mut github);
+    funcs::wrap_module_name(&mut github, current_thread_hex());
 
     let env_name = github.envs().await.apikey.name;
 
@@ -75,7 +76,7 @@ async fn run_not_authenticated_test() {
     let mut github = GitHub::dispatcher();
 
     // Izolate non-generic module environment variables
-    funcs::wrap_module_name(&mut github);
+    funcs::wrap_module_name(&mut github, current_thread_hex());
     funcs::wrap_module_url(&mut github, &stubr.path("/github-code-search"));
 
     let results = github.run(TEST_DOMAIN).await;
@@ -90,7 +91,7 @@ async fn run_failed_test() {
     let mut github = GitHub::dispatcher();
 
     // Izolate non-generic module environment variables
-    funcs::wrap_module_name(&mut github);
+    funcs::wrap_module_name(&mut github, current_thread_hex());
 
     let env_name = github.envs().await.apikey.name;
 

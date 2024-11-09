@@ -25,7 +25,7 @@ pub fn wrap_module_url(dispatcher: &mut SubscanModuleDispatcher, url: &str) {
     }
 }
 
-pub fn wrap_module_name(dispatcher: &mut SubscanModuleDispatcher) {
+pub fn wrap_module_name(dispatcher: &mut SubscanModuleDispatcher, name: String) {
     match dispatcher {
         SubscanModuleDispatcher::GenericIntegrationModule(module) => {
             module.name = current_thread_hex()
@@ -33,9 +33,7 @@ pub fn wrap_module_name(dispatcher: &mut SubscanModuleDispatcher) {
         SubscanModuleDispatcher::GenericSearchEngineModule(module) => {
             module.name = current_thread_hex()
         }
-        SubscanModuleDispatcher::GitHub(module) => {
-            module.name = format!("{}_{}", module.name, current_thread_hex())
-        }
+        SubscanModuleDispatcher::GitHub(module) => module.name = name,
         _ => {}
     }
 }
