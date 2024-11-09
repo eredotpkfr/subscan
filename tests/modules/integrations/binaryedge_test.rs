@@ -1,7 +1,7 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    funcs::read_stub,
-    mocks,
+    mock::funcs,
+    utils::read_stub,
 };
 use reqwest::Url;
 use serde_json::Value;
@@ -19,7 +19,7 @@ async fn run_test() {
     let env_name = binaryedge.envs().await.apikey.name;
 
     env::set_var(&env_name, "binaryedge-api-key");
-    mocks::wrap_module_dispatcher_url_field(&mut binaryedge, &stubr.path("/binaryedge"));
+    funcs::wrap_module_dispatcher_url_field(&mut binaryedge, &stubr.path("/binaryedge"));
 
     let result = binaryedge.run(TEST_DOMAIN).await;
 

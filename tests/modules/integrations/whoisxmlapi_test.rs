@@ -1,7 +1,7 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    funcs::read_stub,
-    mocks,
+    mock::funcs,
+    utils::read_stub,
 };
 use serde_json::Value;
 use std::{collections::BTreeSet, env};
@@ -18,7 +18,7 @@ async fn run_test() {
     let env_name = whoisxmlapi.envs().await.apikey.name;
 
     env::set_var(&env_name, "whoisxmlapi-api-key");
-    mocks::wrap_module_dispatcher_url_field(&mut whoisxmlapi, &stubr.path("/whoisxmlapi"));
+    funcs::wrap_module_dispatcher_url_field(&mut whoisxmlapi, &stubr.path("/whoisxmlapi"));
 
     let result = whoisxmlapi.run(TEST_DOMAIN).await;
 

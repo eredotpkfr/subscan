@@ -8,7 +8,7 @@ on:
     branches: ["main"]
 
 env:
-  RUSTFLAGS: "-Dwarnings"
+  RUSTFLAGS: "-Dwarnings -Ccodegen-units=1"
   CARGO_TERM_COLOR: "always"
 
 jobs:

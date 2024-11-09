@@ -1,6 +1,7 @@
 use crate::{
     cli::{
         commands::{
+            brute::BruteCommandArgs,
             module::{run::ModuleRunSubCommandArgs, ModuleSubCommands},
             scan::ScanCommandArgs,
             Commands,
@@ -12,7 +13,7 @@ use crate::{
     types::env::Credentials,
 };
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
-use std::{collections::HashMap, time::Duration};
+use std::{collections::HashMap, path::PathBuf, time::Duration};
 
 /// `Subscan` configurations as a struct type
 #[derive(Clone, Debug)]
@@ -27,6 +28,8 @@ pub struct SubscanConfig {
     pub proxy: Option<String>,
     /// Cache filter
     pub filter: CacheFilter,
+    /// Wordlist file
+    pub wordlist: Option<PathBuf>,
 }
 
 impl Default for SubscanConfig {
@@ -51,6 +54,7 @@ impl Default for SubscanConfig {
             user_agent: DEFAULT_USER_AGENT.into(),
             proxy: None,
             filter: CacheFilter::default(),
+            wordlist: None,
         }
     }
 }
@@ -107,11 +111,85 @@ impl From<ScanCommandArgs> for SubscanConfig {
             proxy: args.proxy.clone(),
             concurrency: args.concurrency,
             filter: args.filter(),
+            ..Default::default()
+        }
+    }
+}
+
+impl From<BruteCommandArgs> for SubscanConfig {
+    /// Create [`SubscanConfig`] from [`BruteCommandArgs`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::{path::PathBuf, str::FromStr};
+    /// use subscan::types::config::SubscanConfig;
+    /// use subscan::cli::commands::brute::BruteCommandArgs;
+    ///
+    /// let wordlist = PathBuf::from_str("wordlist.txt");
+    /// let args = BruteCommandArgs {
+    ///     concurrency: 10,
+    ///     wordlist: wordlist.unwrap(),
+    ///     ..Default::default()
+    /// };
+    /// let config = SubscanConfig::from(args.clone());
+    ///
+    /// assert_eq!(config.concurrency, args.concurrency);
+    /// ```
+    fn from(args: BruteCommandArgs) -> Self {
+        Self {
+            concurrency: args.concurrency,
+            wordlist: Some(args.wordlist),
+            ..Default::default()
         }
     }
 }
 
 impl From<Cli> for SubscanConfig {
+    /// Create [`SubscanConfig`] from [`Cli`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use clap::Parser;
+    /// use subscan::types::config::SubscanConfig;
+    /// use subscan::cli::Cli;
+    /// use subscan::constants::DEFAULT_HTTP_TIMEOUT;
+    ///
+    /// // Scan command
+    /// let args = vec!["subscan", "scan", "-d", "foo.com", "-t", "120"];
+    /// let cli = Cli::try_parse_from(args).unwrap();
+    ///
+    /// let config = SubscanConfig::from(cli);
+    /// assert_eq!(config.timeout, 120);
+    ///
+    /// // Brute command
+    /// let args = vec![
+    ///     "subscan",
+    ///     "brute",
+    ///     "-d", "foo.com",
+    ///     "-c", "10",
+    ///     "--wordlist", "wordlist.txt"
+    /// ];
+    /// let cli = Cli::try_parse_from(args).unwrap();
+    ///
+    /// let config = SubscanConfig::from(cli);
+    /// assert_eq!(config.concurrency, 10);
+    ///
+    /// // Module list command
+    /// let args = vec!["subscan", "module", "list"];
+    /// let cli = Cli::try_parse_from(args).unwrap();
+    ///
+    /// let config = SubscanConfig::from(cli);
+    /// assert_eq!(config.timeout, DEFAULT_HTTP_TIMEOUT.as_secs());
+    ///
+    /// // Module get command
+    /// let args = vec!["subscan", "module", "get", "foo"];
+    /// let cli = Cli::try_parse_from(args).unwrap();
+    ///
+    /// let config = SubscanConfig::from(cli);
+    /// assert_eq!(config.timeout, DEFAULT_HTTP_TIMEOUT.as_secs());
+    /// ```
     fn from(cli: Cli) -> Self {
         match cli.command {
             Commands::Module(module) => match module.command {
@@ -119,7 +197,7 @@ impl From<Cli> for SubscanConfig {
                 ModuleSubCommands::Run(args) => args.into(),
             },
             Commands::Scan(args) => args.into(),
-            Commands::Brute(_) => Self::default(),
+            Commands::Brute(args) => args.into(),
         }
     }
 }

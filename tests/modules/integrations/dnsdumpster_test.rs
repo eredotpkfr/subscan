@@ -1,6 +1,6 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mocks,
+    mock::funcs,
 };
 use subscan::{
     enums::{content::Content, dispatchers::SubscanModuleDispatcher},
@@ -23,7 +23,7 @@ async fn get_csrf_token_test() {
 async fn run_test_no_token() {
     let mut dnsdumpster = DnsDumpster::dispatcher();
 
-    mocks::wrap_module_dispatcher_url_field(&mut dnsdumpster, &stubr.path("/dnsdumpster-no-token"));
+    funcs::wrap_module_dispatcher_url_field(&mut dnsdumpster, &stubr.path("/dnsdumpster-no-token"));
 
     assert_eq!(dnsdumpster.run(TEST_DOMAIN).await.subdomains, [].into());
 }
@@ -33,7 +33,7 @@ async fn run_test_no_token() {
 async fn run_test_with_token() {
     let mut dnsdumpster = DnsDumpster::dispatcher();
 
-    mocks::wrap_module_dispatcher_url_field(
+    funcs::wrap_module_dispatcher_url_field(
         &mut dnsdumpster,
         &stubr.path("/dnsdumpster-with-token"),
     );

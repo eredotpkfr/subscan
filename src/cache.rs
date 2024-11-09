@@ -8,6 +8,7 @@ use crate::{
             leakix, netlas, securitytrails, shodan, sitedossier, subdomaincenter, threatcrowd,
             virustotal, waybackarchive, whoisxmlapi, zoomeye,
         },
+        zonetransfer,
     },
     types::{config::RequesterConfig, core::SubscanModule},
 };
@@ -49,6 +50,8 @@ lazy_static! {
         SubscanModule::from(waybackarchive::WaybackArchive::dispatcher()),
         SubscanModule::from(whoisxmlapi::WhoisXMLAPI::dispatcher()),
         SubscanModule::from(zoomeye::ZoomEye::dispatcher()),
+        // Others
+        SubscanModule::from(zonetransfer::ZoneTransfer::dispatcher())
     ];
 }
 

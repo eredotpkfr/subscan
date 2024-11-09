@@ -1,7 +1,7 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    funcs::read_stub,
-    mocks,
+    mock::funcs,
+    utils::read_stub,
 };
 use serde_json::Value;
 use std::collections::BTreeSet;
@@ -16,7 +16,7 @@ use subscan::{
 async fn run_test() {
     let mut crtsh = Crtsh::dispatcher();
 
-    mocks::wrap_module_dispatcher_url_field(&mut crtsh, &stubr.path("/crtsh"));
+    funcs::wrap_module_dispatcher_url_field(&mut crtsh, &stubr.path("/crtsh"));
 
     let result = crtsh.run(TEST_DOMAIN).await;
 

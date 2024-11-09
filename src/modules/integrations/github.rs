@@ -107,18 +107,19 @@ impl SubscanModuleInterface for GitHub {
         let envs = self.envs().await;
 
         if let Some(apikey) = envs.apikey.value {
+            let mut url = self.url.clone();
             let query = format!("per_page=100&q={domain}&sort=created&order=asc");
 
-            let requester = &mut *self.components.requester.lock().await;
-            let extractor = &self.components.extractor;
+            let requester = &mut self.requester().await.unwrap().lock().await;
+            let extractor = self.extractor().await.unwrap();
 
             let rconfig = requester.config().await;
             let auth = HeaderValue::from_str(&format!("token {}", apikey));
 
             rconfig.add_header(AUTHORIZATION, auth.unwrap());
-            self.url.set_query(Some(&query));
+            url.set_query(Some(&query));
 
-            let content = requester.get_content(self.url.clone()).await;
+            let content = requester.get_content(url).await;
 
             if let Some(raws) = self.get_html_urls(content).await {
                 for raw_url in raws {

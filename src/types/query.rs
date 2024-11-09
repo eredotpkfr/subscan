@@ -1,4 +1,5 @@
 use super::core::Subdomain;
+use itertools::Itertools;
 use reqwest::Url;
 use std::collections::BTreeSet;
 
@@ -141,7 +142,7 @@ impl SearchQuery {
         let formatted = format!(".{}", self.domain);
 
         if let Some(stripped) = sub.strip_suffix(&formatted) {
-            self.state.insert(format!("-{}", stripped))
+            self.state.insert(format!("-{}", stripped.trim()))
         } else {
             false
         }
@@ -187,14 +188,21 @@ impl SearchQuery {
     /// let param = SearchQueryParam::from("s");
     /// let mut query = SearchQuery::new(param, "site:", "foo.com");
     ///
-    /// assert_eq!(query.as_search_str(), "site:foo.com".to_string());
+    /// assert_eq!(query.as_search_str(), "site:foo.com");
+    ///
+    /// query.update("bar.foo.com".into());
+    /// query.update("baz.foo.com".into());
+    ///
+    /// assert_eq!(query.as_search_str(), "site:foo.com -bar -baz")
     /// ````
     pub fn as_search_str(&mut self) -> String {
-        let asvec = Vec::from_iter(self.state.clone());
-        let long_prefix = format!("{}{}", self.prefix, self.domain);
-        let formatted = format!("{} {}", long_prefix, asvec.join(" "));
+        let suffix = self.state.iter().join(" ");
 
-        formatted.trim().to_string()
+        if suffix.is_empty() {
+            format!("{}{}", self.prefix, self.domain)
+        } else {
+            format!("{}{} {}", self.prefix, self.domain, suffix.trim())
+        }
     }
 
     /// According to given `base_url` returns searchable

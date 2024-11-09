@@ -3,12 +3,12 @@ use std::collections::BTreeSet;
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    mocks,
-    stub::TempStubManager,
+    mock::funcs,
+    stub::StubTemplateManager,
 };
 use serde_json::{json, Value};
 use subscan::{
-    enums::dispatchers::SubscanModuleDispatcher,
+    enums::{dispatchers::SubscanModuleDispatcher, module::SubscanModuleStatus::Failed},
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::integrations::commoncrawl::CommonCrawl,
     types::config::RequesterConfig,
@@ -38,7 +38,7 @@ async fn extract_cdx_urls_test() {
 async fn run_test() {
     let stubs = "module/integrations/commoncrawl";
     let templates = vec!["commoncrawl-index-template.json"];
-    let manager: TempStubManager = (stubs, templates).into();
+    let manager: StubTemplateManager = (stubs, templates).into();
 
     let config = stubr::Config {
         port: Some(manager.port().await),
@@ -48,7 +48,7 @@ async fn run_test() {
     let stubr = stubr::Stubr::start_with(manager.temp().await, config).await;
     let mut commoncrawl = CommonCrawl::dispatcher();
 
-    mocks::wrap_module_dispatcher_url_field(&mut commoncrawl, &stubr.path("/commoncrawl/index"));
+    funcs::wrap_module_dispatcher_url_field(&mut commoncrawl, &stubr.path("/commoncrawl/index"));
 
     if let SubscanModuleDispatcher::CommonCrawl(ref mut module) = commoncrawl {
         let requester = &mut *module.requester().await.unwrap().lock().await;
@@ -69,4 +69,20 @@ async fn run_test() {
     ]);
 
     assert_eq!(results.subdomains, expected);
+}
+
+#[tokio::test]
+#[stubr::mock("module/integrations/commoncrawl/commoncrawl-index-no-data.json")]
+async fn run_failed_test() {
+    let mut commoncrawl = CommonCrawl::dispatcher();
+
+    funcs::wrap_module_dispatcher_url_field(
+        &mut commoncrawl,
+        &stubr.path("/commoncrawl/index-no-data"),
+    );
+
+    let results = commoncrawl.run(TEST_DOMAIN).await;
+
+    assert_eq!(results.status, Failed("not get cdx URLs".into()));
+    assert_eq!(results.subdomains, [].into());
 }

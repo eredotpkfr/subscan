@@ -1,6 +1,6 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mocks,
+    mock::funcs,
 };
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher, interfaces::module::SubscanModuleInterface,
@@ -14,7 +14,7 @@ async fn run_test() {
     let mut duckduckgo = DuckDuckGo::dispatcher();
     let new_requester = HTTPClient::default();
 
-    mocks::wrap_module_dispatcher_url_field(&mut duckduckgo, &stubr.uri());
+    funcs::wrap_module_dispatcher_url_field(&mut duckduckgo, &stubr.uri());
 
     if let SubscanModuleDispatcher::GenericSearchEngineModule(ref mut duckduckgo) = duckduckgo {
         duckduckgo.components.requester = Mutex::new(new_requester.into());

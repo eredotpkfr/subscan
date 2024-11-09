@@ -1,6 +1,6 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    mocks,
+    mock::funcs,
 };
 use subscan::{
     enums::content::Content,
@@ -13,7 +13,7 @@ use subscan::{
 async fn run_test() {
     let mut digitorus = Digitorus::dispatcher();
 
-    mocks::wrap_module_dispatcher_url_field(&mut digitorus, &stubr.path("/digitorus"));
+    funcs::wrap_module_dispatcher_url_field(&mut digitorus, &stubr.path("/digitorus"));
 
     let result = digitorus.run(TEST_DOMAIN).await;
 

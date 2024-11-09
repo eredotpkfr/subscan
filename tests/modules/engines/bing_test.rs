@@ -1,6 +1,6 @@
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mocks,
+    mock::funcs,
 };
 use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::bing::Bing};
 
@@ -9,7 +9,7 @@ use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::bing
 async fn run_test() {
     let mut bing = Bing::dispatcher();
 
-    mocks::wrap_module_dispatcher_url_field(&mut bing, &stubr.path("/search"));
+    funcs::wrap_module_dispatcher_url_field(&mut bing, &stubr.path("/search"));
 
     let result = bing.run(TEST_DOMAIN).await;
 
