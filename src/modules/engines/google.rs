@@ -30,9 +30,10 @@ pub struct Google {}
 
 impl Google {
     pub fn dispatcher() -> SubscanModuleDispatcher {
+        let url = Url::parse(GOOGLE_SEARCH_URL);
+
         let extractor: HTMLExtractor = HTMLExtractor::new(GOOGLE_CITE_TAG.into(), vec![]);
         let requester: RequesterDispatcher = HTTPClient::default().into();
-        let url = Url::parse(GOOGLE_SEARCH_URL);
 
         let generic = GenericSearchEngineModule {
             name: GOOGLE_MODULE_NAME.into(),
