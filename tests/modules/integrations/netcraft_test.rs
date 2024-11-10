@@ -51,8 +51,10 @@ async fn get_next_url_test() {
 
 #[tokio::test]
 async fn get_next_url_fail_test() {
+    let html = "<table></table><p><a></a></p>";
+
     let url = TEST_URL.parse().unwrap();
-    let next = Netcraft::get_next_url(url, Content::Empty);
+    let next = Netcraft::get_next_url(url, html.into());
 
     assert!(next.is_none());
 }
