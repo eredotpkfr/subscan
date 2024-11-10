@@ -123,7 +123,7 @@ impl SubscanModuleInterface for GenericIntegrationModule {
             return result.with_status(NotAuthenticated.into()).await;
         }
 
-        let requester = &*self.components.requester.lock().await;
+        let requester = self.components.requester.lock().await;
         let extractor = &self.components.extractor;
 
         loop {
