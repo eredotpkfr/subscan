@@ -93,6 +93,8 @@ impl ScanResult {
         for subdomain in &self.results {
             log::info!("{}", subdomain);
         }
+
+        log::info!("Total: {}", self.results.len());
     }
 }
 

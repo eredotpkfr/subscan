@@ -5,8 +5,8 @@ use crate::{
         integrations::{
             alienvault, anubis, bevigil, binaryedge, bufferover, builtwith, censys, certspotter,
             chaos, commoncrawl, crtsh, digitorus, dnsdumpster, dnsrepo, github, hackertarget,
-            leakix, netlas, securitytrails, shodan, sitedossier, subdomaincenter, threatcrowd,
-            virustotal, waybackarchive, whoisxmlapi, zoomeye,
+            leakix, netcraft, netlas, securitytrails, shodan, sitedossier, subdomaincenter,
+            threatcrowd, virustotal, waybackarchive, whoisxmlapi, zoomeye,
         },
         zonetransfer,
     },
@@ -40,6 +40,7 @@ lazy_static! {
         SubscanModule::from(github::GitHub::dispatcher()),
         SubscanModule::from(hackertarget::HackerTarget::dispatcher()),
         SubscanModule::from(leakix::Leakix::dispatcher()),
+        SubscanModule::from(netcraft::Netcraft::dispatcher()),
         SubscanModule::from(netlas::Netlas::dispatcher()),
         SubscanModule::from(securitytrails::SecurityTrails::dispatcher()),
         SubscanModule::from(shodan::Shodan::dispatcher()),

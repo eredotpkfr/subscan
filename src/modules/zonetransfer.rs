@@ -20,7 +20,14 @@ use tokio::{net::TcpStream as TokioTcpStream, sync::Mutex};
 
 pub const ZONETRANSFER_MODULE_NAME: &str = "zonetransfer";
 
-/// `ZoneTransfer` non-generic module
+/// ZoneTransfer non-generic module
+///
+/// The `ZoneTransfer` module is a non-generic component designed to perform zone transfers
+/// by querying name servers using the `AXFR` (Authoritative Zone Transfer) query type.
+/// If a name server is configured without proper security measures, this module
+/// may successfully retrieve all DNS records associated with the zone, potentially exposing
+/// sensitive information such as subdomains, email servers, and other internal
+/// infrastructure details
 ///
 /// | Property           | Value          |
 /// |:------------------:|:--------------:|

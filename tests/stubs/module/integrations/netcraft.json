@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/netcraft"
+    },
+    "response": {
+        "body": "<table><tbody><tr><td></td><td><a>bar<b>.foo.com</b></a></td></tr></tbody></table>",
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}

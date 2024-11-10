@@ -60,11 +60,7 @@ impl VirusTotal {
     }
 
     pub fn get_next_url(_url: Url, content: Content) -> Option<Url> {
-        if let Some(next_url) = content.as_json()["links"]["next"].as_str() {
-            next_url.parse().ok()
-        } else {
-            None
-        }
+        content.as_json()["links"]["next"].as_str()?.parse().ok()
     }
 
     pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {

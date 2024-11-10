@@ -50,7 +50,7 @@ repos:
         additional_dependencies: ['@commitlint/config-conventional']
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.26.0
+    rev: typos-dict-v0.11.35
     hooks:
       - id: typos
         exclude: .codespellrc
@@ -67,7 +67,7 @@ repos:
         name: markdownlint
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.20.1
+    rev: v8.21.2
     hooks:
       - id: gitleaks
         name: gitleaks
