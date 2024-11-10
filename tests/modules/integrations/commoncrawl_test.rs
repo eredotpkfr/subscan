@@ -48,7 +48,7 @@ async fn run_test() {
     let stubr = stubr::Stubr::start_with(manager.temp().await, config).await;
     let mut commoncrawl = CommonCrawl::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut commoncrawl, &stubr.path("/commoncrawl/index"));
+    funcs::wrap_module_url(&mut commoncrawl, &stubr.path("/commoncrawl/index"));
 
     if let SubscanModuleDispatcher::CommonCrawl(ref mut module) = commoncrawl {
         let requester = &mut *module.requester().await.unwrap().lock().await;
@@ -76,10 +76,7 @@ async fn run_test() {
 async fn run_failed_test() {
     let mut commoncrawl = CommonCrawl::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(
-        &mut commoncrawl,
-        &stubr.path("/commoncrawl/index-no-data"),
-    );
+    funcs::wrap_module_url(&mut commoncrawl, &stubr.path("/commoncrawl/index-no-data"));
 
     let results = commoncrawl.run(TEST_DOMAIN).await;
 

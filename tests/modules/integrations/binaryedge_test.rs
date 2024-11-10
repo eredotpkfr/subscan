@@ -19,7 +19,7 @@ async fn run_test() {
     let env_name = binaryedge.envs().await.apikey.name;
 
     env::set_var(&env_name, "binaryedge-api-key");
-    funcs::wrap_module_dispatcher_url_field(&mut binaryedge, &stubr.path("/binaryedge"));
+    funcs::wrap_module_url(&mut binaryedge, &stubr.path("/binaryedge"));
 
     let result = binaryedge.run(TEST_DOMAIN).await;
 

@@ -9,7 +9,7 @@ use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::yaho
 async fn run_test() {
     let mut yahoo = Yahoo::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut yahoo, &stubr.path("/search"));
+    funcs::wrap_module_url(&mut yahoo, &stubr.path("/search"));
 
     let result = yahoo.run(TEST_DOMAIN).await;
 

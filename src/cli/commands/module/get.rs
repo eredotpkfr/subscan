@@ -14,8 +14,7 @@ impl ModuleGetSubCommandArgs {
     pub async fn as_table<W: Write>(&self, module: &Mutex<SubscanModuleDispatcher>, out: &mut W) {
         let mut table = cli::create_module_table().await;
 
-        table.add_row(cli::module_as_table_row(&*module.lock().await).await);
-
+        table.add_row(module.lock().await.as_table_row().await);
         table.print(out).unwrap();
     }
 }

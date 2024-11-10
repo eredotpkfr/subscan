@@ -18,7 +18,7 @@ async fn run_test() {
     let env_name = bufferover.envs().await.apikey.name;
 
     env::set_var(&env_name, "bufferover-api-key");
-    funcs::wrap_module_dispatcher_url_field(&mut bufferover, &stubr.path("/bufferover"));
+    funcs::wrap_module_url(&mut bufferover, &stubr.path("/bufferover"));
 
     let result = bufferover.run(TEST_DOMAIN).await;
 

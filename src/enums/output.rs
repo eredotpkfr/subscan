@@ -6,4 +6,5 @@ pub enum OutputFormat {
     CSV,
     #[default]
     JSON,
+    HTML,
 }

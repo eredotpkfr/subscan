@@ -9,7 +9,7 @@ use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::bing
 async fn run_test() {
     let mut bing = Bing::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut bing, &stubr.path("/search"));
+    funcs::wrap_module_url(&mut bing, &stubr.path("/search"));
 
     let result = bing.run(TEST_DOMAIN).await;
 

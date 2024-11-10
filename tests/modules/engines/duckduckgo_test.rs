@@ -14,7 +14,7 @@ async fn run_test() {
     let mut duckduckgo = DuckDuckGo::dispatcher();
     let new_requester = HTTPClient::default();
 
-    funcs::wrap_module_dispatcher_url_field(&mut duckduckgo, &stubr.uri());
+    funcs::wrap_module_url(&mut duckduckgo, &stubr.uri());
 
     if let SubscanModuleDispatcher::GenericSearchEngineModule(ref mut duckduckgo) = duckduckgo {
         duckduckgo.components.requester = Mutex::new(new_requester.into());

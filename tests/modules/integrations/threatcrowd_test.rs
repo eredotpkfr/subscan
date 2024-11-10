@@ -17,7 +17,7 @@ use subscan::{
 async fn run_test() {
     let mut threatcrowd = ThreatCrowd::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut threatcrowd, &stubr.path("/threatcrowd"));
+    funcs::wrap_module_url(&mut threatcrowd, &stubr.path("/threatcrowd"));
 
     let result = threatcrowd.run(TEST_DOMAIN).await;
 

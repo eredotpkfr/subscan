@@ -18,7 +18,7 @@ async fn run_test() {
     let env_name = bevigil.envs().await.apikey.name;
 
     env::set_var(&env_name, "bevigil-api-key");
-    funcs::wrap_module_dispatcher_url_field(&mut bevigil, &stubr.path("/bevigil"));
+    funcs::wrap_module_url(&mut bevigil, &stubr.path("/bevigil"));
 
     let result = bevigil.run(TEST_DOMAIN).await;
 

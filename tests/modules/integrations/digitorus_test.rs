@@ -13,7 +13,7 @@ use subscan::{
 async fn run_test() {
     let mut digitorus = Digitorus::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut digitorus, &stubr.path("/digitorus"));
+    funcs::wrap_module_url(&mut digitorus, &stubr.path("/digitorus"));
 
     let result = digitorus.run(TEST_DOMAIN).await;
 

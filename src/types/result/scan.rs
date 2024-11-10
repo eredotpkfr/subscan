@@ -1,20 +1,23 @@
 use super::module::SubscanModuleResult;
 use crate::{
-    enums::module::SubscanModuleStatus,
+    enums::{module::SubscanModuleStatus, output::OutputFormat},
     types::{
         core::Subdomain,
-        result::{metadata::SubscanScanResultMetadata, stats::SubscanModuleStatistics},
+        result::{metadata::ScanResultMetadata, stats::SubscanModuleStatistics},
     },
 };
 use chrono::Utc;
+use csv::Writer;
+use prettytable::{format::consts::FORMAT_NO_LINESEP_WITH_TITLE, row, table};
 use serde::Serialize;
-use std::collections::BTreeSet;
+use serde_json;
+use std::{collections::BTreeSet, fs::File, io::Write};
 
 /// `Subscan` scan result
 #[derive(Clone, Default, Serialize)]
-pub struct SubscanScanResult {
+pub struct ScanResult {
     /// Scan metadata
-    pub metadata: SubscanScanResultMetadata,
+    pub metadata: ScanResultMetadata,
     /// Module statistics
     pub statistics: Vec<SubscanModuleStatistics>,
     /// Subscans that have been discovered
@@ -23,7 +26,77 @@ pub struct SubscanScanResult {
     pub total: usize,
 }
 
-impl From<&str> for SubscanScanResult {
+impl ScanResult {
+    pub async fn save(&self, output: &OutputFormat) -> String {
+        let (file, filename) = self.get_output_file(output).await;
+
+        match output {
+            OutputFormat::TXT => self.save_txt(file).await,
+            OutputFormat::CSV => self.save_csv(file).await,
+            OutputFormat::JSON => self.save_json(file).await,
+            OutputFormat::HTML => self.save_html(file).await,
+        }
+
+        log::info!("Scan results saved to {filename}");
+
+        filename
+    }
+
+    async fn get_output_file(&self, output: &OutputFormat) -> (File, String) {
+        let now = Utc::now().timestamp();
+        let filename = match output {
+            OutputFormat::TXT => format!("{}_{}.txt", self.metadata.target, now),
+            OutputFormat::CSV => format!("{}_{}.csv", self.metadata.target, now),
+            OutputFormat::JSON => format!("{}_{}.json", self.metadata.target, now),
+            OutputFormat::HTML => format!("{}_{}.html", self.metadata.target, now),
+        };
+
+        (File::create(filename.clone()).unwrap(), filename)
+    }
+
+    async fn save_txt<W: Write>(&self, mut writer: W) {
+        for subdomain in &self.results {
+            writeln!(writer, "{}", subdomain).unwrap();
+        }
+    }
+
+    async fn save_csv<W: Write>(&self, writer: W) {
+        let mut writer = Writer::from_writer(writer);
+
+        writer.serialize("subdomains").unwrap();
+
+        for subdomain in &self.results {
+            writer.serialize(subdomain).unwrap()
+        }
+    }
+
+    async fn save_json<W: Write>(&self, mut writer: W) {
+        let json_content = serde_json::to_string_pretty(&self).unwrap();
+
+        writer.write_all(json_content.as_bytes()).unwrap()
+    }
+
+    async fn save_html<W: Write>(&self, mut writer: W) {
+        let mut table = table!();
+
+        table.set_titles(row!["subdomain"]);
+        table.set_format(*FORMAT_NO_LINESEP_WITH_TITLE);
+
+        for subdomain in &self.results {
+            table.add_row(row![subdomain]);
+        }
+
+        table.print_html(&mut writer).unwrap()
+    }
+
+    pub async fn log(&self) {
+        for subdomain in &self.results {
+            log::info!("{}", subdomain);
+        }
+    }
+}
+
+impl From<&str> for ScanResult {
     fn from(target: &str) -> Self {
         Self {
             metadata: target.into(),
@@ -32,24 +105,24 @@ impl From<&str> for SubscanScanResult {
     }
 }
 
-impl Extend<Subdomain> for SubscanScanResult {
+impl Extend<Subdomain> for ScanResult {
     fn extend<T: IntoIterator<Item = Subdomain>>(&mut self, iter: T) {
         self.results.extend(iter);
     }
 }
 
-impl SubscanScanResult {
+impl ScanResult {
     /// Update `finished_at`, `elapsed` and `total` fields and returns itself
     ///
     /// # Examples
     ///
     /// ```
-    /// use subscan::types::result::scan::SubscanScanResult;
+    /// use subscan::types::result::scan::ScanResult;
     /// use std::collections::BTreeSet;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let mut result: SubscanScanResult = "foo.com".into();
+    ///     let mut result: ScanResult = "foo.com".into();
     ///
     ///     result.extend(BTreeSet::from_iter(["bar.foo.com".into()]));
     ///
@@ -72,12 +145,12 @@ impl SubscanScanResult {
     /// # Examples
     ///
     /// ```
-    /// use subscan::types::result::scan::SubscanScanResult;
+    /// use subscan::types::result::scan::ScanResult;
     /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let mut result: SubscanScanResult = "foo.com".into();
+    ///     let mut result: ScanResult = "foo.com".into();
     ///
     ///     result.add_status("one", &SubscanModuleStatus::Started).await;
     ///     result.add_status("two", &SkipReason::NotAuthenticated.into()).await;
@@ -99,18 +172,18 @@ impl SubscanScanResult {
         }
     }
 
-    /// Add module statistics on [`SubscanScanResult`]
+    /// Add module statistics on [`ScanResult`]
     ///
     /// # Examples
     ///
     /// ```
-    /// use subscan::types::result::scan::SubscanScanResult;
+    /// use subscan::types::result::scan::ScanResult;
     /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
     /// use subscan::types::result::module::SubscanModuleResult;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let mut scan_result: SubscanScanResult = "foo.com".into();
+    ///     let mut scan_result: ScanResult = "foo.com".into();
     ///     let module_result: SubscanModuleResult = "foo".into();
     ///
     ///     scan_result.add_statistic(module_result.into()).await;
@@ -123,18 +196,18 @@ impl SubscanScanResult {
     }
 
     /// Update scan results with any module result, that merges all subdomains and
-    /// statistics into [`SubscanScanResult`]
+    /// statistics into [`ScanResult`]
     ///
     /// # Examples
     ///
     /// ```
-    /// use subscan::types::result::scan::SubscanScanResult;
+    /// use subscan::types::result::scan::ScanResult;
     /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
     /// use subscan::types::result::module::SubscanModuleResult;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let mut scan_result: SubscanScanResult = "foo.com".into();
+    ///     let mut scan_result: ScanResult = "foo.com".into();
     ///     let module_result: SubscanModuleResult = "foo".into();
     ///
     ///     scan_result.update_with_module_result(module_result).await;

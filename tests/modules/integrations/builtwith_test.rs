@@ -19,7 +19,7 @@ async fn run_test() {
     let env_name = builtwith.envs().await.apikey.name;
 
     env::set_var(&env_name, "builtwith-api-key");
-    funcs::wrap_module_dispatcher_url_field(&mut builtwith, &stubr.path("/builtwith"));
+    funcs::wrap_module_url(&mut builtwith, &stubr.path("/builtwith"));
 
     let result = builtwith.run(TEST_DOMAIN).await;
 

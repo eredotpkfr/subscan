@@ -19,7 +19,7 @@ async fn run_test() {
     let env_name = zoomeye.envs().await.apikey.name;
 
     env::set_var(&env_name, "zoomeye-api-key");
-    funcs::wrap_module_dispatcher_url_field(&mut zoomeye, &stubr.path("/zoomeye"));
+    funcs::wrap_module_url(&mut zoomeye, &stubr.path("/zoomeye"));
 
     let result = zoomeye.run(TEST_DOMAIN).await;
 

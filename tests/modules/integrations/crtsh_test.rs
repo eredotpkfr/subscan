@@ -16,7 +16,7 @@ use subscan::{
 async fn run_test() {
     let mut crtsh = Crtsh::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut crtsh, &stubr.path("/crtsh"));
+    funcs::wrap_module_url(&mut crtsh, &stubr.path("/crtsh"));
 
     let result = crtsh.run(TEST_DOMAIN).await;
 

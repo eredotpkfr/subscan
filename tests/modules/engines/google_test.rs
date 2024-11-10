@@ -9,7 +9,7 @@ use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::goog
 async fn run_test() {
     let mut google = Google::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut google, &stubr.path("/search"));
+    funcs::wrap_module_url(&mut google, &stubr.path("/search"));
 
     let result = google.run(TEST_DOMAIN).await;
 

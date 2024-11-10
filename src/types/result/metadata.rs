@@ -3,9 +3,9 @@ use chrono::{DateTime, TimeDelta, Utc};
 use serde::Serialize;
 use std::collections::BTreeSet;
 
-/// [`SubscanScanResult`](crate::types::result::scan::SubscanScanResult) metadata struct definition
+/// [`ScanResult`](crate::types::result::scan::ScanResult) metadata struct definition
 #[derive(Clone, Default, Serialize)]
-pub struct SubscanScanResultMetadata {
+pub struct ScanResultMetadata {
     /// Target domain address have been scanned
     pub target: String,
     /// Modules that last state is started
@@ -27,7 +27,7 @@ pub struct SubscanScanResultMetadata {
     pub elapsed: TimeDelta,
 }
 
-impl From<&str> for SubscanScanResultMetadata {
+impl From<&str> for ScanResultMetadata {
     fn from(target: &str) -> Self {
         Self {
             target: target.to_string(),

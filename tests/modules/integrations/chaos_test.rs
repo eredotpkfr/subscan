@@ -18,7 +18,7 @@ async fn run_test() {
     let env_name = chaos.envs().await.apikey.name;
 
     env::set_var(&env_name, "chaos-api-key");
-    funcs::wrap_module_dispatcher_url_field(&mut chaos, &stubr.path("/chaos"));
+    funcs::wrap_module_url(&mut chaos, &stubr.path("/chaos"));
 
     let result = chaos.run(TEST_DOMAIN).await;
 

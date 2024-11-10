@@ -26,13 +26,11 @@ async fn main() {
                 get.as_table(subscan.module(&get.name).await, out).await;
             }
             ModuleSubCommands::Run(args) => {
-                let result = subscan.run(&args.name, &args.domain).await;
-                println!("{}", serde_json::to_string_pretty(&result).unwrap());
+                subscan.run(&args.name, &args.domain).await.log().await;
             }
         },
         Commands::Scan(args) => {
-            let result = subscan.scan(&args.domain).await;
-            println!("{}", serde_json::to_string_pretty(&result).unwrap());
+            subscan.scan(&args.domain).await.save(&args.output).await;
         }
         Commands::Brute(_) => {}
     }

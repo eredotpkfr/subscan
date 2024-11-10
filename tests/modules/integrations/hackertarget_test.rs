@@ -13,7 +13,7 @@ use subscan::{
 async fn run_test() {
     let mut hackertarget = HackerTarget::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut hackertarget, &stubr.path("/hackertarget"));
+    funcs::wrap_module_url(&mut hackertarget, &stubr.path("/hackertarget"));
 
     let result = hackertarget.run(TEST_DOMAIN).await;
 

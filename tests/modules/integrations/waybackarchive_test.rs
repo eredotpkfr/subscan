@@ -14,7 +14,7 @@ use subscan::{
 async fn run_test() {
     let mut waybackarchive = WaybackArchive::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut waybackarchive, &stubr.path("/waybackarchive"));
+    funcs::wrap_module_url(&mut waybackarchive, &stubr.path("/waybackarchive"));
 
     let results = waybackarchive.run(TEST_DOMAIN).await;
 

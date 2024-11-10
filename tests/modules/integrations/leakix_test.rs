@@ -16,7 +16,7 @@ use subscan::{
 async fn run_test() {
     let mut leakix = Leakix::dispatcher();
 
-    funcs::wrap_module_dispatcher_url_field(&mut leakix, &stubr.path("/leakix"));
+    funcs::wrap_module_url(&mut leakix, &stubr.path("/leakix"));
 
     let result = leakix.run(TEST_DOMAIN).await;
 

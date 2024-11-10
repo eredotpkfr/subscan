@@ -11,7 +11,7 @@ impl ModuleListSubCommandArgs {
         let mut table = cli::create_module_table().await;
 
         for module in modules {
-            table.add_row(cli::module_as_table_row(&*module.lock().await).await);
+            table.add_row(module.lock().await.as_table_row().await);
         }
 
         table.print(out).unwrap();
