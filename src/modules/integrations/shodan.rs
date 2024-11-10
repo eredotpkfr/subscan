@@ -68,7 +68,7 @@ impl Shodan {
                 let page_param = url.query_pairs().find(|item| item.0 == "page");
 
                 if let Some(page) = page_param {
-                    let new_page = (page.1.parse::<usize>().unwrap() + 1).to_string();
+                    let new_page = (page.1.parse::<usize>().ok()? + 1).to_string();
 
                     http::update_url_query(&mut url, "page", &new_page);
                 } else {
