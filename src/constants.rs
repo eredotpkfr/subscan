@@ -4,10 +4,14 @@ use std::time::Duration;
 pub const SUBSCAN_BANNER_LOG_TARGET: &str = "subscan::banner";
 /// `Subscan` environment variable namespace
 pub const SUBSCAN_ENV_NAMESPACE: &str = "SUBSCAN";
-/// Concurrency level, count of threads
-pub const DEFAULT_CONCURRENCY: u64 = 4;
+/// Concurrency level of module runner instances, count of threads
+pub const DEFAULT_MODULE_CONCURRENCY: u64 = 5;
+/// Concurrency level of resolver instances, count of threads
+pub const DEFAULT_RESOLVER_CONCURRENCY: u64 = 50;
 /// Default HTTP timeout as a [`Duration`]
 pub const DEFAULT_HTTP_TIMEOUT: Duration = Duration::from_secs(30);
+/// Default DNS resolver timeout as a [`Duration`]
+pub const DEFAULT_RESOLVER_TIMEOUT: Duration = Duration::from_secs(2);
 /// Default User-Agent headers for HTTP requests
 pub const DEFAULT_USER_AGENT: &str = "\
     Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) \

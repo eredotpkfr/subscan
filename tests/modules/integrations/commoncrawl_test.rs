@@ -11,7 +11,7 @@ use subscan::{
     enums::{dispatchers::SubscanModuleDispatcher, module::SubscanModuleStatus::Failed},
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::integrations::commoncrawl::CommonCrawl,
-    types::config::RequesterConfig,
+    types::config::requester::RequesterConfig,
 };
 
 #[tokio::test]

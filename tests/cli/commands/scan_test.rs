@@ -1,7 +1,10 @@
 use clap::Parser;
 use subscan::{
     cli::Cli,
-    constants::{DEFAULT_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
+    constants::{
+        DEFAULT_HTTP_TIMEOUT, DEFAULT_MODULE_CONCURRENCY, DEFAULT_RESOLVER_CONCURRENCY,
+        DEFAULT_RESOLVER_TIMEOUT, DEFAULT_USER_AGENT,
+    },
     enums::{cache::CacheFilter, output::OutputFormat},
     types::filters::ModuleNameFilter,
 };
@@ -19,13 +22,16 @@ async fn scan_default_args_test() {
 
     match cli.command {
         subscan::cli::commands::Commands::Scan(args) => {
+            assert!(!args.resolver_disabled);
             assert_eq!(args.user_agent, DEFAULT_USER_AGENT);
             assert_eq!(args.proxy, None);
-            assert_eq!(args.timeout, DEFAULT_HTTP_TIMEOUT.as_secs());
-            assert_eq!(args.concurrency, DEFAULT_CONCURRENCY);
+            assert_eq!(args.http_timeout, DEFAULT_HTTP_TIMEOUT.as_secs());
+            assert_eq!(args.module_concurrency, DEFAULT_MODULE_CONCURRENCY);
             assert_eq!(args.modules, "*");
             assert_eq!(args.skips, "");
             assert_eq!(args.output, OutputFormat::JSON);
+            assert_eq!(args.resolver_concurrency, DEFAULT_RESOLVER_CONCURRENCY);
+            assert_eq!(args.resolver_timeout, DEFAULT_RESOLVER_TIMEOUT.as_secs());
         }
         _ => panic!("Expected Commands::Scan"),
     }
@@ -45,19 +51,25 @@ async fn scan_args_test() {
         "--skips", "commoncrawl",
         "-c", "10",
         "--output", "csv",
+        "--disable-ip-resolve",
+        "--resolver-concurrency", "100",
+        "--resolver-timeout", "10"
     ];
 
     let cli = Cli::try_parse_from(args).unwrap();
 
     match cli.command {
         subscan::cli::commands::Commands::Scan(args) => {
+            assert!(args.resolver_disabled);
             assert_eq!(args.user_agent, "foo");
             assert_eq!(args.proxy.unwrap(), "bar");
-            assert_eq!(args.timeout, 120);
-            assert_eq!(args.concurrency, 10);
+            assert_eq!(args.http_timeout, 120);
+            assert_eq!(args.module_concurrency, 10);
             assert_eq!(args.modules, "google,yahoo");
             assert_eq!(args.skips, "commoncrawl");
             assert_eq!(args.output, OutputFormat::CSV);
+            assert_eq!(args.resolver_concurrency, 100);
+            assert_eq!(args.resolver_timeout, 10);
         }
         _ => panic!("Expected Commands::Scan"),
     }

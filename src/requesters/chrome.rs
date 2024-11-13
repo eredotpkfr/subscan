@@ -1,6 +1,6 @@
 use crate::{
     enums::content::Content, interfaces::requester::RequesterInterface,
-    types::config::RequesterConfig,
+    types::config::requester::RequesterConfig,
 };
 use async_trait::async_trait;
 use headless_chrome::{browser::LaunchOptions, Browser};
@@ -38,7 +38,7 @@ impl ChromeBrowser {
     /// use std::time::Duration;
     /// use reqwest::header::HeaderMap;
     /// use subscan::requesters::chrome::ChromeBrowser;
-    /// use subscan::types::config::RequesterConfig;
+    /// use subscan::types::config::requester::RequesterConfig;
     ///
     /// #[tokio::main]
     /// async fn main() {
@@ -122,7 +122,7 @@ impl RequesterInterface for ChromeBrowser {
     /// ```no_run
     /// use std::time::Duration;
     /// use subscan::requesters::chrome::ChromeBrowser;
-    /// use subscan::types::config::RequesterConfig;
+    /// use subscan::types::config::requester::RequesterConfig;
     /// use subscan::interfaces::requester::RequesterInterface;
     /// use reqwest::header::HeaderMap;
     ///

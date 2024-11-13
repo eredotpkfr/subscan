@@ -4,7 +4,7 @@ use crate::common::{
 };
 use reqwest::Url;
 use subscan::{
-    enums::{content::Content, dispatchers::SubscanModuleDispatcher},
+    enums::dispatchers::SubscanModuleDispatcher,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::netcraft::{Netcraft, NETCRAFT_URL},
     requesters::client::HTTPClient,

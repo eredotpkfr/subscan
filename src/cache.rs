@@ -10,7 +10,7 @@ use crate::{
         },
         zonetransfer,
     },
-    types::{config::RequesterConfig, core::SubscanModule},
+    types::{config::requester::RequesterConfig, core::SubscanModule},
 };
 use lazy_static::lazy_static;
 
@@ -115,7 +115,7 @@ impl CacheManager {
     /// ```no_run
     /// use std::time::Duration;
     /// use subscan::cache::CacheManager;
-    /// use subscan::types::config::RequesterConfig;
+    /// use subscan::types::config::requester::RequesterConfig;
     ///
     /// #[tokio::main]
     /// async fn main() {

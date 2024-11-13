@@ -1,7 +1,10 @@
 use clap::Parser;
 use subscan::{
     cli::Cli,
-    constants::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
+    constants::{
+        DEFAULT_HTTP_TIMEOUT, DEFAULT_RESOLVER_CONCURRENCY, DEFAULT_RESOLVER_TIMEOUT,
+        DEFAULT_USER_AGENT,
+    },
 };
 
 #[tokio::test]
@@ -18,11 +21,14 @@ async fn module_run_default_args_test() {
     match cli.command {
         subscan::cli::commands::Commands::Module(sub) => match sub.command {
             subscan::cli::commands::module::ModuleSubCommands::Run(args) => {
+                assert!(!args.resolver_disabled);
                 assert_eq!(args.domain, "bar.com");
                 assert_eq!(args.name, "foo");
                 assert_eq!(args.user_agent, DEFAULT_USER_AGENT);
                 assert_eq!(args.proxy, None);
-                assert_eq!(args.timeout, DEFAULT_HTTP_TIMEOUT.as_secs());
+                assert_eq!(args.http_timeout, DEFAULT_HTTP_TIMEOUT.as_secs());
+                assert_eq!(args.resolver_concurrency, DEFAULT_RESOLVER_CONCURRENCY);
+                assert_eq!(args.resolver_timeout, DEFAULT_RESOLVER_TIMEOUT.as_secs());
             }
             _ => panic!("Expected ModuleSubCommands::Run"),
         },
@@ -40,7 +46,10 @@ async fn module_run_args_test() {
         "-d", "bar.com",
         "--user-agent", "foobar",
         "--proxy", "baz",
-        "--timeout", "120",
+        "--http-timeout", "120",
+        "--disable-ip-resolve",
+        "--resolver-concurrency", "100",
+        "--resolver-timeout", "10",
     ];
 
     let cli = Cli::try_parse_from(args).unwrap();
@@ -48,11 +57,14 @@ async fn module_run_args_test() {
     match cli.command {
         subscan::cli::commands::Commands::Module(sub) => match sub.command {
             subscan::cli::commands::module::ModuleSubCommands::Run(args) => {
+                assert!(args.resolver_disabled);
                 assert_eq!(args.domain, "bar.com");
                 assert_eq!(args.name, "foo");
                 assert_eq!(args.user_agent, "foobar");
                 assert_eq!(args.proxy, Some("baz".into()));
-                assert_eq!(args.timeout, 120);
+                assert_eq!(args.http_timeout, 120);
+                assert_eq!(args.resolver_concurrency, 100);
+                assert_eq!(args.resolver_timeout, 10);
             }
             _ => panic!("Expected ModuleSubCommands::Run"),
         },

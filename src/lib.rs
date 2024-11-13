@@ -27,8 +27,8 @@ pub mod utilities;
 
 use crate::{
     cache::CacheManager, cli::Cli, enums::module::SkipReason::SkippedByUser,
-    interfaces::module::SubscanModuleInterface, pools::runner::SubscanModuleRunnerPool,
-    types::config::SubscanConfig, types::core::SubscanModule,
+    interfaces::module::SubscanModuleInterface, pools::module::SubscanModulePool,
+    types::config::subscan::SubscanConfig, types::core::SubscanModule,
 };
 use tokio::sync::OnceCell;
 use types::result::scan::ScanResult;
@@ -88,10 +88,10 @@ impl Subscan {
 
         let mut result: ScanResult = domain.into();
 
-        let started = result.metadata.started_at.format("%H:%M:%S %Z");
-        let pool = SubscanModuleRunnerPool::new(domain.to_string());
+        let time = result.metadata.started_at.format("%H:%M:%S %Z");
+        let pool = SubscanModulePool::new(domain.to_string(), self.config.resolver.clone());
 
-        log::info!("Started scan on {} ({})", domain, started);
+        log::info!("Started scan on {} ({})", domain, time);
 
         for module in self.modules().await {
             let binding = module.lock().await;
@@ -105,13 +105,9 @@ impl Subscan {
             }
         }
 
-        pool.clone().spawn_runners(self.config.concurrency).await;
-        pool.clone().join().await;
+        pool.clone().start(self.config.concurrency).await;
 
-        for subresult in pool.results().await {
-            result.update_with_module_result(subresult).await;
-        }
-
+        result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await
     }
 
@@ -120,24 +116,21 @@ impl Subscan {
 
         let mut result: ScanResult = domain.into();
 
-        let started = result.metadata.started_at.format("%H:%M:%S %Z");
-        let pool = SubscanModuleRunnerPool::new(domain.to_string());
+        let time = result.metadata.started_at.format("%H:%M:%S %Z");
+        let pool = SubscanModulePool::new(domain.to_string(), self.config.resolver.clone());
         let module = self.module(name).await;
 
         log::info!(
             "Running {} module on {} ({})",
             module.lock().await.name().await,
             domain,
-            started
+            time
         );
 
         pool.clone().submit(module.clone()).await;
-        pool.clone().spawn_runners(1).await;
-        pool.clone().join().await;
+        pool.clone().start(1).await;
 
-        let subresult = pool.results().await.pop_first().unwrap();
-
-        result.update_with_module_result(subresult).await;
+        result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await
     }
 }

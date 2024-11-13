@@ -1,6 +1,6 @@
 use crate::{
     enums::content::Content, interfaces::requester::RequesterInterface,
-    types::config::RequesterConfig,
+    types::config::requester::RequesterConfig,
 };
 use async_trait::async_trait;
 use reqwest::{Client, Proxy, Url};
@@ -28,7 +28,7 @@ impl HTTPClient {
     /// use std::time::Duration;
     /// use reqwest::header::HeaderMap;
     /// use subscan::requesters::client::HTTPClient;
-    /// use subscan::types::config::RequesterConfig;
+    /// use subscan::types::config::requester::RequesterConfig;
     ///
     /// #[tokio::main]
     /// async fn main() {
@@ -79,7 +79,7 @@ impl RequesterInterface for HTTPClient {
     /// ```no_run
     /// use std::time::Duration;
     /// use subscan::requesters::client::HTTPClient;
-    /// use subscan::types::config::RequesterConfig;
+    /// use subscan::types::config::requester::RequesterConfig;
     /// use subscan::interfaces::requester::RequesterInterface;
     /// use reqwest::header::HeaderMap;
     ///

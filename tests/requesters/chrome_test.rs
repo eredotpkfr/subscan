@@ -8,7 +8,7 @@ use subscan::{
     interfaces::requester::RequesterInterface,
     requesters::chrome::ChromeBrowser,
     types::{
-        config::RequesterConfig,
+        config::requester::RequesterConfig,
         env::{Credentials, Env},
     },
 };

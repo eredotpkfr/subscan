@@ -6,8 +6,9 @@ use crate::{
 use chrono::{DateTime, TimeDelta, Utc};
 use serde::Serialize;
 
+pub type ScanResultStatistics = SubscanModulePoolStatistics;
 /// Stores single [`SubscanModule`](crate::types::core::SubscanModule) statistics
-#[derive(Clone, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct SubscanModuleStatistics {
     /// Module name
     pub module: String,
@@ -37,4 +38,47 @@ impl From<SubscanModuleResult> for SubscanModuleStatistics {
             elapsed: result.elapsed(),
         }
     }
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct ResolverStatistics {
+    /// Date and time the IP resolver started as [`DateTime`]
+    #[serde(serialize_with = "dt_to_string_method")]
+    pub started_at: DateTime<Utc>,
+    /// Date and time the IP resolver finished as [`DateTime`]
+    #[serde(serialize_with = "dt_to_string_method")]
+    pub finished_at: DateTime<Utc>,
+    /// Elapsed time during the IP resolve step
+    #[serde(serialize_with = "td_num_seconds_method")]
+    pub elapsed: TimeDelta,
+}
+
+impl Default for ResolverStatistics {
+    fn default() -> Self {
+        Self {
+            started_at: Utc::now(),
+            finished_at: Utc::now(),
+            elapsed: TimeDelta::zero(),
+        }
+    }
+}
+
+impl ResolverStatistics {
+    pub fn started(&mut self) -> DateTime<Utc> {
+        self.started_at = Utc::now();
+        self.started_at
+    }
+
+    pub fn finished(&mut self) -> DateTime<Utc> {
+        self.finished_at = Utc::now();
+        self.elapsed = self.finished_at - self.started_at;
+        self.finished_at
+    }
+}
+
+/// Stores [`SubscanModulePool`](crate::pools::module::SubscanModulePool) statistics
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct SubscanModulePoolStatistics {
+    pub module: Vec<SubscanModuleStatistics>,
+    pub resolve: ResolverStatistics,
 }
