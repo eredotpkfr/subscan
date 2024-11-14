@@ -20,3 +20,5 @@ pub const DEFAULT_USER_AGENT: &str = "\
 ";
 /// Asterisk character to indicate all modules
 pub const ASTERISK: &str = "*";
+/// Time logging format
+pub const LOG_TIME_FORMAT: &str = "%H:%M:%S %Z";

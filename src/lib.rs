@@ -20,6 +20,8 @@ pub mod pools;
 /// HTTP requesters listed under this module
 /// like [`requesters::chrome`], [`requesters::client`], etc.
 pub mod requesters;
+/// IP address resolver component
+pub mod resolver;
 /// Project core type definitions
 pub mod types;
 /// Utilities for the handle different stuff things
@@ -30,15 +32,18 @@ use crate::{
     interfaces::module::SubscanModuleInterface, pools::module::SubscanModulePool,
     types::config::subscan::SubscanConfig, types::core::SubscanModule,
 };
+use constants::LOG_TIME_FORMAT;
 use tokio::sync::OnceCell;
 use types::result::scan::ScanResult;
 
 static INIT: OnceCell<()> = OnceCell::const_new();
 
-/// Main `Subscan` object definition
+/// Main [`Subscan`] object definition
 #[derive(Default)]
 pub struct Subscan {
+    /// Subscan configurations
     pub config: SubscanConfig,
+    /// Cache manager instance to manage modules cache
     pub manager: CacheManager,
 }
 
@@ -88,8 +93,9 @@ impl Subscan {
 
         let mut result: ScanResult = domain.into();
 
-        let time = result.metadata.started_at.format("%H:%M:%S %Z");
-        let pool = SubscanModulePool::new(domain.to_string(), self.config.resolver.clone());
+        let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
+        let resolver = self.config.resolver.clone().into();
+        let pool = SubscanModulePool::new(domain.to_string(), resolver);
 
         log::info!("Started scan on {} ({})", domain, time);
 
@@ -116,8 +122,9 @@ impl Subscan {
 
         let mut result: ScanResult = domain.into();
 
-        let time = result.metadata.started_at.format("%H:%M:%S %Z");
-        let pool = SubscanModulePool::new(domain.to_string(), self.config.resolver.clone());
+        let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
+        let resolver = self.config.resolver.clone().into();
+        let pool = SubscanModulePool::new(domain.to_string(), resolver);
         let module = self.module(name).await;
 
         log::info!(

@@ -1,7 +1,6 @@
 use super::core::Subdomain;
-use crate::enums::content::Content;
+use crate::{enums::content::Content, resolver::Resolver};
 use futures::Future;
-use hickory_resolver::TokioAsyncResolver;
 use reqwest::Url;
 use serde_json::Value;
 use std::{collections::BTreeSet, net::IpAddr, pin::Pin};
@@ -17,9 +16,7 @@ pub type GetQueryUrlFunc = Box<dyn Fn(&str) -> String + Sync + Send>;
 pub type GetNextUrlFunc = Box<dyn Fn(Url, Content) -> Option<Url> + Sync + Send>;
 /// IP address resolver function type
 pub type AsyncIPResolveFunc = Box<
-    dyn Fn(&TokioAsyncResolver, String) -> Pin<Box<dyn Future<Output = Option<IpAddr>> + Send>>
-        + Send
-        + Sync,
+    dyn Fn(&Resolver, String) -> Pin<Box<dyn Future<Output = Option<IpAddr>> + Send>> + Send + Sync,
 >;
 
 /// Container for generic integration module functions

@@ -40,7 +40,7 @@ async fn submit_test() {
     }
 
     let google = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), rconfig);
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), rconfig.into());
 
     assert!(pool.clone().is_empty().await);
 
@@ -86,7 +86,7 @@ async fn results_test() {
     }
 
     let google = SubscanModule::from(google_dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), rconfig);
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), rconfig.into());
 
     pool.clone().submit(google).await;
     pool.clone().start(1).await;

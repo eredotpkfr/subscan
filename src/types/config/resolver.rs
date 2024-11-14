@@ -1,7 +1,4 @@
-use hickory_resolver::{
-    config::{ResolverConfig as HickoryResolverConfig, ResolverOpts},
-    TokioAsyncResolver,
-};
+use hickory_resolver::config::{ResolverConfig as HickoryResolverConfig, ResolverOpts};
 use std::time::Duration;
 
 use crate::{
@@ -9,6 +6,7 @@ use crate::{
         brute::BruteCommandArgs, module::run::ModuleRunSubCommandArgs, scan::ScanCommandArgs,
     },
     constants::DEFAULT_RESOLVER_CONCURRENCY,
+    resolver::Resolver,
     types::func::AsyncIPResolveFunc,
 };
 
@@ -25,14 +23,14 @@ pub struct ResolverConfig {
 }
 
 impl ResolverConfig {
-    pub fn func(&self) -> AsyncIPResolveFunc {
+    pub async fn lookup_ip_future(&self) -> AsyncIPResolveFunc {
         if self.disabled {
-            Box::new(|_: &TokioAsyncResolver, _: String| Box::pin(async move { None }))
+            Box::new(|_: &Resolver, _: String| Box::pin(async move { None }))
         } else {
-            Box::new(|resolver: &TokioAsyncResolver, domain: String| {
+            Box::new(|resolver: &Resolver, domain: String| {
                 let resolver = resolver.clone();
 
-                Box::pin(async move { resolver.lookup_ip(domain).await.ok()?.iter().next() })
+                Box::pin(async move { resolver.inner.lookup_ip(domain).await.ok()?.iter().next() })
             })
         }
     }
