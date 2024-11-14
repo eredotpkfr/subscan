@@ -16,7 +16,7 @@ pub struct ScanResultItem {
 impl ScanResultItem {
     pub fn as_txt(&self) -> String {
         format!(
-            "{} {}",
+            "{}\t{}",
             self.subdomain,
             self.ip.map_or("".to_string(), |ip| ip.to_string())
         )

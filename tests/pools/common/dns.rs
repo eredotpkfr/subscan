@@ -1,3 +1,4 @@
+use super::{constants::LOCAL_HOST, utils::get_random_port};
 use hickory_client::{
     op::{Header, MessageType, OpCode, ResponseCode},
     proto::rr::LowerName,
@@ -24,16 +25,7 @@ use std::{
 use subscan::types::config::resolver::ResolverConfig;
 use tokio::net::TcpListener;
 
-pub const LOCAL_HOST: &str = "127.0.0.1";
-
-pub fn get_random_port() -> u16 {
-    std::net::TcpListener::bind(format!("{LOCAL_HOST}:0"))
-        .unwrap()
-        .local_addr()
-        .unwrap()
-        .port()
-}
-
+#[derive(Clone)]
 pub struct MockDNSServer {
     pub handler: MockDNSHandler,
     pub socket: SocketAddr,

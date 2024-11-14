@@ -1,6 +1,6 @@
 use prettytable::{format::consts::FORMAT_NO_LINESEP_WITH_TITLE, row, table, Table};
 
-/// Creates table for module representation
+/// Creates table for [`SubscanModule`](crate::types::core::SubscanModule)
 ///
 /// # Examples
 ///
@@ -25,7 +25,7 @@ pub async fn create_module_table() -> Table {
     table
 }
 
-/// Creates table for module representation
+/// Creates table for [`ScanResultItem`](crate::types::result::item::ScanResultItem)
 ///
 /// # Examples
 ///

@@ -1,6 +1,27 @@
-use crate::common::utils::current_thread_hex;
+use std::sync::Arc;
+
+use crate::common::{constants::TEST_DOMAIN, utils::current_thread_hex};
 use reqwest::Url;
 use subscan::enums::dispatchers::SubscanModuleDispatcher;
+use tokio::sync::Notify;
+
+use super::dns::MockDNSServer;
+
+pub async fn spawn_mock_dns_server() -> MockDNSServer {
+    let notify_one = Arc::new(Notify::new());
+    let notift_two = notify_one.clone();
+
+    let server = MockDNSServer::new(TEST_DOMAIN);
+    let cloned = server.clone();
+
+    tokio::spawn(async move {
+        notift_two.notify_one();
+        cloned.start().await;
+    });
+
+    notify_one.notified().await;
+    server
+}
 
 pub fn wrap_url_with_mock_func(url: &str) -> Box<dyn Fn(&str) -> String + Sync + Send> {
     let url: Url = url.parse().unwrap();

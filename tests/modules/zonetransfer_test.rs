@@ -1,6 +1,6 @@
 use crate::common::{
     constants::{LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mock::dns::MockDNSServer,
+    mock::{dns::MockDNSServer, funcs::spawn_mock_dns_server},
 };
 use hickory_resolver::config::{NameServerConfig, Protocol};
 use std::{net::SocketAddr, str::FromStr, sync::Arc};
@@ -13,22 +13,11 @@ use tokio::sync::Notify;
 
 #[tokio::test]
 async fn get_async_client_test() {
-    let notify_one = Arc::new(Notify::new());
-    let notift_two = notify_one.clone();
-
+    let server = spawn_mock_dns_server().await;
     let zonetransfer = ZoneTransfer::dispatcher();
-    let server = MockDNSServer::new(TEST_DOMAIN);
-    let addr = server.socket;
-
-    tokio::spawn(async move {
-        notift_two.notify_one();
-        server.start().await;
-    });
-
-    notify_one.notified().await;
 
     if let SubscanModuleDispatcher::ZoneTransfer(zonetransfer) = zonetransfer {
-        assert!(zonetransfer.get_async_client(addr).await.is_some());
+        assert!(zonetransfer.get_async_client(server.socket).await.is_some());
     }
 }
 
@@ -44,45 +33,25 @@ async fn get_async_client_fail_test() {
 
 #[tokio::test]
 async fn get_ns_as_ip_test() {
-    let notify_one = Arc::new(Notify::new());
-    let notift_two = notify_one.clone();
-
+    let server = spawn_mock_dns_server().await;
     let zonetransfer = ZoneTransfer::dispatcher();
-    let server = MockDNSServer::new(TEST_DOMAIN);
-    let addr = server.socket;
-
-    tokio::spawn(async move {
-        notift_two.notify_one();
-        server.start().await;
-    });
-
-    notify_one.notified().await;
 
     if let SubscanModuleDispatcher::ZoneTransfer(zonetransfer) = zonetransfer {
-        let ips = zonetransfer.get_ns_as_ip(addr, TEST_DOMAIN).await;
+        let ips = zonetransfer.get_ns_as_ip(server.socket, TEST_DOMAIN).await;
 
-        assert_eq!(ips.unwrap(), [addr]);
+        assert_eq!(ips.unwrap(), [server.socket]);
     }
 }
 
 #[tokio::test]
 async fn attempt_zone_transfer_test() {
-    let notify_one = Arc::new(Notify::new());
-    let notift_two = notify_one.clone();
-
+    let server = spawn_mock_dns_server().await;
     let zonetransfer = ZoneTransfer::dispatcher();
-    let server = MockDNSServer::new(TEST_DOMAIN);
-    let addr = server.socket;
-
-    tokio::spawn(async move {
-        notift_two.notify_one();
-        server.start().await;
-    });
-
-    notify_one.notified().await;
 
     if let SubscanModuleDispatcher::ZoneTransfer(zonetransfer) = zonetransfer {
-        let subs = zonetransfer.attempt_zone_transfer(addr, TEST_DOMAIN).await;
+        let subs = zonetransfer
+            .attempt_zone_transfer(server.socket, TEST_DOMAIN)
+            .await;
 
         assert_eq!(subs, [TEST_BAR_SUBDOMAIN]);
     }
@@ -103,22 +72,11 @@ async fn run_failed_test() {
 
 #[tokio::test]
 async fn run_test() {
-    let notify_one = Arc::new(Notify::new());
-    let notift_two = notify_one.clone();
-
+    let server = spawn_mock_dns_server().await;
     let mut zonetransfer = ZoneTransfer::dispatcher();
-    let server = MockDNSServer::new(TEST_DOMAIN);
-    let addr = server.socket;
-
-    tokio::spawn(async move {
-        notift_two.notify_one();
-        server.start().await;
-    });
-
-    notify_one.notified().await;
 
     if let SubscanModuleDispatcher::ZoneTransfer(ref mut zonetransfer) = zonetransfer {
-        zonetransfer.ns = Some(NameServerConfig::new(addr, Protocol::Tcp));
+        zonetransfer.ns = Some(NameServerConfig::new(server.socket, Protocol::Tcp));
     }
 
     let result = zonetransfer.run(TEST_DOMAIN).await;

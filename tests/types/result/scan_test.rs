@@ -33,7 +33,7 @@ async fn save_txt_test() {
     let name = result.save(&OutputFormat::TXT).await;
     let content = fix_new_lines(&read_to_string(name.clone()).unwrap());
 
-    assert_eq!(content, "bar.foo.com \nbaz.foo.com 127.0.0.1\n");
+    assert_eq!(content, "bar.foo.com\t\nbaz.foo.com\t127.0.0.1\n");
 
     remove_file(name).unwrap();
 }

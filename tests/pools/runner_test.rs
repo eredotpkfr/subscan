@@ -12,27 +12,17 @@ use subscan::{
 };
 use tokio::sync::Notify;
 
-use crate::common::{MockDNSServer, LOCAL_HOST};
-
-const TEST_DOMAIN: &str = "foo.com";
-const TEST_BAR_SUBDOMAIN: &str = "bar.foo.com";
+use crate::common::{
+    constants::{LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
+    dns::MockDNSServer,
+    utils::spawn_mock_dns_server,
+};
 
 #[tokio::test]
 #[stubr::mock("module/engines/google.json")]
 async fn submit_test() {
-    let notify_one = Arc::new(Notify::new());
-    let notift_two = notify_one.clone();
-
-    let server = MockDNSServer::new(TEST_DOMAIN);
+    let server = spawn_mock_dns_server().await;
     let rconfig = server.get_resolver_config().await;
-
-    tokio::spawn(async move {
-        notift_two.notify_one();
-        server.start().await;
-    });
-
-    notify_one.notified().await;
-
     let mut dispatcher = Google::dispatcher();
 
     if let SubscanModuleDispatcher::GenericSearchEngineModule(ref mut module) = dispatcher {
@@ -66,19 +56,8 @@ async fn submit_test() {
 #[tokio::test]
 #[stubr::mock("module/engines/google.json")]
 async fn results_test() {
-    let notify_one = Arc::new(Notify::new());
-    let notift_two = notify_one.clone();
-
-    let server = MockDNSServer::new(TEST_DOMAIN);
+    let server = spawn_mock_dns_server().await;
     let rconfig = server.get_resolver_config().await;
-
-    tokio::spawn(async move {
-        notift_two.notify_one();
-        server.start().await;
-    });
-
-    notify_one.notified().await;
-
     let mut google_dispatcher = Google::dispatcher();
 
     if let SubscanModuleDispatcher::GenericSearchEngineModule(ref mut module) = google_dispatcher {

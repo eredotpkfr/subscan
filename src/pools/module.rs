@@ -77,7 +77,7 @@ impl SubscanModulePool {
     }
 
     /// [`SubscanModule`] resolver method, simply resolves given subdomain's IP address
-    async fn resolver(self: Arc<Self>) {
+    pub async fn resolver(self: Arc<Self>) {
         let lookup_ip = self.resolver.lookup_ip_future().await;
 
         while let Ok(sub) = self.channels.subs.rx.try_recv() {
@@ -91,7 +91,7 @@ impl SubscanModulePool {
     }
 
     /// [`SubscanModule`] runner method, simply calls `.run(` method
-    async fn runner(self: Arc<Self>) {
+    pub async fn runner(self: Arc<Self>) {
         while let Ok(module) = self.channels.module.rx.try_recv() {
             let subresult = module.lock().await.run(&self.domain).await;
             let mut result = self.result.lock().await;

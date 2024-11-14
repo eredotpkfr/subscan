@@ -20,6 +20,7 @@ use std::{
 };
 use tokio::net::TcpListener;
 
+#[derive(Clone)]
 pub struct MockDNSServer {
     pub handler: MockDNSHandler,
     pub socket: SocketAddr,
