@@ -88,7 +88,6 @@ async fn save_json_test() {
 
     assert_eq!(json["metadata"]["target"], "foo.com");
     assert_eq!(json["total"], 2);
-
     assert_eq!(json["results"].as_array().unwrap().clone(), expected);
 
     remove_file(name).unwrap();
