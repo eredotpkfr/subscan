@@ -1,4 +1,3 @@
-use flume::{Receiver, Sender};
 use tokio::{sync::Mutex, task::JoinSet};
 
 use crate::{
@@ -6,7 +5,7 @@ use crate::{
     interfaces::module::SubscanModuleInterface,
     resolver::Resolver,
     types::{
-        core::{Subdomain, SubscanModule, UnboundedFlumeChannel},
+        core::{Subdomain, SubscanModule, UnboundedFlumeChannel, UnboundedFlumeChannelTuple},
         result::{item::SubscanModulePoolResultItem, pool::SubscanModulePoolResult},
     },
     utilities,
@@ -15,24 +14,12 @@ use std::sync::Arc;
 
 /// Container for to store async channels in a single struct
 struct SubscanModulePoolChannels {
-    module: SubscanModuleChannel,
-    subs: SubdomainChannel,
+    module: UnboundedFlumeChannel<SubscanModule>,
+    subs: UnboundedFlumeChannel<Subdomain>,
 }
 
-/// Container for result channel, stores receiver and sender instances
-struct SubdomainChannel {
-    tx: Sender<Subdomain>,
-    rx: Receiver<Subdomain>,
-}
-
-/// Container for module channel, stores receiver and sender instances
-struct SubscanModuleChannel {
-    tx: Sender<SubscanModule>,
-    rx: Receiver<SubscanModule>,
-}
-
-impl From<UnboundedFlumeChannel<SubscanModule>> for SubscanModuleChannel {
-    fn from(channel: UnboundedFlumeChannel<SubscanModule>) -> Self {
+impl From<UnboundedFlumeChannelTuple<SubscanModule>> for UnboundedFlumeChannel<SubscanModule> {
+    fn from(channel: UnboundedFlumeChannelTuple<SubscanModule>) -> Self {
         Self {
             tx: channel.0,
             rx: channel.1,
@@ -40,8 +27,8 @@ impl From<UnboundedFlumeChannel<SubscanModule>> for SubscanModuleChannel {
     }
 }
 
-impl From<UnboundedFlumeChannel<Subdomain>> for SubdomainChannel {
-    fn from(channel: UnboundedFlumeChannel<Subdomain>) -> Self {
+impl From<UnboundedFlumeChannelTuple<Subdomain>> for UnboundedFlumeChannel<Subdomain> {
+    fn from(channel: UnboundedFlumeChannelTuple<Subdomain>) -> Self {
         Self {
             tx: channel.0,
             rx: channel.1,
