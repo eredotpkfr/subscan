@@ -132,17 +132,16 @@ impl From<BruteCommandArgs> for SubscanConfig {
     ///
     /// let wordlist = PathBuf::from_str("wordlist.txt");
     /// let args = BruteCommandArgs {
-    ///     module_concurrency: 10,
+    ///     resolver_concurrency: 100,
     ///     wordlist: wordlist.unwrap(),
     ///     ..Default::default()
     /// };
     /// let config = SubscanConfig::from(args.clone());
     ///
-    /// assert_eq!(config.concurrency, args.module_concurrency);
+    /// assert_eq!(config.resolver.concurrency, args.resolver_concurrency);
     /// ```
     fn from(args: BruteCommandArgs) -> Self {
         Self {
-            concurrency: args.module_concurrency,
             wordlist: Some(args.clone().wordlist),
             resolver: args.into(),
             ..Default::default()
@@ -173,13 +172,13 @@ impl From<Cli> for SubscanConfig {
     ///     "subscan",
     ///     "brute",
     ///     "-d", "foo.com",
-    ///     "-c", "10",
+    ///     "--resolver-concurrency", "100",
     ///     "--wordlist", "wordlist.txt"
     /// ];
     /// let cli = Cli::try_parse_from(args).unwrap();
     ///
     /// let config = SubscanConfig::from(cli);
-    /// assert_eq!(config.concurrency, 10);
+    /// assert_eq!(config.resolver.concurrency, 100);
     ///
     /// // Module list command
     /// let args = vec!["subscan", "module", "list"];

@@ -21,10 +21,10 @@ pub struct ModuleRunSubCommandArgs {
     /// HTTP proxy
     #[arg(short, long, default_value = None)]
     pub proxy: Option<String>,
-    /// IP resolver concurrency level, thread counts of resolver instances
+    /// IP resolver timeout value as a seconds
     #[arg(long, default_value_t = DEFAULT_RESOLVER_TIMEOUT.as_secs())]
     pub resolver_timeout: u64,
-    /// Thread count of IP resolver instances
+    /// IP resolver concurrency level, thread counts of resolver instances
     #[arg(long, default_value_t = DEFAULT_RESOLVER_CONCURRENCY)]
     pub resolver_concurrency: u64,
     /// Disable IP address resolve step

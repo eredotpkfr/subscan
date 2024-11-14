@@ -1,26 +1,10 @@
-use hickory_resolver::{
-    config::{ResolverConfig as HickoryResolverConfig, ResolverOpts},
-    TokioAsyncResolver,
-};
-
 use crate::types::{config::resolver::ResolverConfig, func::AsyncIPResolveFunc};
+use hickory_resolver::TokioAsyncResolver;
 
 #[derive(Clone)]
 pub struct Resolver {
     pub config: ResolverConfig,
     pub inner: TokioAsyncResolver,
-}
-
-impl Default for Resolver {
-    fn default() -> Self {
-        Self {
-            config: ResolverConfig::default(),
-            inner: TokioAsyncResolver::tokio(
-                HickoryResolverConfig::default(),
-                ResolverOpts::default(),
-            ),
-        }
-    }
 }
 
 impl From<ResolverConfig> for Resolver {

@@ -27,6 +27,24 @@ impl ResolverConfig {
     /// Returns future object that resolves IP address of any domain, if the
     /// [`disabled`](crate::types::config::resolver::ResolverConfig::disabled)
     /// option sets to [`true`] returns a future object that returns [`None`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::config::resolver::ResolverConfig;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut config = ResolverConfig::default();
+    ///
+    ///     config.disabled = true;
+    ///
+    ///     let lookup_ip = config.lookup_ip_future().await;
+    ///     let resolver = config.into();
+    ///
+    ///     assert!(lookup_ip(&resolver, "foo.com".into()).await.is_none());
+    /// }
+    /// ```
     pub async fn lookup_ip_future(&self) -> AsyncIPResolveFunc {
         if self.disabled {
             Box::new(|_: &Resolver, _: String| Box::pin(async move { None }))
@@ -110,7 +128,7 @@ impl From<BruteCommandArgs> for ResolverConfig {
             config: HickoryResolverConfig::default(),
             opts: options,
             concurrency: args.resolver_concurrency,
-            disabled: args.resolver_disabled,
+            disabled: false,
         }
     }
 }

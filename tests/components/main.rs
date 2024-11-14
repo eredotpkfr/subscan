@@ -5,3 +5,5 @@ mod modules;
 mod pools;
 mod requesters;
 mod types;
+
+automod::dir!("tests/components");

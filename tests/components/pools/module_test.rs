@@ -19,7 +19,7 @@ use crate::common::{
 #[stubr::mock("module/engines/google.json")]
 async fn submit_test() {
     let server = spawn_mock_dns_server().await;
-    let rconfig = server.get_resolver_config().await;
+    let resolver = server.get_resolver().await;
     let mut dispatcher = Google::dispatcher();
 
     if let SubscanModuleDispatcher::GenericSearchEngineModule(ref mut module) = dispatcher {
@@ -27,7 +27,7 @@ async fn submit_test() {
     }
 
     let google = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), rconfig.into());
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), resolver);
     let item = ScanResultItem {
         subdomain: TEST_BAR_SUBDOMAIN.into(),
         ip: Some(IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap())),
@@ -51,7 +51,7 @@ async fn submit_test() {
 #[stubr::mock("module/engines/google.json")]
 async fn result_test() {
     let server = spawn_mock_dns_server().await;
-    let rconfig = server.get_resolver_config().await;
+    let resolver = server.get_resolver().await;
     let mut google_dispatcher = Google::dispatcher();
 
     if let SubscanModuleDispatcher::GenericSearchEngineModule(ref mut module) = google_dispatcher {
@@ -59,7 +59,7 @@ async fn result_test() {
     }
 
     let google = SubscanModule::from(google_dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), rconfig.into());
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), resolver);
 
     pool.clone().submit(google).await;
     pool.clone().start(1).await;

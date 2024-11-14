@@ -23,7 +23,7 @@ use std::{
     str::FromStr,
     time::Duration,
 };
-use subscan::types::config::resolver::ResolverConfig;
+use subscan::{resolver::Resolver, types::config::resolver::ResolverConfig};
 use tokio::net::TcpListener;
 
 #[derive(Clone)]
@@ -47,6 +47,10 @@ impl MockDNSServer {
             handler: MockDNSHandler::new(zone.into()),
             socket: socket.unwrap(),
         }
+    }
+
+    pub async fn get_resolver(&self) -> Resolver {
+        self.get_resolver_config().await.into()
     }
 
     pub async fn get_resolver_config(&self) -> ResolverConfig {
