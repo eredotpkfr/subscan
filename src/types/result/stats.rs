@@ -6,7 +6,9 @@ use crate::{
 use chrono::{DateTime, TimeDelta, Utc};
 use serde::Serialize;
 
+/// Alias for [`SubscanModulePoolStatistics`]
 pub type ScanResultStatistics = SubscanModulePoolStatistics;
+
 /// Stores single [`SubscanModule`](crate::types::core::SubscanModule) statistics
 #[derive(Clone, Debug, Serialize)]
 pub struct SubscanModuleStatistics {
@@ -40,6 +42,8 @@ impl From<SubscanModuleResult> for SubscanModuleStatistics {
     }
 }
 
+/// Stores IP address resolver component statistics like a start time, end time
+/// or elapsed time during the resolving process
 #[derive(Clone, Debug, Serialize)]
 pub struct ResolverStatistics {
     /// Date and time the IP resolver started as [`DateTime`]
@@ -64,11 +68,14 @@ impl Default for ResolverStatistics {
 }
 
 impl ResolverStatistics {
+    /// Set [`started_at`](crate::types::result::stats::ResolverStatistics::started_at) to [`Utc::now`]
     pub fn started(&mut self) -> DateTime<Utc> {
         self.started_at = Utc::now();
         self.started_at
     }
 
+    /// Set [`finished_at`](crate::types::result::stats::ResolverStatistics::finished_at) to [`Utc::now`]
+    /// and calculate [`elapsed`](crate::types::result::stats::ResolverStatistics::elapsed) value
     pub fn finished(&mut self) -> DateTime<Utc> {
         self.finished_at = Utc::now();
         self.elapsed = self.finished_at - self.started_at;
@@ -79,6 +86,8 @@ impl ResolverStatistics {
 /// Stores [`SubscanModulePool`](crate::pools::module::SubscanModulePool) statistics
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct SubscanModulePoolStatistics {
+    /// Module statistics list
     pub module: Vec<SubscanModuleStatistics>,
+    /// Resolver statistics
     pub resolve: ResolverStatistics,
 }

@@ -10,11 +10,12 @@ use crate::{
     types::func::AsyncIPResolveFunc,
 };
 
+/// IP address resolver component configurations
 #[derive(Clone, Debug)]
 pub struct ResolverConfig {
-    /// [`hickory_resolver::config::ResolverConfig`] instance
+    /// Inner [`ResolverConfig`](hickory_resolver::config::ResolverConfig) instance
     pub config: HickoryResolverConfig,
-    /// [`ResolverOpts`] instance
+    /// Inner [`ResolverOpts`] instance
     pub opts: ResolverOpts,
     /// Thread counts of resolver instances
     pub concurrency: u64,
@@ -23,6 +24,9 @@ pub struct ResolverConfig {
 }
 
 impl ResolverConfig {
+    /// Returns future object that resolves IP address of any domain, if the
+    /// [`disabled`](crate::types::config::resolver::ResolverConfig::disabled)
+    /// option sets to [`true`] returns a future object that returns [`None`]
     pub async fn lookup_ip_future(&self) -> AsyncIPResolveFunc {
         if self.disabled {
             Box::new(|_: &Resolver, _: String| Box::pin(async move { None }))
@@ -48,6 +52,23 @@ impl Default for ResolverConfig {
 }
 
 impl From<ModuleRunSubCommandArgs> for ResolverConfig {
+    /// Create [`ResolverConfig`] object from [`ModuleRunSubCommandArgs`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::cli::commands::module::run::ModuleRunSubCommandArgs;
+    /// use subscan::types::config::resolver::ResolverConfig;
+    ///
+    /// let args = ModuleRunSubCommandArgs {
+    ///     resolver_concurrency: 100,
+    ///     ..Default::default()
+    /// };
+    ///
+    /// let config: ResolverConfig = args.clone().into();
+    ///
+    /// assert_eq!(config.concurrency, args.resolver_concurrency);
+    /// ```
     fn from(args: ModuleRunSubCommandArgs) -> Self {
         let mut options = ResolverOpts::default();
 
@@ -63,6 +84,23 @@ impl From<ModuleRunSubCommandArgs> for ResolverConfig {
 }
 
 impl From<BruteCommandArgs> for ResolverConfig {
+    /// Create [`ResolverConfig`] object from [`BruteCommandArgs`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::cli::commands::brute::BruteCommandArgs;
+    /// use subscan::types::config::resolver::ResolverConfig;
+    ///
+    /// let args = BruteCommandArgs {
+    ///     resolver_concurrency: 100,
+    ///     ..Default::default()
+    /// };
+    ///
+    /// let config: ResolverConfig = args.clone().into();
+    ///
+    /// assert_eq!(config.concurrency, args.resolver_concurrency);
+    /// ```
     fn from(args: BruteCommandArgs) -> Self {
         let mut options = ResolverOpts::default();
 
@@ -78,6 +116,23 @@ impl From<BruteCommandArgs> for ResolverConfig {
 }
 
 impl From<ScanCommandArgs> for ResolverConfig {
+    /// Create [`ResolverConfig`] object from [`ScanCommandArgs`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::cli::commands::scan::ScanCommandArgs;
+    /// use subscan::types::config::resolver::ResolverConfig;
+    ///
+    /// let args = ScanCommandArgs {
+    ///     resolver_concurrency: 100,
+    ///     ..Default::default()
+    /// };
+    ///
+    /// let config: ResolverConfig = args.clone().into();
+    ///
+    /// assert_eq!(config.concurrency, args.resolver_concurrency);
+    /// ```
     fn from(args: ScanCommandArgs) -> Self {
         let mut options = ResolverOpts::default();
 

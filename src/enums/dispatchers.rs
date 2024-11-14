@@ -79,7 +79,9 @@ impl SubscanModuleDispatcher {
         )
     }
 
-    /// Converts module object to module table row representation
+    /// Returns as a [`Row`] instance. It can be used with table that returns
+    /// from [`create_module_table`](crate::utilities::cli::create_module_table)
+    /// function
     ///
     /// # Examples
     ///

@@ -1,6 +1,9 @@
+/// This filter allows to filter modules by their names
 #[derive(Clone, Debug, PartialEq)]
 pub struct ModuleNameFilter {
+    /// Valid [`SubscanModule`](crate::types::core::SubscanModule) names list
     pub valids: Vec<String>,
+    /// Invalid [`SubscanModule`](crate::types::core::SubscanModule) names list
     pub invalids: Vec<String>,
 }
 

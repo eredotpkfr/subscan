@@ -46,6 +46,22 @@ pub struct ScanCommandArgs {
 }
 
 impl ScanCommandArgs {
+    /// Returns [`CacheFilter`] according to [`modules`](crate::cli::commands::scan::ScanCommandArgs::modules)
+    /// and [`skips`](crate::cli::commands::scan::ScanCommandArgs::skips) values
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::cli::commands::scan::ScanCommandArgs;
+    /// use subscan::enums::cache::CacheFilter;
+    ///
+    /// let args = ScanCommandArgs {
+    ///     modules: String::from("*"),
+    ///     ..Default::default()
+    /// };
+    ///
+    /// assert_eq!(args.filter(), CacheFilter::NoFilter);
+    /// ```
     pub fn filter(&self) -> CacheFilter {
         let filter_empty = |module: &str| {
             if !module.trim().is_empty() {
