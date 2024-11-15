@@ -1,5 +1,5 @@
 use crate::{
-    enums::module::SubscanModuleStatus,
+    enums::module::{SkipReason::SkippedByUser, SubscanModuleStatus},
     types::result::module::SubscanModuleResult,
     utilities::serializers::{dt_to_string_method, td_num_seconds_method},
 };
@@ -27,6 +27,19 @@ pub struct SubscanModuleStatistics {
     /// Elapsed time during the scan
     #[serde(serialize_with = "td_num_seconds_method")]
     pub elapsed: TimeDelta,
+}
+
+impl SubscanModuleStatistics {
+    pub fn skipped(module: &str) -> Self {
+        Self {
+            module: module.into(),
+            status: SkippedByUser.into(),
+            count: 0,
+            started_at: Utc::now(),
+            finished_at: Utc::now(),
+            elapsed: TimeDelta::zero(),
+        }
+    }
 }
 
 impl From<SubscanModuleResult> for SubscanModuleStatistics {
@@ -90,4 +103,26 @@ pub struct SubscanModulePoolStatistics {
     pub module: Vec<SubscanModuleStatistics>,
     /// Resolver statistics
     pub resolve: ResolverStatistics,
+}
+
+impl SubscanModulePoolStatistics {
+    /// Add single skipped module statistic
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::result::stats::SubscanModulePoolStatistics;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut stats = SubscanModulePoolStatistics::default();
+    ///
+    ///     assert_eq!(stats.module.len(), 0);
+    ///     stats.add_skipped("foo").await;
+    ///     assert_eq!(stats.module.len(), 1);
+    /// }
+    /// ```
+    pub async fn add_skipped(&mut self, module: &str) {
+        self.module.push(SubscanModuleStatistics::skipped(module));
+    }
 }

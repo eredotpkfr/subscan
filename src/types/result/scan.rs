@@ -1,6 +1,6 @@
 use super::{pool::SubscanModulePoolResult, stats::ScanResultStatistics};
 use crate::{
-    enums::{module::SubscanModuleStatus, output::OutputFormat},
+    enums::output::OutputFormat,
     types::result::{item::ScanResultItem, metadata::ScanResultMetadata},
     utilities::cli,
 };
@@ -149,38 +149,6 @@ impl ScanResult {
         self
     }
 
-    /// Group modules by their statuses
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::types::result::scan::ScanResult;
-    /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let mut result: ScanResult = "foo.com".into();
-    ///
-    ///     result.add_status("one", &SubscanModuleStatus::Started).await;
-    ///     result.add_status("two", &SkipReason::NotAuthenticated.into()).await;
-    ///     result.add_status("three", &SubscanModuleStatus::Finished).await;
-    ///     result.add_status("four", &SubscanModuleStatus::Failed("bar".into())).await;
-    ///
-    ///     assert_eq!(result.metadata.started.len(), 1);
-    ///     assert_eq!(result.metadata.skipped.len(), 1);
-    ///     assert_eq!(result.metadata.finished.len(), 1);
-    ///     assert_eq!(result.metadata.failed.len(), 1);
-    /// }
-    /// ```
-    pub async fn add_status(&mut self, module: &str, status: &SubscanModuleStatus) -> bool {
-        match status {
-            SubscanModuleStatus::Started => self.metadata.started.insert(module.to_string()),
-            SubscanModuleStatus::Skipped(_) => self.metadata.skipped.insert(module.to_string()),
-            SubscanModuleStatus::Finished => self.metadata.finished.insert(module.to_string()),
-            SubscanModuleStatus::Failed(_) => self.metadata.failed.insert(module.to_string()),
-        }
-    }
-
     /// Update scan results with any module result, that merges all subdomains and
     /// statistics into [`ScanResult`]
     ///
@@ -212,18 +180,12 @@ impl ScanResult {
     ///     scan_result.update_with_pool_result(pool_result).await;
     ///
     ///     assert_eq!(scan_result.statistics.module.len(), 0);
-    ///     assert_eq!(scan_result.metadata.started.len(), 0);
     ///     assert_eq!(scan_result.results.len(), 1);
     ///     assert_eq!(scan_result.total, 1);
     /// }
     /// ```
     pub async fn update_with_pool_result(&mut self, result: SubscanModulePoolResult) {
         self.statistics = result.statistics;
-
-        for subresult in self.statistics.module.clone() {
-            self.add_status(&subresult.module, &subresult.status).await;
-        }
-
         self.results = result.results;
         self.total = self.results.len();
     }

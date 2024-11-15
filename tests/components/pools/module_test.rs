@@ -4,7 +4,7 @@ use std::{
 };
 
 use subscan::{
-    enums::dispatchers::SubscanModuleDispatcher,
+    enums::{cache::CacheFilter, dispatchers::SubscanModuleDispatcher},
     modules::engines::google::Google,
     pools::module::SubscanModulePool,
     types::{core::SubscanModule, result::item::ScanResultItem},
@@ -27,7 +27,7 @@ async fn submit_test() {
     }
 
     let google = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), resolver);
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), resolver, CacheFilter::default());
     let item = ScanResultItem {
         subdomain: TEST_BAR_SUBDOMAIN.into(),
         ip: Some(IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap())),
@@ -59,7 +59,7 @@ async fn result_test() {
     }
 
     let google = SubscanModule::from(google_dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), resolver);
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), resolver, CacheFilter::default());
 
     pool.clone().submit(google).await;
     pool.clone().start(1).await;
