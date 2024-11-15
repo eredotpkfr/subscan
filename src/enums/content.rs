@@ -3,11 +3,8 @@ use serde_json::Value;
 /// Content enumeration that stores all content types in a single storage
 #[derive(Clone, Default)]
 pub enum Content {
-    /// Stores [`String`] typed content
     String(String),
-    /// Stores [`Value`] typed content
     JSON(Value),
-    /// Empty content type
     #[default]
     Empty,
 }

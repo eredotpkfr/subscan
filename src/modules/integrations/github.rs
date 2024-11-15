@@ -3,7 +3,7 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
         module::{
-            SkipReason::NotAuthenticated,
+            SkipReason::AuthenticationNotProvided,
             SubscanModuleStatus::{Failed, Finished},
         },
     },
@@ -134,6 +134,6 @@ impl SubscanModuleInterface for GitHub {
             return result.with_status(Failed("not get raw URLs".into())).await;
         }
 
-        result.with_status(NotAuthenticated.into()).await
+        result.with_status(AuthenticationNotProvided.into()).await
     }
 }

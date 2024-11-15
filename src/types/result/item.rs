@@ -10,9 +10,7 @@ pub type SubscanModulePoolResultItem = ScanResultItem;
 /// its IP address
 #[derive(Clone, Default, Debug, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct ScanResultItem {
-    /// Discovered subdomain address
     pub subdomain: Subdomain,
-    /// IP address of subdomain
     pub ip: Option<IpAddr>,
 }
 

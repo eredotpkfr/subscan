@@ -9,9 +9,7 @@ use reqwest::Url;
 /// Chrome requester struct, send HTTP requests via Chrome browser.
 /// Also its compatible with [`RequesterInterface`]
 pub struct ChromeBrowser {
-    /// Chrome browser request configurations as a [`RequesterConfig`]
     pub config: RequesterConfig,
-    /// [`ChromeBrowser`] instance
     pub browser: Browser,
 }
 

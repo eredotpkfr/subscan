@@ -12,7 +12,7 @@ use subscan::{
     enums::{
         content::Content,
         dispatchers::SubscanModuleDispatcher,
-        module::{SkipReason::NotAuthenticated, SubscanModuleStatus::Failed},
+        module::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Failed},
     },
     interfaces::module::SubscanModuleInterface,
     modules::integrations::github::GitHub,
@@ -81,7 +81,7 @@ async fn run_not_authenticated_test() {
 
     let results = github.run(TEST_DOMAIN).await;
 
-    assert_eq!(results.status, NotAuthenticated.into());
+    assert_eq!(results.status, AuthenticationNotProvided.into());
     assert_eq!(results.subdomains, [].into());
 }
 

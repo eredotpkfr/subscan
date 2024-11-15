@@ -8,15 +8,10 @@ use std::collections::BTreeSet;
 /// `Subscan` module result, it stores findings and module execution status
 #[derive(Clone, Debug, Default, PartialEq, PartialOrd, Eq, Ord)]
 pub struct SubscanModuleResult {
-    /// Module name
     pub module: String,
-    /// Discovered subdomain list
     pub subdomains: BTreeSet<Subdomain>,
-    /// Last state of module, see the [`SubscanModuleStatus`] for variants
     pub status: SubscanModuleStatus,
-    /// Date and time the module started as [`DateTime`]
     pub started_at: DateTime<Utc>,
-    /// Date and time the module finished as [`DateTime`]
     pub finished_at: DateTime<Utc>,
 }
 

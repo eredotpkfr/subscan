@@ -1,7 +1,7 @@
 use crate::{
     enums::{
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        module::{SkipReason::NotAuthenticated, SubscanModuleStatus::Finished},
+        module::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Finished},
     },
     extractors::json::JSONExtractor,
     interfaces::{
@@ -138,6 +138,6 @@ impl SubscanModuleInterface for Netlas {
             }
         }
 
-        result.with_status(NotAuthenticated.into()).await
+        result.with_status(AuthenticationNotProvided.into()).await
     }
 }

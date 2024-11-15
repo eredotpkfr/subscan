@@ -6,6 +6,7 @@ use super::{item::SubscanModulePoolResultItem, stats::SubscanModulePoolStatistic
 #[derive(Clone, Debug, Default)]
 pub struct SubscanModulePoolResult {
     /// Pool statistics, includes each module statistics
+    /// and IP resolver statistics
     pub statistics: SubscanModulePoolStatistics,
     /// Subdomains that have been discovered
     pub results: BTreeSet<SubscanModulePoolResultItem>,

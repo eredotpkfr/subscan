@@ -17,19 +17,12 @@ use std::path::PathBuf;
 /// `Subscan` configurations as a struct type
 #[derive(Clone, Debug)]
 pub struct SubscanConfig {
-    /// Concurrency level, count of threads
     pub concurrency: u64,
-    /// User-Agent header value for HTTP requests
     pub user_agent: String,
-    /// HTTP timeout value as a seconds
     pub timeout: u64,
-    /// HTTP proxy
     pub proxy: Option<String>,
-    /// Cache filter
     pub filter: CacheFilter,
-    /// Resolver configurations
     pub resolver: ResolverConfig,
-    /// Wordlist file
     pub wordlist: Option<PathBuf>,
 }
 

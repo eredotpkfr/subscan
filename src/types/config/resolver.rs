@@ -13,13 +13,9 @@ use crate::{
 /// IP address resolver component configurations
 #[derive(Clone, Debug)]
 pub struct ResolverConfig {
-    /// Inner [`ResolverConfig`](hickory_resolver::config::ResolverConfig) instance
     pub config: HickoryResolverConfig,
-    /// Inner [`ResolverOpts`] instance
     pub opts: ResolverOpts,
-    /// Thread counts of resolver instances
     pub concurrency: u64,
-    /// Boolean flag to indicate IP resolver feature is disabled
     pub disabled: bool,
 }
 

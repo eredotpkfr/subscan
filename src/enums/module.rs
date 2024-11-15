@@ -4,16 +4,17 @@ use std::fmt::Display;
 /// Module skip reasons
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Serialize)]
 pub enum SkipReason {
-    /// If could not authenticated, this reason can be used
-    NotAuthenticated,
-    /// Skipped by user
+    /// Indicates that if authentication requires by module but API key, HTTP credentials
+    /// or other any authentication method not provided
+    AuthenticationNotProvided,
+    /// Indicates that the module skipped by user
     SkippedByUser,
 }
 
 impl Display for SkipReason {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SkipReason::NotAuthenticated => write!(f, "not authenticated"),
+            SkipReason::AuthenticationNotProvided => write!(f, "auth not provided"),
             SkipReason::SkippedByUser => write!(f, "skipped by user"),
         }
     }
@@ -84,14 +85,14 @@ impl SubscanModuleStatus {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let skipped: SubscanModuleStatus = SkipReason::NotAuthenticated.into();
+    ///     let skipped: SubscanModuleStatus = SkipReason::AuthenticationNotProvided.into();
     ///     let skipped_by_user: SubscanModuleStatus = SkipReason::SkippedByUser.into();
     ///
     ///     let started = SubscanModuleStatus::Started;
     ///     let finished = SubscanModuleStatus::Finished;
     ///     let failed = SubscanModuleStatus::Failed("foo".into());
     ///
-    ///     assert_eq!(skipped.with_reason().await, "[not authenticated SKIPPED]");
+    ///     assert_eq!(skipped.with_reason().await, "[auth not provided SKIPPED]");
     ///     assert_eq!(skipped_by_user.with_reason().await, "[skipped by user SKIPPED]");
     ///     assert_eq!(started.with_reason().await, "[STARTED]");
     ///     assert_eq!(finished.with_reason().await, "[FINISHED]");

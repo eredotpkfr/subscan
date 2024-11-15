@@ -11,16 +11,12 @@ use serde::Serialize;
 use serde_json;
 use std::{collections::BTreeSet, fs::File, io::Write};
 
-/// `Subscan` scan result
+/// `Subscan` scan result type
 #[derive(Clone, Default, Serialize)]
 pub struct ScanResult {
-    /// Scan metadata
     pub metadata: ScanResultMetadata,
-    /// Module statistics
     pub statistics: ScanResultStatistics,
-    /// Subdomains that have been discovered
     pub results: BTreeSet<ScanResultItem>,
-    /// Total count of discovered subdomains
     pub total: usize,
 }
 

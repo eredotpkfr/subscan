@@ -12,10 +12,8 @@ use clap_verbosity_flag::{InfoLevel, Verbosity};
 #[derive(Clone, Debug, Parser)]
 #[command(version, about = banner(), long_about = banner())]
 pub struct Cli {
-    /// Container for subcommands
     #[command(subcommand)]
     pub command: Commands,
-    /// Verbosity flag
     #[command(flatten)]
     pub verbose: Verbosity<InfoLevel>,
 }

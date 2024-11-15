@@ -9,13 +9,9 @@ use std::{collections::HashMap, time::Duration};
 /// methods to manage configs
 #[derive(Debug, Clone, PartialEq)]
 pub struct RequesterConfig {
-    /// Stores header values for HTTP requests as a [`HeaderMap`]
     pub headers: HeaderMap,
-    /// HTTP request timeout value as a secs
     pub timeout: Duration,
-    /// Proxy server for HTTP requests
     pub proxy: Option<String>,
-    /// Basic HTTP authentication credentials
     pub credentials: Credentials,
 }
 

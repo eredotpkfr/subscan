@@ -1,6 +1,7 @@
 use crate::types::{config::resolver::ResolverConfig, func::AsyncIPResolveFunc};
 use hickory_resolver::TokioAsyncResolver;
 
+/// IP address resolver component
 #[derive(Clone)]
 pub struct Resolver {
     pub config: ResolverConfig,
@@ -17,6 +18,9 @@ impl From<ResolverConfig> for Resolver {
 }
 
 impl Resolver {
+    /// Returns future object that resolves IP address of any domain, if the
+    /// [`disabled`](crate::types::config::resolver::ResolverConfig::disabled)
+    /// option sets to [`true`] returns a future object that returns [`None`]
     pub async fn lookup_ip_future(&self) -> AsyncIPResolveFunc {
         self.config.lookup_ip_future().await
     }

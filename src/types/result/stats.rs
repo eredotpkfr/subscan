@@ -12,19 +12,13 @@ pub type ScanResultStatistics = SubscanModulePoolStatistics;
 /// Stores single [`SubscanModule`](crate::types::core::SubscanModule) statistics
 #[derive(Clone, Debug, Serialize)]
 pub struct SubscanModuleStatistics {
-    /// Module name
     pub module: String,
-    /// Module last state
     pub status: SubscanModuleStatus,
-    /// Count of discovered subdomains by module
     pub count: usize,
-    /// Date and time the scan started as [`DateTime`]
     #[serde(serialize_with = "dt_to_string_method")]
     pub started_at: DateTime<Utc>,
-    /// Date and time the scan finished as [`DateTime`]
     #[serde(serialize_with = "dt_to_string_method")]
     pub finished_at: DateTime<Utc>,
-    /// Elapsed time during the scan
     #[serde(serialize_with = "td_num_seconds_method")]
     pub elapsed: TimeDelta,
 }
@@ -59,13 +53,10 @@ impl From<SubscanModuleResult> for SubscanModuleStatistics {
 /// or elapsed time during the resolving process
 #[derive(Clone, Debug, Serialize)]
 pub struct ResolverStatistics {
-    /// Date and time the IP resolver started as [`DateTime`]
     #[serde(serialize_with = "dt_to_string_method")]
     pub started_at: DateTime<Utc>,
-    /// Date and time the IP resolver finished as [`DateTime`]
     #[serde(serialize_with = "dt_to_string_method")]
     pub finished_at: DateTime<Utc>,
-    /// Elapsed time during the IP resolve step
     #[serde(serialize_with = "td_num_seconds_method")]
     pub elapsed: TimeDelta,
 }
@@ -99,9 +90,7 @@ impl ResolverStatistics {
 /// Stores [`SubscanModulePool`](crate::pools::module::SubscanModulePool) statistics
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct SubscanModulePoolStatistics {
-    /// Module statistics list
     pub module: Vec<SubscanModuleStatistics>,
-    /// Resolver statistics
     pub resolve: ResolverStatistics,
 }
 

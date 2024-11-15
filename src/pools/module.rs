@@ -14,7 +14,6 @@ use crate::{
 };
 use std::sync::Arc;
 
-/// Container for to store async channels in a single struct
 struct SubscanModulePoolChannels {
     module: UnboundedFlumeChannel<SubscanModule>,
     subs: UnboundedFlumeChannel<Subdomain>,
