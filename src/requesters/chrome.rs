@@ -187,12 +187,15 @@ impl RequesterInterface for ChromeBrowser {
         }
 
         tab.navigate_to(url.to_string().as_str()).ok();
-        tab.wait_until_navigated().unwrap();
 
-        let content = tab.get_content().ok();
+        if let Ok(tab) = tab.wait_until_navigated() {
+            let content = tab.get_content().ok();
 
-        tab.close(true).unwrap();
-
-        Content::String(content.unwrap_or_default())
+            tab.close(true).unwrap();
+            Content::String(content.unwrap_or_default())
+        } else {
+            tab.close(true).unwrap();
+            Content::Empty
+        }
     }
 }

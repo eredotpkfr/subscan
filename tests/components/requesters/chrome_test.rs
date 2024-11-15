@@ -67,7 +67,7 @@ async fn chrome_get_content_timeout_test() {
     let browser = ChromeBrowser::with_config(config);
     let url = Url::parse(&stubr.path("/hello-delayed")).unwrap();
 
-    browser.get_content(url).await;
+    browser.get_content(url).await.as_json().as_str().unwrap();
 }
 
 #[tokio::test]
