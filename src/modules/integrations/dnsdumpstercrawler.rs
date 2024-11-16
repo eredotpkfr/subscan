@@ -15,48 +15,52 @@ use crate::{
 use async_trait::async_trait;
 use regex::Regex;
 use reqwest::{
-    header::{HeaderMap, HeaderName, HeaderValue},
+    header::{HeaderMap, HeaderValue, AUTHORIZATION},
     Url,
 };
 use tokio::sync::Mutex;
 
-pub const DNSDUMPSTER_MODULE_NAME: &str = "dnsdumpster";
-pub const DNSDUMPSTER_URL: &str = "https://dnsdumpster.com/";
-pub const DNSDUMPSTER_SUBDOMAIN_TAG: &str = "table > tbody > tr > td:first-child";
-pub const DNSDUMPSTER_CSRF_PATTERN: &str =
-    r#"<input type="hidden" name="csrfmiddlewaretoken" value="(?<token>.*)">"#;
+pub const DNSDUMPSTERCRAWLER_MODULE_NAME: &str = "dnsdumpstercrawler";
+pub const DNSDUMPSTERCRAWLER_URL: &str = "https://api.dnsdumpster.com/htmld/";
+pub const DNSDUMPSTERCRAWLER_BASE_URL: &str = "https://dnsdumpster.com";
+pub const DNSDUMPSTERCRAWLER_SUBDOMAIN_TAG: &str = "table > tbody > tr > td:first-child";
+pub const DNSDUMPSTERCRAWLER_AUTH_TOKEN_PATTERN: &str = r#"Authorization": "(?<token>[^"]+)"#;
 
-/// `DnsDumpster` non-generic integration module
+/// `DNSDumpsterCrawler` non-generic integration module
 ///
 /// | Property           | Value                                                           |
 /// |:------------------:|:---------------------------------------------------------------:|
-/// | Module Name        | `dnsdumpster`                                                   |
+/// | Module Name        | `dnsdumpstercrawler`                                            |
 /// | Doc URL            | <https://dnsdumpster.com>                                       |
 /// | Subdomain Selector | `table > tbody > tr > td:first-child`                           |
-/// | CSRF Token Pattern | `<input type="hidden" name="csrfmiddlewaretoken" value="(.*)">` |
+/// | Auth Token Pattern | `"Authorization": "(?<token>[^"]+)"`                            |
 /// | Requester          | [`HTTPClient`]                                                  |
 /// | Extractor          | [`HTMLExtractor`]                                               |
 /// | Generic            | [`None`]                                                        |
-pub struct DnsDumpster {
+pub struct DNSDumpsterCrawler {
     /// Module name
     pub name: String,
-    /// Base index URL
+    /// API URL
     pub url: Url,
+    /// Base index URL
+    pub base_url: Url,
     /// Core components
     pub components: SubscanModuleCoreComponents,
 }
 
-impl DnsDumpster {
+impl DNSDumpsterCrawler {
     pub fn dispatcher() -> SubscanModuleDispatcher {
-        let url = Url::parse(DNSDUMPSTER_URL);
+        let url = Url::parse(DNSDUMPSTERCRAWLER_URL);
+        let base_url = Url::parse(DNSDUMPSTERCRAWLER_BASE_URL);
 
-        let selector: String = DNSDUMPSTER_SUBDOMAIN_TAG.into();
+        let selector: String = DNSDUMPSTERCRAWLER_SUBDOMAIN_TAG.into();
         let requester: RequesterDispatcher = HTTPClient::default().into();
         let extractor: HTMLExtractor = HTMLExtractor::new(selector, vec![]);
 
         let dnsdumpster = Self {
-            name: DNSDUMPSTER_MODULE_NAME.into(),
+            name: DNSDUMPSTERCRAWLER_MODULE_NAME.into(),
             url: url.unwrap(),
+            base_url: base_url.unwrap(),
             components: SubscanModuleCoreComponents {
                 requester: requester.into(),
                 extractor: extractor.into(),
@@ -66,8 +70,8 @@ impl DnsDumpster {
         dnsdumpster.into()
     }
 
-    pub async fn get_csrf_token(&self, content: Content) -> Option<String> {
-        let pattern = Regex::new(DNSDUMPSTER_CSRF_PATTERN).unwrap();
+    pub async fn get_auth_token(&self, content: Content) -> Option<String> {
+        let pattern = Regex::new(DNSDUMPSTERCRAWLER_AUTH_TOKEN_PATTERN).unwrap();
 
         if let Some(caps) = pattern.captures(&content.as_string()) {
             return Some(caps["token"].to_string());
@@ -78,7 +82,7 @@ impl DnsDumpster {
 }
 
 #[async_trait]
-impl SubscanModuleInterface for DnsDumpster {
+impl SubscanModuleInterface for DNSDumpsterCrawler {
     async fn name(&self) -> &str {
         &self.name
     }
@@ -97,30 +101,13 @@ impl SubscanModuleInterface for DnsDumpster {
         let requester = &mut *self.requester().await.unwrap().lock().await;
         let extractor = self.extractor().await.unwrap();
 
-        let content = requester.get_content(self.url.clone()).await;
-        let token = self.get_csrf_token(content).await;
+        let content = requester.get_content(self.base_url.clone()).await;
+        let token = self.get_auth_token(content).await;
 
         if let (Some(token), RequesterDispatcher::HTTPClient(requester)) = (token, requester) {
-            let cookie = format!("csrftoken={token}; Domain=dnsdumpster.com");
-            let headers = HeaderMap::from_iter([
-                (
-                    HeaderName::from_static("referer"),
-                    HeaderValue::from_static(DNSDUMPSTER_URL),
-                ),
-                (
-                    HeaderName::from_static("x-csrf-token"),
-                    HeaderValue::from_str(&token).unwrap(),
-                ),
-                (
-                    HeaderName::from_static("cookie"),
-                    HeaderValue::from_str(&cookie).unwrap(),
-                ),
-            ]);
-            let params = &[
-                ("csrfmiddlewaretoken", token.as_str()),
-                ("targetip", domain),
-                ("user", "free"),
-            ];
+            let headers =
+                HeaderMap::from_iter([(AUTHORIZATION, HeaderValue::from_str(&token).unwrap())]);
+            let params = &[("target", domain)];
 
             requester.config.headers.extend(headers);
 

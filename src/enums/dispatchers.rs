@@ -4,8 +4,8 @@ use crate::{
     modules::{
         generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
         integrations::{
-            commoncrawl::CommonCrawl, dnsdumpster::DnsDumpster, github::GitHub, netlas::Netlas,
-            waybackarchive::WaybackArchive,
+            commoncrawl::CommonCrawl, dnsdumpstercrawler::DNSDumpsterCrawler, github::GitHub,
+            netlas::Netlas, waybackarchive::WaybackArchive,
         },
         zonetransfer::ZoneTransfer,
     },
@@ -39,8 +39,8 @@ pub enum SubscanModuleDispatcher {
     GenericSearchEngineModule(GenericSearchEngineModule),
     /// Non-generic `CommonCrawl` integration variant
     CommonCrawl(CommonCrawl),
-    /// Non-generic `DnsDumpster` integration variant
-    DnsDumpster(DnsDumpster),
+    /// Non-generic `DNSDumpsterCrawler` integration variant
+    DNSDumpsterCrawler(DNSDumpsterCrawler),
     /// Non-generic `GitHub` integration variant
     GitHub(GitHub),
     /// Non-generic `Netlas` API integration variant

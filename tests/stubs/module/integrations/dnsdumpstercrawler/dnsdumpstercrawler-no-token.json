@@ -1,7 +1,7 @@
 {
     "request": {
         "method": "GET",
-        "urlPath": "/dnsdumpster-no-token"
+        "urlPath": "/dnsdumpstercrawler-no-token"
     },
     "response": {
         "body": "foo",

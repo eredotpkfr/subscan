@@ -5,8 +5,8 @@ use crate::{
     modules::{
         generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
         integrations::{
-            commoncrawl::CommonCrawl, dnsdumpster::DnsDumpster, github::GitHub, netlas::Netlas,
-            waybackarchive::WaybackArchive,
+            commoncrawl::CommonCrawl, dnsdumpstercrawler::DNSDumpsterCrawler, github::GitHub,
+            netlas::Netlas, waybackarchive::WaybackArchive,
         },
         zonetransfer::ZoneTransfer,
     },

@@ -38,7 +38,10 @@ pub fn wrap_module_url(dispatcher: &mut SubscanModuleDispatcher, url: &str) {
             module.funcs.url = wrap_url_with_mock_func(url)
         }
         SubscanModuleDispatcher::CommonCrawl(module) => module.url = url.parse().unwrap(),
-        SubscanModuleDispatcher::DnsDumpster(module) => module.url = url.parse().unwrap(),
+        SubscanModuleDispatcher::DNSDumpsterCrawler(module) => {
+            module.url = url.parse().unwrap();
+            module.base_url = url.parse().unwrap();
+        }
         SubscanModuleDispatcher::GitHub(module) => module.url = url.parse().unwrap(),
         SubscanModuleDispatcher::Netlas(module) => module.url = url.parse().unwrap(),
         SubscanModuleDispatcher::WaybackArchive(module) => module.url = url.parse().unwrap(),

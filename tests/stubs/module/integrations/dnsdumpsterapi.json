@@ -1,0 +1,24 @@
+{
+    "request": {
+        "headers": {
+            "X-API-Key": {
+                "equalTo": "dnsdumpsterapi-api-key"
+            }
+        },
+        "method": "GET",
+        "urlPath": "/dnsdumpsterapi"
+    },
+    "response": {
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {
+            "a": [
+                {
+                    "host": "bar.foo.com"
+                }
+            ]
+        },
+        "status": 200
+    }
+}

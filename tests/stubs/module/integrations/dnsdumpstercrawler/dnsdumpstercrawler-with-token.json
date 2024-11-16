@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "ANY",
+        "urlPath": "/dnsdumpstercrawler-with-token"
+    },
+    "response": {
+        "body": "\"Authorization\": \"foo\" <table><tbody><tr><td>bar.foo.com</td></tr></tbody></table>",
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}
