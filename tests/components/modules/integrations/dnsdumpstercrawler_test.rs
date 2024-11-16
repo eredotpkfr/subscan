@@ -23,14 +23,14 @@ async fn get_auth_token_test() {
 #[tokio::test]
 #[stubr::mock("module/integrations/dnsdumpstercrawler")]
 async fn run_test_no_token() {
-    let mut dnsdumpster = DNSDumpsterCrawler::dispatcher();
+    let mut dnsdumpstercrawler = DNSDumpsterCrawler::dispatcher();
 
     funcs::wrap_module_url(
-        &mut dnsdumpster,
+        &mut dnsdumpstercrawler,
         &stubr.path("/dnsdumpstercrawler-no-token"),
     );
 
-    let result = dnsdumpster.run(TEST_DOMAIN).await;
+    let result = dnsdumpstercrawler.run(TEST_DOMAIN).await;
 
     assert_eq!(result.subdomains, [].into());
     assert_eq!(result.status, Failed("not get token".into()));
@@ -39,14 +39,14 @@ async fn run_test_no_token() {
 #[tokio::test]
 #[stubr::mock("module/integrations/dnsdumpstercrawler")]
 async fn run_test_with_token() {
-    let mut dnsdumpster = DNSDumpsterCrawler::dispatcher();
+    let mut dnsdumpstercrawler = DNSDumpsterCrawler::dispatcher();
 
     funcs::wrap_module_url(
-        &mut dnsdumpster,
+        &mut dnsdumpstercrawler,
         &stubr.path("/dnsdumpstercrawler-with-token"),
     );
 
-    let results = dnsdumpster.run(TEST_DOMAIN).await;
+    let results = dnsdumpstercrawler.run(TEST_DOMAIN).await;
 
     assert_eq!(results.subdomains, [TEST_BAR_SUBDOMAIN.to_string()].into());
 }
