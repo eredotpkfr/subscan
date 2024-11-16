@@ -23,8 +23,10 @@ pub mod commoncrawl;
 pub mod crtsh;
 /// `Digitorus` HTML crawler integration
 pub mod digitorus;
-/// `DnsDumpster` non-generic integration
-pub mod dnsdumpster;
+/// `DNSDumpster` API integration, API key required
+pub mod dnsdumpsterapi;
+/// `DNSDumpster` non-generic integration
+pub mod dnsdumpstercrawler;
 /// `DnsRepo` html crawler integration
 pub mod dnsrepo;
 /// `GitHub` non-generic integration
