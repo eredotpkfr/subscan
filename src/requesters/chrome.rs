@@ -1,6 +1,6 @@
 use crate::{
     enums::content::Content, interfaces::requester::RequesterInterface,
-    types::config::RequesterConfig,
+    types::config::requester::RequesterConfig,
 };
 use async_trait::async_trait;
 use headless_chrome::{browser::LaunchOptions, Browser};
@@ -9,9 +9,7 @@ use reqwest::Url;
 /// Chrome requester struct, send HTTP requests via Chrome browser.
 /// Also its compatible with [`RequesterInterface`]
 pub struct ChromeBrowser {
-    /// Chrome browser request configurations as a [`RequesterConfig`]
     pub config: RequesterConfig,
-    /// [`ChromeBrowser`] instance
     pub browser: Browser,
 }
 
@@ -38,7 +36,7 @@ impl ChromeBrowser {
     /// use std::time::Duration;
     /// use reqwest::header::HeaderMap;
     /// use subscan::requesters::chrome::ChromeBrowser;
-    /// use subscan::types::config::RequesterConfig;
+    /// use subscan::types::config::requester::RequesterConfig;
     ///
     /// #[tokio::main]
     /// async fn main() {
@@ -122,7 +120,7 @@ impl RequesterInterface for ChromeBrowser {
     /// ```no_run
     /// use std::time::Duration;
     /// use subscan::requesters::chrome::ChromeBrowser;
-    /// use subscan::types::config::RequesterConfig;
+    /// use subscan::types::config::requester::RequesterConfig;
     /// use subscan::interfaces::requester::RequesterInterface;
     /// use reqwest::header::HeaderMap;
     ///
@@ -187,12 +185,15 @@ impl RequesterInterface for ChromeBrowser {
         }
 
         tab.navigate_to(url.to_string().as_str()).ok();
-        tab.wait_until_navigated().unwrap();
 
-        let content = tab.get_content().ok();
+        if let Ok(tab) = tab.wait_until_navigated() {
+            let content = tab.get_content().ok();
 
-        tab.close(true).unwrap();
-
-        Content::String(content.unwrap_or_default())
+            tab.close(true).unwrap();
+            Content::String(content.unwrap_or_default())
+        } else {
+            tab.close(true).unwrap();
+            Content::Empty
+        }
     }
 }

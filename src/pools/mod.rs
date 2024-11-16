@@ -1,2 +1,2 @@
-/// [`SubscanModuleRunnerPool`](crate::pools::runner::SubscanModuleRunnerPool) utilities
-pub mod runner;
+/// [`SubscanModulePool`](crate::pools::module::SubscanModulePool) utilities
+pub mod module;

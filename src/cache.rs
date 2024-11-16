@@ -10,13 +10,17 @@ use crate::{
         },
         zonetransfer,
     },
-    types::{config::RequesterConfig, core::SubscanModule},
+    types::{config::requester::RequesterConfig, core::SubscanModule},
 };
 use lazy_static::lazy_static;
 
+/// Manage cache module
+#[derive(Default)]
+pub struct CacheManager {}
+
 lazy_static! {
-    /// All `Subscan` modules are stores in this in-memory [`Vec`] as a [`SubscanModuleDispatcher`]
-    pub static ref MODULE_CACHE: Vec<SubscanModule> = vec![
+    /// All `Subscan` modules are stores in-memory [`Vec`] as a [`SubscanModule`](crate::types::core::SubscanModule)
+    static ref MODULE_CACHE: Vec<SubscanModule> = vec![
         // Search engines
         SubscanModule::from(bing::Bing::dispatcher()),
         SubscanModule::from(duckduckgo::DuckDuckGo::dispatcher()),
@@ -55,10 +59,6 @@ lazy_static! {
         SubscanModule::from(zonetransfer::ZoneTransfer::dispatcher())
     ];
 }
-
-/// Manage cache module
-#[derive(Default)]
-pub struct CacheManager {}
 
 impl CacheManager {
     /// Get module by name
@@ -115,7 +115,7 @@ impl CacheManager {
     /// ```no_run
     /// use std::time::Duration;
     /// use subscan::cache::CacheManager;
-    /// use subscan::types::config::RequesterConfig;
+    /// use subscan::types::config::requester::RequesterConfig;
     ///
     /// #[tokio::main]
     /// async fn main() {

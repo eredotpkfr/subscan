@@ -20,25 +20,30 @@ pub mod pools;
 /// HTTP requesters listed under this module
 /// like [`requesters::chrome`], [`requesters::client`], etc.
 pub mod requesters;
+/// IP address resolver component
+pub mod resolver;
 /// Project core type definitions
 pub mod types;
 /// Utilities for the handle different stuff things
 pub mod utilities;
 
 use crate::{
-    cache::CacheManager, cli::Cli, enums::module::SkipReason::SkippedByUser,
-    interfaces::module::SubscanModuleInterface, pools::runner::SubscanModuleRunnerPool,
-    types::config::SubscanConfig, types::core::SubscanModule,
+    cache::CacheManager, cli::Cli, interfaces::module::SubscanModuleInterface,
+    pools::module::SubscanModulePool, types::config::subscan::SubscanConfig,
+    types::core::SubscanModule,
 };
+use constants::LOG_TIME_FORMAT;
 use tokio::sync::OnceCell;
 use types::result::scan::ScanResult;
 
 static INIT: OnceCell<()> = OnceCell::const_new();
 
-/// Main `Subscan` object definition
+/// Main [`Subscan`] object definition
 #[derive(Default)]
 pub struct Subscan {
+    /// Subscan configurations
     pub config: SubscanConfig,
+    /// Cache manager instance to manage modules cache
     pub manager: CacheManager,
 }
 
@@ -88,30 +93,18 @@ impl Subscan {
 
         let mut result: ScanResult = domain.into();
 
-        let started = result.metadata.started_at.format("%H:%M:%S %Z");
-        let pool = SubscanModuleRunnerPool::new(domain.to_string());
+        let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
+        let pool = SubscanModulePool::from(domain, self.config.clone());
 
-        log::info!("Started scan on {} ({})", domain, started);
+        log::info!("Started scan on {} ({})", domain, time);
 
         for module in self.modules().await {
-            let binding = module.lock().await;
-            let name = binding.name().await;
-
-            if !self.config.filter.is_filtered(name).await {
-                pool.clone().submit(module.clone()).await;
-            } else {
-                result.add_status(name, &SkippedByUser.into()).await;
-                utilities::log::status(name, SkippedByUser.into()).await;
-            }
+            pool.clone().submit(module.clone()).await;
         }
 
-        pool.clone().spawn_runners(self.config.concurrency).await;
-        pool.clone().join().await;
+        pool.clone().start(self.config.concurrency).await;
 
-        for subresult in pool.results().await {
-            result.update_with_module_result(subresult).await;
-        }
-
+        result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await
     }
 
@@ -120,24 +113,21 @@ impl Subscan {
 
         let mut result: ScanResult = domain.into();
 
-        let started = result.metadata.started_at.format("%H:%M:%S %Z");
-        let pool = SubscanModuleRunnerPool::new(domain.to_string());
+        let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
+        let pool = SubscanModulePool::from(domain, self.config.clone());
         let module = self.module(name).await;
 
         log::info!(
             "Running {} module on {} ({})",
             module.lock().await.name().await,
             domain,
-            started
+            time
         );
 
         pool.clone().submit(module.clone()).await;
-        pool.clone().spawn_runners(1).await;
-        pool.clone().join().await;
+        pool.clone().start(1).await;
 
-        let subresult = pool.results().await.pop_first().unwrap();
-
-        result.update_with_module_result(subresult).await;
+        result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await
     }
 }

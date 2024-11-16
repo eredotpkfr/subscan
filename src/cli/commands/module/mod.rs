@@ -24,7 +24,6 @@ pub enum ModuleSubCommands {
 /// Module subcommand container
 #[derive(Args, Clone, Debug)]
 pub struct ModuleCommandArgs {
-    /// Container for subcommands
     #[command(subcommand)]
     pub command: ModuleSubCommands,
 }

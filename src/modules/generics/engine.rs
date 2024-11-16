@@ -44,13 +44,9 @@ use tokio::sync::Mutex;
 /// | 2      | `site:foo.com -www -api`      | `app`        | <https://foo.com?q=site:foo.com%20-www%20-api>        |
 /// | 3      | `site:foo.com -www -api -app` |              | <https://foo.com?q=site:foo.com%20-www%20-api%20-app> |
 pub struct GenericSearchEngineModule {
-    /// Module name
     pub name: String,
-    /// Target search URL to be visited while enumerate subdomains
     pub url: Url,
-    /// Search engine search query parameter
     pub param: SearchQueryParam,
-    /// Core components
     pub components: SubscanModuleCoreComponents,
 }
 

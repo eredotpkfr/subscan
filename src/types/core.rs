@@ -16,8 +16,14 @@ impl From<SubscanModuleDispatcher> for SubscanModule {
     }
 }
 
-/// Flume unbounded channel tuple
-pub type UnboundedFlumeChannel = (Sender<SubscanModule>, Receiver<SubscanModule>);
+/// Flume unbounded channel return tuple
+pub type UnboundedFlumeChannelTuple<T> = (Sender<T>, Receiver<T>);
+
+/// Flume unbounded channel with generic typed
+pub struct UnboundedFlumeChannel<T> {
+    pub tx: Sender<T>,
+    pub rx: Receiver<T>,
+}
 
 /// Container for core components of `Subscan` modules
 pub struct SubscanModuleCoreComponents {

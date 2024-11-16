@@ -15,7 +15,7 @@ use clap::Subcommand;
 pub enum Commands {
     /// Start scan on any domain address
     Scan(ScanCommandArgs),
-    /// Start brute force attack with given wordlist
+    /// Start brute force attack with a given wordlist
     Brute(BruteCommandArgs),
     /// Subcommand to manage implemented modules
     Module(ModuleCommandArgs),

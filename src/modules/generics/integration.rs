@@ -2,7 +2,7 @@ use crate::{
     enums::{
         auth::AuthenticationMethod,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
-        module::{SkipReason::NotAuthenticated, SubscanModuleStatus::Finished},
+        module::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Finished},
     },
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -31,13 +31,9 @@ use tokio::sync::Mutex;
 /// [`JSONExtractor`](crate::extractors::json::JSONExtractor) extractor is used with this
 /// module to parse JSON contents
 pub struct GenericIntegrationModule {
-    /// Module name
     pub name: String,
-    /// Set authentication method, see [`AuthenticationMethod`] enum for details
     pub auth: AuthenticationMethod,
-    /// Core functions
     pub funcs: GenericIntegrationCoreFuncs,
-    /// Core components
     pub components: SubscanModuleCoreComponents,
 }
 
@@ -120,7 +116,7 @@ impl SubscanModuleInterface for GenericIntegrationModule {
         let mut url: Url = (self.funcs.url)(domain).parse().unwrap();
 
         if self.auth.is_set() && !self.authenticate(&mut url).await {
-            return result.with_status(NotAuthenticated.into()).await;
+            return result.with_status(AuthenticationNotProvided.into()).await;
         }
 
         let requester = self.components.requester.lock().await;

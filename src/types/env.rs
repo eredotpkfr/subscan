@@ -42,9 +42,7 @@ impl From<&str> for Env {
 /// Store basic HTTP authentication credentials as a environment
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Credentials {
-    /// Username as a [`Env`]
     pub username: Env,
-    /// Password as a [`Env`]
     pub password: Env,
 }
 

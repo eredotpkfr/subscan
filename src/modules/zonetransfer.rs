@@ -36,9 +36,7 @@ pub const ZONETRANSFER_MODULE_NAME: &str = "zonetransfer";
 /// | Extractor          | [`None`]       |
 /// | Generic            | [`None`]       |
 pub struct ZoneTransfer {
-    /// Module name
     pub name: String,
-    /// Default name server
     pub ns: Option<NameServerConfig>,
 }
 

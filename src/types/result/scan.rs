@@ -1,28 +1,22 @@
-use super::module::SubscanModuleResult;
+use super::{pool::SubscanModulePoolResult, stats::ScanResultStatistics};
 use crate::{
-    enums::{module::SubscanModuleStatus, output::OutputFormat},
-    types::{
-        core::Subdomain,
-        result::{metadata::ScanResultMetadata, stats::SubscanModuleStatistics},
-    },
+    enums::output::OutputFormat,
+    types::result::{item::ScanResultItem, metadata::ScanResultMetadata},
+    utilities::cli,
 };
 use chrono::Utc;
-use csv::Writer;
-use prettytable::{format::consts::FORMAT_NO_LINESEP_WITH_TITLE, row, table};
+use colored::Colorize;
+use csv::WriterBuilder;
 use serde::Serialize;
 use serde_json;
 use std::{collections::BTreeSet, fs::File, io::Write};
 
-/// `Subscan` scan result
+/// `Subscan` scan result type
 #[derive(Clone, Default, Serialize)]
 pub struct ScanResult {
-    /// Scan metadata
     pub metadata: ScanResultMetadata,
-    /// Module statistics
-    pub statistics: Vec<SubscanModuleStatistics>,
-    /// Subscans that have been discovered
-    pub results: BTreeSet<Subdomain>,
-    /// Total count of discovered subdomains
+    pub statistics: ScanResultStatistics,
+    pub results: BTreeSet<ScanResultItem>,
     pub total: usize,
 }
 
@@ -55,18 +49,16 @@ impl ScanResult {
     }
 
     async fn save_txt<W: Write>(&self, mut writer: W) {
-        for subdomain in &self.results {
-            writeln!(writer, "{}", subdomain).unwrap();
+        for item in &self.results {
+            writeln!(writer, "{}", item.as_txt()).unwrap();
         }
     }
 
     async fn save_csv<W: Write>(&self, writer: W) {
-        let mut writer = Writer::from_writer(writer);
+        let mut writer = WriterBuilder::new().has_headers(true).from_writer(writer);
 
-        writer.serialize("subdomains").unwrap();
-
-        for subdomain in &self.results {
-            writer.serialize(subdomain).unwrap()
+        for item in &self.results {
+            writer.serialize(item).unwrap()
         }
     }
 
@@ -77,21 +69,18 @@ impl ScanResult {
     }
 
     async fn save_html<W: Write>(&self, mut writer: W) {
-        let mut table = table!();
+        let mut table = cli::create_scan_result_item_table().await;
 
-        table.set_titles(row!["subdomain"]);
-        table.set_format(*FORMAT_NO_LINESEP_WITH_TITLE);
-
-        for subdomain in &self.results {
-            table.add_row(row![subdomain]);
+        for item in &self.results {
+            table.add_row(item.as_table_row());
         }
 
         table.print_html(&mut writer).unwrap()
     }
 
     pub async fn log(&self) {
-        for subdomain in &self.results {
-            log::info!("{}", subdomain);
+        for item in &self.results {
+            log::info!("{}", item.as_txt().white());
         }
 
         log::info!("Total: {}", self.results.len());
@@ -107,8 +96,8 @@ impl From<&str> for ScanResult {
     }
 }
 
-impl Extend<Subdomain> for ScanResult {
-    fn extend<T: IntoIterator<Item = Subdomain>>(&mut self, iter: T) {
+impl Extend<ScanResultItem> for ScanResult {
+    fn extend<T: IntoIterator<Item = ScanResultItem>>(&mut self, iter: T) {
         self.results.extend(iter);
     }
 }
@@ -119,14 +108,28 @@ impl ScanResult {
     /// # Examples
     ///
     /// ```
-    /// use subscan::types::result::scan::ScanResult;
     /// use std::collections::BTreeSet;
+    /// use subscan::types::result::{
+    ///     scan::ScanResult,
+    ///     stats::SubscanModulePoolStatistics,
+    ///     pool::SubscanModulePoolResult,
+    /// };
+    /// use subscan::types::result::item::SubscanModulePoolResultItem;
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut result: ScanResult = "foo.com".into();
+    ///     let pool_result = SubscanModulePoolResult {
+    ///         statistics: SubscanModulePoolStatistics::default(),
+    ///         results: BTreeSet::from_iter([
+    ///             SubscanModulePoolResultItem {
+    ///                 subdomain: "bar.foo.com".to_string(),
+    ///                 ip: None,
+    ///             }
+    ///         ])
+    ///     };
     ///
-    ///     result.extend(BTreeSet::from_iter(["bar.foo.com".into()]));
+    ///     result.update_with_pool_result(pool_result).await;
     ///
     ///     let finished = result.clone().with_finished().await;
     ///
@@ -142,87 +145,44 @@ impl ScanResult {
         self
     }
 
-    /// Group modules by their statuses
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::types::result::scan::ScanResult;
-    /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let mut result: ScanResult = "foo.com".into();
-    ///
-    ///     result.add_status("one", &SubscanModuleStatus::Started).await;
-    ///     result.add_status("two", &SkipReason::NotAuthenticated.into()).await;
-    ///     result.add_status("three", &SubscanModuleStatus::Finished).await;
-    ///     result.add_status("four", &SubscanModuleStatus::Failed("bar".into())).await;
-    ///
-    ///     assert_eq!(result.metadata.started.len(), 1);
-    ///     assert_eq!(result.metadata.skipped.len(), 1);
-    ///     assert_eq!(result.metadata.finished.len(), 1);
-    ///     assert_eq!(result.metadata.failed.len(), 1);
-    /// }
-    /// ```
-    pub async fn add_status(&mut self, module: &str, status: &SubscanModuleStatus) -> bool {
-        match status {
-            SubscanModuleStatus::Started => self.metadata.started.insert(module.to_string()),
-            SubscanModuleStatus::Skipped(_) => self.metadata.skipped.insert(module.to_string()),
-            SubscanModuleStatus::Finished => self.metadata.finished.insert(module.to_string()),
-            SubscanModuleStatus::Failed(_) => self.metadata.failed.insert(module.to_string()),
-        }
-    }
-
-    /// Add module statistics on [`ScanResult`]
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::types::result::scan::ScanResult;
-    /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
-    /// use subscan::types::result::module::SubscanModuleResult;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let mut scan_result: ScanResult = "foo.com".into();
-    ///     let module_result: SubscanModuleResult = "foo".into();
-    ///
-    ///     scan_result.add_statistic(module_result.into()).await;
-    ///
-    ///     assert_eq!(scan_result.statistics.len(), 1);
-    /// }
-    /// ```
-    pub async fn add_statistic(&mut self, stats: SubscanModuleStatistics) {
-        self.statistics.push(stats);
-    }
-
     /// Update scan results with any module result, that merges all subdomains and
     /// statistics into [`ScanResult`]
     ///
     /// # Examples
     ///
     /// ```
+    /// use std::collections::BTreeSet;
     /// use subscan::types::result::scan::ScanResult;
     /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
-    /// use subscan::types::result::module::SubscanModuleResult;
+    /// use subscan::types::result::{
+    ///     pool::SubscanModulePoolResult,
+    ///     item::SubscanModulePoolResultItem,
+    ///     stats::SubscanModulePoolStatistics
+    /// };
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut scan_result: ScanResult = "foo.com".into();
-    ///     let module_result: SubscanModuleResult = "foo".into();
+    ///     let pool_result = SubscanModulePoolResult {
+    ///         statistics: SubscanModulePoolStatistics::default(),
+    ///         results: BTreeSet::from_iter([
+    ///             SubscanModulePoolResultItem {
+    ///                 subdomain: "bar.foo.com".to_string(),
+    ///                 ip: None,
+    ///             }
+    ///         ])
+    ///     };
     ///
-    ///     scan_result.update_with_module_result(module_result).await;
+    ///     scan_result.update_with_pool_result(pool_result).await;
     ///
-    ///     assert_eq!(scan_result.statistics.len(), 1);
-    ///     assert_eq!(scan_result.metadata.started.len(), 1);
-    ///     assert_eq!(scan_result.results.len(), 0);
-    ///     assert_eq!(scan_result.total, 0);
+    ///     assert_eq!(scan_result.statistics.module.len(), 0);
+    ///     assert_eq!(scan_result.results.len(), 1);
+    ///     assert_eq!(scan_result.total, 1);
     /// }
     /// ```
-    pub async fn update_with_module_result(&mut self, result: SubscanModuleResult) {
-        self.add_status(&result.module, &result.status).await;
-        self.add_statistic(result.stats()).await;
-        self.extend(result.subdomains);
+    pub async fn update_with_pool_result(&mut self, result: SubscanModulePoolResult) {
+        self.statistics = result.statistics;
+        self.results = result.results;
+        self.total = self.results.len();
     }
 }
