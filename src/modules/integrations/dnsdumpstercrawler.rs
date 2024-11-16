@@ -129,8 +129,6 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
             }
         }
 
-        result
-            .with_status(Failed("not get auth token".into()))
-            .await
+        result.with_status(Failed("not get token".into())).await
     }
 }

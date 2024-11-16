@@ -33,7 +33,7 @@ async fn run_test_no_token() {
     let result = dnsdumpster.run(TEST_DOMAIN).await;
 
     assert_eq!(result.subdomains, [].into());
-    assert_eq!(result.status, Failed("not get auth token".into()));
+    assert_eq!(result.status, Failed("not get token".into()));
 }
 
 #[tokio::test]
