@@ -4,11 +4,12 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::{ModuleErrorKind::JSONExtractError, SubscanError},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
 };
@@ -75,23 +76,19 @@ impl BuiltWith {
         None
     }
 
-    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
         let mut subs = BTreeSet::new();
+        let filter = |item: &Value| Some(format!("{}.{}", item["SubDomain"].as_str()?, domain));
+        let results = content["Results"]
+            .as_array()
+            .ok_or(SubscanError::from(JSONExtractError))?;
 
-        if let Some(results) = content["Results"].as_array() {
-            for result in results {
-                if let Some(paths) = result["Result"]["Paths"].as_array() {
-                    let filter = |item: &Value| {
-                        let sub = item["SubDomain"].as_str()?.to_string();
-
-                        Some(format!("{}.{}", sub, domain))
-                    };
-
-                    subs.extend(paths.iter().filter_map(filter));
-                }
+        for result in results {
+            if let Some(paths) = result["Result"]["Paths"].as_array() {
+                subs.extend(paths.iter().filter_map(filter));
             }
         }
 
-        subs
+        Ok(subs)
     }
 }

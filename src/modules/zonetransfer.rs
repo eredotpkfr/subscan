@@ -1,10 +1,13 @@
 use crate::{
-    enums::{
-        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        module::SubscanModuleStatus::{Failed, Finished},
+    enums::dispatchers::{
+        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
     },
+    error::ModuleErrorKind::CustomError,
     interfaces::module::SubscanModuleInterface,
-    types::{core::Subdomain, result::module::SubscanModuleResult},
+    types::{
+        core::{Result, Subdomain},
+        result::module::SubscanModuleResult,
+    },
     utilities::{net, regex},
 };
 use async_trait::async_trait;
@@ -132,7 +135,7 @@ impl SubscanModuleInterface for ZoneTransfer {
         None
     }
 
-    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
         let mut result: SubscanModuleResult = self.name().await.into();
 
         if let Some(ns) = &self.ns {
@@ -142,9 +145,9 @@ impl SubscanModuleInterface for ZoneTransfer {
                 }
             }
 
-            result.with_status(Finished).await
+            Ok(result.with_finished().await)
         } else {
-            result.with_status(Failed("no default ns".into())).await
+            Err(CustomError("no default ns".into()).into())
         }
     }
 }

@@ -1,7 +1,9 @@
 use crate::{
-    enums::{
-        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        module::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Finished},
+    enums::dispatchers::{
+        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    },
+    error::{
+        ModuleErrorKind::JSONExtractError, SkipReason::AuthenticationNotProvided, SubscanError,
     },
     extractors::json::JSONExtractor,
     interfaces::{
@@ -10,7 +12,7 @@ use crate::{
     },
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         result::module::SubscanModuleResult,
     },
 };
@@ -63,14 +65,14 @@ impl Netlas {
         netlas.into()
     }
 
-    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: &str) -> Result<BTreeSet<Subdomain>> {
         if let Some(items) = content.as_array() {
             let filter = |item: &Value| Some(item["data"]["domain"].as_str()?.to_string());
 
-            return items.iter().filter_map(filter).collect();
+            return Ok(items.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        Err(SubscanError::from(JSONExtractError))
     }
 }
 
@@ -88,7 +90,7 @@ impl SubscanModuleInterface for Netlas {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
         let mut url = self.url.clone();
         let mut result: SubscanModuleResult = self.name().await.into();
 
@@ -106,7 +108,7 @@ impl SubscanModuleInterface for Netlas {
         url.set_path("api/domains_count/");
         url.set_query(Some(&format!("q={query}")));
 
-        let json = requester.get_content(url.clone()).await.as_json();
+        let json = requester.get_content(url.clone()).await?.as_json();
         let count = json["count"].as_i64();
 
         if let (Some(count), RequesterDispatcher::HTTPClient(requester)) = (count, requester) {
@@ -131,13 +133,13 @@ impl SubscanModuleInterface for Netlas {
 
             if let Ok(response) = requester.client.execute(request).await {
                 if let Ok(content) = response.text().await {
-                    result.extend(extractor.extract(content.into(), domain).await);
+                    result.extend(extractor.extract(content.into(), domain).await?);
 
-                    return result.with_status(Finished).await;
+                    return Ok(result.with_finished().await);
                 }
             }
         }
 
-        result.with_status(AuthenticationNotProvided.into()).await
+        Err(AuthenticationNotProvided.into())
     }
 }

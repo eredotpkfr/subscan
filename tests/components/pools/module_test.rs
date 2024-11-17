@@ -44,7 +44,7 @@ async fn submit_test() {
     pool.clone().spawn_resolvers(1).await;
     pool.clone().join().await;
 
-    assert_eq!(pool.result().await.results, [item].into());
+    assert_eq!(pool.result().await.items, [item].into());
 }
 
 #[tokio::test]
@@ -65,7 +65,7 @@ async fn result_test() {
     pool.clone().start(1).await;
 
     let binding = pool.result().await;
-    let result = binding.results.first();
+    let result = binding.items.first();
 
     assert!(result.is_some());
     assert!(result.unwrap().ip.is_some());

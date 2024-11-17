@@ -1,6 +1,8 @@
 use crate::{
-    enums::content::Content, interfaces::requester::RequesterInterface,
-    types::config::requester::RequesterConfig,
+    enums::content::Content,
+    error::{ModuleErrorKind::GetContentError, SubscanError},
+    interfaces::requester::RequesterInterface,
+    types::{config::requester::RequesterConfig, core::Result},
 };
 use async_trait::async_trait;
 use reqwest::{Client, Proxy, Url};
@@ -125,7 +127,7 @@ impl RequesterInterface for HTTPClient {
     ///     // do something with content
     /// }
     /// ```
-    async fn get_content(&self, url: Url) -> Content {
+    async fn get_content(&self, url: Url) -> Result<Content> {
         let mut builder = self.client.get(url);
 
         // Set basic configurations
@@ -142,13 +144,16 @@ impl RequesterInterface for HTTPClient {
         }
 
         let request = builder.build().expect(REQUEST_BUILD_ERR);
+        let response = self
+            .client
+            .execute(request)
+            .await
+            .map_err(|_| SubscanError::from(GetContentError))?;
 
-        if let Ok(response) = self.client.execute(request).await {
-            if let Ok(content) = response.text().await {
-                return Content::String(content);
-            }
-            return Content::Empty;
-        }
-        Content::Empty
+        Ok(response
+            .text()
+            .await
+            .map_err(|_| SubscanError::from(GetContentError))?
+            .into())
     }
 }

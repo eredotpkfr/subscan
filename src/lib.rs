@@ -6,6 +6,8 @@ pub mod cli;
 pub mod constants;
 /// Enumerations and project type definitions
 pub mod enums;
+/// Subscan error type
+pub mod error;
 /// Data extractors like
 /// [`extractors::regex`], [`extractors::html`], etc.
 pub mod extractors;

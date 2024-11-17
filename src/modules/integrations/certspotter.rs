@@ -4,11 +4,12 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::{ModuleErrorKind::JSONExtractError, SubscanError},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
     utilities::regex::generate_subdomain_regex,
@@ -73,25 +74,26 @@ impl CertSpotter {
         None
     }
 
-    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
         let mut subs = BTreeSet::new();
 
-        if let Some(results) = content.as_array() {
-            let pattern = generate_subdomain_regex(domain).unwrap();
+        let pattern = generate_subdomain_regex(domain).unwrap();
+        let matches = |item: &Value| {
+            let to_string = |matched: Match| matched.as_str().to_string();
 
-            for result in results {
-                if let Some(names) = result["dns_names"].as_array() {
-                    let matches = |item: &Value| {
-                        let to_string = |matched: Match| matched.as_str().to_string();
+            pattern.find(item.as_str()?).map(to_string)
+        };
 
-                        pattern.find(item.as_str()?).map(to_string)
-                    };
+        let results = content
+            .as_array()
+            .ok_or(SubscanError::from(JSONExtractError))?;
 
-                    subs.extend(names.iter().filter_map(matches));
-                }
+        for result in results {
+            if let Some(names) = result["dns_names"].as_array() {
+                subs.extend(names.iter().filter_map(matches));
             }
         }
 
-        subs
+        Ok(subs)
     }
 }

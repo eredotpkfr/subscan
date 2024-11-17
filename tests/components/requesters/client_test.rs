@@ -50,7 +50,7 @@ async fn client_get_content_test() {
     let client = HTTPClient::default();
     let url = Url::parse(&stubr.path("/hello")).unwrap();
 
-    let content = client.get_content(url).await.as_string();
+    let content = client.get_content(url).await.unwrap().as_string();
 
     assert_eq!(content, "hello");
 }
@@ -67,7 +67,13 @@ async fn client_get_content_timeout_test() {
     let client = HTTPClient::with_config(config);
     let url = Url::parse(&stubr.path("/hello-delayed")).unwrap();
 
-    client.get_content(url).await.as_json().as_str().unwrap();
+    client
+        .get_content(url)
+        .await
+        .unwrap()
+        .as_json()
+        .as_str()
+        .unwrap();
 }
 
 #[tokio::test]
@@ -87,7 +93,7 @@ async fn client_get_content_extra_header_test() {
     )
     .unwrap();
 
-    let content = client.get_content(url).await.as_string();
+    let content = client.get_content(url).await.unwrap().as_string();
 
     assert_eq!(content, "hello");
 }
@@ -112,7 +118,7 @@ async fn client_get_content_basic_http_auth_test() {
 
     let client = HTTPClient::with_config(config);
     let url = Url::parse(&stubr.path("/hello-with-basic-http-auth")).unwrap();
-    let content = client.get_content(url).await.as_string();
+    let content = client.get_content(url).await.unwrap().as_string();
 
     assert_eq!(content, "hello");
 }

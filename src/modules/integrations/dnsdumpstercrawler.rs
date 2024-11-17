@@ -2,15 +2,18 @@ use crate::{
     enums::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        module::SubscanModuleStatus::{Failed, Finished},
     },
+    error::ModuleErrorKind::CustomError,
     extractors::html::HTMLExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     requesters::client::HTTPClient,
-    types::{core::SubscanModuleCoreComponents, result::module::SubscanModuleResult},
+    types::{
+        core::{Result, SubscanModuleCoreComponents},
+        result::module::SubscanModuleResult,
+    },
 };
 use async_trait::async_trait;
 use regex::Regex;
@@ -95,13 +98,13 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
         let mut result: SubscanModuleResult = self.name().await.into();
 
         let requester = &mut *self.requester().await.unwrap().lock().await;
         let extractor = self.extractor().await.unwrap();
 
-        let content = requester.get_content(self.base_url.clone()).await;
+        let content = requester.get_content(self.base_url.clone()).await?;
         let token = self.get_auth_token(content).await;
 
         if let (Some(token), RequesterDispatcher::HTTPClient(requester)) = (token, requester) {
@@ -122,13 +125,13 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
 
             if let Ok(response) = requester.client.execute(request).await {
                 if let Ok(content) = response.text().await {
-                    result.extend(extractor.extract(content.into(), domain).await);
+                    result.extend(extractor.extract(content.into(), domain).await?);
 
-                    return result.with_status(Finished).await;
+                    return Ok(result.with_finished().await);
                 }
             }
         }
 
-        result.with_status(Failed("not get token".into())).await
+        Err(CustomError("not get token".into()).into())
     }
 }

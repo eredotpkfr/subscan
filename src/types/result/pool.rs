@@ -1,6 +1,9 @@
 use std::collections::BTreeSet;
 
-use super::{item::SubscanModulePoolResultItem, stats::SubscanModulePoolStatistics};
+use super::{
+    item::SubscanModulePoolResultItem,
+    stats::{SubscanModulePoolStatistics, SubscanModuleStatistics},
+};
 
 /// Stores [`SubscanModulePool`](crate::pools::module::SubscanModulePool) results
 #[derive(Clone, Debug, Default)]
@@ -9,5 +12,11 @@ pub struct SubscanModulePoolResult {
     /// and IP resolver statistics
     pub statistics: SubscanModulePoolStatistics,
     /// Subdomains that have been discovered
-    pub results: BTreeSet<SubscanModulePoolResultItem>,
+    pub items: BTreeSet<SubscanModulePoolResultItem>,
+}
+
+impl SubscanModulePoolResult {
+    pub async fn statistic(&mut self, stats: SubscanModuleStatistics) {
+        self.statistics.module(stats).await;
+    }
 }

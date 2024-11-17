@@ -4,11 +4,12 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::ModuleErrorKind::JSONExtractError,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
     utilities::regex::generate_subdomain_regex,
@@ -65,20 +66,18 @@ impl BufferOver {
         None
     }
 
-    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
-        let mut subs = BTreeSet::new();
+    pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
         let pattern = generate_subdomain_regex(domain).unwrap();
+        let filter = |item: &Value| {
+            let to_string = |matches: Match| matches.as_str().to_string();
+
+            pattern.find(item.as_str()?).map(to_string)
+        };
 
         if let Some(results) = content["Results"].as_array() {
-            let filter = |item: &Value| {
-                let to_string = |matches: Match| matches.as_str().to_string();
-
-                pattern.find(item.as_str()?).map(to_string)
-            };
-
-            subs.extend(results.iter().filter_map(filter));
+            return Ok(results.iter().filter_map(filter).collect());
         }
 
-        subs
+        Err(JSONExtractError.into())
     }
 }

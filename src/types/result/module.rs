@@ -1,5 +1,5 @@
 use crate::{
-    enums::module::SubscanModuleStatus,
+    error::{SubscanError, SubscanModuleStatus},
     types::{core::Subdomain, result::stats::SubscanModuleStatistics},
 };
 use chrono::{DateTime, TimeDelta, Utc};
@@ -9,8 +9,8 @@ use std::collections::BTreeSet;
 #[derive(Clone, Debug, Default, PartialEq, PartialOrd, Eq, Ord)]
 pub struct SubscanModuleResult {
     pub module: String,
-    pub subdomains: BTreeSet<Subdomain>,
     pub status: SubscanModuleStatus,
+    pub subdomains: BTreeSet<Subdomain>,
     pub started_at: DateTime<Utc>,
     pub finished_at: DateTime<Utc>,
 }
@@ -33,41 +33,17 @@ impl From<&str> for SubscanModuleResult {
 }
 
 impl SubscanModuleResult {
-    /// Set module status with a new status
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::types::result::module::SubscanModuleResult;
-    /// use subscan::enums::module::SubscanModuleStatus;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let mut result = SubscanModuleResult::default();
-    ///
-    ///     assert_eq!(result.status, SubscanModuleStatus::Started);
-    ///
-    ///     result.set_status(SubscanModuleStatus::Finished).await;
-    ///
-    ///     assert_eq!(result.status, SubscanModuleStatus::Finished);
-    /// }
-    /// ```
-    pub async fn set_status(&mut self, status: SubscanModuleStatus) {
-        self.status = status
-    }
-
     /// Get elapsed time during the module execution
     ///
     /// # Examples
     ///
     /// ```
     /// use subscan::types::result::module::SubscanModuleResult;
-    /// use subscan::enums::module::SubscanModuleStatus;
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let result = SubscanModuleResult::default();
-    ///     let finished = result.with_status(SubscanModuleStatus::Finished).await;
+    ///     let finished = result.with_finished().await;
     ///
     ///     assert!(finished.elapsed().subsec_nanos() > 0);
     /// }
@@ -82,40 +58,36 @@ impl SubscanModuleResult {
     ///
     /// ```
     /// use subscan::types::result::module::SubscanModuleResult;
-    /// use subscan::enums::module::SubscanModuleStatus;
+    /// use subscan::error::SubscanModuleStatus;
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let result = SubscanModuleResult::default();
-    ///     let finished = result.with_status(SubscanModuleStatus::Finished).await;
+    ///     let finished = result.with_finished().await;
     ///
-    ///     assert_eq!(finished.stats().status, SubscanModuleStatus::Finished);
+    ///     assert_eq!(
+    ///         finished.stats().await.status,
+    ///         SubscanModuleStatus::Finished
+    ///     );
     /// }
     /// ```
-    pub fn stats(&self) -> SubscanModuleStatistics {
+    pub async fn stats(&self) -> SubscanModuleStatistics {
         self.clone().into()
     }
 
-    /// Update [`SubscanModuleResult::finished_at`] field and return itself
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::types::result::module::SubscanModuleResult;
-    /// use subscan::enums::module::SubscanModuleStatus;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let result = SubscanModuleResult::default();
-    ///     let finished = result.with_status(SubscanModuleStatus::Finished).await;
-    ///
-    ///     assert_eq!(finished.status, SubscanModuleStatus::Finished);
-    ///     assert!(finished.finished_at > finished.started_at);
-    /// }
-    /// ```
-    pub async fn with_status(mut self, status: SubscanModuleStatus) -> Self {
-        self.status = status;
+    pub async fn with_finished(mut self) -> Self {
+        self.status = SubscanModuleStatus::Finished;
         self.finished_at = Utc::now();
         self
+    }
+
+    pub async fn graceful_exit(&mut self) -> impl Fn(SubscanError) -> SubscanError + '_ {
+        |err| {
+            if !self.subdomains.is_empty() {
+                SubscanError::ModuleErrorWithResult(self.clone())
+            } else {
+                err
+            }
+        }
     }
 }

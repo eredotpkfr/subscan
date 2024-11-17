@@ -9,11 +9,8 @@ use crate::common::{
 use reqwest::Url;
 use serde_json::{json, Value};
 use subscan::{
-    enums::{
-        content::Content,
-        dispatchers::SubscanModuleDispatcher,
-        module::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Failed},
-    },
+    enums::{content::Content, dispatchers::SubscanModuleDispatcher},
+    error::{ModuleErrorKind::CustomError, SkipReason::AuthenticationNotProvided, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::github::GitHub,
 };
@@ -63,7 +60,7 @@ async fn run_test() {
     env::set_var(&env_name, "github-api-key");
     funcs::wrap_module_url(&mut github, &stubr.path("/github-code-search"));
 
-    let results = github.run(TEST_DOMAIN).await;
+    let results = github.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(results.subdomains, [TEST_BAR_SUBDOMAIN.to_string()].into());
 
@@ -81,8 +78,8 @@ async fn run_not_authenticated_test() {
 
     let results = github.run(TEST_DOMAIN).await;
 
-    assert_eq!(results.status, AuthenticationNotProvided.into());
-    assert_eq!(results.subdomains, [].into());
+    assert!(results.is_err());
+    assert_eq!(results.err().unwrap(), AuthenticationNotProvided.into());
 }
 
 #[tokio::test]
@@ -100,8 +97,11 @@ async fn run_failed_test() {
 
     let results = github.run(TEST_DOMAIN).await;
 
-    assert_eq!(results.status, Failed("not get raw URLs".into()));
-    assert_eq!(results.subdomains, [].into());
+    assert!(results.is_err());
+    assert_eq!(
+        results.err().unwrap(),
+        SubscanError::from(CustomError("not get raw URLs".into()))
+    );
 
     env::remove_var(env_name);
 }

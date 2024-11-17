@@ -1,4 +1,4 @@
-use std::{collections::BTreeSet, env};
+use std::env;
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
@@ -6,7 +6,13 @@ use crate::common::{
     utils::read_stub,
 };
 use serde_json::Value;
-use subscan::{interfaces::module::SubscanModuleInterface, modules::integrations::netlas::Netlas};
+use subscan::{
+    error::{
+        ModuleErrorKind::JSONExtractError, SkipReason::AuthenticationNotProvided, SubscanError,
+    },
+    interfaces::module::SubscanModuleInterface,
+    modules::integrations::netlas::Netlas,
+};
 
 #[tokio::test]
 #[stubr::mock("module/integrations/netlas")]
@@ -17,7 +23,7 @@ async fn run_test() {
     env::set_var(&env_name, "netlas-api-key");
     funcs::wrap_module_url(&mut netlas, &stubr.uri());
 
-    let results = netlas.run(TEST_DOMAIN).await;
+    let results = netlas.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(results.subdomains, [TEST_BAR_SUBDOMAIN.to_string()].into());
 
@@ -31,8 +37,11 @@ async fn run_test_no_count() {
 
     funcs::wrap_module_url(&mut netlas, &stubr.uri());
 
+    let results = netlas.run(TEST_DOMAIN).await;
+
     // Test no count response
-    assert_eq!(netlas.run(TEST_DOMAIN).await.subdomains, [].into());
+    assert!(results.is_err());
+    assert_eq!(results.err().unwrap(), AuthenticationNotProvided.into());
 }
 
 #[tokio::test]
@@ -43,6 +52,12 @@ async fn extract_test() {
     let extracted = Netlas::extract(json, TEST_DOMAIN);
     let not_extracted = Netlas::extract(Value::Null, TEST_DOMAIN);
 
-    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
-    assert_eq!(not_extracted, BTreeSet::new());
+    assert!(extracted.is_ok());
+    assert!(not_extracted.is_err());
+
+    assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(
+        not_extracted.err().unwrap(),
+        SubscanError::from(JSONExtractError)
+    );
 }

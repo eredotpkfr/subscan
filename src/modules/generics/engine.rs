@@ -1,14 +1,12 @@
 use crate::{
-    enums::{
-        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
-        module::SubscanModuleStatus::Finished,
-    },
+    enums::dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     types::{
-        core::SubscanModuleCoreComponents, query::SearchQueryParam,
+        core::{Result, SubscanModuleCoreComponents},
+        query::SearchQueryParam,
         result::module::SubscanModuleResult,
     },
 };
@@ -64,7 +62,7 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
         let mut result: SubscanModuleResult = self.name().await.into();
 
         let requester = &*self.components.requester.lock().await;
@@ -76,16 +74,23 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
 
         loop {
             let url = query.as_url(self.url.clone(), &extra_params);
-            let response = requester.get_content(url).await;
-            let news = extractor.extract(response, domain).await;
+            let content = requester
+                .get_content(url)
+                .await
+                .map_err(result.graceful_exit().await)?;
 
-            result.extend(news.clone());
+            let subdomains = extractor
+                .extract(content, domain)
+                .await
+                .map_err(result.graceful_exit().await)?;
 
-            if !query.update_many(news.clone()) {
+            result.extend(subdomains.clone());
+
+            if !query.update_many(subdomains) {
                 break;
             }
         }
 
-        result.with_status(Finished).await
+        Ok(result.with_finished().await)
     }
 }

@@ -1,7 +1,7 @@
 use crate::{
     enums::{content::Content, dispatchers::RequesterDispatcher},
     requesters::{chrome::ChromeBrowser, client::HTTPClient},
-    types::config::requester::RequesterConfig,
+    types::{config::requester::RequesterConfig, core::Result},
 };
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
@@ -20,7 +20,7 @@ use reqwest::Url;
 /// ```
 /// use std::time::Duration;
 /// use subscan::interfaces::requester::RequesterInterface;
-/// use subscan::types::config::requester::RequesterConfig;
+/// use subscan::types::{config::requester::RequesterConfig, core::Result};
 /// use subscan::enums::content::Content;
 /// use subscan::constants::DEFAULT_HTTP_TIMEOUT;
 /// use reqwest::Url;
@@ -41,8 +41,8 @@ use reqwest::Url;
 ///         self.config = config;
 ///     }
 ///
-///     async fn get_content(&self, url: Url) -> Content {
-///         Content::from("foo")
+///     async fn get_content(&self, url: Url) -> Result<Content> {
+///         Ok(Content::from("foo"))
 ///     }
 /// }
 ///
@@ -55,7 +55,7 @@ use reqwest::Url;
 ///     };
 ///
 ///     let config = requester.config().await.clone();
-///     let content = requester.get_content(url).await;
+///     let content = requester.get_content(url).await.unwrap();
 ///
 ///     assert_eq!(content.as_string(), "foo");
 ///     assert_eq!(config.proxy, None);
@@ -81,5 +81,5 @@ pub trait RequesterInterface: Sync + Send {
     /// Configure current requester object by using new [`RequesterConfig`] object
     async fn configure(&mut self, config: RequesterConfig);
     /// HTTP GET method implementation to fetch HTML content from given source [`Url`]
-    async fn get_content(&self, url: Url) -> Content;
+    async fn get_content(&self, url: Url) -> Result<Content>;
 }

@@ -28,5 +28,6 @@ async fn extract_test() {
         TEST_BAZ_SUBDOMAIN.to_string(),
     ]);
 
-    assert_eq!(result, expected);
+    assert!(result.is_ok());
+    assert_eq!(result.unwrap(), expected);
 }

@@ -5,9 +5,13 @@ use crate::common::{
 };
 use reqwest::Url;
 use serde_json::{json, Value};
-use std::{collections::BTreeSet, env};
+use std::env;
 use subscan::{
     enums::content::Content,
+    error::{
+        ModuleErrorKind::JSONExtractError,
+        SubscanError::{self, ModuleErrorWithResult},
+    },
     interfaces::module::SubscanModuleInterface,
     modules::integrations::censys::{Censys, CENSYS_URL},
 };
@@ -23,7 +27,11 @@ async fn run_test() {
 
     let result = censys.run(TEST_DOMAIN).await;
 
-    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert!(result.is_err());
+
+    if let ModuleErrorWithResult(result) = result.err().unwrap() {
+        assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    }
 
     env::remove_var(env_name);
 }
@@ -57,6 +65,12 @@ async fn extract_test() {
     let extracted = Censys::extract(json, TEST_DOMAIN);
     let not_extracted = Censys::extract(Value::Null, TEST_DOMAIN);
 
-    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
-    assert_eq!(not_extracted, BTreeSet::new());
+    assert!(extracted.is_ok());
+    assert!(not_extracted.is_err());
+
+    assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(
+        not_extracted.err().unwrap(),
+        SubscanError::from(JSONExtractError)
+    );
 }

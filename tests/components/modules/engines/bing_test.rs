@@ -11,7 +11,7 @@ async fn run_test() {
 
     funcs::wrap_module_url(&mut bing, &stubr.path("/search"));
 
-    let result = bing.run(TEST_DOMAIN).await;
+    let result = bing.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }

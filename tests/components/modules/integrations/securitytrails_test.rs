@@ -1,4 +1,4 @@
-use std::{collections::BTreeSet, env};
+use std::env;
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
@@ -8,6 +8,7 @@ use crate::common::{
 use serde_json::Value;
 use subscan::{
     enums::content::Content,
+    error::{ModuleErrorKind::JSONExtractError, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::securitytrails::{SecurityTrails, SECURITYTRAILS_URL},
 };
@@ -21,7 +22,7 @@ async fn run_test() {
     env::set_var(&env_name, "securitytrails-api-key");
     funcs::wrap_module_url(&mut securitytrails, &stubr.path("/securitytrails"));
 
-    let result = securitytrails.run(TEST_DOMAIN).await;
+    let result = securitytrails.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
@@ -51,6 +52,12 @@ async fn extract_test() {
     let extracted = SecurityTrails::extract(json, TEST_DOMAIN);
     let not_extracted = SecurityTrails::extract(Value::Null, TEST_DOMAIN);
 
-    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
-    assert_eq!(not_extracted, BTreeSet::new());
+    assert!(extracted.is_ok());
+    assert!(not_extracted.is_err());
+
+    assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(
+        not_extracted.err().unwrap(),
+        SubscanError::from(JSONExtractError)
+    );
 }

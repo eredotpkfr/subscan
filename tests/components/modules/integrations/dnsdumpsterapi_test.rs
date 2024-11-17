@@ -1,4 +1,4 @@
-use std::{collections::BTreeSet, env};
+use std::env;
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
@@ -8,6 +8,7 @@ use crate::common::{
 use serde_json::Value;
 use subscan::{
     enums::content::Content,
+    error::{ModuleErrorKind::JSONExtractError, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::dnsdumpsterapi::{DNSDumpsterAPI, DNSDUMPSTERAPI_URL},
 };
@@ -21,7 +22,7 @@ async fn run_test() {
     env::set_var(&env_name, "dnsdumpsterapi-api-key");
     funcs::wrap_module_url(&mut dnsdumpsterapi, &stubr.path("/dnsdumpsterapi"));
 
-    let result = dnsdumpsterapi.run(TEST_DOMAIN).await;
+    let result = dnsdumpsterapi.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
@@ -51,6 +52,12 @@ async fn extract_test() {
     let extracted = DNSDumpsterAPI::extract(json, TEST_DOMAIN);
     let not_extracted = DNSDumpsterAPI::extract(Value::Null, TEST_DOMAIN);
 
-    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
-    assert_eq!(not_extracted, BTreeSet::new());
+    assert!(extracted.is_ok());
+    assert!(not_extracted.is_err());
+
+    assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(
+        not_extracted.err().unwrap(),
+        SubscanError::from(JSONExtractError)
+    );
 }

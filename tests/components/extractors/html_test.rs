@@ -16,7 +16,7 @@ async fn extract_without_removes() {
     let extractor = HTMLExtractor::new(selector, vec![]);
     let result = extractor.extract(html, TEST_DOMAIN).await;
 
-    assert_eq!(result, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(result.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
 }
 
 #[tokio::test]
@@ -32,5 +32,5 @@ async fn extract_with_removes() {
         TEST_BAZ_SUBDOMAIN.to_string(),
     ]);
 
-    assert_eq!(result, expected);
+    assert_eq!(result.unwrap(), expected);
 }

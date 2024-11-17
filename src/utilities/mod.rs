@@ -4,8 +4,6 @@ pub mod cli;
 pub mod env;
 /// HTTP related utilities
 pub mod http;
-/// Logging utilities
-pub mod log;
 /// Network utilities
 pub mod net;
 /// Regex utilities

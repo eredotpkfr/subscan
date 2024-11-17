@@ -15,7 +15,7 @@ async fn run_test() {
 
     funcs::wrap_module_url(&mut digitorus, &stubr.path("/digitorus"));
 
-    let result = digitorus.run(TEST_DOMAIN).await;
+    let result = digitorus.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }

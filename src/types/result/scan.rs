@@ -118,15 +118,15 @@ impl ScanResult {
     ///
     /// #[tokio::main]
     /// async fn main() {
+    ///     let item = SubscanModulePoolResultItem {
+    ///         subdomain: "bar.foo.com".to_string(),
+    ///         ip: None,
+    ///     };
+    ///
     ///     let mut result: ScanResult = "foo.com".into();
     ///     let pool_result = SubscanModulePoolResult {
     ///         statistics: SubscanModulePoolStatistics::default(),
-    ///         results: BTreeSet::from_iter([
-    ///             SubscanModulePoolResultItem {
-    ///                 subdomain: "bar.foo.com".to_string(),
-    ///                 ip: None,
-    ///             }
-    ///         ])
+    ///         items: BTreeSet::from_iter([item]),
     ///     };
     ///
     ///     result.update_with_pool_result(pool_result).await;
@@ -153,7 +153,7 @@ impl ScanResult {
     /// ```
     /// use std::collections::BTreeSet;
     /// use subscan::types::result::scan::ScanResult;
-    /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
+    /// use subscan::error::{SubscanModuleStatus, SkipReason};
     /// use subscan::types::result::{
     ///     pool::SubscanModulePoolResult,
     ///     item::SubscanModulePoolResultItem,
@@ -162,15 +162,15 @@ impl ScanResult {
     ///
     /// #[tokio::main]
     /// async fn main() {
+    ///     let item = SubscanModulePoolResultItem {
+    ///         subdomain: "bar.foo.com".to_string(),
+    ///         ip: None,
+    ///     };
+    ///
     ///     let mut scan_result: ScanResult = "foo.com".into();
     ///     let pool_result = SubscanModulePoolResult {
     ///         statistics: SubscanModulePoolStatistics::default(),
-    ///         results: BTreeSet::from_iter([
-    ///             SubscanModulePoolResultItem {
-    ///                 subdomain: "bar.foo.com".to_string(),
-    ///                 ip: None,
-    ///             }
-    ///         ])
+    ///         items: BTreeSet::from_iter([item]),
     ///     };
     ///
     ///     scan_result.update_with_pool_result(pool_result).await;
@@ -182,7 +182,7 @@ impl ScanResult {
     /// ```
     pub async fn update_with_pool_result(&mut self, result: SubscanModulePoolResult) {
         self.statistics = result.statistics;
-        self.results = result.results;
+        self.results = result.items;
         self.total = self.results.len();
     }
 }

@@ -1,5 +1,5 @@
 use crate::{
-    enums::module::{SkipReason::SkippedByUser, SubscanModuleStatus},
+    error::{SkipReason::SkippedByUser, SubscanModuleStatus},
     types::result::module::SubscanModuleResult,
     utilities::serializers::{dt_to_string_method, td_num_seconds_method},
 };
@@ -34,13 +34,17 @@ impl SubscanModuleStatistics {
             elapsed: TimeDelta::zero(),
         }
     }
+
+    pub async fn log(&self) {
+        self.status.log(&self.module).await
+    }
 }
 
 impl From<SubscanModuleResult> for SubscanModuleStatistics {
     fn from(result: SubscanModuleResult) -> Self {
         Self {
             module: result.module.clone(),
-            status: result.status.clone(),
+            status: result.clone().status,
             count: result.subdomains.len(),
             started_at: result.started_at,
             finished_at: result.finished_at,
@@ -95,23 +99,7 @@ pub struct SubscanModulePoolStatistics {
 }
 
 impl SubscanModulePoolStatistics {
-    /// Add single skipped module statistic
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::types::result::stats::SubscanModulePoolStatistics;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let mut stats = SubscanModulePoolStatistics::default();
-    ///
-    ///     assert_eq!(stats.module.len(), 0);
-    ///     stats.add_skipped("foo").await;
-    ///     assert_eq!(stats.module.len(), 1);
-    /// }
-    /// ```
-    pub async fn add_skipped(&mut self, module: &str) {
-        self.module.push(SubscanModuleStatistics::skipped(module));
+    pub async fn module(&mut self, stats: SubscanModuleStatistics) {
+        self.module.push(stats);
     }
 }

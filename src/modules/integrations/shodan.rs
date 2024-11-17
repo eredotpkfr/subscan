@@ -4,11 +4,12 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::ModuleErrorKind::JSONExtractError,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
     utilities::http,
@@ -82,13 +83,13 @@ impl Shodan {
         }
     }
 
-    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
-        if let Some(subs) = content["subdomains"].as_array() {
-            let filter = |item: &Value| Some(format!("{}.{domain}", item.as_str()?));
+    pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
+        let filter = |item: &Value| Some(format!("{}.{domain}", item.as_str()?));
 
-            return subs.iter().filter_map(filter).collect();
+        if let Some(subs) = content["subdomains"].as_array() {
+            return Ok(subs.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        Err(JSONExtractError.into())
     }
 }

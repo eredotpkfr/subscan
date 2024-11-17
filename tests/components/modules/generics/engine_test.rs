@@ -24,7 +24,7 @@ async fn attribute_test() {
 async fn run_test() {
     let mut module = generic_search_engine(&stubr.path("/search"));
 
-    let result = module.run(TEST_DOMAIN).await;
+    let result = module.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }

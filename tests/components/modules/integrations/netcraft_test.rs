@@ -23,7 +23,7 @@ async fn run_test() {
         netcraft.components.requester = Mutex::new(new_requester.into());
     }
 
-    let result = netcraft.run(TEST_DOMAIN).await;
+    let result = netcraft.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }

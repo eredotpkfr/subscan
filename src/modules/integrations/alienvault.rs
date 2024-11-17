@@ -6,11 +6,12 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::ModuleErrorKind::JSONExtractError,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
 };
@@ -64,13 +65,13 @@ impl AlienVault {
         None
     }
 
-    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: &str) -> Result<BTreeSet<Subdomain>> {
         if let Some(passives) = content["passive_dns"].as_array() {
             let filter = |item: &Value| Some(item["hostname"].as_str()?.to_string());
 
-            return passives.iter().filter_map(filter).collect();
+            return Ok(passives.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        Err(JSONExtractError.into())
     }
 }

@@ -6,6 +6,7 @@ use reqwest::Url;
 use std::env;
 use subscan::{
     enums::{auth::AuthenticationMethod, content::Content},
+    error::SkipReason::AuthenticationNotProvided,
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     types::env::{Credentials, Env},
 };
@@ -192,7 +193,7 @@ async fn run_test_no_auth() {
     let auth = AuthenticationMethod::NoAuthentication;
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
 
-    let result = module.run(TEST_DOMAIN).await;
+    let result = module.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }
@@ -207,7 +208,7 @@ async fn run_test_with_header_auth() {
 
     env::set_var(env_name.clone(), TEST_API_KEY);
 
-    let result = module.run(TEST_DOMAIN).await;
+    let result = module.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
@@ -224,7 +225,7 @@ async fn run_test_with_query_auth() {
 
     env::set_var(env_name.clone(), TEST_API_KEY);
 
-    let result = module.run(TEST_DOMAIN).await;
+    let result = module.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
@@ -247,7 +248,7 @@ async fn run_test_with_basic_http_auth() {
 
     let auth = AuthenticationMethod::BasicHTTPAuthentication(credentials);
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
-    let result = module.run(TEST_DOMAIN).await;
+    let result = module.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }
@@ -257,6 +258,8 @@ async fn run_test_with_basic_http_auth() {
 async fn run_test_with_not_authenticated() {
     let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
+    let result = module.run(TEST_DOMAIN).await;
 
-    assert!(module.run(TEST_DOMAIN).await.subdomains.is_empty());
+    assert!(result.is_err());
+    assert_eq!(result.err().unwrap(), AuthenticationNotProvided.into());
 }

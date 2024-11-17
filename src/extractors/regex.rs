@@ -1,6 +1,9 @@
 use crate::{
-    enums::content::Content, interfaces::extractor::SubdomainExtractorInterface,
-    types::core::Subdomain, utilities::regex::generate_subdomain_regex,
+    enums::content::Content,
+    error::{ModuleErrorKind::RegexExtractError, SubscanError},
+    interfaces::extractor::SubdomainExtractorInterface,
+    types::core::{Result, Subdomain},
+    utilities::regex::generate_subdomain_regex,
 };
 use async_trait::async_trait;
 use regex::Match;
@@ -68,20 +71,21 @@ impl SubdomainExtractorInterface for RegexExtractor {
     ///     let content = Content::from("bar.foo.com\nbaz.foo.com");
     ///
     ///     let extractor = RegexExtractor::default();
-    ///     let result = extractor.extract(content, "foo.com").await;
+    ///     let result = extractor.extract(content, "foo.com").await.unwrap();
     ///
+    ///     assert_eq!(result.len(), 2);
     ///     assert_eq!(result, [
     ///         Subdomain::from("bar.foo.com"),
     ///         Subdomain::from("baz.foo.com"),
     ///     ].into());
-    ///     assert_eq!(result.len(), 2);
     /// }
     /// ```
-    async fn extract(&self, content: Content, domain: &str) -> BTreeSet<Subdomain> {
-        let pattern = generate_subdomain_regex(domain).unwrap();
+    async fn extract(&self, content: Content, domain: &str) -> Result<BTreeSet<Subdomain>> {
+        let pattern =
+            generate_subdomain_regex(domain).map_err(|_| SubscanError::from(RegexExtractError))?;
         let to_string = |item: Match| item.as_str().parse().ok();
         let content = content.as_string();
 
-        pattern.find_iter(&content).filter_map(to_string).collect()
+        Ok(pattern.find_iter(&content).filter_map(to_string).collect())
     }
 }

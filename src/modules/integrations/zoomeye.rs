@@ -6,11 +6,12 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::ModuleErrorKind::JSONExtractError,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
     utilities::http,
@@ -78,13 +79,13 @@ impl ZoomEye {
         Some(url)
     }
 
-    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
-        if let Some(passives) = content["list"].as_array() {
-            let filter = |item: &Value| Some(item["name"].as_str()?.to_string());
+    pub fn extract(content: Value, _domain: &str) -> Result<BTreeSet<Subdomain>> {
+        let filter = |item: &Value| Some(item["name"].as_str()?.to_string());
 
-            return passives.iter().filter_map(filter).collect();
+        if let Some(passives) = content["list"].as_array() {
+            return Ok(passives.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        Err(JSONExtractError.into())
     }
 }

@@ -16,7 +16,7 @@ async fn run_test() {
 
     funcs::wrap_module_url(&mut waybackarchive, &stubr.path("/waybackarchive"));
 
-    let results = waybackarchive.run(TEST_DOMAIN).await;
+    let results = waybackarchive.run(TEST_DOMAIN).await.unwrap();
 
     let expected = BTreeSet::from([
         TEST_BAR_SUBDOMAIN.to_string(),

@@ -20,7 +20,7 @@ async fn run_test() {
         duckduckgo.components.requester = Mutex::new(new_requester.into());
     }
 
-    let result = duckduckgo.run(TEST_DOMAIN).await;
+    let result = duckduckgo.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }

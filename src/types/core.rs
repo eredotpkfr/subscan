@@ -1,9 +1,15 @@
-use crate::enums::dispatchers::{
-    RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+use crate::{
+    enums::dispatchers::{
+        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    },
+    error::SubscanError,
 };
 use flume::{Receiver, Sender};
-use std::sync::Arc;
+use std::{result, sync::Arc};
 use tokio::sync::Mutex;
+
+/// Result type
+pub type Result<T> = result::Result<T, SubscanError>;
 
 /// Core subdomain data type
 pub type Subdomain = String;

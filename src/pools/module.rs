@@ -2,15 +2,18 @@ use tokio::{sync::Mutex, task::JoinSet};
 
 use crate::{
     constants::LOG_TIME_FORMAT,
-    enums::{cache::CacheFilter, module::SkipReason::SkippedByUser},
+    enums::cache::CacheFilter,
+    error::SubscanError::ModuleErrorWithResult,
     interfaces::module::SubscanModuleInterface,
     resolver::Resolver,
     types::{
         config::subscan::SubscanConfig,
         core::{Subdomain, SubscanModule, UnboundedFlumeChannel, UnboundedFlumeChannelTuple},
-        result::{item::SubscanModulePoolResultItem, pool::SubscanModulePoolResult},
+        result::{
+            item::SubscanModulePoolResultItem, pool::SubscanModulePoolResult,
+            stats::SubscanModuleStatistics,
+        },
     },
-    utilities,
 };
 use std::sync::Arc;
 
@@ -106,7 +109,7 @@ impl SubscanModulePool {
                 ip: lookup_ip(&self.resolver, sub).await,
             };
 
-            self.result.lock().await.results.insert(item);
+            self.result.lock().await.items.insert(item);
         }
     }
 
@@ -115,23 +118,30 @@ impl SubscanModulePool {
         while let Ok(module) = self.channels.module.rx.try_recv() {
             let mut module = module.lock().await;
 
-            if self.filter.is_filtered(module.name().await).await {
-                let mut result = self.result.lock().await;
-
-                result.statistics.add_skipped(module.name().await).await;
-
-                utilities::log::status(module.name().await, SkippedByUser.into()).await;
-            } else {
+            if !self.filter.is_filtered(module.name().await).await {
                 let subresult = module.run(&self.domain).await;
-                let mut result = self.result.lock().await;
 
-                result.statistics.module.push(subresult.stats());
+                if let Ok(subresult) | Err(ModuleErrorWithResult(subresult)) = subresult {
+                    let stats = subresult.stats().await;
 
-                for sub in &subresult.subdomains {
-                    self.channels.subs.tx.send(sub.to_string()).unwrap();
+                    stats.log().await;
+                    self.result.lock().await.statistic(stats).await;
+
+                    for sub in &subresult.subdomains {
+                        self.channels.subs.tx.send(sub.to_string()).unwrap()
+                    }
+                } else {
+                    let error = subresult.unwrap_err();
+                    let stats = error.stats(module.name().await).await;
+
+                    self.result.lock().await.statistic(stats).await;
+                    error.log(module.name().await).await;
                 }
+            } else {
+                let stats = SubscanModuleStatistics::skipped(module.name().await);
 
-                utilities::log::result(subresult).await;
+                stats.log().await;
+                self.result.lock().await.statistic(stats).await;
             }
         }
     }

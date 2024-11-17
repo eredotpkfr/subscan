@@ -11,7 +11,7 @@ async fn run_test() {
 
     funcs::wrap_module_url(&mut yahoo, &stubr.path("/search"));
 
-    let result = yahoo.run(TEST_DOMAIN).await;
+    let result = yahoo.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }

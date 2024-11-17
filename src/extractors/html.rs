@@ -1,6 +1,9 @@
 use crate::{
-    enums::content::Content, extractors::regex::RegexExtractor,
-    interfaces::extractor::SubdomainExtractorInterface, types::core::Subdomain,
+    enums::content::Content,
+    error::{ModuleErrorKind::HTMLExtractError, SubscanError},
+    extractors::regex::RegexExtractor,
+    interfaces::extractor::SubdomainExtractorInterface,
+    types::core::{Result, Subdomain},
 };
 use async_trait::async_trait;
 use scraper::{ElementRef, Html, Selector};
@@ -66,14 +69,15 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     ///     let selector = String::from("div > a");
     ///
     ///     let extractor = HTMLExtractor::new(selector, vec![]);
-    ///     let result = extractor.extract(html, "foo.com").await;
+    ///     let result = extractor.extract(html, "foo.com").await.unwrap();
     ///
     ///     assert_eq!(result, [Subdomain::from("bar.foo.com")].into());
     /// }
     /// ```
-    async fn extract(&self, content: Content, domain: &str) -> BTreeSet<Subdomain> {
+    async fn extract(&self, content: Content, domain: &str) -> Result<BTreeSet<Subdomain>> {
         let document = Html::parse_document(&content.as_string());
-        let selector = Selector::parse(&self.selector).unwrap();
+        let selector =
+            Selector::parse(&self.selector).map_err(|_| SubscanError::from(HTMLExtractError))?;
         let selected = document.select(&selector);
 
         let remove = |item: ElementRef| {
@@ -88,6 +92,6 @@ impl SubdomainExtractorInterface for HTMLExtractor {
 
         let extract = |item| self.regextractor.extract_one(item, domain);
 
-        selected.map(remove).filter_map(extract).collect()
+        Ok(selected.map(remove).filter_map(extract).collect())
     }
 }
