@@ -3,6 +3,7 @@ use colored::Colorize;
 use serde::Serialize;
 use std::fmt::Display;
 
+/// Subscan module states
 #[derive(Clone, Debug, Default, PartialEq, PartialOrd, Eq, Ord)]
 pub enum SubscanModuleStatus {
     #[default]
@@ -23,6 +24,12 @@ impl Display for SubscanModuleStatus {
             }
             SubscanModuleStatus::Skipped(_) => write!(f, "SKIPPED"),
         }
+    }
+}
+
+impl From<ModuleErrorKind> for SubscanModuleStatus {
+    fn from(err: ModuleErrorKind) -> Self {
+        Self::Failed(err)
     }
 }
 
@@ -56,6 +63,39 @@ impl Serialize for SubscanModuleStatus {
 }
 
 impl SubscanModuleStatus {
+    /// Return status with a reason text
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::result::status::{
+    ///     SubscanModuleStatus::{
+    ///         Started,
+    ///         Finished,
+    ///         Failed,
+    ///         FailedWithResult,
+    ///         Skipped
+    ///     },
+    ///     SkipReason::AuthenticationNotProvided,
+    /// };
+    /// use subscan::error::ModuleErrorKind::Custom;
+    ///
+    /// assert_eq!(Started.with_reason(), "[STARTED]");
+    /// assert_eq!(Finished.with_reason(), "[FINISHED]");
+    ///
+    /// assert_eq!(
+    ///     Failed(Custom("foo".into())).with_reason(),
+    ///     "[foo FAILED]"
+    /// );
+    /// assert_eq!(
+    ///     FailedWithResult.with_reason(),
+    ///     "[failed with result FAILED]"
+    /// );
+    /// assert_eq!(
+    ///     Skipped(AuthenticationNotProvided.into()).with_reason(),
+    ///     "[auth not provided SKIPPED]"
+    /// );
+    /// ```
     pub fn with_reason(&self) -> String {
         match self {
             SubscanModuleStatus::Started => format!("[{self}]"),

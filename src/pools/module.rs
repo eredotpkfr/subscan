@@ -120,11 +120,12 @@ impl SubscanModulePool {
 
             if !self.filter.is_filtered(module.name().await).await {
                 let subresult = module.run(&self.domain).await;
+                let name = module.name().await;
 
                 if let Ok(subresult) | Err(ModuleErrorWithResult(subresult)) = subresult {
                     let stats = subresult.stats().await;
 
-                    stats.log().await;
+                    stats.status.log(name);
                     self.result.lock().await.statistic(stats).await;
 
                     for sub in &subresult.subdomains {
@@ -132,15 +133,16 @@ impl SubscanModulePool {
                     }
                 } else {
                     let error = subresult.unwrap_err();
-                    let stats = error.stats(module.name().await).await;
+                    let stats = error.stats(name).await;
 
-                    stats.log().await;
+                    stats.status.log(name);
                     self.result.lock().await.statistic(stats).await;
                 }
             } else {
-                let stats = SubscanModuleStatistics::skipped(module.name().await);
+                let name = module.name().await;
+                let stats = SubscanModuleStatistics::skipped(name);
 
-                stats.log().await;
+                stats.status.log(name);
                 self.result.lock().await.statistic(stats).await;
             }
         }

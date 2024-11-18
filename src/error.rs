@@ -6,9 +6,15 @@ use crate::types::result::{
 use chrono::{TimeDelta, Utc};
 use std::fmt::Display;
 
+/// Subscan error variants
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord)]
 pub enum SubscanError {
+    /// Module error, see [`ModuleErrorKind`] for generic error definitions
     ModuleError(ModuleErrorKind),
+    /// This error type uses for the make graceful returns from module `.run(`
+    /// method. If the module has already discovered a subdomains and encountered
+    /// an error during runtime we need to save already discovered subdomains. So
+    /// implemented this error type to ensure this
     ModuleErrorWithResult(SubscanModuleResult),
 }
 
@@ -34,6 +40,31 @@ impl From<SkipReason> for SubscanError {
 }
 
 impl SubscanError {
+    /// Get [`SubscanModuleStatus`] type
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::error::{SubscanError, ModuleErrorKind::Custom};
+    /// use subscan::types::result::{
+    ///     status::SubscanModuleStatus::FailedWithResult,
+    ///     module::SubscanModuleResult
+    /// };
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let result = SubscanModuleResult::default();
+    ///
+    ///     let failed = SubscanError::from(Custom("foo".into()));
+    ///     let failed_with_result = SubscanError::ModuleErrorWithResult(result);
+    ///
+    ///     assert_eq!(failed.status().await, Custom("foo".into()).into());
+    ///     assert_eq!(failed_with_result.status().await, FailedWithResult);
+    ///
+    ///     assert_eq!(format!("{failed}"), "foo");
+    ///     assert_eq!(format!("{failed_with_result}"), "failed with result");
+    /// }
+    /// ```
     pub async fn status(&self) -> SubscanModuleStatus {
         match self {
             SubscanError::ModuleError(kind) => kind.status(),
@@ -41,6 +72,28 @@ impl SubscanError {
         }
     }
 
+    /// Get [`SubscanModuleStatistics`] from any [`SubscanError`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::error::{SubscanError, ModuleErrorKind::Custom};
+    /// use subscan::types::result::{
+    ///     status::SkipReason::SkippedByUser,
+    ///     module::SubscanModuleResult
+    /// };
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let failed = SubscanError::from(SkippedByUser);
+    ///     let stats = failed.stats("foo").await;
+    ///
+    ///     assert_eq!(stats.module, "foo");
+    ///     assert_eq!(stats.status, SkippedByUser.into());
+    ///     assert_eq!(stats.count, 0);
+    ///     assert_eq!(stats.elapsed.num_seconds(), 0);
+    /// }
+    /// ```
     pub async fn stats(&self, module: &str) -> SubscanModuleStatistics {
         SubscanModuleStatistics {
             module: module.to_string(),
@@ -53,17 +106,43 @@ impl SubscanError {
     }
 }
 
+/// Kind of [`SubscanError::ModuleError`]
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord)]
 pub enum ModuleErrorKind {
+    /// Indicates an error when extracting subdomains from any HTML content
     HTMLExtract,
+    /// Indicates an error when extracting subdomains from any JSON content
     JSONExtract,
+    /// Indicates an error when extracting subdomains by using regex pattern
     RegexExtract,
+    /// Indicates an error when getting content from URL
     GetContent,
+    /// Indicates that the module was skipped for any [`SkipReason`]
     Skip(SkipReason),
+    /// Indicates that the module encountered a error with a custom error message
     Custom(String),
 }
 
 impl ModuleErrorKind {
+    /// Wrap [`ModuleErrorKind`] with a [`SubscanModuleStatus`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::error::ModuleErrorKind;
+    /// use subscan::types::result::status::{
+    ///     SkipReason::SkippedByUser,
+    ///     SubscanModuleStatus::{Failed, Skipped},
+    /// };
+    ///
+    /// let failed = ModuleErrorKind::RegexExtract;
+    /// let skipped = ModuleErrorKind::from(SkippedByUser);
+    /// let custom = ModuleErrorKind::Custom("foo".into());
+    ///
+    /// assert_eq!(failed.status(), Failed(failed.clone()));
+    /// assert_eq!(skipped.status(), SkippedByUser.into());
+    /// assert_eq!(custom.status(), Failed(custom));
+    /// ```
     pub fn status(&self) -> SubscanModuleStatus {
         match self {
             ModuleErrorKind::HTMLExtract
@@ -75,6 +154,26 @@ impl ModuleErrorKind {
         }
     }
 
+    /// Return [`ModuleErrorKind`] type with a error message
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::error::ModuleErrorKind;
+    /// use subscan::types::result::status::{SkipReason::SkippedByUser};
+    ///
+    /// let html = ModuleErrorKind::HTMLExtract;
+    /// let json = ModuleErrorKind::JSONExtract;
+    /// let regex = ModuleErrorKind::RegexExtract;
+    /// let skipped = ModuleErrorKind::from(SkippedByUser);
+    /// let custom = ModuleErrorKind::Custom("foo".into());
+    ///
+    /// assert_eq!(html.with_msg(), "[html extract error FAILED]");
+    /// assert_eq!(json.with_msg(), "[json extract error FAILED]");
+    /// assert_eq!(regex.with_msg(), "[regex extract error FAILED]");
+    /// assert_eq!(skipped.with_msg(), "[skipped by user SKIPPED]");
+    /// assert_eq!(custom.with_msg(), "[foo FAILED]");
+    /// ```
     pub fn with_msg(&self) -> String {
         match self {
             ModuleErrorKind::HTMLExtract

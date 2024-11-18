@@ -24,6 +24,23 @@ pub struct SubscanModuleStatistics {
 }
 
 impl SubscanModuleStatistics {
+    /// Create skipped module statistics
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::result::{
+    ///     statistics::SubscanModuleStatistics,
+    ///     status::SkipReason::SkippedByUser,
+    /// };
+    ///
+    /// let skipped = SubscanModuleStatistics::skipped("foo");
+    ///
+    /// assert_eq!(skipped.module, "foo");
+    /// assert_eq!(skipped.status, SkippedByUser.into());
+    /// assert_eq!(skipped.count, 0);
+    /// assert_eq!(skipped.elapsed.num_seconds(), 0);
+    /// ```
     pub fn skipped(module: &str) -> Self {
         Self {
             module: module.into(),
@@ -33,10 +50,6 @@ impl SubscanModuleStatistics {
             finished_at: Utc::now(),
             elapsed: TimeDelta::zero(),
         }
-    }
-
-    pub async fn log(&self) {
-        self.status.log(&self.module);
     }
 }
 
@@ -76,14 +89,14 @@ impl Default for ResolverStatistics {
 }
 
 impl ResolverStatistics {
-    /// Set [`started_at`](crate::types::result::stats::ResolverStatistics::started_at) to [`Utc::now`]
+    /// Set [`started_at`](crate::types::result::statistics::ResolverStatistics::started_at) to [`Utc::now`]
     pub fn started(&mut self) -> DateTime<Utc> {
         self.started_at = Utc::now();
         self.started_at
     }
 
-    /// Set [`finished_at`](crate::types::result::stats::ResolverStatistics::finished_at) to [`Utc::now`]
-    /// and calculate [`elapsed`](crate::types::result::stats::ResolverStatistics::elapsed) value
+    /// Set [`finished_at`](crate::types::result::statistics::ResolverStatistics::finished_at) to [`Utc::now`]
+    /// and calculate [`elapsed`](crate::types::result::statistics::ResolverStatistics::elapsed) value
     pub fn finished(&mut self) -> DateTime<Utc> {
         self.finished_at = Utc::now();
         self.elapsed = self.finished_at - self.started_at;
