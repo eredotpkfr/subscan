@@ -4,7 +4,7 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
-    error::ModuleErrorKind::JSONExtractError,
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -78,6 +78,6 @@ impl BufferOver {
             return Ok(results.iter().filter_map(filter).collect());
         }
 
-        Err(JSONExtractError.into())
+        Err(JSONExtract.into())
     }
 }

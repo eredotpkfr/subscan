@@ -10,7 +10,7 @@ use reqwest::Url;
 use serde_json::{json, Value};
 use subscan::{
     enums::{content::Content, dispatchers::SubscanModuleDispatcher},
-    error::{ModuleErrorKind::CustomError, SkipReason::AuthenticationNotProvided, SubscanError},
+    error::{ModuleErrorKind::Custom, SkipReason::AuthenticationNotProvided, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::github::GitHub,
 };
@@ -100,7 +100,7 @@ async fn run_failed_test() {
     assert!(results.is_err());
     assert_eq!(
         results.err().unwrap(),
-        SubscanError::from(CustomError("not get raw URLs".into()))
+        SubscanError::from(Custom("not get raw URLs".into()))
     );
 
     env::remove_var(env_name);

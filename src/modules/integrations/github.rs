@@ -3,7 +3,7 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
     },
-    error::{ModuleErrorKind::CustomError, SkipReason::AuthenticationNotProvided},
+    error::{ModuleErrorKind::Custom, SkipReason::AuthenticationNotProvided},
     extractors::regex::RegexExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -131,7 +131,7 @@ impl SubscanModuleInterface for GitHub {
                 return Ok(result.with_finished().await);
             }
 
-            return Err(CustomError("not get raw URLs".into()).into());
+            return Err(Custom("not get raw URLs".into()).into());
         }
 
         Err(AuthenticationNotProvided.into())

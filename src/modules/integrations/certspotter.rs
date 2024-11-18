@@ -4,7 +4,7 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
-    error::{ModuleErrorKind::JSONExtractError, SubscanError},
+    error::{ModuleErrorKind::JSONExtract, SubscanError},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -84,9 +84,7 @@ impl CertSpotter {
             pattern.find(item.as_str()?).map(to_string)
         };
 
-        let results = content
-            .as_array()
-            .ok_or(SubscanError::from(JSONExtractError))?;
+        let results = content.as_array().ok_or(SubscanError::from(JSONExtract))?;
 
         for result in results {
             if let Some(names) = result["dns_names"].as_array() {

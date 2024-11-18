@@ -5,7 +5,7 @@ use serde_json::Value;
 use std::collections::BTreeSet;
 use subscan::{
     enums::{auth::AuthenticationMethod, dispatchers::RequesterDispatcher},
-    error::{ModuleErrorKind::JSONExtractError, SubscanError},
+    error::{ModuleErrorKind::JSONExtract, SubscanError},
     extractors::{json::JSONExtractor, regex::RegexExtractor},
     modules::generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
     requesters::client::HTTPClient,
@@ -39,7 +39,7 @@ pub fn generic_integration(url: &str, auth: AuthenticationMethod) -> GenericInte
             return Ok(BTreeSet::from_iter(subs.iter().filter_map(filter)));
         }
 
-        Err(SubscanError::from(JSONExtractError))
+        Err(SubscanError::from(JSONExtract))
     };
 
     let requester = RequesterDispatcher::HTTPClient(HTTPClient::default());

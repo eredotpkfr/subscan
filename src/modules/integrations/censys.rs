@@ -4,7 +4,7 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
-    error::{ModuleErrorKind::JSONExtractError, SubscanError},
+    error::{ModuleErrorKind::JSONExtract, SubscanError},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -83,7 +83,7 @@ impl Censys {
 
         let hits = content["result"]["hits"]
             .as_array()
-            .ok_or(SubscanError::from(JSONExtractError))?;
+            .ok_or(SubscanError::from(JSONExtract))?;
 
         for result in hits {
             if let Some(names) = result["names"].as_array() {

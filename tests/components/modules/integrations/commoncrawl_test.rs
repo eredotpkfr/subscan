@@ -9,7 +9,7 @@ use crate::common::{
 use serde_json::{json, Value};
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher,
-    error::ModuleErrorKind::CustomError,
+    error::ModuleErrorKind::Custom,
     error::SubscanError,
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::integrations::commoncrawl::CommonCrawl,
@@ -85,6 +85,6 @@ async fn run_failed_test() {
     assert!(results.is_err());
     assert_eq!(
         results.err().unwrap(),
-        SubscanError::from(CustomError("not get cdx URLs".into()))
+        SubscanError::from(Custom("not get cdx URLs".into()))
     );
 }

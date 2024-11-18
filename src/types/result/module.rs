@@ -82,6 +82,8 @@ impl SubscanModuleResult {
     }
 
     pub async fn graceful_exit(&mut self) -> impl Fn(SubscanError) -> SubscanError + '_ {
+        self.status = SubscanModuleStatus::FailedWithResult;
+
         |err| {
             if !self.subdomains.is_empty() {
                 SubscanError::ModuleErrorWithResult(self.clone())

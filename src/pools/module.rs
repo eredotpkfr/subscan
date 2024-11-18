@@ -134,8 +134,8 @@ impl SubscanModulePool {
                     let error = subresult.unwrap_err();
                     let stats = error.stats(module.name().await).await;
 
+                    stats.log().await;
                     self.result.lock().await.statistic(stats).await;
-                    error.log(module.name().await).await;
                 }
             } else {
                 let stats = SubscanModuleStatistics::skipped(module.name().await);

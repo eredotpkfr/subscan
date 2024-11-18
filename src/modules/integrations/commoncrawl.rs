@@ -2,7 +2,7 @@ use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
     },
-    error::ModuleErrorKind::CustomError,
+    error::ModuleErrorKind::Custom,
     extractors::regex::RegexExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -133,7 +133,7 @@ impl SubscanModuleInterface for CommonCrawl {
                     }
                 }
             } else {
-                return Err(CustomError("not get cdx URLs".into()).into());
+                return Err(Custom("not get cdx URLs".into()).into());
             }
         }
 

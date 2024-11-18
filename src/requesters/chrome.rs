@@ -1,6 +1,6 @@
 use crate::{
     enums::content::Content,
-    error::{ModuleErrorKind::GetContentError, SubscanError},
+    error::{ModuleErrorKind::GetContent, SubscanError},
     interfaces::requester::RequesterInterface,
     types::{config::requester::RequesterConfig, core::Result},
 };
@@ -174,13 +174,13 @@ impl RequesterInterface for ChromeBrowser {
         let tab = self
             .browser
             .new_tab()
-            .map_err(|_| SubscanError::from(GetContentError))?;
+            .map_err(|_| SubscanError::from(GetContent))?;
         let headers = self.config.headers_as_hashmap();
 
         // Set basic configurations
         tab.set_default_timeout(self.config.timeout);
         tab.set_extra_http_headers(headers)
-            .map_err(|_| SubscanError::from(GetContentError))?;
+            .map_err(|_| SubscanError::from(GetContent))?;
 
         // Set basic HTTP authentication if credentials provided
         if self.config.credentials.is_ok() {
@@ -188,23 +188,23 @@ impl RequesterInterface for ChromeBrowser {
             let password = self.config.credentials.password.value.clone();
 
             tab.authenticate(username, password)
-                .map_err(|_| SubscanError::from(GetContentError))?;
+                .map_err(|_| SubscanError::from(GetContent))?;
         }
 
         tab.navigate_to(url.to_string().as_str())
-            .map_err(|_| SubscanError::from(GetContentError))?;
+            .map_err(|_| SubscanError::from(GetContent))?;
 
         if let Ok(tab) = tab.wait_until_navigated() {
             let content = tab.get_content();
 
             tab.close(true)
-                .map_err(|_| SubscanError::from(GetContentError))?;
+                .map_err(|_| SubscanError::from(GetContent))?;
             Ok(Content::String(
-                content.map_err(|_| SubscanError::from(GetContentError))?,
+                content.map_err(|_| SubscanError::from(GetContent))?,
             ))
         } else {
             tab.close(true)
-                .map_err(|_| SubscanError::from(GetContentError))?;
+                .map_err(|_| SubscanError::from(GetContent))?;
             Ok(Content::Empty)
         }
     }

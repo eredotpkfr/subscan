@@ -2,9 +2,7 @@ use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
     },
-    error::{
-        ModuleErrorKind::JSONExtractError, SkipReason::AuthenticationNotProvided, SubscanError,
-    },
+    error::{ModuleErrorKind::JSONExtract, SkipReason::AuthenticationNotProvided, SubscanError},
     extractors::json::JSONExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -72,7 +70,7 @@ impl Netlas {
             return Ok(items.iter().filter_map(filter).collect());
         }
 
-        Err(SubscanError::from(JSONExtractError))
+        Err(SubscanError::from(JSONExtract))
     }
 }
 

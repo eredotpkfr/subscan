@@ -17,6 +17,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check
+          log-level: error
+          arguments: --all-features
 
   rust-cargo-machete:
     runs-on: ubuntu-latest

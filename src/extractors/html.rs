@@ -1,6 +1,6 @@
 use crate::{
     enums::content::Content,
-    error::{ModuleErrorKind::HTMLExtractError, SubscanError},
+    error::{ModuleErrorKind::HTMLExtract, SubscanError},
     extractors::regex::RegexExtractor,
     interfaces::extractor::SubdomainExtractorInterface,
     types::core::{Result, Subdomain},
@@ -77,7 +77,7 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     async fn extract(&self, content: Content, domain: &str) -> Result<BTreeSet<Subdomain>> {
         let document = Html::parse_document(&content.as_string());
         let selector =
-            Selector::parse(&self.selector).map_err(|_| SubscanError::from(HTMLExtractError))?;
+            Selector::parse(&self.selector).map_err(|_| SubscanError::from(HTMLExtract))?;
         let selected = document.select(&selector);
 
         let remove = |item: ElementRef| {

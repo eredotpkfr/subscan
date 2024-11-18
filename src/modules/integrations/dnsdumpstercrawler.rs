@@ -3,7 +3,7 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
     },
-    error::ModuleErrorKind::CustomError,
+    error::ModuleErrorKind::Custom,
     extractors::html::HTMLExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -132,6 +132,6 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
             }
         }
 
-        Err(CustomError("not get token".into()).into())
+        Err(Custom("not get token".into()).into())
     }
 }

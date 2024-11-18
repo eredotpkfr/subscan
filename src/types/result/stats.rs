@@ -36,7 +36,7 @@ impl SubscanModuleStatistics {
     }
 
     pub async fn log(&self) {
-        self.status.log(&self.module).await
+        self.status.log(&self.module);
     }
 }
 

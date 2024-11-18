@@ -7,7 +7,7 @@ use serde_json::Value;
 use std::env;
 use subscan::{
     enums::content::Content,
-    error::{ModuleErrorKind::JSONExtractError, SubscanError},
+    error::{ModuleErrorKind::JSONExtract, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::bevigil::{Bevigil, BEVIGIL_URL},
 };
@@ -57,6 +57,6 @@ async fn extract_test() {
     assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(
         not_extracted.err().unwrap(),
-        SubscanError::from(JSONExtractError)
+        SubscanError::from(JSONExtract)
     );
 }

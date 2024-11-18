@@ -1,6 +1,6 @@
 use crate::{
     enums::content::Content,
-    error::{ModuleErrorKind::RegexExtractError, SubscanError},
+    error::{ModuleErrorKind::RegexExtract, SubscanError},
     interfaces::extractor::SubdomainExtractorInterface,
     types::core::{Result, Subdomain},
     utilities::regex::generate_subdomain_regex,
@@ -82,7 +82,7 @@ impl SubdomainExtractorInterface for RegexExtractor {
     /// ```
     async fn extract(&self, content: Content, domain: &str) -> Result<BTreeSet<Subdomain>> {
         let pattern =
-            generate_subdomain_regex(domain).map_err(|_| SubscanError::from(RegexExtractError))?;
+            generate_subdomain_regex(domain).map_err(|_| SubscanError::from(RegexExtract))?;
         let to_string = |item: Match| item.as_str().parse().ok();
         let content = content.as_string();
 

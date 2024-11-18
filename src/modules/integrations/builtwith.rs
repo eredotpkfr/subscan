@@ -4,7 +4,7 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
-    error::{ModuleErrorKind::JSONExtractError, SubscanError},
+    error::{ModuleErrorKind::JSONExtract, SubscanError},
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -81,7 +81,7 @@ impl BuiltWith {
         let filter = |item: &Value| Some(format!("{}.{}", item["SubDomain"].as_str()?, domain));
         let results = content["Results"]
             .as_array()
-            .ok_or(SubscanError::from(JSONExtractError))?;
+            .ok_or(SubscanError::from(JSONExtract))?;
 
         for result in results {
             if let Some(paths) = result["Result"]["Paths"].as_array() {

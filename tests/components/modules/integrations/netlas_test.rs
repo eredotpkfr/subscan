@@ -7,9 +7,7 @@ use crate::common::{
 };
 use serde_json::Value;
 use subscan::{
-    error::{
-        ModuleErrorKind::JSONExtractError, SkipReason::AuthenticationNotProvided, SubscanError,
-    },
+    error::{ModuleErrorKind::JSONExtract, SkipReason::AuthenticationNotProvided, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::netlas::Netlas,
 };
@@ -58,6 +56,6 @@ async fn extract_test() {
     assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(
         not_extracted.err().unwrap(),
-        SubscanError::from(JSONExtractError)
+        SubscanError::from(JSONExtract)
     );
 }

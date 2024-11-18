@@ -9,7 +9,7 @@ use std::env;
 use subscan::{
     enums::content::Content,
     error::{
-        ModuleErrorKind::JSONExtractError,
+        ModuleErrorKind::JSONExtract,
         SubscanError::{self, ModuleErrorWithResult},
     },
     interfaces::module::SubscanModuleInterface,
@@ -72,6 +72,6 @@ async fn extract_test() {
     assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
     assert_eq!(
         not_extracted.err().unwrap(),
-        SubscanError::from(JSONExtractError)
+        SubscanError::from(JSONExtract)
     );
 }

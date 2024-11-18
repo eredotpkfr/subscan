@@ -4,7 +4,7 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
-    error::ModuleErrorKind::JSONExtractError,
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -81,6 +81,6 @@ impl Crtsh {
             return Ok(results.iter().filter_map(matches).collect());
         }
 
-        Err(JSONExtractError.into())
+        Err(JSONExtract.into())
     }
 }

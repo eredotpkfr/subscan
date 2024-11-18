@@ -4,7 +4,7 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
-    error::ModuleErrorKind::JSONExtractError,
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -71,6 +71,6 @@ impl Bevigil {
             return Ok(subs.iter().filter_map(filter).collect());
         }
 
-        Err(JSONExtractError.into())
+        Err(JSONExtract.into())
     }
 }

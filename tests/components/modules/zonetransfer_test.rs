@@ -6,7 +6,7 @@ use hickory_resolver::config::{NameServerConfig, Protocol};
 use std::{net::SocketAddr, str::FromStr};
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher,
-    error::{ModuleErrorKind::CustomError, SubscanError},
+    error::{ModuleErrorKind::Custom, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::zonetransfer::ZoneTransfer,
 };
@@ -70,7 +70,7 @@ async fn run_failed_test() {
     assert!(result.is_err());
     assert_eq!(
         result.err().unwrap(),
-        SubscanError::from(CustomError("no default ns".into()))
+        SubscanError::from(Custom("no default ns".into()))
     );
 }
 

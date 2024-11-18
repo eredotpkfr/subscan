@@ -4,7 +4,7 @@ use crate::common::{
 };
 use subscan::{
     enums::{content::Content, dispatchers::SubscanModuleDispatcher},
-    error::{ModuleErrorKind::CustomError, SubscanError},
+    error::{ModuleErrorKind::Custom, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::dnsdumpstercrawler::DNSDumpsterCrawler,
 };
@@ -34,7 +34,7 @@ async fn run_test_no_token() {
     assert!(result.is_err());
     assert_eq!(
         result.err().unwrap(),
-        SubscanError::from(CustomError("not get token".into()))
+        SubscanError::from(Custom("not get token".into()))
     );
 }
 

@@ -2,7 +2,7 @@ use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
     },
-    error::ModuleErrorKind::CustomError,
+    error::ModuleErrorKind::Custom,
     interfaces::module::SubscanModuleInterface,
     types::{
         core::{Result, Subdomain},
@@ -69,7 +69,7 @@ impl ZoneTransfer {
         let mut ips = vec![];
         let mut client = self.get_async_client(server).await?;
 
-        let name = Name::from_str(domain).unwrap();
+        let name = Name::from_str(domain).ok()?;
         let ns_response = client.query(name, DNSClass::IN, RecordType::NS);
 
         for answer in ns_response.await.ok()?.answers() {
@@ -139,15 +139,18 @@ impl SubscanModuleInterface for ZoneTransfer {
         let mut result: SubscanModuleResult = self.name().await.into();
 
         if let Some(ns) = &self.ns {
-            if let Some(ips) = self.get_ns_as_ip(ns.socket_addr, domain).await {
-                for ip in ips {
-                    result.extend(self.attempt_zone_transfer(ip, domain).await);
-                }
+            let ips = self
+                .get_ns_as_ip(ns.socket_addr, domain)
+                .await
+                .ok_or(Custom("connection error".into()))?;
+
+            for ip in ips {
+                result.extend(self.attempt_zone_transfer(ip, domain).await);
             }
 
-            Ok(result.with_finished().await)
-        } else {
-            Err(CustomError("no default ns".into()).into())
+            return Ok(result.with_finished().await);
         }
+
+        Err(Custom("no default ns".into()).into())
     }
 }

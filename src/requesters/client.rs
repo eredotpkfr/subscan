@@ -1,6 +1,6 @@
 use crate::{
     enums::content::Content,
-    error::{ModuleErrorKind::GetContentError, SubscanError},
+    error::{ModuleErrorKind::GetContent, SubscanError},
     interfaces::requester::RequesterInterface,
     types::{config::requester::RequesterConfig, core::Result},
 };
@@ -148,12 +148,12 @@ impl RequesterInterface for HTTPClient {
             .client
             .execute(request)
             .await
-            .map_err(|_| SubscanError::from(GetContentError))?;
+            .map_err(|_| SubscanError::from(GetContent))?;
 
         Ok(response
             .text()
             .await
-            .map_err(|_| SubscanError::from(GetContentError))?
+            .map_err(|_| SubscanError::from(GetContent))?
             .into())
     }
 }
