@@ -2,7 +2,7 @@ use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
     },
-    error::{ModuleErrorKind::JSONExtract, SkipReason::AuthenticationNotProvided, SubscanError},
+    error::{ModuleErrorKind::JSONExtract, SubscanError},
     extractors::json::JSONExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -11,7 +11,7 @@ use crate::{
     requesters::client::HTTPClient,
     types::{
         core::{Result, Subdomain, SubscanModuleCoreComponents},
-        result::module::SubscanModuleResult,
+        result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
     },
 };
 use async_trait::async_trait;

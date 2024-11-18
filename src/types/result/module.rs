@@ -1,6 +1,7 @@
+use super::status::SubscanModuleStatus;
 use crate::{
-    error::{SubscanError, SubscanModuleStatus},
-    types::{core::Subdomain, result::stats::SubscanModuleStatistics},
+    error::SubscanError,
+    types::{core::Subdomain, result::statistics::SubscanModuleStatistics},
 };
 use chrono::{DateTime, TimeDelta, Utc};
 use std::collections::BTreeSet;
@@ -57,8 +58,10 @@ impl SubscanModuleResult {
     /// # Examples
     ///
     /// ```
-    /// use subscan::types::result::module::SubscanModuleResult;
-    /// use subscan::error::SubscanModuleStatus;
+    /// use subscan::types::result::{
+    ///     module::SubscanModuleResult,
+    ///     status::SubscanModuleStatus
+    /// };
     ///
     /// #[tokio::main]
     /// async fn main() {

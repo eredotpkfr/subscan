@@ -11,7 +11,7 @@ use crate::{
         core::{Subdomain, SubscanModule, UnboundedFlumeChannel, UnboundedFlumeChannelTuple},
         result::{
             item::SubscanModulePoolResultItem, pool::SubscanModulePoolResult,
-            stats::SubscanModuleStatistics,
+            statistics::SubscanModuleStatistics,
         },
     },
 };

@@ -2,7 +2,7 @@ use std::collections::BTreeSet;
 
 use super::{
     item::SubscanModulePoolResultItem,
-    stats::{SubscanModulePoolStatistics, SubscanModuleStatistics},
+    statistics::{SubscanModulePoolStatistics, SubscanModuleStatistics},
 };
 
 /// Stores [`SubscanModulePool`](crate::pools::module::SubscanModulePool) results

@@ -1,5 +1,5 @@
+use super::status::{SkipReason::SkippedByUser, SubscanModuleStatus};
 use crate::{
-    error::{SkipReason::SkippedByUser, SubscanModuleStatus},
     types::result::module::SubscanModuleResult,
     utilities::serializers::{dt_to_string_method, td_num_seconds_method},
 };

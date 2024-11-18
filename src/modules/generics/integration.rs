@@ -3,7 +3,6 @@ use crate::{
         auth::AuthenticationMethod,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
     },
-    error::SkipReason::AuthenticationNotProvided,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
@@ -12,7 +11,7 @@ use crate::{
         core::{Result, SubscanModuleCoreComponents},
         env::{Credentials, Env},
         func::GenericIntegrationCoreFuncs,
-        result::module::SubscanModuleResult,
+        result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
     },
     utilities::http,
 };

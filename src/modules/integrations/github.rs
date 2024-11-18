@@ -3,7 +3,7 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
     },
-    error::{ModuleErrorKind::Custom, SkipReason::AuthenticationNotProvided},
+    error::ModuleErrorKind::Custom,
     extractors::regex::RegexExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -12,7 +12,7 @@ use crate::{
     requesters::client::HTTPClient,
     types::{
         core::{Result, SubscanModuleCoreComponents},
-        result::module::SubscanModuleResult,
+        result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
     },
 };
 use async_trait::async_trait;

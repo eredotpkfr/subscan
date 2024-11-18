@@ -7,9 +7,10 @@ use crate::common::{
 };
 use serde_json::Value;
 use subscan::{
-    error::{ModuleErrorKind::JSONExtract, SkipReason::AuthenticationNotProvided, SubscanError},
+    error::{ModuleErrorKind::JSONExtract, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::netlas::Netlas,
+    types::result::status::SkipReason::AuthenticationNotProvided,
 };
 
 #[tokio::test]

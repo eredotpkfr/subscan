@@ -6,9 +6,11 @@ use reqwest::Url;
 use std::env;
 use subscan::{
     enums::{auth::AuthenticationMethod, content::Content},
-    error::SkipReason::AuthenticationNotProvided,
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
-    types::env::{Credentials, Env},
+    types::{
+        env::{Credentials, Env},
+        result::status::SkipReason::AuthenticationNotProvided,
+    },
 };
 
 #[tokio::test]

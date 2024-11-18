@@ -10,9 +10,10 @@ use reqwest::Url;
 use serde_json::{json, Value};
 use subscan::{
     enums::{content::Content, dispatchers::SubscanModuleDispatcher},
-    error::{ModuleErrorKind::Custom, SkipReason::AuthenticationNotProvided, SubscanError},
+    error::{ModuleErrorKind::Custom, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::github::GitHub,
+    types::result::status::SkipReason::AuthenticationNotProvided,
 };
 
 #[tokio::test]

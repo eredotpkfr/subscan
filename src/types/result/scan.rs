@@ -1,4 +1,4 @@
-use super::{pool::SubscanModulePoolResult, stats::ScanResultStatistics};
+use super::{pool::SubscanModulePoolResult, statistics::ScanResultStatistics};
 use crate::{
     enums::output::OutputFormat,
     types::result::{item::ScanResultItem, metadata::ScanResultMetadata},
@@ -9,7 +9,7 @@ use colored::Colorize;
 use csv::WriterBuilder;
 use serde::Serialize;
 use serde_json;
-use std::{collections::BTreeSet, fs::File, io::Write};
+use std::{collections::BTreeSet, io::Write};
 
 /// `Subscan` scan result type
 #[derive(Clone, Default, Serialize)]
@@ -22,7 +22,7 @@ pub struct ScanResult {
 
 impl ScanResult {
     pub async fn save(&self, output: &OutputFormat) -> String {
-        let (file, filename) = self.get_output_file(output).await;
+        let (file, filename) = output.get_file(&self.metadata.target).await;
 
         match output {
             OutputFormat::TXT => self.save_txt(file).await,
@@ -34,18 +34,6 @@ impl ScanResult {
         log::info!("Scan results saved to {filename}");
 
         filename
-    }
-
-    async fn get_output_file(&self, output: &OutputFormat) -> (File, String) {
-        let now = Utc::now().timestamp();
-        let filename = match output {
-            OutputFormat::TXT => format!("{}_{}.txt", self.metadata.target, now),
-            OutputFormat::CSV => format!("{}_{}.csv", self.metadata.target, now),
-            OutputFormat::JSON => format!("{}_{}.json", self.metadata.target, now),
-            OutputFormat::HTML => format!("{}_{}.html", self.metadata.target, now),
-        };
-
-        (File::create(filename.clone()).unwrap(), filename)
     }
 
     async fn save_txt<W: Write>(&self, mut writer: W) {
@@ -111,7 +99,7 @@ impl ScanResult {
     /// use std::collections::BTreeSet;
     /// use subscan::types::result::{
     ///     scan::ScanResult,
-    ///     stats::SubscanModulePoolStatistics,
+    ///     statistics::SubscanModulePoolStatistics,
     ///     pool::SubscanModulePoolResult,
     /// };
     /// use subscan::types::result::item::SubscanModulePoolResultItem;
@@ -152,12 +140,11 @@ impl ScanResult {
     ///
     /// ```
     /// use std::collections::BTreeSet;
-    /// use subscan::types::result::scan::ScanResult;
-    /// use subscan::error::{SubscanModuleStatus, SkipReason};
+    /// use subscan::types::result::{scan::ScanResult, status::SkipReason};
     /// use subscan::types::result::{
     ///     pool::SubscanModulePoolResult,
     ///     item::SubscanModulePoolResultItem,
-    ///     stats::SubscanModulePoolStatistics
+    ///     statistics::SubscanModulePoolStatistics
     /// };
     ///
     /// #[tokio::main]
