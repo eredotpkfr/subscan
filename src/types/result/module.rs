@@ -78,19 +78,81 @@ impl SubscanModuleResult {
         self.clone().into()
     }
 
+    /// Updated status to [`SubscanModuleStatus::Finished`] and [`finished_at`](crate::types::result::module::SubscanModuleResult::finished_at)
+    /// to [`Utc::now()`] and returns itself
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::result::{
+    ///     module::SubscanModuleResult,
+    ///     status::SubscanModuleStatus,
+    /// };
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let result = SubscanModuleResult::default();
+    ///
+    ///     assert_eq!(result.status, SubscanModuleStatus::Started);
+    ///     assert_eq!(
+    ///         result.with_finished().await.status,
+    ///         SubscanModuleStatus::Finished
+    ///     );
+    /// }
+    /// ```
     pub async fn with_finished(mut self) -> Self {
         self.status = SubscanModuleStatus::Finished;
         self.finished_at = Utc::now();
         self
     }
 
+    /// Make a graceful exit if any subdomain available in result, returns
+    /// [`SubscanError::ModuleErrorWithResult`] error type
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::result::{
+    ///     module::SubscanModuleResult,
+    ///     status::SubscanModuleStatus,
+    /// };
+    /// use std::collections::BTreeSet;
+    /// use subscan::error::{SubscanError, ModuleErrorKind::JSONExtract};
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut result = SubscanModuleResult::default();
+    ///     let graceful = result.graceful_exit().await(JSONExtract.into());
+    ///
+    ///     assert_eq!(graceful, JSONExtract.into());
+    ///     assert_eq!(graceful.status(), SubscanModuleStatus::Failed(JSONExtract.into()));
+    ///
+    ///     let mut result = SubscanModuleResult::default();
+    ///     let mut expected = result.clone();
+    ///
+    ///     result.extend(BTreeSet::from_iter(["bar.foo.com".into()]));
+    ///
+    ///     expected.extend(BTreeSet::from_iter(["bar.foo.com".into()]));
+    ///     expected.status = SubscanModuleStatus::FailedWithResult;
+    ///
+    ///     let graceful = result.graceful_exit().await(JSONExtract.into());
+    ///
+    ///     assert_eq!(graceful, SubscanError::ModuleErrorWithResult(expected));
+    ///
+    ///     if let SubscanError::ModuleErrorWithResult(inner) = graceful {
+    ///         assert_eq!(inner.subdomains, ["bar.foo.com".into()].into());
+    ///     }
+    /// }
+    /// ```
     pub async fn graceful_exit(&mut self) -> impl Fn(SubscanError) -> SubscanError + '_ {
-        self.status = SubscanModuleStatus::FailedWithResult;
-
         |err| {
+            let mut res = self.clone();
+
             if !self.subdomains.is_empty() {
-                SubscanError::ModuleErrorWithResult(self.clone())
+                res.status = SubscanModuleStatus::FailedWithResult;
+                SubscanError::ModuleErrorWithResult(res)
             } else {
+                res.status = err.status();
                 err
             }
         }

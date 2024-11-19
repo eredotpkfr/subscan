@@ -133,7 +133,7 @@ impl SubscanModulePool {
                     }
                 } else {
                     let error = subresult.unwrap_err();
-                    let stats = error.stats(name).await;
+                    let stats = error.stats(name);
 
                     stats.status.log(name);
                     self.result.lock().await.statistic(stats).await;

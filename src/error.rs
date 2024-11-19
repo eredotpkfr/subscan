@@ -51,21 +51,18 @@ impl SubscanError {
     ///     module::SubscanModuleResult
     /// };
     ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let result = SubscanModuleResult::default();
+    /// let result = SubscanModuleResult::default();
     ///
-    ///     let failed = SubscanError::from(Custom("foo".into()));
-    ///     let failed_with_result = SubscanError::ModuleErrorWithResult(result);
+    /// let failed = SubscanError::from(Custom("foo".into()));
+    /// let failed_with_result = SubscanError::ModuleErrorWithResult(result);
     ///
-    ///     assert_eq!(failed.status().await, Custom("foo".into()).into());
-    ///     assert_eq!(failed_with_result.status().await, FailedWithResult);
+    /// assert_eq!(failed.status(), Custom("foo".into()).into());
+    /// assert_eq!(failed_with_result.status(), FailedWithResult);
     ///
-    ///     assert_eq!(format!("{failed}"), "foo");
-    ///     assert_eq!(format!("{failed_with_result}"), "failed with result");
-    /// }
+    /// assert_eq!(format!("{failed}"), "foo");
+    /// assert_eq!(format!("{failed_with_result}"), "failed with result");
     /// ```
-    pub async fn status(&self) -> SubscanModuleStatus {
+    pub fn status(&self) -> SubscanModuleStatus {
         match self {
             SubscanError::ModuleError(kind) => kind.status(),
             SubscanError::ModuleErrorWithResult(_) => SubscanModuleStatus::FailedWithResult,
@@ -83,21 +80,18 @@ impl SubscanError {
     ///     module::SubscanModuleResult
     /// };
     ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let failed = SubscanError::from(SkippedByUser);
-    ///     let stats = failed.stats("foo").await;
+    /// let failed = SubscanError::from(SkippedByUser);
+    /// let stats = failed.stats("foo");
     ///
-    ///     assert_eq!(stats.module, "foo");
-    ///     assert_eq!(stats.status, SkippedByUser.into());
-    ///     assert_eq!(stats.count, 0);
-    ///     assert_eq!(stats.elapsed.num_seconds(), 0);
-    /// }
+    /// assert_eq!(stats.module, "foo");
+    /// assert_eq!(stats.status, SkippedByUser.into());
+    /// assert_eq!(stats.count, 0);
+    /// assert_eq!(stats.elapsed.num_seconds(), 0);
     /// ```
-    pub async fn stats(&self, module: &str) -> SubscanModuleStatistics {
+    pub fn stats(&self, module: &str) -> SubscanModuleStatistics {
         SubscanModuleStatistics {
             module: module.to_string(),
-            status: self.status().await,
+            status: self.status(),
             count: 0,
             started_at: Utc::now(),
             finished_at: Utc::now(),
