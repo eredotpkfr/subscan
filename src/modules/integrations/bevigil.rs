@@ -1,3 +1,8 @@
+use std::collections::BTreeSet;
+
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -13,9 +18,6 @@ use crate::{
         func::GenericIntegrationCoreFuncs,
     },
 };
-use reqwest::Url;
-use serde_json::Value;
-use std::collections::BTreeSet;
 
 pub const BEVIGIL_MODULE_NAME: &str = "bevigil";
 pub const BEVIGIL_URL: &str = "https://osint.bevigil.com/api";

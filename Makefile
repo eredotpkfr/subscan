@@ -10,6 +10,7 @@ all: install-pre-commit-mac \
 	clean \
 	build \
 	doc \
+	doc-rs \
 	clippy \
 	deny \
 	test
@@ -30,13 +31,15 @@ install-cargo-deny:
 pre-commit-update-hooks:
 	@pre-commit autoupdate
 rustfmt-check:
-	@cargo fmt --all -- --check
+	@cargo +nightly fmt --all -- --check
 rustfmt: fix
-	@cargo fmt --all
+	@cargo +nightly fmt --all
 test:
 	@cargo test
 doc:
 	@cargo doc
+doc-rs:
+	@cargo +nightly docs-rs
 clean:
 	@cargo clean
 fix:

@@ -1,3 +1,8 @@
+use std::collections::BTreeSet;
+
+use async_trait::async_trait;
+use regex::Match;
+
 use crate::{
     enums::content::Content,
     error::{ModuleErrorKind::RegexExtract, SubscanError},
@@ -5,9 +10,6 @@ use crate::{
     types::core::{Result, Subdomain},
     utilities::regex::generate_subdomain_regex,
 };
-use async_trait::async_trait;
-use regex::Match;
-use std::collections::BTreeSet;
 
 /// Regex extractor component generates subdomain pattern by
 /// given domain address and extracts subdomains via this pattern.

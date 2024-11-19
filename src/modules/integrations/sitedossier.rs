@@ -1,3 +1,5 @@
+use reqwest::Url;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -9,7 +11,6 @@ use crate::{
     requesters::client::HTTPClient,
     types::{core::SubscanModuleCoreComponents, func::GenericIntegrationCoreFuncs},
 };
-use reqwest::Url;
 
 pub const SITEDOSSIER_MODULE_NAME: &str = "sitedossier";
 pub const SITEDOSSIER_URL: &str = "http://www.sitedossier.com/parentdomain";

@@ -1,7 +1,9 @@
-use super::core::Subdomain;
+use std::collections::BTreeSet;
+
 use itertools::Itertools;
 use reqwest::Url;
-use std::collections::BTreeSet;
+
+use super::core::Subdomain;
 
 /// Data type to store search URL query param
 /// for search engines like `Google`, `Yahoo`, `Bing`, etc.

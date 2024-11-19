@@ -1,3 +1,12 @@
+use std::str::FromStr;
+
+use async_trait::async_trait;
+use reqwest::{
+    header::{HeaderName, HeaderValue},
+    Url,
+};
+use tokio::sync::Mutex;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -15,13 +24,6 @@ use crate::{
     },
     utilities::http,
 };
-use async_trait::async_trait;
-use reqwest::{
-    header::{HeaderName, HeaderValue},
-    Url,
-};
-use std::str::FromStr;
-use tokio::sync::Mutex;
 
 /// Generic integration module
 ///

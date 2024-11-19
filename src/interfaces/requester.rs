@@ -1,11 +1,12 @@
+use async_trait::async_trait;
+use enum_dispatch::enum_dispatch;
+use reqwest::Url;
+
 use crate::{
     enums::{content::Content, dispatchers::RequesterDispatcher},
     requesters::{chrome::ChromeBrowser, client::HTTPClient},
     types::{config::requester::RequesterConfig, core::Result},
 };
-use async_trait::async_trait;
-use enum_dispatch::enum_dispatch;
-use reqwest::Url;
 
 /// Generic HTTP client trait definition to implement different
 /// HTTP requester objects with a single interface compatible

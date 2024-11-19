@@ -1,3 +1,13 @@
+use std::collections::BTreeSet;
+
+use async_trait::async_trait;
+use reqwest::{
+    header::{HeaderName, HeaderValue},
+    Url,
+};
+use serde_json::{json, Value};
+use tokio::sync::Mutex;
+
 use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
@@ -14,14 +24,6 @@ use crate::{
         result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
     },
 };
-use async_trait::async_trait;
-use reqwest::{
-    header::{HeaderName, HeaderValue},
-    Url,
-};
-use serde_json::{json, Value};
-use std::collections::BTreeSet;
-use tokio::sync::Mutex;
 
 pub const NETLAS_MODULE_NAME: &str = "netlas";
 pub const NETLAS_URL: &str = "https://app.netlas.io";

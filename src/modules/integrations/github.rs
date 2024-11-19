@@ -1,3 +1,13 @@
+use std::collections::BTreeSet;
+
+use async_trait::async_trait;
+use reqwest::{
+    header::{HeaderValue, AUTHORIZATION},
+    Url,
+};
+use serde_json::Value;
+use tokio::sync::Mutex;
+
 use crate::{
     enums::{
         content::Content,
@@ -15,14 +25,6 @@ use crate::{
         result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
     },
 };
-use async_trait::async_trait;
-use reqwest::{
-    header::{HeaderValue, AUTHORIZATION},
-    Url,
-};
-use serde_json::Value;
-use std::collections::BTreeSet;
-use tokio::sync::Mutex;
 
 pub const GITHUB_MODULE_NAME: &str = "github";
 pub const GITHUB_URL: &str = "https://github.com/";

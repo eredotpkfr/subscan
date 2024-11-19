@@ -1,3 +1,7 @@
+use async_trait::async_trait;
+use enum_dispatch::enum_dispatch;
+use tokio::sync::Mutex;
+
 use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
@@ -12,9 +16,6 @@ use crate::{
     },
     types::{core::Result, env::SubscanModuleEnvs, result::module::SubscanModuleResult},
 };
-use async_trait::async_trait;
-use enum_dispatch::enum_dispatch;
-use tokio::sync::Mutex;
 
 /// Generic `subscan` module trait definition to implement
 /// subdomain enumeration modules

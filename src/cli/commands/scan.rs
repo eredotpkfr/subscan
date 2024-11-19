@@ -1,3 +1,5 @@
+use clap::Args;
+
 use crate::{
     constants::{
         ASTERISK, DEFAULT_HTTP_TIMEOUT, DEFAULT_MODULE_CONCURRENCY, DEFAULT_RESOLVER_CONCURRENCY,
@@ -5,7 +7,6 @@ use crate::{
     },
     enums::{cache::CacheFilter, output::OutputFormat},
 };
-use clap::Args;
 
 /// Scan command arguments
 #[derive(Args, Clone, Debug, Default)]

@@ -1,3 +1,8 @@
+use std::collections::BTreeSet;
+
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -14,9 +19,6 @@ use crate::{
     },
     utilities::http,
 };
-use reqwest::Url;
-use serde_json::Value;
-use std::collections::BTreeSet;
 
 pub const SHODAN_MODULE_NAME: &str = "shodan";
 pub const SHODAN_URL: &str = "https://api.shodan.io";

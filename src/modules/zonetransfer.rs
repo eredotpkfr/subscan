@@ -1,3 +1,15 @@
+use std::{net::SocketAddr, str::FromStr};
+
+use async_trait::async_trait;
+use hickory_client::{
+    client::{AsyncClient, ClientHandle},
+    proto::iocompat::AsyncIoTokioAsStd,
+    rr::{domain::Name, DNSClass, Record, RecordType},
+    tcp::TcpClientStream,
+};
+use hickory_resolver::config::NameServerConfig;
+use tokio::{net::TcpStream as TokioTcpStream, sync::Mutex};
+
 use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
@@ -10,16 +22,6 @@ use crate::{
     },
     utilities::{net, regex},
 };
-use async_trait::async_trait;
-use hickory_client::{
-    client::{AsyncClient, ClientHandle},
-    proto::iocompat::AsyncIoTokioAsStd,
-    rr::{domain::Name, DNSClass, Record, RecordType},
-    tcp::TcpClientStream,
-};
-use hickory_resolver::config::NameServerConfig;
-use std::{net::SocketAddr, str::FromStr};
-use tokio::{net::TcpStream as TokioTcpStream, sync::Mutex};
 
 pub const ZONETRANSFER_MODULE_NAME: &str = "zonetransfer";
 

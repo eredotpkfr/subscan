@@ -1,5 +1,8 @@
 use std::collections::BTreeSet;
 
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -16,8 +19,6 @@ use crate::{
     },
     utilities::http,
 };
-use reqwest::Url;
-use serde_json::Value;
 
 pub const ZOOMEYE_MODULE_NAME: &str = "zoomeye";
 pub const ZOOMEYE_URL: &str = "https://api.zoomeye.hk/domain/search";

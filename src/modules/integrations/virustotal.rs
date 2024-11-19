@@ -1,3 +1,8 @@
+use std::collections::BTreeSet;
+
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -13,9 +18,6 @@ use crate::{
         func::GenericIntegrationCoreFuncs,
     },
 };
-use reqwest::Url;
-use serde_json::Value;
-use std::collections::BTreeSet;
 
 pub const VIRUSTOTAL_MODULE_NAME: &str = "virustotal";
 pub const VIRUSTOTAL_URL: &str = "https://www.virustotal.com/api/v3/domains";

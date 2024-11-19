@@ -1,11 +1,12 @@
+use async_trait::async_trait;
+use reqwest::{Client, Proxy, Url};
+
 use crate::{
     enums::content::Content,
     error::{ModuleErrorKind::GetContent, SubscanError},
     interfaces::requester::RequesterInterface,
     types::{config::requester::RequesterConfig, core::Result},
 };
-use async_trait::async_trait;
-use reqwest::{Client, Proxy, Url};
 
 const CLIENT_BUILD_ERR: &str = "Cannot create HTTP client!";
 const REQUEST_BUILD_ERR: &str = "Cannot build request!";

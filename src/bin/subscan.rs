@@ -1,5 +1,6 @@
-use clap::Parser;
 use std::io;
+
+use clap::Parser;
 use subscan::{
     cli::{
         commands::{module::ModuleSubCommands, Commands},

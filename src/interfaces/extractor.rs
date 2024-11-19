@@ -1,11 +1,13 @@
+use std::collections::BTreeSet;
+
+use async_trait::async_trait;
+use enum_dispatch::enum_dispatch;
+
 use crate::{
     enums::{content::Content, dispatchers::SubdomainExtractorDispatcher},
     extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor},
     types::core::{Result, Subdomain},
 };
-use async_trait::async_trait;
-use enum_dispatch::enum_dispatch;
-use std::collections::BTreeSet;
 
 /// Extractor trait definition to implement subdomain extractors
 ///

@@ -1,11 +1,13 @@
-use super::utils::{get_random_port, stubs_path};
 use std::{
     fs::{self, File},
     io::Write,
     path::PathBuf,
 };
+
 use tempfile::{tempdir_in, TempDir};
 use tokio::sync::OnceCell;
+
+use super::utils::{get_random_port, stubs_path};
 
 pub struct StubTemplateManager<'a> {
     pub temp: TempDir,

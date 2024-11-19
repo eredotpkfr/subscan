@@ -1,3 +1,8 @@
+use std::collections::BTreeSet;
+
+use async_trait::async_trait;
+use scraper::{ElementRef, Html, Selector};
+
 use crate::{
     enums::content::Content,
     error::{ModuleErrorKind::HTMLExtract, SubscanError},
@@ -5,9 +10,6 @@ use crate::{
     interfaces::extractor::SubdomainExtractorInterface,
     types::core::{Result, Subdomain},
 };
-use async_trait::async_trait;
-use scraper::{ElementRef, Html, Selector};
-use std::collections::BTreeSet;
 
 /// This object compatible with [`SubdomainExtractorInterface`]
 /// and it uses `extract` method to extract subdomain addresses

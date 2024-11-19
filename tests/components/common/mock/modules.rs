@@ -1,8 +1,7 @@
-use super::funcs::wrap_url_with_mock_func;
-use crate::common::utils::current_thread_hex;
+use std::collections::BTreeSet;
+
 use reqwest::Url;
 use serde_json::Value;
-use std::collections::BTreeSet;
 use subscan::{
     enums::{auth::AuthenticationMethod, dispatchers::RequesterDispatcher},
     error::{ModuleErrorKind::JSONExtract, SubscanError},
@@ -14,6 +13,9 @@ use subscan::{
         query::SearchQueryParam,
     },
 };
+
+use super::funcs::wrap_url_with_mock_func;
+use crate::common::utils::current_thread_hex;
 
 pub fn generic_search_engine(url: &str) -> GenericSearchEngineModule {
     let requester = RequesterDispatcher::HTTPClient(HTTPClient::default());

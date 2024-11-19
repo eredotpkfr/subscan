@@ -1,12 +1,14 @@
-use crate::common::constants::{LOCAL_HOST, READ_ERROR};
-use serde_json::Value;
 use std::{
     fs,
     net::TcpListener,
     path::{Path, PathBuf},
     thread,
 };
+
+use serde_json::Value;
 use subscan::enums::content::Content;
+
+use crate::common::constants::{LOCAL_HOST, READ_ERROR};
 
 pub fn stubs_path() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/stubs")

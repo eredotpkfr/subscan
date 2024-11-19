@@ -1,3 +1,9 @@
+use std::collections::BTreeSet;
+
+use regex::Match;
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -14,10 +20,6 @@ use crate::{
     },
     utilities::regex::generate_subdomain_regex,
 };
-use regex::Match;
-use reqwest::Url;
-use serde_json::Value;
-use std::collections::BTreeSet;
 
 pub const CERTSPOTTER_MODULE_NAME: &str = "certspotter";
 pub const CERTSPOTTER_URL: &str = "https://api.certspotter.com/v1/issuances";

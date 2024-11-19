@@ -1,15 +1,17 @@
+use std::{collections::BTreeSet, io::Write};
+
+use chrono::Utc;
+use colored::Colorize;
+use csv::WriterBuilder;
+use serde::Serialize;
+use serde_json;
+
 use super::{pool::SubscanModulePoolResult, statistics::ScanResultStatistics};
 use crate::{
     enums::output::OutputFormat,
     types::result::{item::ScanResultItem, metadata::ScanResultMetadata},
     utilities::cli,
 };
-use chrono::Utc;
-use colored::Colorize;
-use csv::WriterBuilder;
-use serde::Serialize;
-use serde_json;
-use std::{collections::BTreeSet, io::Write};
 
 /// `Subscan` scan result type
 #[derive(Clone, Default, Serialize)]

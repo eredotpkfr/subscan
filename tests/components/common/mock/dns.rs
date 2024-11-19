@@ -1,4 +1,9 @@
-use crate::common::{constants::LOCAL_HOST, utils::get_random_port};
+use std::{
+    net::{IpAddr, SocketAddr},
+    str::FromStr,
+    time::Duration,
+};
+
 use hickory_client::{
     op::{Header, MessageType, OpCode, ResponseCode},
     proto::rr::LowerName,
@@ -18,13 +23,10 @@ use hickory_server::{
     server::{Request, RequestHandler, ResponseHandler, ResponseInfo},
     ServerFuture,
 };
-use std::{
-    net::{IpAddr, SocketAddr},
-    str::FromStr,
-    time::Duration,
-};
 use subscan::{resolver::Resolver, types::config::resolver::ResolverConfig};
 use tokio::net::TcpListener;
+
+use crate::common::{constants::LOCAL_HOST, utils::get_random_port};
 
 #[derive(Clone)]
 pub struct MockDNSServer {

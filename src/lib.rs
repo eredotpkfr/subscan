@@ -29,14 +29,17 @@ pub mod types;
 /// Utilities for the handle different stuff things
 pub mod utilities;
 
-use crate::{
-    cache::CacheManager, cli::Cli, interfaces::module::SubscanModuleInterface,
-    pools::module::SubscanModulePool, types::config::subscan::SubscanConfig,
-    types::core::SubscanModule,
-};
 use constants::LOG_TIME_FORMAT;
 use tokio::sync::OnceCell;
 use types::result::scan::ScanResult;
+
+use crate::{
+    cache::CacheManager,
+    cli::Cli,
+    interfaces::module::SubscanModuleInterface,
+    pools::module::SubscanModulePool,
+    types::{config::subscan::SubscanConfig, core::SubscanModule},
+};
 
 static INIT: OnceCell<()> = OnceCell::const_new();
 

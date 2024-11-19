@@ -1,3 +1,5 @@
+use reqwest::Url;
+
 use crate::{
     enums::dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     extractors::html::HTMLExtractor,
@@ -5,7 +7,6 @@ use crate::{
     requesters::client::HTTPClient,
     types::core::SubscanModuleCoreComponents,
 };
-use reqwest::Url;
 
 pub const BING_MODULE_NAME: &str = "bing";
 pub const BING_SEARCH_URL: &str = "https://www.bing.com/search";

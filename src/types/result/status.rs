@@ -1,7 +1,9 @@
-use crate::error::ModuleErrorKind;
+use std::fmt::Display;
+
 use colored::Colorize;
 use serde::Serialize;
-use std::fmt::Display;
+
+use crate::error::ModuleErrorKind;
 
 /// Subscan module states
 #[derive(Clone, Debug, Default, PartialEq, PartialOrd, Eq, Ord)]

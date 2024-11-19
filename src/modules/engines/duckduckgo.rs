@@ -1,3 +1,5 @@
+use reqwest::Url;
+
 use crate::{
     enums::dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     extractors::html::HTMLExtractor,
@@ -5,7 +7,6 @@ use crate::{
     requesters::chrome::ChromeBrowser,
     types::core::SubscanModuleCoreComponents,
 };
-use reqwest::Url;
 
 pub const DUCKDUCKGO_MODULE_NAME: &str = "duckduckgo";
 pub const DUCKDUCKGO_SEARCH_URL: &str = "https://duckduckgo.com";

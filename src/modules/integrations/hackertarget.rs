@@ -1,3 +1,5 @@
+use reqwest::Url;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -9,7 +11,6 @@ use crate::{
     requesters::client::HTTPClient,
     types::{core::SubscanModuleCoreComponents, func::GenericIntegrationCoreFuncs},
 };
-use reqwest::Url;
 
 pub const HACKERTARGET_MODULE_NAME: &str = "hackertarget";
 pub const HACKERTARGET_URL: &str = "https://api.hackertarget.com/hostsearch";

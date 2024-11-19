@@ -1,6 +1,7 @@
+use std::fs::File;
+
 use chrono::Utc;
 use clap::ValueEnum;
-use std::fs::File;
 
 /// Supported output formats for reporting scan results
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]

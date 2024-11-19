@@ -1,8 +1,9 @@
+use clap::Args;
+
 use crate::constants::{
     DEFAULT_HTTP_TIMEOUT, DEFAULT_RESOLVER_CONCURRENCY, DEFAULT_RESOLVER_TIMEOUT,
     DEFAULT_USER_AGENT,
 };
-use clap::Args;
 
 /// Run command to start any module
 #[derive(Args, Clone, Debug, Default)]

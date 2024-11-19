@@ -1,3 +1,13 @@
+use std::{collections::BTreeSet, io::Error};
+
+use async_trait::async_trait;
+use chrono::Datelike;
+use futures::TryStreamExt;
+use reqwest::Url;
+use serde_json::Value;
+use tokio::{io::AsyncBufReadExt, sync::Mutex};
+use tokio_util::io::StreamReader;
+
 use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
@@ -14,14 +24,6 @@ use crate::{
         result::module::SubscanModuleResult,
     },
 };
-use async_trait::async_trait;
-use chrono::Datelike;
-use futures::TryStreamExt;
-use reqwest::Url;
-use serde_json::Value;
-use std::{collections::BTreeSet, io::Error};
-use tokio::{io::AsyncBufReadExt, sync::Mutex};
-use tokio_util::io::StreamReader;
 
 pub const COMMONCRAWL_MODULE_NAME: &str = "commoncrawl";
 pub const COMMONCRAWL_INDEX_URL: &str = "https://index.commoncrawl.org/collinfo.json";

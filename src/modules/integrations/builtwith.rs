@@ -1,3 +1,8 @@
+use std::collections::BTreeSet;
+
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -13,9 +18,6 @@ use crate::{
         func::GenericIntegrationCoreFuncs,
     },
 };
-use reqwest::Url;
-use serde_json::Value;
-use std::collections::BTreeSet;
 
 pub const BUILTWITH_MODULE_NAME: &str = "builtwith";
 pub const BUILTWITH_URL: &str = "https://api.builtwith.com/v21/api.json";

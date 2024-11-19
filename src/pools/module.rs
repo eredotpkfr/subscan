@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use tokio::{sync::Mutex, task::JoinSet};
 
 use crate::{
@@ -15,7 +17,6 @@ use crate::{
         },
     },
 };
-use std::sync::Arc;
 
 struct SubscanModulePoolChannels {
     module: UnboundedFlumeChannel<SubscanModule>,

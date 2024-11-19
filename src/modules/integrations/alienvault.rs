@@ -1,5 +1,8 @@
 use std::collections::BTreeSet;
 
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -15,8 +18,6 @@ use crate::{
         func::GenericIntegrationCoreFuncs,
     },
 };
-use reqwest::Url;
-use serde_json::Value;
 
 pub const ALIENVAULT_MODULE_NAME: &str = "alienvault";
 pub const ALIENVAULT_URL: &str = "https://otx.alienvault.com/api/v1/indicators/domain";

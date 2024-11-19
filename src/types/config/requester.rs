@@ -1,8 +1,11 @@
-use crate::{
-    constants::DEFAULT_HTTP_TIMEOUT, types::config::subscan::SubscanConfig, types::env::Credentials,
-};
-use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
 use std::{collections::HashMap, time::Duration};
+
+use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
+
+use crate::{
+    constants::DEFAULT_HTTP_TIMEOUT,
+    types::{config::subscan::SubscanConfig, env::Credentials},
+};
 
 /// Type definition for store [`RequesterInterface`](crate::interfaces::requester::RequesterInterface)
 /// configurations in a struct. Also it has helpful

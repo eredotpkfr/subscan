@@ -1,3 +1,9 @@
+use std::collections::BTreeSet;
+
+use regex::Match;
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -14,10 +20,6 @@ use crate::{
     },
     utilities::{http, regex::generate_subdomain_regex},
 };
-use regex::Match;
-use reqwest::Url;
-use serde_json::Value;
-use std::collections::BTreeSet;
 
 pub const CENSYS_MODULE_NAME: &str = "censys";
 pub const CENSYS_URL: &str = "https://search.censys.io/api/v2/certificates/search";

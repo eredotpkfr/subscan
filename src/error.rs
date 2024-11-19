@@ -1,10 +1,12 @@
+use std::fmt::Display;
+
+use chrono::{TimeDelta, Utc};
+
 use crate::types::result::{
     module::SubscanModuleResult,
     statistics::SubscanModuleStatistics,
     status::{SkipReason, SubscanModuleStatus},
 };
-use chrono::{TimeDelta, Utc};
-use std::fmt::Display;
 
 /// Subscan error variants
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord)]

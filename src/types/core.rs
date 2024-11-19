@@ -1,12 +1,14 @@
+use std::{result, sync::Arc};
+
+use flume::{Receiver, Sender};
+use tokio::sync::Mutex;
+
 use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
     },
     error::SubscanError,
 };
-use flume::{Receiver, Sender};
-use std::{result, sync::Arc};
-use tokio::sync::Mutex;
 
 /// Result type
 pub type Result<T> = result::Result<T, SubscanError>;

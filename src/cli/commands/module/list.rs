@@ -1,6 +1,8 @@
-use crate::{types::core::SubscanModule, utilities::cli};
-use clap::Args;
 use std::io::Write;
+
+use clap::Args;
+
+use crate::{types::core::SubscanModule, utilities::cli};
 
 /// List command to list implemented modules
 #[derive(Args, Clone, Debug)]

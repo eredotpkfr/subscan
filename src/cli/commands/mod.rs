@@ -5,10 +5,11 @@ pub mod module;
 /// Scan command to start scan on any domain address
 pub mod scan;
 
+use clap::Subcommand;
+
 use crate::cli::commands::{
     brute::BruteCommandArgs, module::ModuleCommandArgs, scan::ScanCommandArgs,
 };
-use clap::Subcommand;
 
 /// List of CLI commands
 #[derive(Clone, Debug, Subcommand)]

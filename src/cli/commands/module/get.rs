@@ -1,7 +1,9 @@
-use crate::{enums::dispatchers::SubscanModuleDispatcher, utilities::cli};
-use clap::Args;
 use std::io::Write;
+
+use clap::Args;
 use tokio::sync::Mutex;
+
+use crate::{enums::dispatchers::SubscanModuleDispatcher, utilities::cli};
 
 /// Get command to fetch any module
 #[derive(Args, Clone, Debug)]

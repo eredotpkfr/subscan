@@ -1,3 +1,7 @@
+use async_trait::async_trait;
+use reqwest::Url;
+use tokio::sync::Mutex;
+
 use crate::{
     enums::dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
     interfaces::{
@@ -10,9 +14,6 @@ use crate::{
         result::module::SubscanModuleResult,
     },
 };
-use async_trait::async_trait;
-use reqwest::Url;
-use tokio::sync::Mutex;
 
 /// Generic search engine module that enumerates subdomain addresses by using dorking technique
 ///

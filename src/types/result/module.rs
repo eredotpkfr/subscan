@@ -1,10 +1,12 @@
+use std::collections::BTreeSet;
+
+use chrono::{DateTime, TimeDelta, Utc};
+
 use super::status::SubscanModuleStatus;
 use crate::{
     error::SubscanError,
     types::{core::Subdomain, result::statistics::SubscanModuleStatistics},
 };
-use chrono::{DateTime, TimeDelta, Utc};
-use std::collections::BTreeSet;
 
 /// `Subscan` module result, it stores findings and module execution status
 #[derive(Clone, Debug, Default, PartialEq, PartialOrd, Eq, Ord)]

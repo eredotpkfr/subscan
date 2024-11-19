@@ -1,3 +1,11 @@
+use async_trait::async_trait;
+use regex::Regex;
+use reqwest::{
+    header::{HeaderMap, HeaderValue, AUTHORIZATION},
+    Url,
+};
+use tokio::sync::Mutex;
+
 use crate::{
     enums::{
         content::Content,
@@ -15,13 +23,6 @@ use crate::{
         result::module::SubscanModuleResult,
     },
 };
-use async_trait::async_trait;
-use regex::Regex;
-use reqwest::{
-    header::{HeaderMap, HeaderValue, AUTHORIZATION},
-    Url,
-};
-use tokio::sync::Mutex;
 
 pub const DNSDUMPSTERCRAWLER_MODULE_NAME: &str = "dnsdumpstercrawler";
 pub const DNSDUMPSTERCRAWLER_URL: &str = "https://api.dnsdumpster.com/htmld/";

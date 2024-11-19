@@ -1,3 +1,11 @@
+use std::io::Error;
+
+use async_trait::async_trait;
+use futures::TryStreamExt;
+use reqwest::Url;
+use tokio::{io::AsyncBufReadExt, sync::Mutex};
+use tokio_util::io::StreamReader;
+
 use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
@@ -11,12 +19,6 @@ use crate::{
         result::module::SubscanModuleResult,
     },
 };
-use async_trait::async_trait;
-use futures::TryStreamExt;
-use reqwest::Url;
-use std::io::Error;
-use tokio::{io::AsyncBufReadExt, sync::Mutex};
-use tokio_util::io::StreamReader;
 
 pub const WAYBACKARCHIVE_MODULE_NAME: &str = "waybackarchive";
 pub const WAYBACKARCHIVE_URL: &str = "http://web.archive.org/cdx/search/cdx";

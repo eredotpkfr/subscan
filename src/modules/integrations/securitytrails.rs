@@ -1,5 +1,8 @@
 use std::collections::BTreeSet;
 
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -15,8 +18,6 @@ use crate::{
         func::GenericIntegrationCoreFuncs,
     },
 };
-use reqwest::Url;
-use serde_json::Value;
 
 pub const SECURITYTRAILS_MODULE_NAME: &str = "securitytrails";
 pub const SECURITYTRAILS_URL: &str = "https://api.securitytrails.com/v1/domain";

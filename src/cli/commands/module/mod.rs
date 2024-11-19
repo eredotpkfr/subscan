@@ -5,10 +5,11 @@ pub mod list;
 /// Run command to start any module
 pub mod run;
 
+use clap::{Args, Subcommand};
+
 use crate::cli::commands::module::{
     get::ModuleGetSubCommandArgs, list::ModuleListSubCommandArgs, run::ModuleRunSubCommandArgs,
 };
-use clap::{Args, Subcommand};
 
 /// List of subcommands on module command
 #[derive(Debug, Clone, Subcommand)]

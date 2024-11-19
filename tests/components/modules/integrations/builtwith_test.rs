@@ -1,16 +1,18 @@
-use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    mock::funcs,
-    utils::read_stub,
-};
+use std::env;
+
 use reqwest::Url;
 use serde_json::Value;
-use std::env;
 use subscan::{
     enums::content::Content,
     error::{ModuleErrorKind::JSONExtract, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::builtwith::{BuiltWith, BUILTWITH_URL},
+};
+
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
+    mock::funcs,
+    utils::read_stub,
 };
 
 #[tokio::test]

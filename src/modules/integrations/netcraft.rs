@@ -1,3 +1,6 @@
+use reqwest::Url;
+use scraper::{Html, Selector};
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -9,8 +12,6 @@ use crate::{
     requesters::chrome::ChromeBrowser,
     types::{core::SubscanModuleCoreComponents, func::GenericIntegrationCoreFuncs},
 };
-use reqwest::Url;
-use scraper::{Html, Selector};
 
 pub const NETCRAFT_MODULE_NAME: &str = "netcraft";
 pub const NETCRAFT_URL: &str = "https://searchdns.netcraft.com";

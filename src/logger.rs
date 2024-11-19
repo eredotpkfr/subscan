@@ -1,8 +1,10 @@
-use crate::constants::SUBSCAN_BANNER_LOG_TARGET;
+use std::io::Write;
+
 use colog::format::{CologStyle, DefaultCologStyle};
 use env_logger::fmt::Formatter;
 use log::{LevelFilter, Record};
-use std::io::Write;
+
+use crate::constants::SUBSCAN_BANNER_LOG_TARGET;
 
 /// Initialize logger
 pub async fn init(level: Option<LevelFilter>) {

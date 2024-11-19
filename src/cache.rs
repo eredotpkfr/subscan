@@ -1,3 +1,5 @@
+use lazy_static::lazy_static;
+
 use crate::{
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::{
@@ -12,7 +14,6 @@ use crate::{
     },
     types::{config::requester::RequesterConfig, core::SubscanModule},
 };
-use lazy_static::lazy_static;
 
 /// Manage cache module
 #[derive(Default)]

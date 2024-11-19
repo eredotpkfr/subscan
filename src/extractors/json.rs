@@ -1,3 +1,7 @@
+use std::collections::BTreeSet;
+
+use async_trait::async_trait;
+
 use crate::{
     enums::content::Content,
     interfaces::extractor::SubdomainExtractorInterface,
@@ -6,8 +10,6 @@ use crate::{
         func::InnerExtractFunc,
     },
 };
-use async_trait::async_trait;
-use std::collections::BTreeSet;
 
 /// JSON content parser wrapper struct
 ///
