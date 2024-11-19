@@ -1,12 +1,13 @@
-use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mock::funcs,
-};
 use subscan::{
     enums::{content::Content, dispatchers::SubscanModuleDispatcher},
     error::{ModuleErrorKind::Custom, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::dnsdumpstercrawler::DNSDumpsterCrawler,
+};
+
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
+    mock::funcs,
 };
 
 #[tokio::test]

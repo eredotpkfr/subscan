@@ -1,11 +1,12 @@
 use std::collections::BTreeSet;
 
+use subscan::{
+    extractors::html::HTMLExtractor, interfaces::extractor::SubdomainExtractorInterface,
+};
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
     utils::read_testdata,
-};
-use subscan::{
-    extractors::html::HTMLExtractor, interfaces::extractor::SubdomainExtractorInterface,
 };
 
 #[tokio::test]

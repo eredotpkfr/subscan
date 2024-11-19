@@ -1,17 +1,18 @@
-use crate::common::utils::fix_new_lines;
-use csv::{Reader, StringRecord};
-use serde_json::Value;
-use std::net::IpAddr;
 use std::{
     collections::BTreeSet,
     fs::{read_to_string, remove_file},
-    net::Ipv4Addr,
+    net::{IpAddr, Ipv4Addr},
     str::FromStr,
 };
+
+use csv::{Reader, StringRecord};
+use serde_json::Value;
 use subscan::{
     enums::output::OutputFormat,
     types::result::{item::ScanResultItem, scan::ScanResult},
 };
+
+use crate::common::utils::fix_new_lines;
 
 #[tokio::test]
 async fn save_txt_test() {

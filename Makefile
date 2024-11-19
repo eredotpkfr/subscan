@@ -2,8 +2,9 @@ SHELL=/bin/bash
 
 all: install-pre-commit-mac \
 	install-pre-commit-linux \
-	pre-commit-update-hooks \
+	install-nightly-toolchain \
 	install-pre-commit-hooks \
+	pre-commit-update-hooks \
 	rustfmt-check \
 	rustfmt \
 	fix \
@@ -24,6 +25,8 @@ install-pre-commit-linux:
 install-pre-commit-hooks:
 	@pre-commit install --install-hooks
 	@pre-commit install --hook-type commit-msg --install-hooks
+install-nightly-toolchain:
+	@rustup toolchain install nightly
 install-cargo-clippy:
 	@rustup component add clippy
 install-cargo-deny:

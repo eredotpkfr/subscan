@@ -1,11 +1,5 @@
 use std::env;
 
-use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mock::funcs,
-    stub::StubTemplateManager,
-    utils::current_thread_hex,
-};
 use reqwest::Url;
 use serde_json::{json, Value};
 use subscan::{
@@ -14,6 +8,13 @@ use subscan::{
     interfaces::module::SubscanModuleInterface,
     modules::integrations::github::GitHub,
     types::result::status::SkipReason::AuthenticationNotProvided,
+};
+
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
+    mock::funcs,
+    stub::StubTemplateManager,
+    utils::current_thread_hex,
 };
 
 #[tokio::test]

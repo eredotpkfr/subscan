@@ -1,11 +1,12 @@
-use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    mock::funcs,
-};
 use subscan::{
     enums::content::Content,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::digitorus::{Digitorus, DIGITORUS_URL},
+};
+
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
+    mock::funcs,
 };
 
 #[tokio::test]

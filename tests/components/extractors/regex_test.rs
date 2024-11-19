@@ -1,9 +1,11 @@
-use crate::common::constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN};
 use std::collections::BTreeSet;
+
 use subscan::{
     enums::content::Content, extractors::regex::RegexExtractor,
     interfaces::extractor::SubdomainExtractorInterface,
 };
+
+use crate::common::constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN};
 
 #[tokio::test]
 async fn extract_one_test() {

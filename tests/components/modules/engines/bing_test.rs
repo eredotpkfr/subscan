@@ -1,8 +1,9 @@
+use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::bing::Bing};
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     mock::funcs,
 };
-use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::bing::Bing};
 
 #[tokio::test]
 #[stubr::mock("module/engines/bing.json")]

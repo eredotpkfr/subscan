@@ -1,9 +1,6 @@
-use crate::common::{
-    constants::{TEST_API_KEY, TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    mock::modules::generic_integration,
-};
-use reqwest::Url;
 use std::env;
+
+use reqwest::Url;
 use subscan::{
     enums::{auth::AuthenticationMethod, content::Content},
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
@@ -11,6 +8,11 @@ use subscan::{
         env::{Credentials, Env},
         result::status::SkipReason::AuthenticationNotProvided,
     },
+};
+
+use crate::common::{
+    constants::{TEST_API_KEY, TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
+    mock::modules::generic_integration,
 };
 
 #[tokio::test]

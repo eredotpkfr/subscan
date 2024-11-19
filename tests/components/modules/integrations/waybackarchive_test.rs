@@ -1,12 +1,13 @@
 use std::collections::BTreeSet;
 
-use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
-    mock::funcs,
-};
 use subscan::{
     interfaces::module::SubscanModuleInterface,
     modules::integrations::waybackarchive::WaybackArchive,
+};
+
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
+    mock::funcs,
 };
 
 #[tokio::test]

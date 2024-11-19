@@ -1,12 +1,13 @@
-use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mock::funcs,
-};
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher, interfaces::module::SubscanModuleInterface,
     modules::engines::duckduckgo::DuckDuckGo, requesters::client::HTTPClient,
 };
 use tokio::sync::Mutex;
+
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
+    mock::funcs,
+};
 
 #[tokio::test]
 #[stubr::mock("module/engines/duckduckgo.json")]

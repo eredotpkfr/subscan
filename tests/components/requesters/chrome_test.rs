@@ -1,9 +1,9 @@
-use crate::common::constants::TEST_URL;
+use std::time::Duration;
+
 use reqwest::{
     header::{HeaderMap, HeaderName, HeaderValue, CONTENT_LENGTH, USER_AGENT},
     Url,
 };
-use std::time::Duration;
 use subscan::{
     interfaces::requester::RequesterInterface,
     requesters::chrome::ChromeBrowser,
@@ -12,6 +12,8 @@ use subscan::{
         env::{Credentials, Env},
     },
 };
+
+use crate::common::constants::TEST_URL;
 
 #[tokio::test]
 async fn chrome_configure_test() {

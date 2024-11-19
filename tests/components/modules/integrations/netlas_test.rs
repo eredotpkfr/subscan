@@ -1,16 +1,17 @@
 use std::env;
 
-use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mock::funcs,
-    utils::read_stub,
-};
 use serde_json::Value;
 use subscan::{
     error::{ModuleErrorKind::JSONExtract, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::netlas::Netlas,
     types::result::status::SkipReason::AuthenticationNotProvided,
+};
+
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
+    mock::funcs,
+    utils::read_stub,
 };
 
 #[tokio::test]

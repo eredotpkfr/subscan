@@ -1,7 +1,3 @@
-use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    mock::funcs,
-};
 use reqwest::Url;
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher,
@@ -10,6 +6,11 @@ use subscan::{
     requesters::client::HTTPClient,
 };
 use tokio::sync::Mutex;
+
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
+    mock::funcs,
+};
 
 #[tokio::test]
 #[stubr::mock("module/integrations/netcraft.json")]

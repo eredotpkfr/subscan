@@ -1,19 +1,19 @@
 use core::time::Duration;
 use std::collections::BTreeSet;
 
+use serde_json::{json, Value};
+use subscan::{
+    enums::dispatchers::SubscanModuleDispatcher,
+    error::{ModuleErrorKind::Custom, SubscanError},
+    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
+    modules::integrations::commoncrawl::CommonCrawl,
+    types::config::requester::RequesterConfig,
+};
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::funcs,
     stub::StubTemplateManager,
-};
-use serde_json::{json, Value};
-use subscan::{
-    enums::dispatchers::SubscanModuleDispatcher,
-    error::ModuleErrorKind::Custom,
-    error::SubscanError,
-    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
-    modules::integrations::commoncrawl::CommonCrawl,
-    types::config::requester::RequesterConfig,
 };
 
 #[tokio::test]

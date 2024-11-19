@@ -1,8 +1,9 @@
+use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::google::Google};
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     mock::funcs,
 };
-use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::google::Google};
 
 #[tokio::test]
 #[stubr::mock("module/engines/google.json")]

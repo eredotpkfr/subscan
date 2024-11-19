@@ -1,16 +1,17 @@
 use std::env;
 
-use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    mock::funcs,
-    utils::read_stub,
-};
 use serde_json::Value;
 use subscan::{
     enums::content::Content,
     error::{ModuleErrorKind::JSONExtract, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::dnsdumpsterapi::{DNSDumpsterAPI, DNSDUMPSTERAPI_URL},
+};
+
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
+    mock::funcs,
+    utils::read_stub,
 };
 
 #[tokio::test]

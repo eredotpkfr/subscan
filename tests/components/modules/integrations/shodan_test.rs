@@ -1,11 +1,7 @@
-use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    mock::funcs,
-    utils::read_stub,
-};
+use std::env;
+
 use reqwest::Url;
 use serde_json::{json, Value};
-use std::env;
 use subscan::{
     enums::content::Content,
     error::{
@@ -14,6 +10,12 @@ use subscan::{
     },
     interfaces::module::SubscanModuleInterface,
     modules::integrations::shodan::{Shodan, SHODAN_URL},
+};
+
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
+    mock::funcs,
+    utils::read_stub,
 };
 
 #[tokio::test]

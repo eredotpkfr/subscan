@@ -1,8 +1,9 @@
+use subscan::interfaces::module::SubscanModuleInterface;
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::modules::generic_search_engine,
 };
-use subscan::interfaces::module::SubscanModuleInterface;
 
 #[tokio::test]
 async fn attribute_test() {

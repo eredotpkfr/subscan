@@ -1,14 +1,16 @@
-use crate::common::{
-    constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
-    utils::read_testdata,
-};
-use serde_json::Value;
 use std::collections::BTreeSet;
+
+use serde_json::Value;
 use subscan::{
     enums::content::Content,
     error::{ModuleErrorKind::JSONExtract, SubscanError},
     extractors::json::JSONExtractor,
     interfaces::extractor::SubdomainExtractorInterface,
+};
+
+use crate::common::{
+    constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
+    utils::read_testdata,
 };
 
 #[tokio::test]

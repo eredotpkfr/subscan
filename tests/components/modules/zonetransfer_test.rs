@@ -1,14 +1,16 @@
-use crate::common::{
-    constants::{LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mock::funcs::spawn_mock_dns_server,
-};
-use hickory_resolver::config::{NameServerConfig, Protocol};
 use std::{net::SocketAddr, str::FromStr};
+
+use hickory_resolver::config::{NameServerConfig, Protocol};
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher,
     error::{ModuleErrorKind::Custom, SubscanError},
     interfaces::module::SubscanModuleInterface,
     modules::zonetransfer::ZoneTransfer,
+};
+
+use crate::common::{
+    constants::{LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
+    mock::funcs::spawn_mock_dns_server,
 };
 
 #[tokio::test]
