@@ -1,7 +1,7 @@
 use serde_json::Value;
 use subscan::{
     enums::content::Content,
-    error::{ModuleErrorKind::JSONExtract, SubscanError},
+    error::ModuleErrorKind::JSONExtract,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::leakix::{Leakix, LEAKIX_URL},
 };
@@ -50,8 +50,5 @@ async fn extract_test() {
     assert!(not_extracted.is_err());
 
     assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
-    assert_eq!(
-        not_extracted.err().unwrap(),
-        SubscanError::from(JSONExtract)
-    );
+    assert_eq!(not_extracted.err().unwrap(), JSONExtract.into());
 }

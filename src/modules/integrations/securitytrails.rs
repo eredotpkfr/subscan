@@ -67,10 +67,10 @@ impl SecurityTrails {
     }
 
     pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
-        let filter = |item: &Value| Some(format!("{}.{domain}", item.as_str()?));
+        if let Some(subdomains) = content["subdomains"].as_array() {
+            let filter = |item: &Value| Some(format!("{}.{domain}", item.as_str()?));
 
-        if let Some(subs) = content["subdomains"].as_array() {
-            return Ok(subs.iter().filter_map(filter).collect());
+            return Ok(subdomains.iter().filter_map(filter).collect());
         }
 
         Err(JSONExtract.into())

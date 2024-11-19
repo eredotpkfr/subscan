@@ -81,9 +81,9 @@ impl ZoomEye {
     }
 
     pub fn extract(content: Value, _domain: &str) -> Result<BTreeSet<Subdomain>> {
-        let filter = |item: &Value| Some(item["name"].as_str()?.to_string());
-
         if let Some(passives) = content["list"].as_array() {
+            let filter = |item: &Value| Some(item["name"].as_str()?.to_string());
+
             return Ok(passives.iter().filter_map(filter).collect());
         }
 

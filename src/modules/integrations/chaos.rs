@@ -67,10 +67,10 @@ impl Chaos {
     }
 
     pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
-        if let Some(subs) = content["subdomains"].as_array() {
+        if let Some(subdomains) = content["subdomains"].as_array() {
             let filter = |item: &Value| Some(format!("{}.{}", item.as_str()?, domain));
 
-            return Ok(subs.iter().filter_map(filter).collect());
+            return Ok(subdomains.iter().filter_map(filter).collect());
         }
 
         Err(JSONExtract.into())

@@ -69,14 +69,14 @@ impl BufferOver {
     }
 
     pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
-        let pattern = generate_subdomain_regex(domain).unwrap();
-        let filter = |item: &Value| {
-            let to_string = |matches: Match| matches.as_str().to_string();
-
-            pattern.find(item.as_str()?).map(to_string)
-        };
-
         if let Some(results) = content["Results"].as_array() {
+            let pattern = generate_subdomain_regex(domain)?;
+            let filter = |item: &Value| {
+                let to_string = |matches: Match| matches.as_str().to_string();
+
+                pattern.find(item.as_str()?).map(to_string)
+            };
+
             return Ok(results.iter().filter_map(filter).collect());
         }
 

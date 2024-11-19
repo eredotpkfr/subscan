@@ -2,10 +2,8 @@ use std::{net::SocketAddr, str::FromStr};
 
 use hickory_resolver::config::{NameServerConfig, Protocol};
 use subscan::{
-    enums::dispatchers::SubscanModuleDispatcher,
-    error::{ModuleErrorKind::Custom, SubscanError},
-    interfaces::module::SubscanModuleInterface,
-    modules::zonetransfer::ZoneTransfer,
+    enums::dispatchers::SubscanModuleDispatcher, error::ModuleErrorKind::Custom,
+    interfaces::module::SubscanModuleInterface, modules::zonetransfer::ZoneTransfer,
 };
 
 use crate::common::{
@@ -70,10 +68,7 @@ async fn run_failed_test() {
     let result = zonetransfer.run(TEST_DOMAIN).await;
 
     assert!(result.is_err());
-    assert_eq!(
-        result.err().unwrap(),
-        SubscanError::from(Custom("no default ns".into()))
-    );
+    assert_eq!(result.err().unwrap(), Custom("no default ns".into()).into());
 }
 
 #[tokio::test]

@@ -4,10 +4,7 @@ use reqwest::Url;
 use serde_json::{json, Value};
 use subscan::{
     enums::content::Content,
-    error::{
-        ModuleErrorKind::JSONExtract,
-        SubscanError::{self, ModuleErrorWithResult},
-    },
+    error::{ModuleErrorKind::JSONExtract, SubscanError::ModuleErrorWithResult},
     interfaces::module::SubscanModuleInterface,
     modules::integrations::shodan::{Shodan, SHODAN_URL},
 };
@@ -79,8 +76,5 @@ async fn extract_test() {
     assert!(not_extracted.is_err());
 
     assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
-    assert_eq!(
-        not_extracted.err().unwrap(),
-        SubscanError::from(JSONExtract)
-    );
+    assert_eq!(not_extracted.err().unwrap(), JSONExtract.into());
 }

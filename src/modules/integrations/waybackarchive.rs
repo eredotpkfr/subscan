@@ -10,7 +10,6 @@ use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
     },
-    error::{ModuleErrorKind::GetContent, SubscanError},
     extractors::regex::RegexExtractor,
     interfaces::{extractor::SubdomainExtractorInterface, module::SubscanModuleInterface},
     requesters::client::HTTPClient,
@@ -92,14 +91,9 @@ impl SubscanModuleInterface for WaybackArchive {
                 .get(url)
                 .timeout(requester.config.timeout)
                 .headers(requester.config.headers.clone())
-                .build()
-                .unwrap();
+                .build()?;
 
-            let response = requester
-                .client
-                .execute(request)
-                .await
-                .map_err(|_| SubscanError::from(GetContent))?;
+            let response = requester.client.execute(request).await?;
 
             let stream = response.bytes_stream().map_err(Error::other);
             let reader = StreamReader::new(stream);

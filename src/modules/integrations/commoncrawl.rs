@@ -115,8 +115,7 @@ impl SubscanModuleInterface for CommonCrawl {
                         .get(cdx_url.unwrap())
                         .timeout(requester.config.timeout)
                         .headers(requester.config.headers.clone())
-                        .build()
-                        .unwrap();
+                        .build()?;
 
                     if let Ok(response) = requester.client.execute(request).await {
                         let stream = response.bytes_stream().map_err(Error::other);

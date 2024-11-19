@@ -17,7 +17,7 @@ use crate::common::utils::fix_new_lines;
 #[tokio::test]
 async fn save_txt_test() {
     let mut result: ScanResult = "foo.com".into();
-    let subs = BTreeSet::from_iter([
+    let subdomains = BTreeSet::from_iter([
         ScanResultItem {
             subdomain: "bar.foo.com".into(),
             ip: None,
@@ -28,7 +28,7 @@ async fn save_txt_test() {
         },
     ]);
 
-    result.extend(subs);
+    result.extend(subdomains);
     result = result.with_finished().await;
 
     let name = result.save(&OutputFormat::TXT).await;
@@ -42,12 +42,12 @@ async fn save_txt_test() {
 #[tokio::test]
 async fn save_csv_test() {
     let mut result: ScanResult = "foo.com".into();
-    let subs = BTreeSet::from_iter([ScanResultItem {
+    let subdomains = BTreeSet::from_iter([ScanResultItem {
         subdomain: "bar.foo.com".into(),
         ip: None,
     }]);
 
-    result.extend(subs);
+    result.extend(subdomains);
     result = result.with_finished().await;
 
     let name = result.save(&OutputFormat::CSV).await;
@@ -97,12 +97,12 @@ async fn save_json_test() {
 #[tokio::test]
 async fn save_html_test() {
     let mut result: ScanResult = "foo.com".into();
-    let subs = BTreeSet::from_iter([ScanResultItem {
+    let subdomains = BTreeSet::from_iter([ScanResultItem {
         subdomain: "bar.foo.com".into(),
         ip: None,
     }]);
 
-    result.extend(subs);
+    result.extend(subdomains);
     result = result.with_finished().await;
 
     let name = result.save(&OutputFormat::HTML).await;

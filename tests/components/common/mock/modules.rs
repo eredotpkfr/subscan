@@ -4,7 +4,7 @@ use reqwest::Url;
 use serde_json::Value;
 use subscan::{
     enums::{auth::AuthenticationMethod, dispatchers::RequesterDispatcher},
-    error::{ModuleErrorKind::JSONExtract, SubscanError},
+    error::ModuleErrorKind::JSONExtract,
     extractors::{json::JSONExtractor, regex::RegexExtractor},
     modules::generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
     requesters::client::HTTPClient,
@@ -35,13 +35,13 @@ pub fn generic_search_engine(url: &str) -> GenericSearchEngineModule {
 
 pub fn generic_integration(url: &str, auth: AuthenticationMethod) -> GenericIntegrationModule {
     let parse = |json: Value, _domain: &str| {
-        if let Some(subs) = json["subdomains"].as_array() {
+        if let Some(subdomains) = json["subdomains"].as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());
 
-            return Ok(BTreeSet::from_iter(subs.iter().filter_map(filter)));
+            return Ok(BTreeSet::from_iter(subdomains.iter().filter_map(filter)));
         }
 
-        Err(SubscanError::from(JSONExtract))
+        Err(JSONExtract.into())
     };
 
     let requester = RequesterDispatcher::HTTPClient(HTTPClient::default());

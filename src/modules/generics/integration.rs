@@ -136,8 +136,8 @@ impl SubscanModuleInterface for GenericIntegrationModule {
 
             result.extend(subdomains);
 
-            if let Some(next_url) = (self.funcs.next)(url, content) {
-                url = next_url;
+            if let Some(next) = (self.funcs.next)(url, content) {
+                url = next;
             } else {
                 break;
             }

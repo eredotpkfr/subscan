@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 use chrono::{TimeDelta, Utc};
+use scraper::error::SelectorErrorKind;
 
 use crate::types::result::{
     module::SubscanModuleResult,
@@ -14,7 +15,7 @@ pub enum SubscanError {
     /// Module error, see [`ModuleErrorKind`] for generic error definitions
     ModuleError(ModuleErrorKind),
     /// This error type uses for the make graceful returns from module `.run(`
-    /// method. If the module has already discovered a subdomains and encountered
+    /// method. If the module has already discovered subdomains and encountered
     /// an error during runtime we need to save already discovered subdomains. So
     /// implemented this error type to ensure this
     ModuleErrorWithResult(SubscanModuleResult),
@@ -38,6 +39,24 @@ impl From<ModuleErrorKind> for SubscanError {
 impl From<SkipReason> for SubscanError {
     fn from(reason: SkipReason) -> Self {
         Self::ModuleError(reason.into())
+    }
+}
+
+impl From<SelectorErrorKind<'_>> for SubscanError {
+    fn from(_: SelectorErrorKind<'_>) -> Self {
+        Self::ModuleError(ModuleErrorKind::HTMLExtract)
+    }
+}
+
+impl From<regex::Error> for SubscanError {
+    fn from(_: regex::Error) -> Self {
+        Self::ModuleError(ModuleErrorKind::RegexExtract)
+    }
+}
+
+impl From<reqwest::Error> for SubscanError {
+    fn from(_: reqwest::Error) -> Self {
+        Self::ModuleError(ModuleErrorKind::GetContent)
     }
 }
 

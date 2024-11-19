@@ -2,8 +2,7 @@ use std::env;
 
 use serde_json::Value;
 use subscan::{
-    error::{ModuleErrorKind::JSONExtract, SubscanError},
-    interfaces::module::SubscanModuleInterface,
+    error::ModuleErrorKind::JSONExtract, interfaces::module::SubscanModuleInterface,
     modules::integrations::netlas::Netlas,
     types::result::status::SkipReason::AuthenticationNotProvided,
 };
@@ -56,8 +55,5 @@ async fn extract_test() {
     assert!(not_extracted.is_err());
 
     assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
-    assert_eq!(
-        not_extracted.err().unwrap(),
-        SubscanError::from(JSONExtract)
-    );
+    assert_eq!(not_extracted.err().unwrap(), JSONExtract.into());
 }

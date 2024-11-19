@@ -10,7 +10,7 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
-    error::{ModuleErrorKind::JSONExtract, SubscanError},
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -74,25 +74,23 @@ impl Censys {
     }
 
     pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
-        let mut subs = BTreeSet::new();
+        let mut subdomains = BTreeSet::new();
 
-        let pattern = generate_subdomain_regex(domain).unwrap();
+        let pattern = generate_subdomain_regex(domain)?;
         let matches = |item: &Value| {
             let to_string = |matched: Match| matched.as_str().to_string();
 
             pattern.find(item.as_str()?).map(to_string)
         };
 
-        let hits = content["result"]["hits"]
-            .as_array()
-            .ok_or(SubscanError::from(JSONExtract))?;
+        let hits = content["result"]["hits"].as_array().ok_or(JSONExtract)?;
 
         for result in hits {
             if let Some(names) = result["names"].as_array() {
-                subs.extend(names.iter().filter_map(matches));
+                subdomains.extend(names.iter().filter_map(matches));
             }
         }
 
-        Ok(subs)
+        Ok(subdomains)
     }
 }

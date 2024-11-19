@@ -69,8 +69,8 @@ impl Leakix {
     pub fn extract(content: Value, _domain: &str) -> Result<BTreeSet<Subdomain>> {
         let filter = |item: &Value| Some(item["subdomain"].as_str()?.to_string());
 
-        if let Some(subs) = content.as_array() {
-            return Ok(subs.iter().filter_map(filter).collect());
+        if let Some(subdomains) = content.as_array() {
+            return Ok(subdomains.iter().filter_map(filter).collect());
         }
 
         Err(JSONExtract.into())

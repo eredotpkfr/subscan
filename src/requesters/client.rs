@@ -3,13 +3,11 @@ use reqwest::{Client, Proxy, Url};
 
 use crate::{
     enums::content::Content,
-    error::{ModuleErrorKind::GetContent, SubscanError},
     interfaces::requester::RequesterInterface,
     types::{config::requester::RequesterConfig, core::Result},
 };
 
 const CLIENT_BUILD_ERR: &str = "Cannot create HTTP client!";
-const REQUEST_BUILD_ERR: &str = "Cannot build request!";
 const PROXY_PARSE_ERR: &str = "Cannot parse proxy!";
 
 /// HTTP requester struct, send HTTP requests via [`reqwest`] client.
@@ -144,17 +142,9 @@ impl RequesterInterface for HTTPClient {
             builder = builder.basic_auth(username.unwrap(), password);
         }
 
-        let request = builder.build().expect(REQUEST_BUILD_ERR);
-        let response = self
-            .client
-            .execute(request)
-            .await
-            .map_err(|_| SubscanError::from(GetContent))?;
+        let request = builder.build()?;
+        let response = self.client.execute(request).await?;
 
-        Ok(response
-            .text()
-            .await
-            .map_err(|_| SubscanError::from(GetContent))?
-            .into())
+        Ok(response.text().await?.into())
     }
 }

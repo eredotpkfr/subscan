@@ -58,7 +58,7 @@ impl From<SubscanModuleResult> for SubscanModuleStatistics {
     fn from(result: SubscanModuleResult) -> Self {
         Self {
             module: result.module.clone(),
-            status: result.clone().status,
+            status: result.status.clone(),
             count: result.subdomains.len(),
             started_at: result.started_at,
             finished_at: result.finished_at,
@@ -113,6 +113,28 @@ pub struct SubscanModulePoolStatistics {
 }
 
 impl SubscanModulePoolStatistics {
+    /// Add [`SubscanModuleStatistics`] into [`SubscanModulePoolStatistics`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::result::statistics::{
+    ///     SubscanModulePoolStatistics,
+    ///     SubscanModuleStatistics,
+    /// };
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut pool_stats = SubscanModulePoolStatistics::default();
+    ///     let module_stat = SubscanModuleStatistics::skipped("foo");
+    ///
+    ///     assert_eq!(pool_stats.module.len(), 0);
+    ///
+    ///     pool_stats.module(module_stat).await;
+    ///
+    ///     assert_eq!(pool_stats.module.len(), 1);
+    /// }
+    /// ```
     pub async fn module(&mut self, stats: SubscanModuleStatistics) {
         self.module.push(stats);
     }

@@ -4,7 +4,7 @@ use std::collections::BTreeSet;
 use serde_json::{json, Value};
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher,
-    error::{ModuleErrorKind::Custom, SubscanError},
+    error::ModuleErrorKind::Custom,
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::integrations::commoncrawl::CommonCrawl,
     types::config::requester::RequesterConfig,
@@ -85,6 +85,6 @@ async fn run_failed_test() {
     assert!(results.is_err());
     assert_eq!(
         results.err().unwrap(),
-        SubscanError::from(Custom("not get cdx URLs".into()))
+        Custom("not get cdx URLs".into()).into()
     );
 }

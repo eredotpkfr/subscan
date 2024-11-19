@@ -16,6 +16,28 @@ pub struct SubscanModulePoolResult {
 }
 
 impl SubscanModulePoolResult {
+    /// Add a single [`SubscanModuleStatistics`] into [`SubscanModulePoolResult`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::result::{
+    ///     pool::SubscanModulePoolResult,
+    ///     statistics::SubscanModuleStatistics,
+    /// };
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut result = SubscanModulePoolResult::default();
+    ///     let stat = SubscanModuleStatistics::skipped("foo");
+    ///
+    ///     assert_eq!(result.statistics.module.len(), 0);
+    ///
+    ///     result.statistic(stat).await;
+    ///
+    ///     assert_eq!(result.statistics.module.len(), 1);
+    /// }
+    /// ```
     pub async fn statistic(&mut self, stats: SubscanModuleStatistics) {
         self.statistics.module(stats).await;
     }

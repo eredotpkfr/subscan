@@ -12,7 +12,7 @@ use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
     },
-    error::{ModuleErrorKind::JSONExtract, SubscanError},
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -72,7 +72,7 @@ impl Netlas {
             return Ok(items.iter().filter_map(filter).collect());
         }
 
-        Err(SubscanError::from(JSONExtract))
+        Err(JSONExtract.into())
     }
 }
 
@@ -91,8 +91,8 @@ impl SubscanModuleInterface for Netlas {
     }
 
     async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-        let mut url = self.url.clone();
         let mut result: SubscanModuleResult = self.name().await.into();
+        let mut url = self.url.clone();
 
         let requester = &mut *self.requester().await.unwrap().lock().await;
         let extractor = self.extractor().await.unwrap();
@@ -128,16 +128,14 @@ impl SubscanModuleInterface for Netlas {
                 .json(&body)
                 .timeout(requester.config.timeout)
                 .headers(requester.config.headers.clone())
-                .build()
-                .unwrap();
+                .build()?;
 
-            if let Ok(response) = requester.client.execute(request).await {
-                if let Ok(content) = response.text().await {
-                    result.extend(extractor.extract(content.into(), domain).await?);
+            let response = requester.client.execute(request).await?;
+            let content = response.text().await?;
 
-                    return Ok(result.with_finished().await);
-                }
-            }
+            result.extend(extractor.extract(content.into(), domain).await?);
+
+            return Ok(result.with_finished().await);
         }
 
         Err(AuthenticationNotProvided.into())

@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use regex::Regex;
 use reqwest::{
-    header::{HeaderMap, HeaderValue, AUTHORIZATION},
+    header::{HeaderMap, HeaderName, HeaderValue},
     Url,
 };
 use tokio::sync::Mutex;
@@ -109,8 +109,10 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
         let token = self.get_auth_token(content).await;
 
         if let (Some(token), RequesterDispatcher::HTTPClient(requester)) = (token, requester) {
-            let headers =
-                HeaderMap::from_iter([(AUTHORIZATION, HeaderValue::from_str(&token).unwrap())]);
+            let headers = HeaderMap::from_iter([(
+                HeaderName::from_static("authorization"),
+                HeaderValue::from_str(&token).unwrap(),
+            )]);
             let params = &[("target", domain)];
 
             requester.config.headers.extend(headers);
@@ -121,16 +123,14 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
                 .form(params)
                 .timeout(requester.config.timeout)
                 .headers(requester.config.headers.clone())
-                .build()
-                .unwrap();
+                .build()?;
 
-            if let Ok(response) = requester.client.execute(request).await {
-                if let Ok(content) = response.text().await {
-                    result.extend(extractor.extract(content.into(), domain).await?);
+            let response = requester.client.execute(request).await?;
+            let content = response.text().await?;
 
-                    return Ok(result.with_finished().await);
-                }
-            }
+            result.extend(extractor.extract(content.into(), domain).await?);
+
+            return Ok(result.with_finished().await);
         }
 
         Err(Custom("not get token".into()).into())

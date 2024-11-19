@@ -72,14 +72,14 @@ impl Crtsh {
     }
 
     pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
-        let pattern = generate_subdomain_regex(domain).unwrap();
-        let matches = |item: &Value| {
-            let to_string = |matched: Match| matched.as_str().to_string();
-
-            pattern.find(item["name_value"].as_str()?).map(to_string)
-        };
-
         if let Some(results) = content.as_array() {
+            let pattern = generate_subdomain_regex(domain)?;
+            let matches = |item: &Value| {
+                let to_string = |matched: Match| matched.as_str().to_string();
+
+                pattern.find(item["name_value"].as_str()?).map(to_string)
+            };
+
             return Ok(results.iter().filter_map(matches).collect());
         }
 

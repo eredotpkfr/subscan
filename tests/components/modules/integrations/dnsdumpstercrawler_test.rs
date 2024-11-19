@@ -1,6 +1,6 @@
 use subscan::{
     enums::{content::Content, dispatchers::SubscanModuleDispatcher},
-    error::{ModuleErrorKind::Custom, SubscanError},
+    error::ModuleErrorKind::Custom,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::dnsdumpstercrawler::DNSDumpsterCrawler,
 };
@@ -33,10 +33,7 @@ async fn run_test_no_token() {
     let result = dnsdumpstercrawler.run(TEST_DOMAIN).await;
 
     assert!(result.is_err());
-    assert_eq!(
-        result.err().unwrap(),
-        SubscanError::from(Custom("not get token".into()))
-    );
+    assert_eq!(result.err().unwrap(), Custom("not get token".into()).into());
 }
 
 #[tokio::test]

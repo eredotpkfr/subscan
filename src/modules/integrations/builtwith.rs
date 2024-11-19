@@ -9,7 +9,7 @@ use crate::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
-    error::{ModuleErrorKind::JSONExtract, SubscanError},
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
@@ -79,18 +79,17 @@ impl BuiltWith {
     }
 
     pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
-        let mut subs = BTreeSet::new();
+        let mut subdomains = BTreeSet::new();
+
         let filter = |item: &Value| Some(format!("{}.{}", item["SubDomain"].as_str()?, domain));
-        let results = content["Results"]
-            .as_array()
-            .ok_or(SubscanError::from(JSONExtract))?;
+        let results = content["Results"].as_array().ok_or(JSONExtract)?;
 
         for result in results {
             if let Some(paths) = result["Result"]["Paths"].as_array() {
-                subs.extend(paths.iter().filter_map(filter));
+                subdomains.extend(paths.iter().filter_map(filter));
             }
         }
 
-        Ok(subs)
+        Ok(subdomains)
     }
 }

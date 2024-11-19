@@ -67,9 +67,9 @@ impl VirusTotal {
     }
 
     pub fn extract(content: Value, _domain: &str) -> Result<BTreeSet<Subdomain>> {
-        let filter = |item: &Value| Some(item["id"].as_str()?.to_string());
-
         if let Some(passives) = content["data"].as_array() {
+            let filter = |item: &Value| Some(item["id"].as_str()?.to_string());
+
             return Ok(passives.iter().filter_map(filter).collect());
         }
 
