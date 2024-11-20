@@ -1,8 +1,10 @@
+use derive_more::From;
+
 use crate::types::env::Credentials;
 
 /// Authentication methods for API calls or HTTP requests. [`GenericIntegrationModule`](crate::modules::generics::integration::GenericIntegrationModule)
 /// uses them to apply correct auth method. See the method descriptions to learn how it works
-#[derive(PartialEq)]
+#[derive(From, PartialEq)]
 pub enum AuthenticationMethod {
     /// Some APIs uses request headers to get API key. If this auth type selected API key
     /// will add in request headers with a given header key
@@ -14,31 +16,10 @@ pub enum AuthenticationMethod {
     /// tries to fetch from environment variables using pre-formatted
     /// (see [`format_env`](crate::utilities::env::format_env)) variable names. Module specific
     /// variable names looks like `SUBSCAN_FOO_USERNAME`, `SUBSCAN_FOO_PASSWORD`
+    #[from]
     BasicHTTPAuthentication(Credentials),
     /// This auth type does nothing for auth
     NoAuthentication,
-}
-
-impl From<Credentials> for AuthenticationMethod {
-    /// Create authentication method from [`Credentials`]
-    ///
-    /// # Examples
-    /// ```
-    /// use subscan::enums::auth::AuthenticationMethod;
-    /// use subscan::types::env::Credentials;
-    /// use subscan::types::env::Env;
-    ///
-    /// let credentials = Credentials {
-    ///     username: Env { name: "USERNAME".into(), value: Some("foo".to_string())},
-    ///     password: Env { name: "PASSWORD".into(), value: Some("bar".to_string())},
-    /// };
-    ///
-    /// let auth = AuthenticationMethod::from(credentials);
-    /// ```
-    /// let credentials = "foo".into()
-    fn from(credentials: Credentials) -> Self {
-        Self::BasicHTTPAuthentication(credentials)
-    }
 }
 
 impl AuthenticationMethod {

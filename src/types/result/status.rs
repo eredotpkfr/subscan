@@ -1,35 +1,25 @@
 use colored::Colorize;
-use derive_more::Display;
+use derive_more::{Display, From};
 use serde::Serialize;
 
 use crate::error::ModuleErrorKind;
 
 /// Subscan module states
-#[derive(Clone, Debug, Default, Display, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Default, Display, Eq, From, Ord, PartialEq, PartialOrd)]
 pub enum SubscanModuleStatus {
     #[default]
     #[display("STARTED")]
     Started,
     #[display("FINISHED")]
     Finished,
+    #[from]
     #[display("SKIPPED")]
     Skipped(SkipReason),
+    #[from]
     #[display("FAILED")]
     Failed(ModuleErrorKind),
     #[display("FAILED")]
     FailedWithResult,
-}
-
-impl From<ModuleErrorKind> for SubscanModuleStatus {
-    fn from(err: ModuleErrorKind) -> Self {
-        Self::Failed(err)
-    }
-}
-
-impl From<SkipReason> for SubscanModuleStatus {
-    fn from(reason: SkipReason) -> Self {
-        Self::Skipped(reason)
-    }
 }
 
 impl Serialize for SubscanModuleStatus {

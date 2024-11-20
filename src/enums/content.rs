@@ -1,30 +1,15 @@
+use derive_more::From;
 use serde_json::Value;
 
 /// Content enumeration that stores all content types in a single storage
-#[derive(Clone, Default)]
+#[derive(Clone, Default, From)]
 pub enum Content {
+    #[from(String, &str)]
     String(String),
+    #[from(Value)]
     JSON(Value),
     #[default]
     Empty,
-}
-
-impl From<String> for Content {
-    fn from(value: String) -> Self {
-        Self::String(value)
-    }
-}
-
-impl From<&str> for Content {
-    fn from(value: &str) -> Self {
-        Self::String(value.to_string())
-    }
-}
-
-impl From<Value> for Content {
-    fn from(value: Value) -> Self {
-        Self::JSON(value)
-    }
 }
 
 impl Content {

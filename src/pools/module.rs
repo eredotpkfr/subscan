@@ -10,7 +10,7 @@ use crate::{
     resolver::Resolver,
     types::{
         config::subscan::SubscanConfig,
-        core::{Subdomain, SubscanModule, UnboundedFlumeChannel, UnboundedFlumeChannelTuple},
+        core::{Subdomain, SubscanModule, UnboundedFlumeChannel},
         result::{
             item::SubscanModulePoolResultItem, pool::SubscanModulePoolResult,
             statistics::SubscanModuleStatistics,
@@ -21,24 +21,6 @@ use crate::{
 struct SubscanModulePoolChannels {
     module: UnboundedFlumeChannel<SubscanModule>,
     subs: UnboundedFlumeChannel<Subdomain>,
-}
-
-impl From<UnboundedFlumeChannelTuple<SubscanModule>> for UnboundedFlumeChannel<SubscanModule> {
-    fn from(channel: UnboundedFlumeChannelTuple<SubscanModule>) -> Self {
-        Self {
-            tx: channel.0,
-            rx: channel.1,
-        }
-    }
-}
-
-impl From<UnboundedFlumeChannelTuple<Subdomain>> for UnboundedFlumeChannel<Subdomain> {
-    fn from(channel: UnboundedFlumeChannelTuple<Subdomain>) -> Self {
-        Self {
-            tx: channel.0,
-            rx: channel.1,
-        }
-    }
 }
 
 /// Subscan module pool to run modules and resolve IPs

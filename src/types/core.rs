@@ -1,5 +1,6 @@
 use std::{result, sync::Arc};
 
+use derive_more::From;
 use flume::{Receiver, Sender};
 use tokio::sync::Mutex;
 
@@ -24,10 +25,9 @@ impl From<SubscanModuleDispatcher> for SubscanModule {
     }
 }
 
-/// Flume unbounded channel return tuple
-pub type UnboundedFlumeChannelTuple<T> = (Sender<T>, Receiver<T>);
-
 /// Flume unbounded channel with generic typed
+#[derive(From)]
+#[from((Sender<T>, Receiver<T>))]
 pub struct UnboundedFlumeChannel<T> {
     pub tx: Sender<T>,
     pub rx: Receiver<T>,

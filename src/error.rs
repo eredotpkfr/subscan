@@ -1,5 +1,5 @@
 use chrono::{TimeDelta, Utc};
-use derive_more::Display;
+use derive_more::{Display, From};
 use scraper::error::SelectorErrorKind;
 
 use crate::types::result::{
@@ -9,9 +9,10 @@ use crate::types::result::{
 };
 
 /// Subscan error variants
-#[derive(Clone, Debug, Display, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Display, Eq, From, Ord, PartialEq, PartialOrd)]
 pub enum SubscanError {
     /// Module error, see [`ModuleErrorKind`] for generic error definitions
+    #[from(ModuleErrorKind, SkipReason, SelectorErrorKind<'_>, regex::Error, reqwest::Error)]
     #[display("{_0}")]
     ModuleError(ModuleErrorKind),
     /// This error type uses for the make graceful returns from module `.run(`
@@ -20,36 +21,6 @@ pub enum SubscanError {
     /// implemented this error type to ensure this
     #[display("failed with result")]
     ModuleErrorWithResult(SubscanModuleResult),
-}
-
-impl From<ModuleErrorKind> for SubscanError {
-    fn from(err: ModuleErrorKind) -> Self {
-        Self::ModuleError(err)
-    }
-}
-
-impl From<SkipReason> for SubscanError {
-    fn from(reason: SkipReason) -> Self {
-        Self::ModuleError(reason.into())
-    }
-}
-
-impl From<SelectorErrorKind<'_>> for SubscanError {
-    fn from(_: SelectorErrorKind<'_>) -> Self {
-        Self::ModuleError(ModuleErrorKind::HTMLExtract)
-    }
-}
-
-impl From<regex::Error> for SubscanError {
-    fn from(_: regex::Error) -> Self {
-        Self::ModuleError(ModuleErrorKind::RegexExtract)
-    }
-}
-
-impl From<reqwest::Error> for SubscanError {
-    fn from(_: reqwest::Error) -> Self {
-        Self::ModuleError(ModuleErrorKind::GetContent)
-    }
 }
 
 impl SubscanError {
@@ -114,32 +85,30 @@ impl SubscanError {
 }
 
 /// Kind of [`SubscanError::ModuleError`]
-#[derive(Clone, Debug, Display, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Display, Eq, From, Ord, PartialEq, PartialOrd)]
 pub enum ModuleErrorKind {
     /// Indicates an error when extracting subdomains from any HTML content
+    #[from(SelectorErrorKind<'_>)]
     #[display("html extract error")]
     HTMLExtract,
     /// Indicates an error when extracting subdomains from any JSON content
     #[display("json extract error")]
     JSONExtract,
     /// Indicates an error when extracting subdomains by using regex pattern
+    #[from(regex::Error)]
     #[display("regex extract error")]
     RegexExtract,
     /// Indicates an error when getting content from URL
+    #[from(reqwest::Error)]
     #[display("get content error")]
     GetContent,
     /// Indicates that the module was skipped for any [`SkipReason`]
+    #[from]
     #[display("{_0}")]
     Skip(SkipReason),
     /// Indicates that the module encountered a error with a custom error message
     #[display("{_0}")]
     Custom(String),
-}
-
-impl From<SkipReason> for ModuleErrorKind {
-    fn from(reason: SkipReason) -> Self {
-        Self::Skip(reason)
-    }
 }
 
 impl ModuleErrorKind {

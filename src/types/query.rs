@@ -1,5 +1,6 @@
 use std::collections::BTreeSet;
 
+use derive_more::From;
 use itertools::Itertools;
 use reqwest::Url;
 
@@ -7,28 +8,9 @@ use super::core::Subdomain;
 
 /// Data type to store search URL query param
 /// for search engines like `Google`, `Yahoo`, `Bing`, etc.
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, From)]
+#[from(&str)]
 pub struct SearchQueryParam(String);
-
-impl From<&str> for SearchQueryParam {
-    /// Create query param from static str
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use subscan::types::query::SearchQueryParam;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let param = SearchQueryParam::from("q");
-    ///
-    ///     // do something with param
-    /// }
-    /// ```
-    fn from(value: &str) -> Self {
-        Self(value.to_string())
-    }
-}
 
 #[allow(clippy::to_string_trait_impl)]
 impl ToString for SearchQueryParam {
