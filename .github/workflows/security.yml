@@ -22,6 +22,16 @@ jobs:
           log-level: error
           arguments: --all-features
 
+  rust-cargo-udeps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: aig787/cargo-udeps-action@v1
+        with:
+          version: "latest"
+          args: "--all-targets"
+
   rust-cargo-machete:
     runs-on: ubuntu-latest
     steps:

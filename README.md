@@ -42,5 +42,12 @@
       <img alt="Codecov Status" src="https://img.shields.io/badge/protected%20by-gitleaks-blue?color=e6e6e6&labelColor=42445a">
     </picture>
   </a>
+
+  <a href="https://github.com/rust-secure-code/safety-dance/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/unsafe-forbidden-success.svg?color=e6e6e6&labelColor=ff3030">
+      <img alt="Unsafe Forbidden" src="https://img.shields.io/badge/unsafe-forbidden-success.svg?color=e6e6e6&labelColor=42445a">
+    </picture>
+  </a>
 </div>
 <!-- markdownlint-enable MD033 MD041 -->

@@ -1,22 +1,27 @@
 SHELL=/bin/bash
 
+.PHONY: all
+
 all: install-pre-commit-mac \
 	install-pre-commit-linux \
-	install-nightly-toolchain \
 	install-pre-commit-hooks \
-	pre-commit-update-hooks \
-	rustfmt-check \
-	rustfmt \
-	fix \
+	install-cargo-tools \
+	update-pre-commit-hooks \
+	install-nightly-toolchain \
+	install-cargo-clippy \
+	install-cargo-deny \
+	install-cargo-udeps \
 	clean \
-	build \
+	check \
+	fix \
 	doc \
 	doc-rs \
+	test \
+	build \
+	rustfmt-check \
+	rustfmt \
 	clippy \
-	deny \
-	test
-
-.PHONY: all
+	deny
 
 install-pre-commit-mac:
 	@brew install pre-commit
@@ -25,31 +30,56 @@ install-pre-commit-linux:
 install-pre-commit-hooks:
 	@pre-commit install --install-hooks
 	@pre-commit install --hook-type commit-msg --install-hooks
+
+update-pre-commit-hooks:
+	@pre-commit autoupdate
+
+install-cargo-tools: install-nightly-toolchain \
+	install-cargo-clippy \
+	install-cargo-doc-rs \
+	install-cargo-deny \
+	install-cargo-udeps
+
 install-nightly-toolchain:
 	@rustup toolchain install nightly
 install-cargo-clippy:
 	@rustup component add clippy
+install-cargo-doc-rs:
+	@cargo install cargo-docs-rs
 install-cargo-deny:
-	@cargo install cargo-deny
-pre-commit-update-hooks:
-	@pre-commit autoupdate
-rustfmt-check:
-	@cargo +nightly fmt --all -- --check
-rustfmt: fix
-	@cargo +nightly fmt --all
-test:
-	@cargo test
+	@cargo install cargo-deny --locked
+install-cargo-udeps:
+	@cargo install cargo-udeps --locked
+
+clean:
+	@cargo clean
+check:
+	@cargo check
+fix:
+	@cargo fix --allow-dirty --allow-staged
 doc:
 	@cargo doc
 doc-rs:
 	@cargo +nightly docs-rs
-clean:
-	@cargo clean
-fix:
-	@cargo fix --allow-dirty --allow-staged
+test:
+	@cargo test
+coverage:
+	@cargo +nightly llvm-cov \
+		--all-features \
+		--workspace \
+		--doctests \
+		--fail-under-lines 95 \
+		--html \
+		--open
 build:
 	@cargo build
+rustfmt-check:
+	@cargo +nightly fmt --all -- --check
+rustfmt: fix
+	@cargo +nightly fmt --all
 clippy:
 	@cargo clippy --all-targets --all-features
 deny:
 	@cargo deny --all-features --log-level error check
+udeps:
+	@cargo +nightly udeps

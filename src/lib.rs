@@ -1,3 +1,5 @@
+#![forbid(unsafe_code)]
+
 /// In-memory cache to store all modules
 pub mod cache;
 /// Includes CLI components
