@@ -1,6 +1,5 @@
-use std::fmt::Display;
-
 use chrono::{TimeDelta, Utc};
+use derive_more::Display;
 use scraper::error::SelectorErrorKind;
 
 use crate::types::result::{
@@ -10,24 +9,17 @@ use crate::types::result::{
 };
 
 /// Subscan error variants
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Clone, Debug, Display, Eq, Ord, PartialEq, PartialOrd)]
 pub enum SubscanError {
     /// Module error, see [`ModuleErrorKind`] for generic error definitions
+    #[display("{_0}")]
     ModuleError(ModuleErrorKind),
     /// This error type uses for the make graceful returns from module `.run(`
     /// method. If the module has already discovered subdomains and encountered
     /// an error during runtime we need to save already discovered subdomains. So
     /// implemented this error type to ensure this
+    #[display("failed with result")]
     ModuleErrorWithResult(SubscanModuleResult),
-}
-
-impl Display for SubscanError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            SubscanError::ModuleError(kind) => write!(f, "{kind}"),
-            SubscanError::ModuleErrorWithResult(_) => write!(f, "failed with result"),
-        }
-    }
 }
 
 impl From<ModuleErrorKind> for SubscanError {
@@ -122,20 +114,32 @@ impl SubscanError {
 }
 
 /// Kind of [`SubscanError::ModuleError`]
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Clone, Debug, Display, Eq, Ord, PartialEq, PartialOrd)]
 pub enum ModuleErrorKind {
     /// Indicates an error when extracting subdomains from any HTML content
+    #[display("html extract error")]
     HTMLExtract,
     /// Indicates an error when extracting subdomains from any JSON content
+    #[display("json extract error")]
     JSONExtract,
     /// Indicates an error when extracting subdomains by using regex pattern
+    #[display("regex extract error")]
     RegexExtract,
     /// Indicates an error when getting content from URL
+    #[display("get content error")]
     GetContent,
     /// Indicates that the module was skipped for any [`SkipReason`]
+    #[display("{_0}")]
     Skip(SkipReason),
     /// Indicates that the module encountered a error with a custom error message
+    #[display("{_0}")]
     Custom(String),
+}
+
+impl From<SkipReason> for ModuleErrorKind {
+    fn from(reason: SkipReason) -> Self {
+        Self::Skip(reason)
+    }
 }
 
 impl ModuleErrorKind {
@@ -197,25 +201,6 @@ impl ModuleErrorKind {
             | ModuleErrorKind::GetContent => format!("[{self} {}]", self.status()),
             ModuleErrorKind::Skip(reason) => format!("[{reason} {}]", self.status()),
             ModuleErrorKind::Custom(msg) => format!("[{msg} {}]", self.status()),
-        }
-    }
-}
-
-impl From<SkipReason> for ModuleErrorKind {
-    fn from(reason: SkipReason) -> Self {
-        Self::Skip(reason)
-    }
-}
-
-impl Display for ModuleErrorKind {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ModuleErrorKind::HTMLExtract => write!(f, "html extract error"),
-            ModuleErrorKind::JSONExtract => write!(f, "json extract error"),
-            ModuleErrorKind::RegexExtract => write!(f, "regex extract error"),
-            ModuleErrorKind::GetContent => write!(f, "get content error"),
-            ModuleErrorKind::Custom(msg) => write!(f, "{msg}"),
-            ModuleErrorKind::Skip(reason) => write!(f, "{reason}"),
         }
     }
 }

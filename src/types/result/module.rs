@@ -9,7 +9,7 @@ use crate::{
 };
 
 /// `Subscan` module result, it stores findings and module execution status
-#[derive(Clone, Debug, Default, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Clone, Debug, Default, Eq, Ord, PartialEq, PartialOrd)]
 pub struct SubscanModuleResult {
     pub module: String,
     pub status: SubscanModuleStatus,

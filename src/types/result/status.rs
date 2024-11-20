@@ -1,32 +1,23 @@
-use std::fmt::Display;
-
 use colored::Colorize;
+use derive_more::Display;
 use serde::Serialize;
 
 use crate::error::ModuleErrorKind;
 
 /// Subscan module states
-#[derive(Clone, Debug, Default, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Clone, Debug, Default, Display, Eq, Ord, PartialEq, PartialOrd)]
 pub enum SubscanModuleStatus {
     #[default]
+    #[display("STARTED")]
     Started,
+    #[display("FINISHED")]
     Finished,
+    #[display("SKIPPED")]
     Skipped(SkipReason),
+    #[display("FAILED")]
     Failed(ModuleErrorKind),
+    #[display("FAILED")]
     FailedWithResult,
-}
-
-impl Display for SubscanModuleStatus {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            SubscanModuleStatus::Started => write!(f, "STARTED"),
-            SubscanModuleStatus::Finished => write!(f, "FINISHED"),
-            SubscanModuleStatus::Failed(_) | SubscanModuleStatus::FailedWithResult => {
-                write!(f, "FAILED")
-            }
-            SubscanModuleStatus::Skipped(_) => write!(f, "SKIPPED"),
-        }
-    }
 }
 
 impl From<ModuleErrorKind> for SubscanModuleStatus {
@@ -131,20 +122,13 @@ impl SubscanModuleStatus {
 }
 
 /// Module skip reasons
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord, Serialize)]
+#[derive(Clone, Debug, Display, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub enum SkipReason {
     /// Indicates that if authentication requires by module but API key, HTTP credentials
     /// or other any authentication method not provided
+    #[display("auth not provided")]
     AuthenticationNotProvided,
     /// Indicates that the module skipped by user
+    #[display("skipped by user")]
     SkippedByUser,
-}
-
-impl Display for SkipReason {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            SkipReason::AuthenticationNotProvided => write!(f, "auth not provided"),
-            SkipReason::SkippedByUser => write!(f, "skipped by user"),
-        }
-    }
 }

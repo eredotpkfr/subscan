@@ -4,7 +4,7 @@ use chrono::Utc;
 use clap::ValueEnum;
 
 /// Supported output formats for reporting scan results
-#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
+#[derive(Copy, Clone, Debug, Default, Eq, Ord, PartialEq, PartialOrd, ValueEnum)]
 pub enum OutputFormat {
     TXT,
     CSV,
