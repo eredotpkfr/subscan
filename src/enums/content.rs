@@ -6,7 +6,7 @@ use serde_json::Value;
 pub enum Content {
     #[from(String, &str)]
     String(String),
-    #[from(Value)]
+    #[from]
     JSON(Value),
     #[default]
     Empty,
