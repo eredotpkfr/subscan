@@ -111,7 +111,7 @@ impl SubscanModulePool {
                     stats.status.log(name);
                     self.result.lock().await.statistic(stats).await;
 
-                    for sub in &subresult.subdomains {
+                    for sub in subresult.valids(&self.domain) {
                         self.channels.subs.tx.send(sub.to_string()).unwrap()
                     }
                 } else {

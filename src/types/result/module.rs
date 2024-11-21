@@ -6,6 +6,7 @@ use super::status::SubscanModuleStatus;
 use crate::{
     error::SubscanError,
     types::{core::Subdomain, result::statistics::SubscanModuleStatistics},
+    utilities::regex::generate_subdomain_regex,
 };
 
 /// `Subscan` module result, it stores findings and module execution status
@@ -53,6 +54,37 @@ impl SubscanModuleResult {
     /// ```
     pub fn elapsed(&self) -> TimeDelta {
         self.finished_at - self.started_at
+    }
+
+    /// Returns iterator of valid subdomains according to given domain address
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::result::module::SubscanModuleResult;
+    ///
+    /// let mut result: SubscanModuleResult = "foo".into();
+    ///
+    /// // Valids
+    /// result.subdomains.insert("bar.foo.com".into());
+    /// result.subdomains.insert("baz.foo.com".into());
+    ///
+    /// // Invalids
+    /// result.subdomains.insert("bar.baz.com".into());
+    /// result.subdomains.insert("baz.baz.com".into());
+    ///
+    /// // Get subdomains that matches with foo.com
+    /// let valids = result.valids("foo.com").collect::<Vec<_>>();
+    /// let expected = vec!["bar.foo.com", "baz.foo.com"];
+    ///
+    /// assert_eq!(valids, expected);
+    /// ```
+    pub fn valids(&self, domain: &str) -> impl Iterator<Item = &String> {
+        let pattern = generate_subdomain_regex(domain).unwrap();
+
+        self.subdomains
+            .iter()
+            .filter(move |sub| pattern.is_match(sub))
     }
 
     /// Get module stats as [`SubscanModuleStatistics`]
