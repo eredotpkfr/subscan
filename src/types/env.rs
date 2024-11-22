@@ -1,5 +1,6 @@
-use crate::utilities::env::format_env;
 use dotenvy;
+
+use crate::utilities::env::format_env;
 
 /// Struct that stores any environment variable value with its name
 #[derive(Clone, Debug, Default, PartialEq)]

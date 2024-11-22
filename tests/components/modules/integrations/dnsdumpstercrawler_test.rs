@@ -1,13 +1,13 @@
+use subscan::{
+    enums::{content::Content, dispatchers::SubscanModuleDispatcher},
+    error::ModuleErrorKind::Custom,
+    interfaces::module::SubscanModuleInterface,
+    modules::integrations::dnsdumpstercrawler::DNSDumpsterCrawler,
+};
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     mock::funcs,
-};
-use subscan::{
-    enums::{
-        content::Content, dispatchers::SubscanModuleDispatcher, module::SubscanModuleStatus::Failed,
-    },
-    interfaces::module::SubscanModuleInterface,
-    modules::integrations::dnsdumpstercrawler::DNSDumpsterCrawler,
 };
 
 #[tokio::test]
@@ -32,8 +32,8 @@ async fn run_test_no_token() {
 
     let result = dnsdumpstercrawler.run(TEST_DOMAIN).await;
 
-    assert_eq!(result.subdomains, [].into());
-    assert_eq!(result.status, Failed("not get token".into()));
+    assert!(result.is_err());
+    assert_eq!(result.err().unwrap(), Custom("not get token".into()).into());
 }
 
 #[tokio::test]
@@ -46,7 +46,7 @@ async fn run_test_with_token() {
         &stubr.path("/dnsdumpstercrawler-with-token"),
     );
 
-    let results = dnsdumpstercrawler.run(TEST_DOMAIN).await;
+    let results = dnsdumpstercrawler.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(results.subdomains, [TEST_BAR_SUBDOMAIN.to_string()].into());
 }

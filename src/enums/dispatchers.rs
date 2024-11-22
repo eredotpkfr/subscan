@@ -1,3 +1,6 @@
+use enum_dispatch::enum_dispatch;
+use prettytable::{row, Row};
+
 use crate::{
     extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor},
     interfaces::module::SubscanModuleInterface,
@@ -11,8 +14,6 @@ use crate::{
     },
     requesters::{chrome::ChromeBrowser, client::HTTPClient},
 };
-use enum_dispatch::enum_dispatch;
-use prettytable::{row, Row};
 
 /// Dispatcher enumeration to decide module types
 ///

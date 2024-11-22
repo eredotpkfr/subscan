@@ -1,11 +1,11 @@
 use std::sync::Arc;
 
-use crate::common::{constants::TEST_DOMAIN, utils::current_thread_hex};
 use reqwest::Url;
 use subscan::enums::dispatchers::SubscanModuleDispatcher;
 use tokio::sync::Notify;
 
 use super::dns::MockDNSServer;
+use crate::common::{constants::TEST_DOMAIN, utils::current_thread_hex};
 
 pub async fn spawn_mock_dns_server() -> MockDNSServer {
     let notify_one = Arc::new(Notify::new());

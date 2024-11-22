@@ -1,12 +1,5 @@
-use crate::{
-    enums::{
-        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        module::SubscanModuleStatus::{Failed, Finished},
-    },
-    interfaces::module::SubscanModuleInterface,
-    types::{core::Subdomain, result::module::SubscanModuleResult},
-    utilities::{net, regex},
-};
+use std::{net::SocketAddr, str::FromStr};
+
 use async_trait::async_trait;
 use hickory_client::{
     client::{AsyncClient, ClientHandle},
@@ -15,8 +8,20 @@ use hickory_client::{
     tcp::TcpClientStream,
 };
 use hickory_resolver::config::NameServerConfig;
-use std::{net::SocketAddr, str::FromStr};
 use tokio::{net::TcpStream as TokioTcpStream, sync::Mutex};
+
+use crate::{
+    enums::dispatchers::{
+        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    },
+    error::ModuleErrorKind::Custom,
+    interfaces::module::SubscanModuleInterface,
+    types::{
+        core::{Result, Subdomain},
+        result::module::SubscanModuleResult,
+    },
+    utilities::{net, regex},
+};
 
 pub const ZONETRANSFER_MODULE_NAME: &str = "zonetransfer";
 
@@ -66,7 +71,7 @@ impl ZoneTransfer {
         let mut ips = vec![];
         let mut client = self.get_async_client(server).await?;
 
-        let name = Name::from_str(domain).unwrap();
+        let name = Name::from_str(domain).ok()?;
         let ns_response = client.query(name, DNSClass::IN, RecordType::NS);
 
         for answer in ns_response.await.ok()?.answers() {
@@ -132,19 +137,22 @@ impl SubscanModuleInterface for ZoneTransfer {
         None
     }
 
-    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
         let mut result: SubscanModuleResult = self.name().await.into();
 
         if let Some(ns) = &self.ns {
-            if let Some(ips) = self.get_ns_as_ip(ns.socket_addr, domain).await {
-                for ip in ips {
-                    result.extend(self.attempt_zone_transfer(ip, domain).await);
-                }
+            let ips = self
+                .get_ns_as_ip(ns.socket_addr, domain)
+                .await
+                .ok_or(Custom("connection error".into()))?;
+
+            for ip in ips {
+                result.extend(self.attempt_zone_transfer(ip, domain).await);
             }
 
-            result.with_status(Finished).await
-        } else {
-            result.with_status(Failed("no default ns".into())).await
+            return Ok(result.with_finished().await);
         }
+
+        Err(Custom("no default ns".into()).into())
     }
 }

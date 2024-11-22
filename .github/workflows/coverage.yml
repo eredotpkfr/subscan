@@ -26,6 +26,7 @@ jobs:
           --all-features \
           --workspace \
           --doctests \
+          --fail-under-lines 95 \
           --lcov \
           --output-path lcov.info
 

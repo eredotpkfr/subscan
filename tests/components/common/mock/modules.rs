@@ -1,10 +1,10 @@
-use super::funcs::wrap_url_with_mock_func;
-use crate::common::utils::current_thread_hex;
+use std::collections::BTreeSet;
+
 use reqwest::Url;
 use serde_json::Value;
-use std::collections::BTreeSet;
 use subscan::{
     enums::{auth::AuthenticationMethod, dispatchers::RequesterDispatcher},
+    error::ModuleErrorKind::JSONExtract,
     extractors::{json::JSONExtractor, regex::RegexExtractor},
     modules::generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
     requesters::client::HTTPClient,
@@ -13,6 +13,9 @@ use subscan::{
         query::SearchQueryParam,
     },
 };
+
+use super::funcs::wrap_url_with_mock_func;
+use crate::common::utils::current_thread_hex;
 
 pub fn generic_search_engine(url: &str) -> GenericSearchEngineModule {
     let requester = RequesterDispatcher::HTTPClient(HTTPClient::default());
@@ -32,13 +35,13 @@ pub fn generic_search_engine(url: &str) -> GenericSearchEngineModule {
 
 pub fn generic_integration(url: &str, auth: AuthenticationMethod) -> GenericIntegrationModule {
     let parse = |json: Value, _domain: &str| {
-        if let Some(subs) = json["subdomains"].as_array() {
+        if let Some(subdomains) = json["subdomains"].as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());
 
-            BTreeSet::from_iter(subs.iter().filter_map(filter))
-        } else {
-            BTreeSet::new()
+            return Ok(BTreeSet::from_iter(subdomains.iter().filter_map(filter)));
         }
+
+        Err(JSONExtract.into())
     };
 
     let requester = RequesterDispatcher::HTTPClient(HTTPClient::default());

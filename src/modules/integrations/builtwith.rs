@@ -1,20 +1,23 @@
+use std::collections::BTreeSet;
+
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
 };
-use reqwest::Url;
-use serde_json::Value;
-use std::collections::BTreeSet;
 
 pub const BUILTWITH_MODULE_NAME: &str = "builtwith";
 pub const BUILTWITH_URL: &str = "https://api.builtwith.com/v21/api.json";
@@ -75,23 +78,18 @@ impl BuiltWith {
         None
     }
 
-    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
-        let mut subs = BTreeSet::new();
+    pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
+        let mut subdomains = BTreeSet::new();
 
-        if let Some(results) = content["Results"].as_array() {
-            for result in results {
-                if let Some(paths) = result["Result"]["Paths"].as_array() {
-                    let filter = |item: &Value| {
-                        let sub = item["SubDomain"].as_str()?.to_string();
+        let filter = |item: &Value| Some(format!("{}.{}", item["SubDomain"].as_str()?, domain));
+        let results = content["Results"].as_array().ok_or(JSONExtract)?;
 
-                        Some(format!("{}.{}", sub, domain))
-                    };
-
-                    subs.extend(paths.iter().filter_map(filter));
-                }
+        for result in results {
+            if let Some(paths) = result["Result"]["Paths"].as_array() {
+                subdomains.extend(paths.iter().filter_map(filter));
             }
         }
 
-        subs
+        Ok(subdomains)
     }
 }

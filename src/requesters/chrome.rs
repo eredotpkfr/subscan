@@ -1,10 +1,13 @@
-use crate::{
-    enums::content::Content, interfaces::requester::RequesterInterface,
-    types::config::requester::RequesterConfig,
-};
 use async_trait::async_trait;
 use headless_chrome::{browser::LaunchOptions, Browser};
 use reqwest::Url;
+
+use crate::{
+    enums::content::Content,
+    error::ModuleErrorKind::GetContent,
+    interfaces::requester::RequesterInterface,
+    types::{config::requester::RequesterConfig, core::Result},
+};
 
 /// Chrome requester struct, send HTTP requests via Chrome browser.
 /// Also its compatible with [`RequesterInterface`]
@@ -168,32 +171,34 @@ impl RequesterInterface for ChromeBrowser {
     ///     // do something with content
     /// }
     /// ```
-    async fn get_content(&self, url: Url) -> Content {
-        let tab = self.browser.new_tab().expect("Cannot create tab!");
+    async fn get_content(&self, url: Url) -> Result<Content> {
+        let err = |_| GetContent;
+
+        let tab = self.browser.new_tab().map_err(err)?;
         let headers = self.config.headers_as_hashmap();
 
         // Set basic configurations
         tab.set_default_timeout(self.config.timeout);
-        tab.set_extra_http_headers(headers).unwrap();
+        tab.set_extra_http_headers(headers).map_err(err)?;
 
         // Set basic HTTP authentication if credentials provided
         if self.config.credentials.is_ok() {
             let username = self.config.credentials.username.value.clone();
             let password = self.config.credentials.password.value.clone();
 
-            tab.authenticate(username, password).unwrap();
+            tab.authenticate(username, password).map_err(err)?;
         }
 
-        tab.navigate_to(url.to_string().as_str()).ok();
+        tab.navigate_to(url.to_string().as_str()).map_err(err)?;
 
         if let Ok(tab) = tab.wait_until_navigated() {
-            let content = tab.get_content().ok();
+            let content = tab.get_content();
 
-            tab.close(true).unwrap();
-            Content::String(content.unwrap_or_default())
+            tab.close(true).map_err(err)?;
+            Ok(content.map_err(err)?.into())
         } else {
-            tab.close(true).unwrap();
-            Content::Empty
+            tab.close(true).map_err(err)?;
+            Ok(Content::Empty)
         }
     }
 }

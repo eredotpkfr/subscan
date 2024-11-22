@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@nightly
       - uses: Swatinem/rust-cache@v2
 
       - name: Run rustfmt
@@ -34,7 +34,8 @@ jobs:
       - uses: dtolnay/install@cargo-docs-rs
       - uses: Swatinem/rust-cache@v2
 
-      - run: cargo +nightly docs-rs
+      - name: Run doc-rs
+        run: make doc-rs
 
   typos:
     runs-on: ubuntu-latest

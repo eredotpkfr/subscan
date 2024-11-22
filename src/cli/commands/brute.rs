@@ -1,9 +1,11 @@
+use std::path::PathBuf;
+
+use clap::Args;
+
 use crate::{
     constants::{DEFAULT_RESOLVER_CONCURRENCY, DEFAULT_RESOLVER_TIMEOUT},
     enums::output::OutputFormat,
 };
-use clap::Args;
-use std::path::PathBuf;
 
 /// Brute force attack command arguments
 #[derive(Args, Clone, Debug, Default)]

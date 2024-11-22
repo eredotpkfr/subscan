@@ -1,9 +1,9 @@
-use crate::common::constants::TEST_URL;
+use std::time::Duration;
+
 use reqwest::{
     header::{HeaderMap, HeaderName, HeaderValue, CONTENT_LENGTH, USER_AGENT},
     Url,
 };
-use std::time::Duration;
 use subscan::{
     interfaces::requester::RequesterInterface,
     requesters::chrome::ChromeBrowser,
@@ -12,6 +12,8 @@ use subscan::{
         env::{Credentials, Env},
     },
 };
+
+use crate::common::constants::TEST_URL;
 
 #[tokio::test]
 async fn chrome_configure_test() {
@@ -50,7 +52,7 @@ async fn chrome_get_content_test() {
     let browser = ChromeBrowser::default();
     let url = Url::parse(&stubr.path("/hello")).unwrap();
 
-    let content = browser.get_content(url).await.as_string();
+    let content = browser.get_content(url).await.unwrap().as_string();
 
     assert!(content.contains("hello"));
 }
@@ -67,7 +69,13 @@ async fn chrome_get_content_timeout_test() {
     let browser = ChromeBrowser::with_config(config);
     let url = Url::parse(&stubr.path("/hello-delayed")).unwrap();
 
-    browser.get_content(url).await.as_json().as_str().unwrap();
+    browser
+        .get_content(url)
+        .await
+        .unwrap()
+        .as_json()
+        .as_str()
+        .unwrap();
 }
 
 #[tokio::test]
@@ -87,7 +95,7 @@ async fn chrome_get_content_extra_header_test() {
     )
     .unwrap();
 
-    let content = browser.get_content(url).await.as_string();
+    let content = browser.get_content(url).await.unwrap().as_string();
 
     assert!(content.contains("hello"));
 }

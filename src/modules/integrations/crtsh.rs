@@ -1,22 +1,25 @@
+use std::collections::BTreeSet;
+
+use regex::Match;
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
     utilities::regex::generate_subdomain_regex,
 };
-use regex::Match;
-use reqwest::Url;
-use serde_json::Value;
-use std::collections::BTreeSet;
 
 pub const CRTSH_MODULE_NAME: &str = "crtsh";
 pub const CRTSH_URL: &str = "https://crt.sh";
@@ -68,20 +71,18 @@ impl Crtsh {
         None
     }
 
-    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
-        let mut subs = BTreeSet::new();
-        let pattern = generate_subdomain_regex(domain).unwrap();
-
+    pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
         if let Some(results) = content.as_array() {
+            let pattern = generate_subdomain_regex(domain)?;
             let matches = |item: &Value| {
                 let to_string = |matched: Match| matched.as_str().to_string();
 
                 pattern.find(item["name_value"].as_str()?).map(to_string)
             };
 
-            subs.extend(results.iter().filter_map(matches));
+            return Ok(results.iter().filter_map(matches).collect());
         }
 
-        subs
+        Err(JSONExtract.into())
     }
 }

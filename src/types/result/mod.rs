@@ -9,4 +9,6 @@ pub mod pool;
 /// Scan result types
 pub mod scan;
 /// Statistics types
-pub mod stats;
+pub mod statistics;
+/// Status types
+pub mod status;

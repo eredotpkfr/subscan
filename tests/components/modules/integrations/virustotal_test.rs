@@ -1,15 +1,18 @@
+use std::env;
+
+use reqwest::Url;
+use serde_json::{json, Value};
+use subscan::{
+    enums::content::Content,
+    error::ModuleErrorKind::JSONExtract,
+    interfaces::module::SubscanModuleInterface,
+    modules::integrations::virustotal::{VirusTotal, VIRUSTOTAL_URL},
+};
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::funcs,
     utils::read_stub,
-};
-use reqwest::Url;
-use serde_json::{json, Value};
-use std::{collections::BTreeSet, env};
-use subscan::{
-    enums::content::Content,
-    interfaces::module::SubscanModuleInterface,
-    modules::integrations::virustotal::{VirusTotal, VIRUSTOTAL_URL},
 };
 
 #[tokio::test]
@@ -21,7 +24,7 @@ async fn run_test() {
     env::set_var(&env_name, "virustotal-api-key");
     funcs::wrap_module_url(&mut virustotal, &stubr.path("/virustotal"));
 
-    let result = virustotal.run(TEST_DOMAIN).await;
+    let result = virustotal.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
@@ -57,6 +60,9 @@ async fn extract_test() {
     let extracted = VirusTotal::extract(json, TEST_DOMAIN);
     let not_extracted = VirusTotal::extract(Value::Null, TEST_DOMAIN);
 
-    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
-    assert_eq!(not_extracted, BTreeSet::new());
+    assert!(extracted.is_ok());
+    assert!(not_extracted.is_err());
+
+    assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(not_extracted.err().unwrap(), JSONExtract.into());
 }

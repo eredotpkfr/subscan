@@ -1,22 +1,25 @@
+use std::collections::BTreeSet;
+
+use regex::Match;
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
     utilities::regex::generate_subdomain_regex,
 };
-use regex::Match;
-use reqwest::Url;
-use serde_json::Value;
-use std::collections::BTreeSet;
 
 pub const BUFFEROVER_MODULE_NAME: &str = "bufferover";
 pub const BUFFEROVER_URL: &str = "https://tls.bufferover.run";
@@ -65,20 +68,18 @@ impl BufferOver {
         None
     }
 
-    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
-        let mut subs = BTreeSet::new();
-        let pattern = generate_subdomain_regex(domain).unwrap();
-
+    pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
         if let Some(results) = content["Results"].as_array() {
+            let pattern = generate_subdomain_regex(domain)?;
             let filter = |item: &Value| {
                 let to_string = |matches: Match| matches.as_str().to_string();
 
                 pattern.find(item.as_str()?).map(to_string)
             };
 
-            subs.extend(results.iter().filter_map(filter));
+            return Ok(results.iter().filter_map(filter).collect());
         }
 
-        subs
+        Err(JSONExtract.into())
     }
 }

@@ -1,17 +1,19 @@
 use core::time::Duration;
 use std::collections::BTreeSet;
 
+use serde_json::{json, Value};
+use subscan::{
+    enums::dispatchers::SubscanModuleDispatcher,
+    error::ModuleErrorKind::Custom,
+    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
+    modules::integrations::commoncrawl::CommonCrawl,
+    types::config::requester::RequesterConfig,
+};
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::funcs,
     stub::StubTemplateManager,
-};
-use serde_json::{json, Value};
-use subscan::{
-    enums::{dispatchers::SubscanModuleDispatcher, module::SubscanModuleStatus::Failed},
-    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
-    modules::integrations::commoncrawl::CommonCrawl,
-    types::config::requester::RequesterConfig,
 };
 
 #[tokio::test]
@@ -62,7 +64,7 @@ async fn run_test() {
         requester.configure(config).await;
     };
 
-    let results = commoncrawl.run(TEST_DOMAIN).await;
+    let results = commoncrawl.run(TEST_DOMAIN).await.unwrap();
     let expected = BTreeSet::from([
         TEST_BAR_SUBDOMAIN.to_string(),
         TEST_BAZ_SUBDOMAIN.to_string(),
@@ -80,6 +82,9 @@ async fn run_failed_test() {
 
     let results = commoncrawl.run(TEST_DOMAIN).await;
 
-    assert_eq!(results.status, Failed("not get cdx URLs".into()));
-    assert_eq!(results.subdomains, [].into());
+    assert!(results.is_err());
+    assert_eq!(
+        results.err().unwrap(),
+        Custom("not get cdx URLs".into()).into()
+    );
 }

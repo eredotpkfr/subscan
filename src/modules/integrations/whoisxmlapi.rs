@@ -1,21 +1,23 @@
 use std::collections::BTreeSet;
 
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
 };
-use reqwest::Url;
-use serde_json::Value;
 
 pub const WHOISXMLAPI_MODULE_NAME: &str = "whoisxmlapi";
 pub const WHOISXMLAPI_URL: &str = "https://subdomains.whoisxmlapi.com/api/v1";
@@ -64,13 +66,13 @@ impl WhoisXMLAPI {
         None
     }
 
-    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: &str) -> Result<BTreeSet<Subdomain>> {
         if let Some(passives) = content["result"]["records"].as_array() {
             let filter = |item: &Value| Some(item["domain"].as_str()?.to_string());
 
-            return passives.iter().filter_map(filter).collect();
+            return Ok(passives.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        Err(JSONExtract.into())
     }
 }

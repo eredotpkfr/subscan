@@ -1,12 +1,14 @@
+use std::collections::BTreeSet;
+
+use serde_json::Value;
+use subscan::{
+    enums::content::Content, error::ModuleErrorKind::JSONExtract, extractors::json::JSONExtractor,
+    interfaces::extractor::SubdomainExtractorInterface,
+};
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN},
     utils::read_testdata,
-};
-use serde_json::Value;
-use std::collections::BTreeSet;
-use subscan::{
-    enums::content::Content, extractors::json::JSONExtractor,
-    interfaces::extractor::SubdomainExtractorInterface,
 };
 
 #[tokio::test]
@@ -14,13 +16,13 @@ async fn extract_test() {
     let json = read_testdata("json/subdomains.json");
 
     let inner_parser = |json: Value, _domain: &str| {
-        if let Some(subs) = json["data"]["subdomains"].as_array() {
+        if let Some(subdomains) = json["data"]["subdomains"].as_array() {
             let filter = |json: &Value| Some(json["subdomain"].as_str().unwrap().to_string());
 
-            BTreeSet::from_iter(subs.iter().filter_map(filter))
-        } else {
-            BTreeSet::new()
+            return Ok(BTreeSet::from_iter(subdomains.iter().filter_map(filter)));
         }
+
+        Err(JSONExtract.into())
     };
 
     let extractor = JSONExtractor::new(Box::new(inner_parser));
@@ -33,6 +35,9 @@ async fn extract_test() {
         TEST_BAZ_SUBDOMAIN.to_string(),
     ]);
 
-    assert_eq!(result, expected);
-    assert_eq!(no_result, BTreeSet::new());
+    assert!(result.is_ok());
+    assert!(no_result.is_err());
+
+    assert_eq!(no_result.err().unwrap(), JSONExtract.into());
+    assert_eq!(result.unwrap(), expected);
 }

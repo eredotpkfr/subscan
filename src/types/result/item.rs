@@ -1,7 +1,9 @@
-use crate::types::core::Subdomain;
+use std::net::IpAddr;
+
 use prettytable::{row, Row};
 use serde::Serialize;
-use std::net::IpAddr;
+
+use crate::types::core::Subdomain;
 
 /// Module pool item, alias for [`ScanResultItem`]
 pub type SubscanModulePoolResultItem = ScanResultItem;

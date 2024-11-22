@@ -1,28 +1,29 @@
+use std::str::FromStr;
+
+use async_trait::async_trait;
+use reqwest::{
+    header::{HeaderName, HeaderValue},
+    Url,
+};
+use tokio::sync::Mutex;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
-        module::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Finished},
     },
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     types::{
-        core::SubscanModuleCoreComponents,
+        core::{Result, SubscanModuleCoreComponents},
         env::{Credentials, Env},
         func::GenericIntegrationCoreFuncs,
-        result::module::SubscanModuleResult,
+        result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
     },
     utilities::http,
 };
-use async_trait::async_trait;
-use reqwest::{
-    header::{HeaderName, HeaderValue},
-    Url,
-};
-use std::str::FromStr;
-use tokio::sync::Mutex;
 
 /// Generic integration module
 ///
@@ -111,34 +112,37 @@ impl SubscanModuleInterface for GenericIntegrationModule {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
         let mut result: SubscanModuleResult = self.name().await.into();
         let mut url: Url = (self.funcs.url)(domain).parse().unwrap();
 
         if self.auth.is_set() && !self.authenticate(&mut url).await {
-            return result.with_status(AuthenticationNotProvided.into()).await;
+            return Err(AuthenticationNotProvided.into());
         }
 
         let requester = self.components.requester.lock().await;
         let extractor = &self.components.extractor;
 
         loop {
-            let content = requester.get_content(url.clone()).await;
-            let news = extractor.extract(content.clone(), domain).await;
+            let content = requester
+                .get_content(url.clone())
+                .await
+                .map_err(result.graceful_exit().await)?;
 
-            if news.is_empty() {
-                break;
-            }
+            let subdomains = extractor
+                .extract(content.clone(), domain)
+                .await
+                .map_err(result.graceful_exit().await)?;
 
-            result.extend(news);
+            result.extend(subdomains);
 
-            if let Some(next_url) = (self.funcs.next)(url.clone(), content.clone()) {
-                url = next_url;
+            if let Some(next) = (self.funcs.next)(url, content) {
+                url = next;
             } else {
                 break;
             }
         }
 
-        result.with_status(Finished).await
+        Ok(result.with_finished().await)
     }
 }

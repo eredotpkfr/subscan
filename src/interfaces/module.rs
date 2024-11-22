@@ -1,3 +1,7 @@
+use async_trait::async_trait;
+use enum_dispatch::enum_dispatch;
+use tokio::sync::Mutex;
+
 use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
@@ -10,11 +14,8 @@ use crate::{
         },
         zonetransfer::ZoneTransfer,
     },
-    types::{env::SubscanModuleEnvs, result::module::SubscanModuleResult},
+    types::{core::Result, env::SubscanModuleEnvs, result::module::SubscanModuleResult},
 };
-use async_trait::async_trait;
-use enum_dispatch::enum_dispatch;
-use tokio::sync::Mutex;
 
 /// Generic `subscan` module trait definition to implement
 /// subdomain enumeration modules
@@ -30,7 +31,7 @@ use tokio::sync::Mutex;
 /// use std::collections::BTreeSet;
 /// use subscan::interfaces::module::SubscanModuleInterface;
 /// use subscan::requesters::client::HTTPClient;
-/// use subscan::types::result::module::SubscanModuleResult;
+/// use subscan::types::{result::module::SubscanModuleResult, core::Result};
 /// use subscan::extractors::regex::RegexExtractor;
 /// use subscan::enums::dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher};
 /// use async_trait::async_trait;
@@ -55,9 +56,9 @@ use tokio::sync::Mutex;
 ///         Some(&self.extractor)
 ///     }
 ///
-///     async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+///     async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
 ///         // do something in `run` method
-///         self.name().await.into()
+///         Ok(self.name().await.into())
 ///     }
 /// }
 ///
@@ -77,7 +78,7 @@ use tokio::sync::Mutex;
 ///     assert_eq!(foo.name().await, "foo");
 ///
 ///     // do something with results
-///     let results = foo.run("foo.com").await;
+///     let results = foo.run("foo.com").await.unwrap();
 /// }
 /// ```
 #[async_trait]
@@ -98,5 +99,5 @@ pub trait SubscanModuleInterface: Sync + Send {
     async fn extractor(&self) -> Option<&SubdomainExtractorDispatcher>;
     /// Just like a `main` method, when the module run this `run` method will be called.
     /// So this method should do everything
-    async fn run(&mut self, domain: &str) -> SubscanModuleResult;
+    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult>;
 }

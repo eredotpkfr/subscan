@@ -1,3 +1,5 @@
+use reqwest::Url;
+
 use crate::{
     enums::dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     extractors::html::HTMLExtractor,
@@ -5,7 +7,6 @@ use crate::{
     requesters::client::HTTPClient,
     types::core::SubscanModuleCoreComponents,
 };
-use reqwest::Url;
 
 pub const YAHOO_MODULE_NAME: &str = "yahoo";
 pub const YAHOO_SEARCH_URL: &str = "https://search.yahoo.com/search";

@@ -1,15 +1,15 @@
-use std::collections::BTreeSet;
+use serde_json::Value;
+use subscan::{
+    enums::content::Content,
+    error::ModuleErrorKind::JSONExtract,
+    interfaces::module::SubscanModuleInterface,
+    modules::integrations::subdomaincenter::{SubdomainCenter, SUBDOMAINCENTER_URL},
+};
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::funcs,
     utils::read_stub,
-};
-use serde_json::Value;
-use subscan::{
-    enums::content::Content,
-    interfaces::module::SubscanModuleInterface,
-    modules::integrations::subdomaincenter::{SubdomainCenter, SUBDOMAINCENTER_URL},
 };
 
 #[tokio::test]
@@ -19,7 +19,7 @@ async fn run_test() {
 
     funcs::wrap_module_url(&mut subdomaincenter, &stubr.path("/subdomaincenter"));
 
-    let result = subdomaincenter.run(TEST_DOMAIN).await;
+    let result = subdomaincenter.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }
@@ -48,6 +48,9 @@ async fn extract_test() {
     let extracted = SubdomainCenter::extract(json, TEST_DOMAIN);
     let not_extracted = SubdomainCenter::extract(Value::Null, TEST_DOMAIN);
 
-    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
-    assert_eq!(not_extracted, BTreeSet::new());
+    assert!(extracted.is_ok());
+    assert!(not_extracted.is_err());
+
+    assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(not_extracted.err().unwrap(), JSONExtract.into());
 }

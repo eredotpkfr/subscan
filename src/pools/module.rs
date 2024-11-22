@@ -1,40 +1,26 @@
+use std::sync::Arc;
+
 use tokio::{sync::Mutex, task::JoinSet};
 
 use crate::{
     constants::LOG_TIME_FORMAT,
-    enums::{cache::CacheFilter, module::SkipReason::SkippedByUser},
+    enums::cache::CacheFilter,
+    error::SubscanError::ModuleErrorWithResult,
     interfaces::module::SubscanModuleInterface,
     resolver::Resolver,
     types::{
         config::subscan::SubscanConfig,
-        core::{Subdomain, SubscanModule, UnboundedFlumeChannel, UnboundedFlumeChannelTuple},
-        result::{item::SubscanModulePoolResultItem, pool::SubscanModulePoolResult},
+        core::{Subdomain, SubscanModule, UnboundedFlumeChannel},
+        result::{
+            item::SubscanModulePoolResultItem, pool::SubscanModulePoolResult,
+            statistics::SubscanModuleStatistics,
+        },
     },
-    utilities,
 };
-use std::sync::Arc;
 
 struct SubscanModulePoolChannels {
     module: UnboundedFlumeChannel<SubscanModule>,
     subs: UnboundedFlumeChannel<Subdomain>,
-}
-
-impl From<UnboundedFlumeChannelTuple<SubscanModule>> for UnboundedFlumeChannel<SubscanModule> {
-    fn from(channel: UnboundedFlumeChannelTuple<SubscanModule>) -> Self {
-        Self {
-            tx: channel.0,
-            rx: channel.1,
-        }
-    }
-}
-
-impl From<UnboundedFlumeChannelTuple<Subdomain>> for UnboundedFlumeChannel<Subdomain> {
-    fn from(channel: UnboundedFlumeChannelTuple<Subdomain>) -> Self {
-        Self {
-            tx: channel.0,
-            rx: channel.1,
-        }
-    }
 }
 
 /// Subscan module pool to run modules and resolve IPs
@@ -106,7 +92,7 @@ impl SubscanModulePool {
                 ip: lookup_ip(&self.resolver, sub).await,
             };
 
-            self.result.lock().await.results.insert(item);
+            self.result.lock().await.items.insert(item);
         }
     }
 
@@ -115,23 +101,32 @@ impl SubscanModulePool {
         while let Ok(module) = self.channels.module.rx.try_recv() {
             let mut module = module.lock().await;
 
-            if self.filter.is_filtered(module.name().await).await {
-                let mut result = self.result.lock().await;
-
-                result.statistics.add_skipped(module.name().await).await;
-
-                utilities::log::status(module.name().await, SkippedByUser.into()).await;
-            } else {
+            if !self.filter.is_filtered(module.name().await).await {
                 let subresult = module.run(&self.domain).await;
-                let mut result = self.result.lock().await;
+                let name = module.name().await;
 
-                result.statistics.module.push(subresult.stats());
+                if let Ok(subresult) | Err(ModuleErrorWithResult(subresult)) = subresult {
+                    let stats = subresult.stats().await;
 
-                for sub in &subresult.subdomains {
-                    self.channels.subs.tx.send(sub.to_string()).unwrap();
+                    stats.status.log(name);
+                    self.result.lock().await.statistic(stats).await;
+
+                    for sub in &subresult.subdomains {
+                        self.channels.subs.tx.send(sub.to_string()).unwrap()
+                    }
+                } else {
+                    let error = subresult.unwrap_err();
+                    let stats = error.stats(name);
+
+                    stats.status.log(name);
+                    self.result.lock().await.statistic(stats).await;
                 }
+            } else {
+                let name = module.name().await;
+                let stats = SubscanModuleStatistics::skipped(name);
 
-                utilities::log::result(subresult).await;
+                stats.status.log(name);
+                self.result.lock().await.statistic(stats).await;
             }
         }
     }

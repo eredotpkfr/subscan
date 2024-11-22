@@ -1,8 +1,10 @@
-use crate::common::utils;
-use clap::Parser;
 use std::io::Cursor;
+
+use clap::Parser;
 use subscan::{cli::Cli, modules::engines::google::Google};
 use tokio::sync::Mutex;
+
+use crate::common::utils;
 
 #[tokio::test]
 #[should_panic]

@@ -1,3 +1,5 @@
+use reqwest::Url;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
@@ -9,7 +11,6 @@ use crate::{
     requesters::client::HTTPClient,
     types::{core::SubscanModuleCoreComponents, func::GenericIntegrationCoreFuncs},
 };
-use reqwest::Url;
 
 pub const DIGITORUS_MODULE_NAME: &str = "digitorus";
 pub const DIGITORUS_URL: &str = "https://certificatedetails.com";

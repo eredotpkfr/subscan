@@ -1,15 +1,17 @@
-use super::{pool::SubscanModulePoolResult, stats::ScanResultStatistics};
-use crate::{
-    enums::output::OutputFormat,
-    types::result::{item::ScanResultItem, metadata::ScanResultMetadata},
-    utilities::cli,
-};
+use std::{collections::BTreeSet, io::Write};
+
 use chrono::Utc;
 use colored::Colorize;
 use csv::WriterBuilder;
 use serde::Serialize;
 use serde_json;
-use std::{collections::BTreeSet, fs::File, io::Write};
+
+use super::{pool::SubscanModulePoolResult, statistics::ScanResultStatistics};
+use crate::{
+    enums::output::OutputFormat,
+    types::result::{item::ScanResultItem, metadata::ScanResultMetadata},
+    utilities::cli,
+};
 
 /// `Subscan` scan result type
 #[derive(Clone, Default, Serialize)]
@@ -22,7 +24,7 @@ pub struct ScanResult {
 
 impl ScanResult {
     pub async fn save(&self, output: &OutputFormat) -> String {
-        let (file, filename) = self.get_output_file(output).await;
+        let (file, filename) = output.get_file(&self.metadata.target).await;
 
         match output {
             OutputFormat::TXT => self.save_txt(file).await,
@@ -34,18 +36,6 @@ impl ScanResult {
         log::info!("Scan results saved to {filename}");
 
         filename
-    }
-
-    async fn get_output_file(&self, output: &OutputFormat) -> (File, String) {
-        let now = Utc::now().timestamp();
-        let filename = match output {
-            OutputFormat::TXT => format!("{}_{}.txt", self.metadata.target, now),
-            OutputFormat::CSV => format!("{}_{}.csv", self.metadata.target, now),
-            OutputFormat::JSON => format!("{}_{}.json", self.metadata.target, now),
-            OutputFormat::HTML => format!("{}_{}.html", self.metadata.target, now),
-        };
-
-        (File::create(filename.clone()).unwrap(), filename)
     }
 
     async fn save_txt<W: Write>(&self, mut writer: W) {
@@ -111,22 +101,22 @@ impl ScanResult {
     /// use std::collections::BTreeSet;
     /// use subscan::types::result::{
     ///     scan::ScanResult,
-    ///     stats::SubscanModulePoolStatistics,
+    ///     statistics::SubscanModulePoolStatistics,
     ///     pool::SubscanModulePoolResult,
     /// };
     /// use subscan::types::result::item::SubscanModulePoolResultItem;
     ///
     /// #[tokio::main]
     /// async fn main() {
+    ///     let item = SubscanModulePoolResultItem {
+    ///         subdomain: "bar.foo.com".to_string(),
+    ///         ip: None,
+    ///     };
+    ///
     ///     let mut result: ScanResult = "foo.com".into();
     ///     let pool_result = SubscanModulePoolResult {
     ///         statistics: SubscanModulePoolStatistics::default(),
-    ///         results: BTreeSet::from_iter([
-    ///             SubscanModulePoolResultItem {
-    ///                 subdomain: "bar.foo.com".to_string(),
-    ///                 ip: None,
-    ///             }
-    ///         ])
+    ///         items: BTreeSet::from_iter([item]),
     ///     };
     ///
     ///     result.update_with_pool_result(pool_result).await;
@@ -152,25 +142,24 @@ impl ScanResult {
     ///
     /// ```
     /// use std::collections::BTreeSet;
-    /// use subscan::types::result::scan::ScanResult;
-    /// use subscan::enums::module::{SubscanModuleStatus, SkipReason};
+    /// use subscan::types::result::{scan::ScanResult, status::SkipReason};
     /// use subscan::types::result::{
     ///     pool::SubscanModulePoolResult,
     ///     item::SubscanModulePoolResultItem,
-    ///     stats::SubscanModulePoolStatistics
+    ///     statistics::SubscanModulePoolStatistics
     /// };
     ///
     /// #[tokio::main]
     /// async fn main() {
+    ///     let item = SubscanModulePoolResultItem {
+    ///         subdomain: "bar.foo.com".to_string(),
+    ///         ip: None,
+    ///     };
+    ///
     ///     let mut scan_result: ScanResult = "foo.com".into();
     ///     let pool_result = SubscanModulePoolResult {
     ///         statistics: SubscanModulePoolStatistics::default(),
-    ///         results: BTreeSet::from_iter([
-    ///             SubscanModulePoolResultItem {
-    ///                 subdomain: "bar.foo.com".to_string(),
-    ///                 ip: None,
-    ///             }
-    ///         ])
+    ///         items: BTreeSet::from_iter([item]),
     ///     };
     ///
     ///     scan_result.update_with_pool_result(pool_result).await;
@@ -182,7 +171,7 @@ impl ScanResult {
     /// ```
     pub async fn update_with_pool_result(&mut self, result: SubscanModulePoolResult) {
         self.statistics = result.statistics;
-        self.results = result.results;
+        self.results = result.items;
         self.total = self.results.len();
     }
 }

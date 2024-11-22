@@ -1,3 +1,5 @@
+use reqwest::Url;
+
 use crate::{
     enums::dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     extractors::html::HTMLExtractor,
@@ -5,27 +7,26 @@ use crate::{
     requesters::chrome::ChromeBrowser,
     types::core::SubscanModuleCoreComponents,
 };
-use reqwest::Url;
 
 pub const DUCKDUCKGO_MODULE_NAME: &str = "duckduckgo";
 pub const DUCKDUCKGO_SEARCH_URL: &str = "https://duckduckgo.com";
 pub const DUCKDUCKGO_SEARCH_PARAM: &str = "q";
-pub const DUCKDUCKGO_CITE_TAG: &str = "article > div > div > a > span:first-child";
+pub const DUCKDUCKGO_CITE_TAG: &str = "article > div:nth-child(2) > div > div > a span:first-child";
 
 /// DuckDuckGo search engine enumerator
 ///
 /// It uses [`GenericSearchEngineModule`] its own inner
 /// here are the configurations
 ///
-/// | Property           | Value                                        |
-/// |:------------------:|:--------------------------------------------:|
-/// | Module Name        | `duckduckgo`                                 |
-/// | Search URL         | <https://duckduckgo.com>                     |
-/// | Search Param       | `q`                                          |
-/// | Subdomain Selector | `article > div > div > a > span:first-child` |
-/// | Requester          | [`ChromeBrowser`]                            |
-/// | Extractor          | [`HTMLExtractor`]                            |
-/// | Generic            | [`GenericSearchEngineModule`]                |
+/// | Property           | Value                                                         |
+/// |:------------------:|:-------------------------------------------------------------:|
+/// | Module Name        | `duckduckgo`                                                  |
+/// | Search URL         | <https://duckduckgo.com>                                      |
+/// | Search Param       | `q`                                                           |
+/// | Subdomain Selector | `article > div:nth-child(2) > div > div > a span:first-child` |
+/// | Requester          | [`ChromeBrowser`]                                             |
+/// | Extractor          | [`HTMLExtractor`]                                             |
+/// | Generic            | [`GenericSearchEngineModule`]                                 |
 pub struct DuckDuckGo {}
 
 impl DuckDuckGo {

@@ -1,3 +1,5 @@
+#![forbid(unsafe_code)]
+
 /// In-memory cache to store all modules
 pub mod cache;
 /// Includes CLI components
@@ -6,6 +8,8 @@ pub mod cli;
 pub mod constants;
 /// Enumerations and project type definitions
 pub mod enums;
+/// Subscan error type
+pub mod error;
 /// Data extractors like
 /// [`extractors::regex`], [`extractors::html`], etc.
 pub mod extractors;
@@ -27,14 +31,17 @@ pub mod types;
 /// Utilities for the handle different stuff things
 pub mod utilities;
 
-use crate::{
-    cache::CacheManager, cli::Cli, interfaces::module::SubscanModuleInterface,
-    pools::module::SubscanModulePool, types::config::subscan::SubscanConfig,
-    types::core::SubscanModule,
-};
 use constants::LOG_TIME_FORMAT;
 use tokio::sync::OnceCell;
 use types::result::scan::ScanResult;
+
+use crate::{
+    cache::CacheManager,
+    cli::Cli,
+    interfaces::module::SubscanModuleInterface,
+    pools::module::SubscanModulePool,
+    types::{config::subscan::SubscanConfig, core::SubscanModule},
+};
 
 static INIT: OnceCell<()> = OnceCell::const_new();
 

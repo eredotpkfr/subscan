@@ -1,15 +1,18 @@
+use std::env;
+
+use reqwest::Url;
+use serde_json::{json, Value};
+use subscan::{
+    enums::content::Content,
+    error::{ModuleErrorKind::JSONExtract, SubscanError::ModuleErrorWithResult},
+    interfaces::module::SubscanModuleInterface,
+    modules::integrations::shodan::{Shodan, SHODAN_URL},
+};
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::funcs,
     utils::read_stub,
-};
-use reqwest::Url;
-use serde_json::{json, Value};
-use std::{collections::BTreeSet, env};
-use subscan::{
-    enums::content::Content,
-    interfaces::module::SubscanModuleInterface,
-    modules::integrations::shodan::{Shodan, SHODAN_URL},
 };
 
 #[tokio::test]
@@ -23,7 +26,11 @@ async fn run_test() {
 
     let result = shodan.run(TEST_DOMAIN).await;
 
-    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert!(result.is_err());
+
+    if let ModuleErrorWithResult(result) = result.err().unwrap() {
+        assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    }
 
     env::remove_var(env_name);
 }
@@ -65,6 +72,9 @@ async fn extract_test() {
     let extracted = Shodan::extract(json, TEST_DOMAIN);
     let not_extracted = Shodan::extract(Value::Null, TEST_DOMAIN);
 
-    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
-    assert_eq!(not_extracted, BTreeSet::new());
+    assert!(extracted.is_ok());
+    assert!(not_extracted.is_err());
+
+    assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(not_extracted.err().unwrap(), JSONExtract.into());
 }

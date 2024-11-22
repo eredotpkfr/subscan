@@ -1,20 +1,23 @@
+use std::collections::BTreeSet;
+
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
 };
-use reqwest::Url;
-use serde_json::Value;
-use std::collections::BTreeSet;
 
 pub const VIRUSTOTAL_MODULE_NAME: &str = "virustotal";
 pub const VIRUSTOTAL_URL: &str = "https://www.virustotal.com/api/v3/domains";
@@ -63,13 +66,13 @@ impl VirusTotal {
         content.as_json()["links"]["next"].as_str()?.parse().ok()
     }
 
-    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: &str) -> Result<BTreeSet<Subdomain>> {
         if let Some(passives) = content["data"].as_array() {
             let filter = |item: &Value| Some(item["id"].as_str()?.to_string());
 
-            return passives.iter().filter_map(filter).collect();
+            return Ok(passives.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        Err(JSONExtract.into())
     }
 }

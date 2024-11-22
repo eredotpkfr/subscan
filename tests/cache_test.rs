@@ -1,4 +1,5 @@
 use std::time::Duration;
+
 use subscan::{
     cache::CacheManager,
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},

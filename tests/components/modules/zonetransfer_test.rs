@@ -1,13 +1,14 @@
+use std::{net::SocketAddr, str::FromStr};
+
+use hickory_resolver::config::{NameServerConfig, Protocol};
+use subscan::{
+    enums::dispatchers::SubscanModuleDispatcher, error::ModuleErrorKind::Custom,
+    interfaces::module::SubscanModuleInterface, modules::zonetransfer::ZoneTransfer,
+};
+
 use crate::common::{
     constants::{LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     mock::funcs::spawn_mock_dns_server,
-};
-use hickory_resolver::config::{NameServerConfig, Protocol};
-use std::{net::SocketAddr, str::FromStr};
-use subscan::{
-    enums::{dispatchers::SubscanModuleDispatcher, module::SubscanModuleStatus::Failed},
-    interfaces::module::SubscanModuleInterface,
-    modules::zonetransfer::ZoneTransfer,
 };
 
 #[tokio::test]
@@ -66,7 +67,8 @@ async fn run_failed_test() {
 
     let result = zonetransfer.run(TEST_DOMAIN).await;
 
-    assert_eq!(result.status, Failed("no default ns".into()));
+    assert!(result.is_err());
+    assert_eq!(result.err().unwrap(), Custom("no default ns".into()).into());
 }
 
 #[tokio::test]
@@ -78,7 +80,7 @@ async fn run_test() {
         zonetransfer.ns = Some(NameServerConfig::new(server.socket, Protocol::Tcp));
     }
 
-    let result = zonetransfer.run(TEST_DOMAIN).await;
+    let result = zonetransfer.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }

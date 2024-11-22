@@ -1,5 +1,6 @@
-use hickory_resolver::config::{ResolverConfig as HickoryResolverConfig, ResolverOpts};
 use std::time::Duration;
+
+use hickory_resolver::config::{ResolverConfig as HickoryResolverConfig, ResolverOpts};
 
 use crate::{
     cli::commands::{

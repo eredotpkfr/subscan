@@ -1,10 +1,15 @@
+use std::collections::BTreeSet;
+
+use async_trait::async_trait;
+
 use crate::{
     enums::content::Content,
     interfaces::extractor::SubdomainExtractorInterface,
-    types::{core::Subdomain, func::InnerExtractFunc},
+    types::{
+        core::{Result, Subdomain},
+        func::InnerExtractFunc,
+    },
 };
-use async_trait::async_trait;
-use std::collections::BTreeSet;
 
 /// JSON content parser wrapper struct
 ///
@@ -33,14 +38,15 @@ impl JSONExtractor {
     ///     let inner = |content: Value, _domain: &str| {
     ///         let bar = content["foo"].as_str().unwrap().to_string();
     ///
-    ///         [bar].into()
+    ///         Ok([bar].into())
     ///     };
     ///
     ///     let json = Content::from(json!({"foo": "bar"}));
     ///     let extractor = JSONExtractor::new(Box::new(inner));
     ///     let expected = BTreeSet::from(["bar".to_string()]);
+    ///     let result = extractor.extract(json, "foo.com").await.unwrap();
     ///
-    ///     assert_eq!(extractor.extract(json, "foo.com").await, expected);
+    ///     assert_eq!(result, expected);
     /// }
     /// ```
     pub fn new(inner: InnerExtractFunc) -> Self {
@@ -68,18 +74,20 @@ impl SubdomainExtractorInterface for JSONExtractor {
     ///     let content = Content::from(json!({"foo": "bar"}));
     ///
     ///     let inner = |item: Value, _domain: &str| {
-    ///         [
-    ///             Subdomain::from(item["foo"].as_str().unwrap())
-    ///         ].into()
+    ///         Ok(
+    ///             [
+    ///                 Subdomain::from(item["foo"].as_str().unwrap())
+    ///             ].into()
+    ///         )
     ///     };
     ///     let extractor = JSONExtractor::new(Box::new(inner));
     ///
-    ///     let result = extractor.extract(content, "foo.com").await;
+    ///     let result = extractor.extract(content, "foo.com").await.unwrap();
     ///
     ///     assert_eq!(result, [Subdomain::from("bar")].into());
     /// }
     /// ```
-    async fn extract(&self, content: Content, domain: &str) -> BTreeSet<Subdomain> {
+    async fn extract(&self, content: Content, domain: &str) -> Result<BTreeSet<Subdomain>> {
         (self.inner)(content.as_json(), domain)
     }
 }

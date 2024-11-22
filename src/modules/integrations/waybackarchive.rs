@@ -1,19 +1,23 @@
+use std::io::Error;
+
+use async_trait::async_trait;
+use futures::TryStreamExt;
+use reqwest::Url;
+use tokio::{io::AsyncBufReadExt, sync::Mutex};
+use tokio_util::io::StreamReader;
+
 use crate::{
-    enums::{
-        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        module::SubscanModuleStatus::Finished,
+    enums::dispatchers::{
+        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
     },
     extractors::regex::RegexExtractor,
     interfaces::{extractor::SubdomainExtractorInterface, module::SubscanModuleInterface},
     requesters::client::HTTPClient,
-    types::{core::SubscanModuleCoreComponents, result::module::SubscanModuleResult},
+    types::{
+        core::{Result, SubscanModuleCoreComponents},
+        result::module::SubscanModuleResult,
+    },
 };
-use async_trait::async_trait;
-use futures::TryStreamExt;
-use reqwest::Url;
-use std::io::Error;
-use tokio::{io::AsyncBufReadExt, sync::Mutex};
-use tokio_util::io::StreamReader;
 
 pub const WAYBACKARCHIVE_MODULE_NAME: &str = "waybackarchive";
 pub const WAYBACKARCHIVE_URL: &str = "http://web.archive.org/cdx/search/cdx";
@@ -70,7 +74,7 @@ impl SubscanModuleInterface for WaybackArchive {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
         let mut url = self.url.clone();
         let mut result: SubscanModuleResult = self.name().await.into();
 
@@ -87,24 +91,23 @@ impl SubscanModuleInterface for WaybackArchive {
                 .get(url)
                 .timeout(requester.config.timeout)
                 .headers(requester.config.headers.clone())
-                .build()
-                .unwrap();
+                .build()?;
 
-            if let Ok(response) = requester.client.execute(request).await {
-                let stream = response.bytes_stream().map_err(Error::other);
-                let reader = StreamReader::new(stream);
-                let mut lines = reader.lines();
+            let response = requester.client.execute(request).await?;
 
-                while let Ok(next_line) = lines.next_line().await {
-                    if let Some(line) = next_line {
-                        result.extend(extractor.extract(line.into(), domain).await);
-                    } else {
-                        break;
-                    }
+            let stream = response.bytes_stream().map_err(Error::other);
+            let reader = StreamReader::new(stream);
+            let mut lines = reader.lines();
+
+            while let Ok(next_line) = lines.next_line().await {
+                if let Some(line) = next_line {
+                    result.extend(extractor.extract(line.into(), domain).await?);
+                } else {
+                    break;
                 }
             }
         }
 
-        result.with_status(Finished).await
+        Ok(result.with_finished().await)
     }
 }

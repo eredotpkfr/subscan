@@ -1,5 +1,6 @@
-use crate::types::{config::resolver::ResolverConfig, func::AsyncIPResolveFunc};
 use hickory_resolver::TokioAsyncResolver;
+
+use crate::types::{config::resolver::ResolverConfig, func::AsyncIPResolveFunc};
 
 /// IP address resolver component
 #[derive(Clone)]

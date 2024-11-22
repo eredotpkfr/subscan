@@ -1,24 +1,28 @@
+use async_trait::async_trait;
+use regex::Regex;
+use reqwest::{
+    header::{HeaderMap, HeaderName, HeaderValue},
+    Url,
+};
+use tokio::sync::Mutex;
+
 use crate::{
     enums::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        module::SubscanModuleStatus::{Failed, Finished},
     },
+    error::ModuleErrorKind::Custom,
     extractors::html::HTMLExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     requesters::client::HTTPClient,
-    types::{core::SubscanModuleCoreComponents, result::module::SubscanModuleResult},
+    types::{
+        core::{Result, SubscanModuleCoreComponents},
+        result::module::SubscanModuleResult,
+    },
 };
-use async_trait::async_trait;
-use regex::Regex;
-use reqwest::{
-    header::{HeaderMap, HeaderValue, AUTHORIZATION},
-    Url,
-};
-use tokio::sync::Mutex;
 
 pub const DNSDUMPSTERCRAWLER_MODULE_NAME: &str = "dnsdumpstercrawler";
 pub const DNSDUMPSTERCRAWLER_URL: &str = "https://api.dnsdumpster.com/htmld/";
@@ -95,18 +99,20 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
         let mut result: SubscanModuleResult = self.name().await.into();
 
         let requester = &mut *self.requester().await.unwrap().lock().await;
         let extractor = self.extractor().await.unwrap();
 
-        let content = requester.get_content(self.base_url.clone()).await;
+        let content = requester.get_content(self.base_url.clone()).await?;
         let token = self.get_auth_token(content).await;
 
         if let (Some(token), RequesterDispatcher::HTTPClient(requester)) = (token, requester) {
-            let headers =
-                HeaderMap::from_iter([(AUTHORIZATION, HeaderValue::from_str(&token).unwrap())]);
+            let headers = HeaderMap::from_iter([(
+                HeaderName::from_static("authorization"),
+                HeaderValue::from_str(&token).unwrap(),
+            )]);
             let params = &[("target", domain)];
 
             requester.config.headers.extend(headers);
@@ -117,18 +123,16 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
                 .form(params)
                 .timeout(requester.config.timeout)
                 .headers(requester.config.headers.clone())
-                .build()
-                .unwrap();
+                .build()?;
 
-            if let Ok(response) = requester.client.execute(request).await {
-                if let Ok(content) = response.text().await {
-                    result.extend(extractor.extract(content.into(), domain).await);
+            let response = requester.client.execute(request).await?;
+            let content = response.text().await?;
 
-                    return result.with_status(Finished).await;
-                }
-            }
+            result.extend(extractor.extract(content.into(), domain).await?);
+
+            return Ok(result.with_finished().await);
         }
 
-        result.with_status(Failed("not get token".into())).await
+        Err(Custom("not get token".into()).into())
     }
 }

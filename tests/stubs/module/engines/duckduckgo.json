@@ -11,7 +11,7 @@
         }
     },
     "response": {
-        "body": "<article><div><div><a><span>bar.foo.com</span></a></div></div></article>",
+        "body": "<article><div></div><div><div><div><a><span>bar.foo.com</span></a></div></div></div></article>",
         "headers": {
             "content-type": "text/html"
         },

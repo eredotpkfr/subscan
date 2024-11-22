@@ -1,8 +1,18 @@
+use std::collections::BTreeSet;
+
+use async_trait::async_trait;
+use reqwest::{
+    header::{HeaderName, HeaderValue},
+    Url,
+};
+use serde_json::{json, Value};
+use tokio::sync::Mutex;
+
 use crate::{
-    enums::{
-        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        module::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Finished},
+    enums::dispatchers::{
+        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
     },
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -10,18 +20,10 @@ use crate::{
     },
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
-        result::module::SubscanModuleResult,
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
+        result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
     },
 };
-use async_trait::async_trait;
-use reqwest::{
-    header::{HeaderName, HeaderValue},
-    Url,
-};
-use serde_json::{json, Value};
-use std::collections::BTreeSet;
-use tokio::sync::Mutex;
 
 pub const NETLAS_MODULE_NAME: &str = "netlas";
 pub const NETLAS_URL: &str = "https://app.netlas.io";
@@ -63,14 +65,14 @@ impl Netlas {
         netlas.into()
     }
 
-    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: &str) -> Result<BTreeSet<Subdomain>> {
         if let Some(items) = content.as_array() {
             let filter = |item: &Value| Some(item["data"]["domain"].as_str()?.to_string());
 
-            return items.iter().filter_map(filter).collect();
+            return Ok(items.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        Err(JSONExtract.into())
     }
 }
 
@@ -88,9 +90,9 @@ impl SubscanModuleInterface for Netlas {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
-        let mut url = self.url.clone();
+    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
         let mut result: SubscanModuleResult = self.name().await.into();
+        let mut url = self.url.clone();
 
         let requester = &mut *self.requester().await.unwrap().lock().await;
         let extractor = self.extractor().await.unwrap();
@@ -106,7 +108,7 @@ impl SubscanModuleInterface for Netlas {
         url.set_path("api/domains_count/");
         url.set_query(Some(&format!("q={query}")));
 
-        let json = requester.get_content(url.clone()).await.as_json();
+        let json = requester.get_content(url.clone()).await?.as_json();
         let count = json["count"].as_i64();
 
         if let (Some(count), RequesterDispatcher::HTTPClient(requester)) = (count, requester) {
@@ -126,18 +128,16 @@ impl SubscanModuleInterface for Netlas {
                 .json(&body)
                 .timeout(requester.config.timeout)
                 .headers(requester.config.headers.clone())
-                .build()
-                .unwrap();
+                .build()?;
 
-            if let Ok(response) = requester.client.execute(request).await {
-                if let Ok(content) = response.text().await {
-                    result.extend(extractor.extract(content.into(), domain).await);
+            let response = requester.client.execute(request).await?;
+            let content = response.text().await?;
 
-                    return result.with_status(Finished).await;
-                }
-            }
+            result.extend(extractor.extract(content.into(), domain).await?);
+
+            return Ok(result.with_finished().await);
         }
 
-        result.with_status(AuthenticationNotProvided.into()).await
+        Err(AuthenticationNotProvided.into())
     }
 }

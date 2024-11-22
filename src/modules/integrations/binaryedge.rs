@@ -1,21 +1,24 @@
+use std::collections::BTreeSet;
+
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
     utilities::http,
 };
-use reqwest::Url;
-use serde_json::Value;
-use std::collections::BTreeSet;
 
 pub const BINARYEDGE_MODULE_NAME: &str = "binaryedge";
 pub const BINARYEDGE_URL: &str = "https://api.binaryedge.io/v2/query/domains/subdomain";
@@ -74,13 +77,13 @@ impl BinaryEdge {
         Some(url)
     }
 
-    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
-        if let Some(subs) = content["events"].as_array() {
+    pub fn extract(content: Value, _domain: &str) -> Result<BTreeSet<Subdomain>> {
+        if let Some(subdomains) = content["events"].as_array() {
             let filter = |item: &Value| Some(item.as_str()?.to_string());
 
-            return subs.iter().filter_map(filter).collect();
+            return Ok(subdomains.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        Err(JSONExtract.into())
     }
 }

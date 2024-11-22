@@ -1,21 +1,23 @@
 use std::collections::BTreeSet;
 
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
 };
-use reqwest::Url;
-use serde_json::Value;
 
 pub const SECURITYTRAILS_MODULE_NAME: &str = "securitytrails";
 pub const SECURITYTRAILS_URL: &str = "https://api.securitytrails.com/v1/domain";
@@ -64,13 +66,13 @@ impl SecurityTrails {
         None
     }
 
-    pub fn extract(content: Value, domain: &str) -> BTreeSet<Subdomain> {
-        if let Some(subs) = content["subdomains"].as_array() {
+    pub fn extract(content: Value, domain: &str) -> Result<BTreeSet<Subdomain>> {
+        if let Some(subdomains) = content["subdomains"].as_array() {
             let filter = |item: &Value| Some(format!("{}.{domain}", item.as_str()?));
 
-            return subs.iter().filter_map(filter).collect();
+            return Ok(subdomains.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        Err(JSONExtract.into())
     }
 }

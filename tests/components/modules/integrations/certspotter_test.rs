@@ -1,15 +1,18 @@
+use std::env;
+
+use reqwest::Url;
+use serde_json::Value;
+use subscan::{
+    enums::content::Content,
+    error::ModuleErrorKind::JSONExtract,
+    interfaces::module::SubscanModuleInterface,
+    modules::integrations::certspotter::{CertSpotter, CERTSPOTTER_URL},
+};
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::funcs,
     utils::read_stub,
-};
-use reqwest::Url;
-use serde_json::Value;
-use std::{collections::BTreeSet, env};
-use subscan::{
-    enums::content::Content,
-    interfaces::module::SubscanModuleInterface,
-    modules::integrations::certspotter::{CertSpotter, CERTSPOTTER_URL},
 };
 
 #[tokio::test]
@@ -21,7 +24,7 @@ async fn run_test() {
     env::set_var(&env_name, "certspotter-api-key");
     funcs::wrap_module_url(&mut certspotter, &stubr.path("/certspotter"));
 
-    let result = certspotter.run(TEST_DOMAIN).await;
+    let result = certspotter.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
@@ -57,6 +60,9 @@ async fn extract_test() {
     let extracted = CertSpotter::extract(json, TEST_DOMAIN);
     let not_extracted = CertSpotter::extract(Value::Null, TEST_DOMAIN);
 
-    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
-    assert_eq!(not_extracted, BTreeSet::new());
+    assert!(extracted.is_ok());
+    assert!(not_extracted.is_err());
+
+    assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(not_extracted.err().unwrap(), JSONExtract.into());
 }

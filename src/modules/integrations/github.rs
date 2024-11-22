@@ -1,28 +1,30 @@
-use crate::{
-    enums::{
-        content::Content,
-        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        module::{
-            SkipReason::AuthenticationNotProvided,
-            SubscanModuleStatus::{Failed, Finished},
-        },
-    },
-    extractors::regex::RegexExtractor,
-    interfaces::{
-        extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
-        requester::RequesterInterface,
-    },
-    requesters::client::HTTPClient,
-    types::{core::SubscanModuleCoreComponents, result::module::SubscanModuleResult},
-};
+use std::collections::BTreeSet;
+
 use async_trait::async_trait;
 use reqwest::{
     header::{HeaderValue, AUTHORIZATION},
     Url,
 };
 use serde_json::Value;
-use std::collections::BTreeSet;
 use tokio::sync::Mutex;
+
+use crate::{
+    enums::{
+        content::Content,
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+    },
+    error::ModuleErrorKind::Custom,
+    extractors::regex::RegexExtractor,
+    interfaces::{
+        extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
+        requester::RequesterInterface,
+    },
+    requesters::client::HTTPClient,
+    types::{
+        core::{Result, SubscanModuleCoreComponents},
+        result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
+    },
+};
 
 pub const GITHUB_MODULE_NAME: &str = "github";
 pub const GITHUB_URL: &str = "https://github.com/";
@@ -101,7 +103,7 @@ impl SubscanModuleInterface for GitHub {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
         let mut result: SubscanModuleResult = self.name().await.into();
 
         let envs = self.envs().await;
@@ -119,21 +121,21 @@ impl SubscanModuleInterface for GitHub {
             rconfig.add_header(AUTHORIZATION, auth.unwrap());
             url.set_query(Some(&query));
 
-            let content = requester.get_content(url).await;
+            let content = requester.get_content(url).await?;
 
             if let Some(raws) = self.get_html_urls(content).await {
                 for raw_url in raws {
-                    let raw_content = requester.get_content(raw_url.clone()).await;
+                    let raw_content = requester.get_content(raw_url.clone()).await?;
 
-                    result.extend(extractor.extract(raw_content, domain).await);
+                    result.extend(extractor.extract(raw_content, domain).await?);
                 }
 
-                return result.with_status(Finished).await;
+                return Ok(result.with_finished().await);
             }
 
-            return result.with_status(Failed("not get raw URLs".into())).await;
+            return Err(Custom("not get raw URLs".into()).into());
         }
 
-        result.with_status(AuthenticationNotProvided.into()).await
+        Err(AuthenticationNotProvided.into())
     }
 }

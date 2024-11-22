@@ -1,11 +1,13 @@
+use std::collections::BTreeSet;
+
+use async_trait::async_trait;
+use enum_dispatch::enum_dispatch;
+
 use crate::{
     enums::{content::Content, dispatchers::SubdomainExtractorDispatcher},
     extractors::{html::HTMLExtractor, json::JSONExtractor, regex::RegexExtractor},
-    types::core::Subdomain,
+    types::core::{Result, Subdomain},
 };
-use async_trait::async_trait;
-use enum_dispatch::enum_dispatch;
-use std::collections::BTreeSet;
 
 /// Extractor trait definition to implement subdomain extractors
 ///
@@ -20,7 +22,7 @@ use std::collections::BTreeSet;
 /// ```
 /// use std::collections::BTreeSet;
 /// use subscan::interfaces::extractor::SubdomainExtractorInterface;
-/// use subscan::types::core::Subdomain;
+/// use subscan::types::core::{Subdomain, Result};
 /// use subscan::enums::content::Content;
 /// use async_trait::async_trait;
 ///
@@ -28,10 +30,10 @@ use std::collections::BTreeSet;
 ///
 /// #[async_trait]
 /// impl SubdomainExtractorInterface for CustomExtractor {
-///     async fn extract(&self, content: Content, domain: &str) -> BTreeSet<Subdomain> {
+///     async fn extract(&self, content: Content, domain: &str) -> Result<BTreeSet<Subdomain>> {
 ///         let sub = content.as_string().replace("-", "");
 ///
-///         [Subdomain::from(sub)].into()
+///         Ok([Subdomain::from(sub)].into())
 ///     }
 /// }
 ///
@@ -40,7 +42,7 @@ use std::collections::BTreeSet;
 ///     let content = Content::from("--foo.com--");
 ///     let extractor = CustomExtractor {};
 ///
-///     let result = extractor.extract(content, "foo.com").await;
+///     let result = extractor.extract(content, "foo.com").await.unwrap();
 ///
 ///     assert_eq!(result, [Subdomain::from("foo.com")].into());
 /// }
@@ -50,5 +52,5 @@ use std::collections::BTreeSet;
 pub trait SubdomainExtractorInterface: Send + Sync {
     /// Generic extract method, it should extract subdomain addresses
     /// from given [`String`] content
-    async fn extract(&self, content: Content, domain: &str) -> BTreeSet<Subdomain>;
+    async fn extract(&self, content: Content, domain: &str) -> Result<BTreeSet<Subdomain>>;
 }

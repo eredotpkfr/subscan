@@ -1,13 +1,18 @@
-use crate::common::{
-    constants::{TEST_API_KEY, TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    mock::modules::generic_integration,
-};
-use reqwest::Url;
 use std::env;
+
+use reqwest::Url;
 use subscan::{
     enums::{auth::AuthenticationMethod, content::Content},
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
-    types::env::{Credentials, Env},
+    types::{
+        env::{Credentials, Env},
+        result::status::SkipReason::AuthenticationNotProvided,
+    },
+};
+
+use crate::common::{
+    constants::{TEST_API_KEY, TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
+    mock::modules::generic_integration,
 };
 
 #[tokio::test]
@@ -192,7 +197,7 @@ async fn run_test_no_auth() {
     let auth = AuthenticationMethod::NoAuthentication;
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
 
-    let result = module.run(TEST_DOMAIN).await;
+    let result = module.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }
@@ -207,7 +212,7 @@ async fn run_test_with_header_auth() {
 
     env::set_var(env_name.clone(), TEST_API_KEY);
 
-    let result = module.run(TEST_DOMAIN).await;
+    let result = module.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
@@ -224,7 +229,7 @@ async fn run_test_with_query_auth() {
 
     env::set_var(env_name.clone(), TEST_API_KEY);
 
-    let result = module.run(TEST_DOMAIN).await;
+    let result = module.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
@@ -247,7 +252,7 @@ async fn run_test_with_basic_http_auth() {
 
     let auth = AuthenticationMethod::BasicHTTPAuthentication(credentials);
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
-    let result = module.run(TEST_DOMAIN).await;
+    let result = module.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 }
@@ -257,6 +262,8 @@ async fn run_test_with_basic_http_auth() {
 async fn run_test_with_not_authenticated() {
     let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
     let mut module = generic_integration(&stubr.path("/subdomains"), auth);
+    let result = module.run(TEST_DOMAIN).await;
 
-    assert!(module.run(TEST_DOMAIN).await.subdomains.is_empty());
+    assert!(result.is_err());
+    assert_eq!(result.err().unwrap(), AuthenticationNotProvided.into());
 }

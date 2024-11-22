@@ -1,21 +1,23 @@
 use std::collections::BTreeSet;
 
+use reqwest::Url;
+use serde_json::Value;
+
 use crate::{
     enums::{
         auth::AuthenticationMethod,
         content::Content,
         dispatchers::{RequesterDispatcher, SubscanModuleDispatcher},
     },
+    error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
     modules::generics::integration::GenericIntegrationModule,
     requesters::client::HTTPClient,
     types::{
-        core::{Subdomain, SubscanModuleCoreComponents},
+        core::{Result, Subdomain, SubscanModuleCoreComponents},
         func::GenericIntegrationCoreFuncs,
     },
 };
-use reqwest::Url;
-use serde_json::Value;
 
 pub const DNSDUMPSTERAPI_MODULE_NAME: &str = "dnsdumpsterapi";
 pub const DNSDUMPSTERAPI_URL: &str = "https://api.dnsdumpster.com/domain";
@@ -64,13 +66,13 @@ impl DNSDumpsterAPI {
         None
     }
 
-    pub fn extract(content: Value, _domain: &str) -> BTreeSet<Subdomain> {
+    pub fn extract(content: Value, _domain: &str) -> Result<BTreeSet<Subdomain>> {
         if let Some(a_records) = content["a"].as_array() {
             let filter = |item: &Value| Some(item["host"].as_str()?.to_string());
 
-            return a_records.iter().filter_map(filter).collect();
+            return Ok(a_records.iter().filter_map(filter).collect());
         }
 
-        [].into()
+        Err(JSONExtract.into())
     }
 }

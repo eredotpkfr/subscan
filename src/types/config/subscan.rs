@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::{
     cli::{
         commands::{
@@ -12,7 +14,6 @@ use crate::{
     enums::cache::CacheFilter,
     types::config::resolver::ResolverConfig,
 };
-use std::path::PathBuf;
 
 /// `Subscan` configurations as a struct type
 #[derive(Clone, Debug)]

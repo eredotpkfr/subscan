@@ -1,14 +1,17 @@
+use std::env;
+
+use serde_json::Value;
+use subscan::{
+    enums::content::Content,
+    error::ModuleErrorKind::JSONExtract,
+    interfaces::module::SubscanModuleInterface,
+    modules::integrations::chaos::{Chaos, CHAOS_URL},
+};
+
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::funcs,
     utils::read_stub,
-};
-use serde_json::Value;
-use std::{collections::BTreeSet, env};
-use subscan::{
-    enums::content::Content,
-    interfaces::module::SubscanModuleInterface,
-    modules::integrations::chaos::{Chaos, CHAOS_URL},
 };
 
 #[tokio::test]
@@ -20,7 +23,7 @@ async fn run_test() {
     env::set_var(&env_name, "chaos-api-key");
     funcs::wrap_module_url(&mut chaos, &stubr.path("/chaos"));
 
-    let result = chaos.run(TEST_DOMAIN).await;
+    let result = chaos.run(TEST_DOMAIN).await.unwrap();
 
     assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
 
@@ -49,6 +52,9 @@ async fn extract_test() {
     let extracted = Chaos::extract(json, TEST_DOMAIN);
     let not_extracted = Chaos::extract(Value::Null, TEST_DOMAIN);
 
-    assert_eq!(extracted, [TEST_BAR_SUBDOMAIN.into()].into());
-    assert_eq!(not_extracted, BTreeSet::new());
+    assert!(extracted.is_ok());
+    assert!(not_extracted.is_err());
+
+    assert_eq!(extracted.unwrap(), [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(not_extracted.err().unwrap(), JSONExtract.into());
 }

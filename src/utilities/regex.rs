@@ -1,4 +1,5 @@
 use core::result::Result;
+
 use regex::{Error, Regex};
 
 /// Helper function that generates dynamically regex statement

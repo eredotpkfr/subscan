@@ -1,24 +1,29 @@
+use std::{collections::BTreeSet, io::Error};
+
+use async_trait::async_trait;
+use chrono::Datelike;
+use futures::TryStreamExt;
+use reqwest::Url;
+use serde_json::Value;
+use tokio::{io::AsyncBufReadExt, sync::Mutex};
+use tokio_util::io::StreamReader;
+
 use crate::{
-    enums::{
-        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        module::SubscanModuleStatus::{Failed, Finished},
+    enums::dispatchers::{
+        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
     },
+    error::ModuleErrorKind::Custom,
     extractors::regex::RegexExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     requesters::client::HTTPClient,
-    types::{core::SubscanModuleCoreComponents, result::module::SubscanModuleResult},
+    types::{
+        core::{Result, SubscanModuleCoreComponents},
+        result::module::SubscanModuleResult,
+    },
 };
-use async_trait::async_trait;
-use chrono::Datelike;
-use futures::TryStreamExt;
-use reqwest::Url;
-use serde_json::Value;
-use std::{collections::BTreeSet, io::Error};
-use tokio::{io::AsyncBufReadExt, sync::Mutex};
-use tokio_util::io::StreamReader;
 
 pub const COMMONCRAWL_MODULE_NAME: &str = "commoncrawl";
 pub const COMMONCRAWL_INDEX_URL: &str = "https://index.commoncrawl.org/collinfo.json";
@@ -91,7 +96,7 @@ impl SubscanModuleInterface for CommonCrawl {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> SubscanModuleResult {
+    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
         let mut result: SubscanModuleResult = self.name().await.into();
 
         let requester = self.requester().await.unwrap().lock().await;
@@ -100,7 +105,7 @@ impl SubscanModuleInterface for CommonCrawl {
         if let RequesterDispatcher::HTTPClient(requester) = &*requester {
             let year = chrono::Utc::now().year().to_string();
             let query = format!("*.{}", domain);
-            let content = requester.get_content(self.url.clone()).await;
+            let content = requester.get_content(self.url.clone()).await?;
 
             if let Some(cdxs) = self.extract_cdx_urls(content.as_json(), &year) {
                 for cdx in cdxs {
@@ -110,8 +115,7 @@ impl SubscanModuleInterface for CommonCrawl {
                         .get(cdx_url.unwrap())
                         .timeout(requester.config.timeout)
                         .headers(requester.config.headers.clone())
-                        .build()
-                        .unwrap();
+                        .build()?;
 
                     if let Ok(response) = requester.client.execute(request).await {
                         let stream = response.bytes_stream().map_err(Error::other);
@@ -120,7 +124,7 @@ impl SubscanModuleInterface for CommonCrawl {
 
                         while let Ok(next_line) = lines.next_line().await {
                             if let Some(line) = next_line {
-                                result.extend(extractor.extract(line.into(), domain).await);
+                                result.extend(extractor.extract(line.into(), domain).await?);
                             } else {
                                 break;
                             }
@@ -130,10 +134,10 @@ impl SubscanModuleInterface for CommonCrawl {
                     }
                 }
             } else {
-                return result.with_status(Failed("not get cdx URLs".into())).await;
+                return Err(Custom("not get cdx URLs".into()).into());
             }
         }
 
-        result.with_status(Finished).await
+        Ok(result.with_finished().await)
     }
 }

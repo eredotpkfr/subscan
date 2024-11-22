@@ -1,9 +1,18 @@
-use crate::enums::dispatchers::{
-    RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
-};
+use std::{result, sync::Arc};
+
+use derive_more::From;
 use flume::{Receiver, Sender};
-use std::sync::Arc;
 use tokio::sync::Mutex;
+
+use crate::{
+    enums::dispatchers::{
+        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    },
+    error::SubscanError,
+};
+
+/// Result type
+pub type Result<T> = result::Result<T, SubscanError>;
 
 /// Core subdomain data type
 pub type Subdomain = String;
@@ -16,10 +25,9 @@ impl From<SubscanModuleDispatcher> for SubscanModule {
     }
 }
 
-/// Flume unbounded channel return tuple
-pub type UnboundedFlumeChannelTuple<T> = (Sender<T>, Receiver<T>);
-
 /// Flume unbounded channel with generic typed
+#[derive(From)]
+#[from((Sender<T>, Receiver<T>))]
 pub struct UnboundedFlumeChannel<T> {
     pub tx: Sender<T>,
     pub rx: Receiver<T>,

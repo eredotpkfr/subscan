@@ -8,6 +8,10 @@ repos:
       - id: end-of-file-fixer
       - id: check-added-large-files
       - id: check-shebang-scripts-are-executable
+        exclude: |
+          (?x)^(
+            src/lib.rs
+          )$
       - id: check-case-conflict
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
@@ -32,8 +36,15 @@ repos:
     rev: v1.0
     hooks:
       - id: fmt
-      - id: cargo-check
+        entry: cargo +nightly fmt --all
       - id: clippy
+        args: ["--all-targets", "--all-features"]
+      - id: cargo-check
+
+  - repo: https://github.com/est31/cargo-udeps
+    rev: v0.1.52
+    hooks:
+    - id: udeps
 
   - repo: https://github.com/EmbarkStudios/cargo-deny
     rev: 0.16.2
