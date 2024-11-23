@@ -5,26 +5,26 @@ use serde::Serialize;
 
 use crate::types::core::Subdomain;
 
-/// Module pool item, alias for [`ScanResultItem`]
-pub type SubscanModulePoolResultItem = ScanResultItem;
+/// Pool result item, alias for [`SubscanResultItem`]
+pub type PoolResultItem = SubscanResultItem;
 
 /// Core scan result item, simply stores single discovered subdomain and
 /// its IP address
 #[derive(Clone, Default, Debug, Eq, Ord, PartialEq, PartialOrd, Serialize)]
-pub struct ScanResultItem {
+pub struct SubscanResultItem {
     pub subdomain: Subdomain,
     pub ip: Option<IpAddr>,
 }
 
-impl ScanResultItem {
+impl SubscanResultItem {
     /// Returns as a txt line
     ///
     /// # Examples
     ///
     /// ```
-    /// use subscan::types::result::item::ScanResultItem;
+    /// use subscan::types::result::item::SubscanResultItem;
     ///
-    /// let item = ScanResultItem {
+    /// let item = SubscanResultItem {
     ///     subdomain: "bar.foo.com".into(),
     ///     ip: None
     /// };
@@ -47,12 +47,12 @@ impl ScanResultItem {
     ///
     /// ```
     /// use subscan::utilities::cli::create_scan_result_item_table;
-    /// use subscan::types::result::item::ScanResultItem;
+    /// use subscan::types::result::item::SubscanResultItem;
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut table = create_scan_result_item_table().await;
-    ///     let item = ScanResultItem {
+    ///     let item = SubscanResultItem {
     ///         subdomain: "bar.foo.com".into(),
     ///         ip: None
     ///     };

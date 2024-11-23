@@ -4,7 +4,7 @@ use scraper::error::SelectorErrorKind;
 
 use crate::types::result::{
     module::SubscanModuleResult,
-    statistics::SubscanModuleStatistics,
+    statistics::SubscanModuleStatistic,
     status::{SkipReason, SubscanModuleStatus},
 };
 
@@ -12,7 +12,7 @@ use crate::types::result::{
 #[derive(Clone, Debug, Display, Eq, From, Ord, PartialEq, PartialOrd)]
 pub enum SubscanError {
     /// Module error, see [`ModuleErrorKind`] for generic error definitions
-    #[from(ModuleErrorKind, SkipReason, SelectorErrorKind<'_>, regex::Error, reqwest::Error)]
+    #[from(ModuleErrorKind, SkipReason, SelectorErrorKind<'_>, regex::Error, reqwest::Error, url::ParseError)]
     #[display("{_0}")]
     ModuleError(ModuleErrorKind),
     /// This error type uses for the make graceful returns from module `.run(`
@@ -53,7 +53,7 @@ impl SubscanError {
         }
     }
 
-    /// Get [`SubscanModuleStatistics`] from any [`SubscanError`]
+    /// Get [`SubscanModuleStatistic`] from any [`SubscanError`]
     ///
     /// # Examples
     ///
@@ -72,8 +72,8 @@ impl SubscanError {
     /// assert_eq!(stats.count, 0);
     /// assert_eq!(stats.elapsed.num_seconds(), 0);
     /// ```
-    pub fn stats(&self, module: &str) -> SubscanModuleStatistics {
-        SubscanModuleStatistics {
+    pub fn stats(&self, module: &str) -> SubscanModuleStatistic {
+        SubscanModuleStatistic {
             module: module.to_string(),
             status: self.status(),
             count: 0,
@@ -102,6 +102,10 @@ pub enum ModuleErrorKind {
     #[from(reqwest::Error)]
     #[display("get content error")]
     GetContent,
+    /// Indicates an error while parsing URL
+    #[from(url::ParseError)]
+    #[display("url parse error")]
+    UrlParse,
     /// Indicates that the module was skipped for any [`SkipReason`]
     #[from]
     #[display("{_0}")]
@@ -136,6 +140,7 @@ impl ModuleErrorKind {
             ModuleErrorKind::HTMLExtract
             | ModuleErrorKind::JSONExtract
             | ModuleErrorKind::RegexExtract
+            | ModuleErrorKind::UrlParse
             | ModuleErrorKind::GetContent => SubscanModuleStatus::Failed(self.clone()),
             ModuleErrorKind::Skip(reason) => SubscanModuleStatus::Skipped(reason.clone()),
             ModuleErrorKind::Custom(_) => SubscanModuleStatus::Failed(self.clone()),
@@ -153,12 +158,14 @@ impl ModuleErrorKind {
     /// let html = ModuleErrorKind::HTMLExtract;
     /// let json = ModuleErrorKind::JSONExtract;
     /// let regex = ModuleErrorKind::RegexExtract;
+    /// let url = ModuleErrorKind::UrlParse;
     /// let skipped = ModuleErrorKind::from(SkippedByUser);
     /// let custom = ModuleErrorKind::Custom("foo".into());
     ///
     /// assert_eq!(html.with_msg(), "[html extract error FAILED]");
     /// assert_eq!(json.with_msg(), "[json extract error FAILED]");
     /// assert_eq!(regex.with_msg(), "[regex extract error FAILED]");
+    /// assert_eq!(url.with_msg(), "[url parse error FAILED]");
     /// assert_eq!(skipped.with_msg(), "[skipped by user SKIPPED]");
     /// assert_eq!(custom.with_msg(), "[foo FAILED]");
     /// ```
@@ -167,6 +174,7 @@ impl ModuleErrorKind {
             ModuleErrorKind::HTMLExtract
             | ModuleErrorKind::JSONExtract
             | ModuleErrorKind::RegexExtract
+            | ModuleErrorKind::UrlParse
             | ModuleErrorKind::GetContent => format!("[{self} {}]", self.status()),
             ModuleErrorKind::Skip(reason) => format!("[{reason} {}]", self.status()),
             ModuleErrorKind::Custom(msg) => format!("[{msg} {}]", self.status()),

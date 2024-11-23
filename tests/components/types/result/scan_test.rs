@@ -9,20 +9,20 @@ use csv::{Reader, StringRecord};
 use serde_json::Value;
 use subscan::{
     enums::output::OutputFormat,
-    types::result::{item::ScanResultItem, scan::ScanResult},
+    types::result::{item::SubscanResultItem, subscan::SubscanResult},
 };
 
 use crate::common::utils::fix_new_lines;
 
 #[tokio::test]
 async fn save_txt_test() {
-    let mut result: ScanResult = "foo.com".into();
+    let mut result: SubscanResult = "foo.com".into();
     let subdomains = BTreeSet::from_iter([
-        ScanResultItem {
+        SubscanResultItem {
             subdomain: "bar.foo.com".into(),
             ip: None,
         },
-        ScanResultItem {
+        SubscanResultItem {
             subdomain: "baz.foo.com".into(),
             ip: Some(IpAddr::V4(Ipv4Addr::from_str("127.0.0.1").unwrap())),
         },
@@ -41,11 +41,13 @@ async fn save_txt_test() {
 
 #[tokio::test]
 async fn save_csv_test() {
-    let mut result: ScanResult = "foo.com".into();
-    let subdomains = BTreeSet::from_iter([ScanResultItem {
+    let mut result: SubscanResult = "foo.com".into();
+    let item = SubscanResultItem {
         subdomain: "bar.foo.com".into(),
         ip: None,
-    }]);
+    };
+
+    let subdomains = BTreeSet::from_iter([item]);
 
     result.extend(subdomains);
     result = result.with_finished().await;
@@ -65,13 +67,13 @@ async fn save_csv_test() {
 
 #[tokio::test]
 async fn save_json_test() {
-    let mut result: ScanResult = "foo.com".into();
+    let mut result: SubscanResult = "foo.com".into();
     let subs = BTreeSet::from_iter([
-        ScanResultItem {
+        SubscanResultItem {
             subdomain: "bar.foo.com".into(),
             ip: None,
         },
-        ScanResultItem {
+        SubscanResultItem {
             subdomain: "baz.foo.com".into(),
             ip: Some(IpAddr::V4(Ipv4Addr::from_str("127.0.0.1").unwrap())),
         },
@@ -96,11 +98,13 @@ async fn save_json_test() {
 
 #[tokio::test]
 async fn save_html_test() {
-    let mut result: ScanResult = "foo.com".into();
-    let subdomains = BTreeSet::from_iter([ScanResultItem {
+    let mut result: SubscanResult = "foo.com".into();
+    let item = SubscanResultItem {
         subdomain: "bar.foo.com".into(),
         ip: None,
-    }]);
+    };
+
+    let subdomains = BTreeSet::from_iter([item]);
 
     result.extend(subdomains);
     result = result.with_finished().await;

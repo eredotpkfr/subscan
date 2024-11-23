@@ -5,7 +5,7 @@ use chrono::{DateTime, TimeDelta, Utc};
 use super::status::SubscanModuleStatus;
 use crate::{
     error::SubscanError,
-    types::{core::Subdomain, result::statistics::SubscanModuleStatistics},
+    types::{core::Subdomain, result::statistics::SubscanModuleStatistic},
     utilities::regex::generate_subdomain_regex,
 };
 
@@ -87,7 +87,7 @@ impl SubscanModuleResult {
             .filter(move |sub| pattern.is_match(sub))
     }
 
-    /// Get module stats as [`SubscanModuleStatistics`]
+    /// Get module stats as [`SubscanModuleStatistic`]
     ///
     /// # Examples
     ///
@@ -108,7 +108,7 @@ impl SubscanModuleResult {
     ///     );
     /// }
     /// ```
-    pub async fn stats(&self) -> SubscanModuleStatistics {
+    pub async fn stats(&self) -> SubscanModuleStatistic {
         self.clone().into()
     }
 

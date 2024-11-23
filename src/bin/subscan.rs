@@ -33,6 +33,12 @@ async fn main() {
         Commands::Scan(args) => {
             subscan.scan(&args.domain).await.save(&args.output).await;
         }
-        Commands::Brute(_) => {}
+        Commands::Brute(args) => {
+            if args.print {
+                subscan.brute(&args.domain).await.log().await;
+            } else {
+                subscan.brute(&args.domain).await.save(&args.output).await;
+            }
+        }
     }
 }

@@ -22,6 +22,7 @@ async fn module_run_default_args_test() {
         subscan::cli::commands::Commands::Module(sub) => match sub.command {
             subscan::cli::commands::module::ModuleSubCommands::Run(args) => {
                 assert!(!args.resolver_disabled);
+
                 assert_eq!(args.domain, "bar.com");
                 assert_eq!(args.name, "foo");
                 assert_eq!(args.user_agent, DEFAULT_USER_AGENT);
@@ -58,6 +59,7 @@ async fn module_run_args_test() {
         subscan::cli::commands::Commands::Module(sub) => match sub.command {
             subscan::cli::commands::module::ModuleSubCommands::Run(args) => {
                 assert!(args.resolver_disabled);
+
                 assert_eq!(args.domain, "bar.com");
                 assert_eq!(args.name, "foo");
                 assert_eq!(args.user_agent, "foobar");

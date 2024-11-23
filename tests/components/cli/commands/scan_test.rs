@@ -23,6 +23,8 @@ async fn scan_default_args_test() {
     match cli.command {
         subscan::cli::commands::Commands::Scan(args) => {
             assert!(!args.resolver_disabled);
+
+            assert_eq!(args.domain, "foo.com");
             assert_eq!(args.user_agent, DEFAULT_USER_AGENT);
             assert_eq!(args.proxy, None);
             assert_eq!(args.http_timeout, DEFAULT_HTTP_TIMEOUT.as_secs());
@@ -61,6 +63,8 @@ async fn scan_args_test() {
     match cli.command {
         subscan::cli::commands::Commands::Scan(args) => {
             assert!(args.resolver_disabled);
+
+            assert_eq!(args.domain, "foo.com");
             assert_eq!(args.user_agent, "foo");
             assert_eq!(args.proxy.unwrap(), "bar");
             assert_eq!(args.http_timeout, 120);
