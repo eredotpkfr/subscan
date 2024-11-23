@@ -33,5 +33,5 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: lcov.info
+          file: lcov.info
           fail_ci_if_error: true
