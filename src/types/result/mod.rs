@@ -6,9 +6,9 @@ pub mod metadata;
 pub mod module;
 /// Pool result definitions
 pub mod pool;
-/// Scan result types
-pub mod scan;
 /// Statistics types
 pub mod statistics;
 /// Status types
 pub mod status;
+/// Scan result types
+pub mod subscan;

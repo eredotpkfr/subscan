@@ -114,7 +114,7 @@ impl SubscanModuleInterface for GenericIntegrationModule {
 
     async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
         let mut result: SubscanModuleResult = self.name().await.into();
-        let mut url: Url = (self.funcs.url)(domain).parse().unwrap();
+        let mut url: Url = (self.funcs.url)(domain).parse()?;
 
         if self.auth.is_set() && !self.authenticate(&mut url).await {
             return Err(AuthenticationNotProvided.into());

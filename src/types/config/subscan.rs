@@ -103,9 +103,9 @@ impl From<ScanCommandArgs> for SubscanConfig {
     /// ```
     fn from(args: ScanCommandArgs) -> Self {
         Self {
-            user_agent: args.user_agent.clone(),
+            user_agent: args.clone().user_agent,
             timeout: args.http_timeout,
-            proxy: args.proxy.clone(),
+            proxy: args.clone().proxy,
             concurrency: args.module_concurrency,
             filter: args.filter(),
             resolver: args.into(),

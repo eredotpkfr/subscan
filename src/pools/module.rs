@@ -11,10 +11,7 @@ use crate::{
     types::{
         config::subscan::SubscanConfig,
         core::{Subdomain, SubscanModule, UnboundedFlumeChannel},
-        result::{
-            item::SubscanModulePoolResultItem, pool::SubscanModulePoolResult,
-            statistics::SubscanModuleStatistics,
-        },
+        result::{item::PoolResultItem, pool::PoolResult, statistics::SubscanModuleStatistic},
     },
 };
 
@@ -26,7 +23,7 @@ struct SubscanModulePoolChannels {
 /// Subscan module pool to run modules and resolve IPs
 pub struct SubscanModulePool {
     domain: String,
-    result: Mutex<SubscanModulePoolResult>,
+    result: Mutex<PoolResult>,
     resolver: Resolver,
     filter: CacheFilter,
     channels: SubscanModulePoolChannels,
@@ -53,7 +50,7 @@ impl SubscanModulePool {
     pub fn from(domain: &str, config: SubscanConfig) -> Arc<Self> {
         Arc::new(Self {
             domain: domain.to_string(),
-            result: SubscanModulePoolResult::default().into(),
+            result: PoolResult::default().into(),
             resolver: config.resolver.into(),
             channels: SubscanModulePoolChannels {
                 module: flume::unbounded::<SubscanModule>().into(),
@@ -65,7 +62,7 @@ impl SubscanModulePool {
     }
 
     pub fn new(domain: String, resolver: Resolver, filter: CacheFilter) -> Arc<Self> {
-        let result = SubscanModulePoolResult::default().into();
+        let result = PoolResult::default().into();
         let channels = SubscanModulePoolChannels {
             module: flume::unbounded::<SubscanModule>().into(),
             subs: flume::unbounded::<Subdomain>().into(),
@@ -87,7 +84,7 @@ impl SubscanModulePool {
         let lookup_ip = self.resolver.lookup_ip_future().await;
 
         while let Ok(sub) = self.channels.subs.rx.try_recv() {
-            let item = SubscanModulePoolResultItem {
+            let item = PoolResultItem {
                 subdomain: sub.clone(),
                 ip: lookup_ip(&self.resolver, sub).await,
             };
@@ -123,7 +120,7 @@ impl SubscanModulePool {
                 }
             } else {
                 let name = module.name().await;
-                let stats = SubscanModuleStatistics::skipped(name);
+                let stats = SubscanModuleStatistic::skipped(name);
 
                 stats.status.log(name);
                 self.result.lock().await.statistic(stats).await;
@@ -346,11 +343,11 @@ impl SubscanModulePool {
     ///     // runners in main thread
     ///     pool.clone().start(1).await;
     ///
-    ///     // do something with module result
+    ///     // do something with pool result
     ///     let result = pool.result().await;
     /// }
     /// ```
-    pub async fn result(&self) -> SubscanModulePoolResult {
+    pub async fn result(&self) -> PoolResult {
         self.result.lock().await.clone()
     }
 }

@@ -7,12 +7,12 @@ use crate::{
     utilities::serializers::{dt_to_string_method, td_num_seconds_method},
 };
 
-/// Alias for [`SubscanModulePoolStatistics`]
-pub type ScanResultStatistics = SubscanModulePoolStatistics;
+/// Alias for [`PoolStatistics`]
+pub type SubscanResultStatistics = PoolStatistics;
 
 /// Stores single [`SubscanModule`](crate::types::core::SubscanModule) statistics
 #[derive(Clone, Debug, Serialize)]
-pub struct SubscanModuleStatistics {
+pub struct SubscanModuleStatistic {
     pub module: String,
     pub status: SubscanModuleStatus,
     pub count: usize,
@@ -24,18 +24,18 @@ pub struct SubscanModuleStatistics {
     pub elapsed: TimeDelta,
 }
 
-impl SubscanModuleStatistics {
+impl SubscanModuleStatistic {
     /// Create skipped module statistics
     ///
     /// # Examples
     ///
     /// ```
     /// use subscan::types::result::{
-    ///     statistics::SubscanModuleStatistics,
+    ///     statistics::SubscanModuleStatistic,
     ///     status::SkipReason::SkippedByUser,
     /// };
     ///
-    /// let skipped = SubscanModuleStatistics::skipped("foo");
+    /// let skipped = SubscanModuleStatistic::skipped("foo");
     ///
     /// assert_eq!(skipped.module, "foo");
     /// assert_eq!(skipped.status, SkippedByUser.into());
@@ -54,7 +54,7 @@ impl SubscanModuleStatistics {
     }
 }
 
-impl From<SubscanModuleResult> for SubscanModuleStatistics {
+impl From<SubscanModuleResult> for SubscanModuleStatistic {
     fn from(result: SubscanModuleResult) -> Self {
         Self {
             module: result.module.clone(),
@@ -70,7 +70,7 @@ impl From<SubscanModuleResult> for SubscanModuleStatistics {
 /// Stores IP address resolver component statistics like a start time, end time
 /// or elapsed time during the resolving process
 #[derive(Clone, Debug, Serialize)]
-pub struct ResolverStatistics {
+pub struct ResolverStatistic {
     #[serde(serialize_with = "dt_to_string_method")]
     pub started_at: DateTime<Utc>,
     #[serde(serialize_with = "dt_to_string_method")]
@@ -79,7 +79,7 @@ pub struct ResolverStatistics {
     pub elapsed: TimeDelta,
 }
 
-impl Default for ResolverStatistics {
+impl Default for ResolverStatistic {
     fn default() -> Self {
         Self {
             started_at: Utc::now(),
@@ -89,15 +89,15 @@ impl Default for ResolverStatistics {
     }
 }
 
-impl ResolverStatistics {
-    /// Set [`started_at`](crate::types::result::statistics::ResolverStatistics::started_at) to [`Utc::now`]
+impl ResolverStatistic {
+    /// Set [`started_at`](crate::types::result::statistics::ResolverStatistic::started_at) to [`Utc::now`]
     pub fn started(&mut self) -> DateTime<Utc> {
         self.started_at = Utc::now();
         self.started_at
     }
 
-    /// Set [`finished_at`](crate::types::result::statistics::ResolverStatistics::finished_at) to [`Utc::now`]
-    /// and calculate [`elapsed`](crate::types::result::statistics::ResolverStatistics::elapsed) value
+    /// Set [`finished_at`](crate::types::result::statistics::ResolverStatistic::finished_at) to [`Utc::now`]
+    /// and calculate [`elapsed`](crate::types::result::statistics::ResolverStatistic::elapsed) value
     pub fn finished(&mut self) -> DateTime<Utc> {
         self.finished_at = Utc::now();
         self.elapsed = self.finished_at - self.started_at;
@@ -107,26 +107,57 @@ impl ResolverStatistics {
 
 /// Stores [`SubscanModulePool`](crate::pools::module::SubscanModulePool) statistics
 #[derive(Clone, Debug, Default, Serialize)]
-pub struct SubscanModulePoolStatistics {
-    pub module: Vec<SubscanModuleStatistics>,
-    pub resolve: ResolverStatistics,
+pub struct PoolStatistics {
+    pub module: Vec<SubscanModuleStatistic>,
+    pub resolve: ResolverStatistic,
 }
 
-impl SubscanModulePoolStatistics {
-    /// Add [`SubscanModuleStatistics`] into [`SubscanModulePoolStatistics`]
+impl PoolStatistics {
+    /// Set a new statistics
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chrono::TimeDelta;
+    /// use subscan::types::result::statistics::{
+    ///     PoolStatistics,
+    ///     ResolverStatistic,
+    /// };
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut stats = PoolStatistics::default();
+    ///     let new = PoolStatistics {
+    ///         module: vec![],
+    ///         resolve: ResolverStatistic {
+    ///             elapsed: TimeDelta::seconds(10),
+    ///             ..Default::default()
+    ///         },
+    ///     };
+    ///
+    ///     stats.set(new).await;
+    ///
+    ///     assert_eq!(stats.resolve.elapsed.num_seconds(), 10);
+    /// }
+    /// ```
+    pub async fn set(&mut self, new: PoolStatistics) {
+        *self = new
+    }
+
+    /// Add [`SubscanModuleStatistic`] into [`PoolStatistics`]
     ///
     /// # Examples
     ///
     /// ```
     /// use subscan::types::result::statistics::{
-    ///     SubscanModulePoolStatistics,
-    ///     SubscanModuleStatistics,
+    ///     PoolStatistics,
+    ///     SubscanModuleStatistic,
     /// };
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let mut pool_stats = SubscanModulePoolStatistics::default();
-    ///     let module_stat = SubscanModuleStatistics::skipped("foo");
+    ///     let mut pool_stats = PoolStatistics::default();
+    ///     let module_stat = SubscanModuleStatistic::skipped("foo");
     ///
     ///     assert_eq!(pool_stats.module.len(), 0);
     ///
@@ -135,7 +166,7 @@ impl SubscanModulePoolStatistics {
     ///     assert_eq!(pool_stats.module.len(), 1);
     /// }
     /// ```
-    pub async fn module(&mut self, stats: SubscanModuleStatistics) {
+    pub async fn module(&mut self, stats: SubscanModuleStatistic) {
         self.module.push(stats);
     }
 }

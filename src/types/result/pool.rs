@@ -1,35 +1,35 @@
 use std::collections::BTreeSet;
 
 use super::{
-    item::SubscanModulePoolResultItem,
-    statistics::{SubscanModulePoolStatistics, SubscanModuleStatistics},
+    item::PoolResultItem,
+    statistics::{PoolStatistics, SubscanModuleStatistic},
 };
 
 /// Stores [`SubscanModulePool`](crate::pools::module::SubscanModulePool) results
 #[derive(Clone, Debug, Default)]
-pub struct SubscanModulePoolResult {
+pub struct PoolResult {
     /// Pool statistics, includes each module statistics
     /// and IP resolver statistics
-    pub statistics: SubscanModulePoolStatistics,
+    pub statistics: PoolStatistics,
     /// Subdomains that have been discovered
-    pub items: BTreeSet<SubscanModulePoolResultItem>,
+    pub items: BTreeSet<PoolResultItem>,
 }
 
-impl SubscanModulePoolResult {
-    /// Add a single [`SubscanModuleStatistics`] into [`SubscanModulePoolResult`]
+impl PoolResult {
+    /// Add a single [`SubscanModuleStatistic`] into [`PoolResult`]
     ///
     /// # Examples
     ///
     /// ```
     /// use subscan::types::result::{
-    ///     pool::SubscanModulePoolResult,
-    ///     statistics::SubscanModuleStatistics,
+    ///     pool::PoolResult,
+    ///     statistics::SubscanModuleStatistic,
     /// };
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let mut result = SubscanModulePoolResult::default();
-    ///     let stat = SubscanModuleStatistics::skipped("foo");
+    ///     let mut result = PoolResult::default();
+    ///     let stat = SubscanModuleStatistic::skipped("foo");
     ///
     ///     assert_eq!(result.statistics.module.len(), 0);
     ///
@@ -38,7 +38,7 @@ impl SubscanModulePoolResult {
     ///     assert_eq!(result.statistics.module.len(), 1);
     /// }
     /// ```
-    pub async fn statistic(&mut self, stats: SubscanModuleStatistics) {
+    pub async fn statistic(&mut self, stats: SubscanModuleStatistic) {
         self.statistics.module(stats).await;
     }
 }

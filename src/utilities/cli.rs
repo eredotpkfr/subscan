@@ -25,7 +25,7 @@ pub async fn create_module_table() -> Table {
     table
 }
 
-/// Creates table for [`ScanResultItem`](crate::types::result::item::ScanResultItem)
+/// Creates table for [`SubscanResultItem`](crate::types::result::item::SubscanResultItem)
 ///
 /// # Examples
 ///
