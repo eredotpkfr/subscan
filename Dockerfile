@@ -26,7 +26,7 @@ RUN apt-get update -y && \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-COPY Cargo.toml Cargo.lock ./
+COPY Cargo.toml .
 COPY src src
 
 RUN cargo clean && cargo build --release
