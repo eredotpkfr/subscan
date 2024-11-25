@@ -1,6 +1,6 @@
 FROM rust:1.82-slim-bookworm AS builder
 
-WORKDIR /app
+WORKDIR /builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -24,6 +24,7 @@ RUN apt-get update -y && \
     libxkbcommon0 \
     libxrandr2 \
     pkg-config \
+    tini \
     && rm -rf /var/lib/apt/lists/*
 
 COPY Cargo.toml .
@@ -32,12 +33,15 @@ COPY src src
 
 RUN cargo build --release
 
-FROM gcr.io/distroless/cc-debian12:nonroot
+FROM gcr.io/distroless/cc-debian12:latest
 
 # Copy libs from builder
 COPY --from=builder /lib /lib
 COPY --from=builder /usr/share /usr/share
-# Copy subscan binary
-COPY --from=builder --chown=nonroot /app/target/release/subscan /app/subscan
+# Copy required binaries
+COPY --from=builder /usr/bin/tini /bin/tini
+COPY --from=builder /builder/target/release/subscan /bin/subscan
 
-ENTRYPOINT [ "/app/subscan" ]
+WORKDIR /data
+
+ENTRYPOINT ["tini", "--", "subscan"]
