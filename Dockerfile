@@ -4,7 +4,7 @@ WORKDIR /app
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install chrome and project deps
+# Install project and chrome deps
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
     libasound2 \
@@ -27,6 +27,7 @@ RUN apt-get update -y && \
     && rm -rf /var/lib/apt/lists/*
 
 COPY Cargo.toml .
+COPY Cargo.lock .
 COPY src src
 
 RUN cargo build --release

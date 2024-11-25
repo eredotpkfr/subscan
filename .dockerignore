@@ -1,5 +1,4 @@
 # Rust specific
-Cargo.lock
 target/
 **/*.rs.bk
 *.pdb
