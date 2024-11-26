@@ -18,7 +18,7 @@ use crate::{
 pub struct SubscanResult {
     pub metadata: SubscanResultMetadata,
     pub statistics: SubscanResultStatistics,
-    pub results: BTreeSet<SubscanResultItem>,
+    pub items: BTreeSet<SubscanResultItem>,
     pub total: usize,
 }
 
@@ -39,7 +39,7 @@ impl SubscanResult {
     }
 
     async fn save_txt<W: Write>(&self, mut writer: W) {
-        for item in &self.results {
+        for item in &self.items {
             writeln!(writer, "{}", item.as_txt()).unwrap();
         }
     }
@@ -47,7 +47,7 @@ impl SubscanResult {
     async fn save_csv<W: Write>(&self, writer: W) {
         let mut writer = WriterBuilder::new().has_headers(true).from_writer(writer);
 
-        for item in &self.results {
+        for item in &self.items {
             writer.serialize(item).unwrap()
         }
     }
@@ -61,7 +61,7 @@ impl SubscanResult {
     async fn save_html<W: Write>(&self, mut writer: W) {
         let mut table = cli::create_scan_result_item_table().await;
 
-        for item in &self.results {
+        for item in &self.items {
             table.add_row(item.as_table_row());
         }
 
@@ -69,11 +69,11 @@ impl SubscanResult {
     }
 
     pub async fn log(&self) {
-        for item in &self.results {
+        for item in &self.items {
             log::info!("{}", item.as_txt().white());
         }
 
-        log::info!("Total: {}", self.results.len());
+        log::info!("Total: {}", self.items.len());
     }
 }
 
@@ -88,7 +88,7 @@ impl From<&str> for SubscanResult {
 
 impl Extend<SubscanResultItem> for SubscanResult {
     fn extend<T: IntoIterator<Item = SubscanResultItem>>(&mut self, iter: T) {
-        self.results.extend(iter);
+        self.items.extend(iter);
     }
 }
 
@@ -123,12 +123,12 @@ impl SubscanResult {
     ///     result.update_with_pool_result(poolres).await;
     ///
     ///     assert_eq!(result.statistics.module.len(), 0);
-    ///     assert_eq!(result.results.len(), 1);
+    ///     assert_eq!(result.items.len(), 1);
     /// }
     /// ```
     pub async fn update_with_pool_result(&mut self, result: PoolResult) {
         self.statistics.set(result.statistics).await;
-        self.results.extend(result.items);
+        self.items.extend(result.items);
     }
 
     /// Update `finished_at`, `elapsed` and `total` fields and returns itself
@@ -168,7 +168,7 @@ impl SubscanResult {
     pub async fn with_finished(mut self) -> Self {
         self.metadata.finished_at = Utc::now();
         self.metadata.elapsed = self.metadata.finished_at - self.metadata.started_at;
-        self.total = self.results.len();
+        self.total = self.items.len();
 
         self
     }

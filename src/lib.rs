@@ -156,10 +156,8 @@ impl Subscan {
 
         let reader = BufReader::new(file.expect("Cannot read wordlist!"));
 
-        for line in reader.lines() {
-            if let Ok(subdomain) = line {
-                pool.clone().submit(subdomain).await;
-            }
+        for subdomain in reader.lines().map_while(Result::ok) {
+            pool.clone().submit(subdomain).await;
         }
 
         pool.clone().spawn_bruters(concurrency).await;
