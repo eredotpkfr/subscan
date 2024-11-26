@@ -17,7 +17,7 @@ async fn main() {
     };
 
     // set module conccurrency to 1
-    // set http timeout to 120
+    // set HTTP timeout to 120
     let config = SubscanConfig {
         concurrency: 1,
         timeout: 120,
