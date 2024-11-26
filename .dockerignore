@@ -1,0 +1,70 @@
+# Rust specific
+target/
+**/*.rs.bk
+*.pdb
+
+# Cache directories
+.cargo-cache/
+.cargo/
+
+# Tests and examples
+tests/
+examples/
+benches/
+
+# Documentation
+docs/
+*.md
+README*
+
+# Docker-related files
+Dockerfile*
+.dockerignore
+docker-compose*
+
+# Git-related files
+.git/
+.gitignore
+
+# Logs, databases and temporary files
+*.sqlite
+*.db
+*.log
+*.tmp
+*.out
+
+# Temporary folders
+tmp/
+temp/
+
+# Project specific backups
+backup/
+*.bak
+*~
+
+# Envs
+.env
+.env.*
+*.env
+
+# IDE/Editor-specific files
+*.rs.bk
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+*.iml
+.project
+.classpath
+.idea/
+.vscode/
+.settings/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+ehthumbs.db
+.Trashes
+._*

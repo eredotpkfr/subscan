@@ -70,12 +70,22 @@ repos:
     rev: v2.3.0
     hooks:
       - id: codespell
+        exclude: |
+          (?x)^(
+            Cargo.lock
+          )$
 
   - repo: https://github.com/markdownlint/markdownlint
     rev: v0.12.0
     hooks:
       - id: markdownlint
         name: markdownlint
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        name: hadolint
 
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.21.2
