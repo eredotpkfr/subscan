@@ -16,5 +16,5 @@ async fn verbosity_test() {
     cli.banner().await;
 
     assert!(cli.verbose.is_present());
-    assert_eq!(cli.verbose.to_string(), "0");
+    assert_eq!(cli.verbose.to_string(), "off");
 }
