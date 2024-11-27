@@ -17,70 +17,10 @@ use crate::{
     types::{core::Result, env::SubscanModuleEnvs, result::module::SubscanModuleResult},
 };
 
-/// Generic `subscan` module trait definition to implement
-/// subdomain enumeration modules
+/// Generic `subscan` module trait definition to implement subdomain enumeration modules
 ///
-/// Each module that will be implemented in the future
-/// must conform to this interface. Summary it has
-/// single method that called `run` and it does
-/// whatever it has to do
-///
-/// # Examples
-///
-/// ```
-/// use std::collections::BTreeSet;
-/// use subscan::interfaces::module::SubscanModuleInterface;
-/// use subscan::requesters::client::HTTPClient;
-/// use subscan::types::{result::module::SubscanModuleResult, core::Result};
-/// use subscan::extractors::regex::RegexExtractor;
-/// use subscan::enums::dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher};
-/// use async_trait::async_trait;
-/// use tokio::sync::Mutex;
-///
-/// pub struct FooModule {
-///     pub requester: Mutex<RequesterDispatcher>,
-///     pub extractor: SubdomainExtractorDispatcher,
-/// }
-///
-/// #[async_trait]
-/// impl SubscanModuleInterface for FooModule {
-///     async fn name(&self) -> &str {
-///         &"foo"
-///     }
-///
-///     async fn requester(&self) -> Option<&Mutex<RequesterDispatcher>> {
-///         Some(&self.requester)
-///     }
-///
-///     async fn extractor(&self) -> Option<&SubdomainExtractorDispatcher> {
-///         Some(&self.extractor)
-///     }
-///
-///     async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-///         // do something in `run` method
-///         Ok(self.name().await.into())
-///     }
-/// }
-///
-/// #[tokio::main]
-/// async fn main() {
-///     let requester = RequesterDispatcher::HTTPClient(HTTPClient::default());
-///     let extracator = RegexExtractor::default();
-///
-///     let mut foo = FooModule {
-///         requester: Mutex::new(requester),
-///         extractor: SubdomainExtractorDispatcher::RegexExtractor(extracator),
-///     };
-///
-///     assert!(foo.requester().await.is_some());
-///     assert!(foo.extractor().await.is_some());
-///
-///     assert_eq!(foo.name().await, "foo");
-///
-///     // do something with results
-///     let results = foo.run("foo.com").await.unwrap();
-/// }
-/// ```
+/// Each module that will be implemented in the future must conform to this interface.
+/// Summary it has single method that called `run` and it does whatever it has to do
 #[async_trait]
 #[enum_dispatch]
 pub trait SubscanModuleInterface: Sync + Send {

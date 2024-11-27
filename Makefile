@@ -11,6 +11,7 @@ all: install-pre-commit-mac \
 	install-cargo-clippy \
 	install-cargo-deny \
 	install-cargo-udeps \
+	install-cargo-llvm-cov \
 	clean \
 	check \
 	fix \
@@ -38,7 +39,8 @@ install-cargo-tools: install-nightly-toolchain \
 	install-cargo-clippy \
 	install-cargo-doc-rs \
 	install-cargo-deny \
-	install-cargo-udeps
+	install-cargo-udeps \
+	install-cargo-llvm-cov
 
 install-nightly-toolchain:
 	@rustup toolchain install nightly
@@ -50,6 +52,8 @@ install-cargo-deny:
 	@cargo install cargo-deny --locked
 install-cargo-udeps:
 	@cargo install cargo-udeps --locked
+install-cargo-llvm-cov:
+	@cargo install cargo-llvm-cov --locked
 
 clean:
 	@cargo clean
