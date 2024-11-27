@@ -1,5 +1,6 @@
 use std::env;
 
+use log::LevelFilter::Debug;
 use subscan::{
     enums::cache::CacheFilter::FilterByName,
     types::{config::subscan::SubscanConfig, filters::ModuleNameFilter},
@@ -8,7 +9,13 @@ use subscan::{
 
 #[tokio::main]
 async fn main() {
+    let exe = env::current_exe().unwrap();
+    let exe_name = exe.file_name().unwrap().to_str();
     let args: Vec<String> = env::args().collect();
+
+    env_logger::builder()
+        .filter_module(exe_name.unwrap(), Debug)
+        .init();
 
     // filter modules by name, only runs google and alienvault modules
     let filter = ModuleNameFilter {
@@ -29,6 +36,6 @@ async fn main() {
     let result = subscan.scan(&args[1]).await;
 
     for item in result.items {
-        println!("{}", item.as_txt())
+        log::debug!("{}", item.as_txt())
     }
 }
