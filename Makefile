@@ -12,6 +12,8 @@ all: install-pre-commit-mac \
 	install-cargo-deny \
 	install-cargo-udeps \
 	install-cargo-llvm-cov \
+	install-cargo-dist \
+	install-git-cliff \
 	clean \
 	check \
 	fix \
@@ -40,7 +42,9 @@ install-cargo-tools: install-nightly-toolchain \
 	install-cargo-doc-rs \
 	install-cargo-deny \
 	install-cargo-udeps \
-	install-cargo-llvm-cov
+	install-cargo-llvm-cov \
+	install-cargo-dist \
+	install-git-cliff
 
 install-nightly-toolchain:
 	@rustup toolchain install nightly
@@ -54,6 +58,10 @@ install-cargo-udeps:
 	@cargo install cargo-udeps --locked
 install-cargo-llvm-cov:
 	@cargo install cargo-llvm-cov --locked
+install-cargo-dist:
+	@cargo install cargo-dist --locked
+install-git-cliff:
+	@cargo install git-cliff --locked
 
 clean:
 	@cargo clean

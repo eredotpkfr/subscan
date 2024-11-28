@@ -33,6 +33,7 @@ COPY src src
 
 RUN cargo build --release
 
+# hadolint ignore=DL3007
 FROM gcr.io/distroless/cc-debian12:latest
 
 # Copy libs from builder

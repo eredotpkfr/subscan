@@ -4,6 +4,7 @@ version = "0.1.7"
 edition = "2021"
 description = "Next generation subdomain enumeration tool"
 readme = "README.md"
+repository = "https://github.com/eredotpkfr/subscan"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -43,6 +44,11 @@ hickory-server = "0.24.1"
 md5 = "0.7.0"
 stubr = "0.6.2"
 tempfile = "3.14.0"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
 
 [package.metadata.cargo-machete]
 ignored = ["prettytable-rs"]

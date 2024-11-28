@@ -64,7 +64,12 @@ repos:
     rev: v1.28.0
     hooks:
       - id: typos
-        exclude: .codespellrc
+        exclude: |
+          (?x)^(
+            Cargo.lock|
+            cliff.toml|
+            .codespellrc
+          )$
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
@@ -72,7 +77,8 @@ repos:
       - id: codespell
         exclude: |
           (?x)^(
-            Cargo.lock
+            Cargo.lock|
+            cliff.toml
           )$
 
   - repo: https://github.com/markdownlint/markdownlint
