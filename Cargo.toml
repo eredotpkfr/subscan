@@ -56,14 +56,16 @@ md5 = "0.7.0"
 stubr = "0.6.2"
 tempfile = "3.14.0"
 
-# The profile that 'dist' will build with
-[profile.dist]
-inherits = "release"
+[profile.release]
 lto = true
 strip = true
 opt-level = "z"
 codegen-units = 1
 panic = "abort"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
 
 [package.metadata.cargo-machete]
 ignored = ["prettytable-rs"]
