@@ -1,6 +1,5 @@
 use std::{env, io::Write};
 
-use env_logger;
 use log::LevelFilter::Debug;
 use subscan::{types::config::subscan::SubscanConfig, Subscan};
 use tempfile::NamedTempFile;
