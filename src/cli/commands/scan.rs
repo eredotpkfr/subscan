@@ -58,6 +58,7 @@ impl ScanCommandArgs {
     ///
     /// let args = ScanCommandArgs {
     ///     modules: String::from("*"),
+    ///     skips: String::new(),
     ///     ..Default::default()
     /// };
     ///

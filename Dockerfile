@@ -2,27 +2,13 @@ FROM rust:1.82-slim-bookworm AS builder
 
 WORKDIR /builder
 
+ENV CHROMIUM_VERSION=131.0.6778.85-1~deb12u1
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install project and chrome deps
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdrm2 \
-    libgbm1 \
-    libglib2.0-0 \
-    libnss3 \
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
+    chromium=${CHROMIUM_VERSION} \
     libssl-dev \
-    libxcomposite1 \
-    libxdamage1 \
-    libxfixes3 \
-    libxkbcommon0 \
-    libxrandr2 \
     pkg-config \
     tini \
     && rm -rf /var/lib/apt/lists/*
@@ -36,8 +22,10 @@ RUN cargo build --release
 # hadolint ignore=DL3007
 FROM gcr.io/distroless/cc-debian12:latest
 
+ENV SUBSCAN_CHROME_PATH=/usr/lib/chromium/chromium
+
 # Copy libs from builder
-COPY --from=builder /lib /lib
+COPY --from=builder /usr/lib /usr/lib
 COPY --from=builder /usr/share /usr/share
 # Copy required binaries
 COPY --from=builder /usr/bin/tini /bin/tini

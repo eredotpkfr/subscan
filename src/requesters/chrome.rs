@@ -1,12 +1,15 @@
+use std::ffi::OsStr;
+
 use async_trait::async_trait;
 use headless_chrome::{browser::LaunchOptions, Browser};
 use reqwest::Url;
 
 use crate::{
+    constants::SUBSCAN_CHROME_PATH_ENV,
     enums::content::Content,
     error::ModuleErrorKind::GetContent,
     interfaces::requester::RequesterInterface,
-    types::{config::requester::RequesterConfig, core::Result},
+    types::{config::requester::RequesterConfig, core::Result, env::Env},
 };
 
 /// Chrome requester struct, send HTTP requests via Chrome browser.
@@ -89,6 +92,14 @@ impl ChromeBrowser {
             headless: true,
             sandbox: false,
             enable_gpu: false,
+            path: Env::from(SUBSCAN_CHROME_PATH_ENV)
+                .value
+                .map_or(None, |path| Some(path.into())),
+            args: vec![
+                OsStr::new("--disable-dev-shm-usage"),
+                OsStr::new("--disable-software-rasterizer"),
+                OsStr::new("--single-process"),
+            ],
             ..Default::default()
         }
     }

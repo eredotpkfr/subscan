@@ -4,6 +4,8 @@ use std::time::Duration;
 pub const SUBSCAN_BANNER_LOG_TARGET: &str = "subscan::banner";
 /// `Subscan` environment variable namespace
 pub const SUBSCAN_ENV_NAMESPACE: &str = "SUBSCAN";
+/// `Subscan` Chrome browser executable path env
+pub const SUBSCAN_CHROME_PATH_ENV: &str = "SUBSCAN_CHROME_PATH";
 /// Concurrency level of module runner instances, count of threads
 pub const DEFAULT_MODULE_CONCURRENCY: u64 = 5;
 /// Concurrency level of resolver instances, count of threads
