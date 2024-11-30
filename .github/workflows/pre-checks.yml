@@ -1,0 +1,22 @@
+name: Pre checks
+
+on:
+  workflow_call:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  coverage:
+    uses: eredotpkfr/subscan/.github/workflows/coverage.yml@main
+
+  linters:
+    uses: eredotpkfr/subscan/.github/workflows/linters.yml@main
+
+  security:
+    uses: eredotpkfr/subscan/.github/workflows/security.yml@main
+
+  tests:
+    needs:
+      - linters
+      - security
+    uses: eredotpkfr/subscan/.github/workflows/tests.yml@main
