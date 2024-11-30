@@ -7,10 +7,10 @@
 </div>
 <br>
 <div align="center">
-  <a href="https://github.com/eredotpkfr/subscan/actions/workflows/test.yml">
+  <a href="https://github.com/eredotpkfr/subscan/actions/workflows/tests.yml">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/test.yml?label=test&logo=Github&labelColor=ff3030&color=e6e6e6">
-      <img alt="GitHub Actions Test Workflow Status" src="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/test.yml?label=test&logo=Github&labelColor=42445a&color=e6e6e6">
+      <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/tests.yml?label=test&logo=Github&labelColor=ff3030&color=e6e6e6">
+      <img alt="GitHub Actions Test Workflow Status" src="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/tests.yml?label=test&logo=Github&labelColor=42445a&color=e6e6e6">
     </picture>
   </a>
 
@@ -24,7 +24,7 @@
   <a href="https://github.com/eredotpkfr/subscan/actions/workflows/docker.yml">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/docker.yml?label=docker&logo=Docker&labelColor=ff3030&color=e6e6e6&logoColor=white">
-      <img alt="Codecov Status" src="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/test.yml?label=docker&logo=Docker&labelColor=42445a&color=e6e6e6&logoColor=white">
+      <img alt="Codecov Status" src="https://img.shields.io/github/actions/workflow/status/eredotpkfr/subscan/docker.yml?label=docker&logo=Docker&labelColor=42445a&color=e6e6e6&logoColor=white">
     </picture>
   </a>
 
