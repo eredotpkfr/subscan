@@ -5,7 +5,7 @@ pub mod commands;
 
 use banner::banner;
 use clap::Parser;
-use clap_verbosity_flag::{InfoLevel, Verbosity};
+use clap_verbosity_flag::{DebugLevel, Verbosity};
 
 use crate::{cli::commands::Commands, constants::SUBSCAN_BANNER_LOG_TARGET, logger};
 
@@ -16,7 +16,7 @@ pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
     #[command(flatten)]
-    pub verbose: Verbosity<InfoLevel>,
+    pub verbose: Verbosity<DebugLevel>,
 }
 
 impl Cli {
@@ -25,6 +25,6 @@ impl Cli {
     }
 
     pub async fn banner(&self) {
-        log::info!(target: SUBSCAN_BANNER_LOG_TARGET, "{}", banner());
+        log::debug!(target: SUBSCAN_BANNER_LOG_TARGET, "{}", banner());
     }
 }
