@@ -14,7 +14,6 @@ jobs:
     uses: eredotpkfr/subscan/.github/workflows/pre-checks.yml@main
 
   release-plz-release:
-    name: Release-plz release
     runs-on: ubuntu-latest
     needs: release-pre-checks
     steps:
@@ -34,7 +33,6 @@ jobs:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
   release-plz-pr:
-    name: Release-plz PR
     runs-on: ubuntu-latest
     concurrency:
       group: release-plz-${{ github.ref }}
