@@ -2,6 +2,8 @@ name: Security
 
 on:
   workflow_call:
+  pull_request:
+    branches: ["main"]
 
 env:
   RUSTFLAGS: "-Dwarnings"
@@ -37,9 +39,7 @@ jobs:
 
   gitleaks-scan:
     permissions:
-      # Allow access to commit list
       contents: read
-      # Allow access to adding comments
       discussions: write
       pull-requests: write
     runs-on: ubuntu-latest

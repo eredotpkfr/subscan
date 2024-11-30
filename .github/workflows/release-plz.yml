@@ -1,4 +1,4 @@
-name: Release-plz
+name: CI-CD
 
 permissions:
   pull-requests: write
@@ -10,46 +10,40 @@ on:
       - main
 
 jobs:
-  release-pre-checks:
-    uses: eredotpkfr/subscan/.github/workflows/pre-checks.yml@main
+  coverage:
+    uses: eredotpkfr/subscan/.github/workflows/coverage.yml@main
 
-  release-plz-release:
+  linters:
+    uses: eredotpkfr/subscan/.github/workflows/linters.yml@main
+
+  security:
+    permissions:
+      contents: read
+      discussions: write
+      pull-requests: write
+    uses: eredotpkfr/subscan/.github/workflows/security.yml@main
+
+  tests:
+    uses: eredotpkfr/subscan/.github/workflows/tests.yml@main
+
+  release-plz:
     runs-on: ubuntu-latest
-    needs: release-pre-checks
+    needs:
+      - coverage
+      - linters
+      - security
+      - tests
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Run release-plz
-        uses: release-plz/action@v0.5
-        with:
-          command: release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-
-  release-plz-pr:
-    runs-on: ubuntu-latest
-    concurrency:
-      group: release-plz-${{ github.ref }}
-      cancel-in-progress: false
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
       - name: Run release-plz
         uses: release-plz/action@v0.5
-        with:
-          command: release-pr
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
