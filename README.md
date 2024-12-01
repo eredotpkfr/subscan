@@ -57,13 +57,13 @@
     </picture>
   </a>
 </div>
-<h4 align="center">
-  <a href="#">Install</a> |
-  <a href="#">Usage</a> |
-  <a href="#">Doc</a> |
-  <a href="#">Book</a> |
+<p align="center">
+  <a href="#">Install</a> •
+  <a href="#">Usage</a> •
+  <a href="#">Doc</a> •
+  <a href="#">Book</a> •
   <a href="#">Development</a>
-</h4>
+</p>
 <br>
 <!-- markdownlint-enable MD033 MD041 -->
 
