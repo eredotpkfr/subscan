@@ -72,6 +72,7 @@ repos:
         exclude: |
           (?x)^(
             Cargo.lock|
+            CHANGELOG.md|
             cliff.toml
           )$
 

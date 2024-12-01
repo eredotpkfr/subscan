@@ -1,2 +1,2 @@
 [files]
-extend-exclude = ["Cargo.lock", "cliff.toml", ".codespellrc"]
+extend-exclude = ["Cargo.lock", "cliff.toml", ".codespellrc", "CHANGELOG.md"]
