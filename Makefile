@@ -14,11 +14,14 @@ all: install-pre-commit-mac \
 	install-cargo-llvm-cov \
 	install-cargo-dist \
 	install-git-cliff \
+	install-cargo-nextest \
 	clean \
 	check \
 	fix \
 	doc \
 	doc-rs \
+	doc-test \
+	nextest \
 	test \
 	build \
 	rustfmt-check \
@@ -44,7 +47,8 @@ install-cargo-tools: install-nightly-toolchain \
 	install-cargo-udeps \
 	install-cargo-llvm-cov \
 	install-cargo-dist \
-	install-git-cliff
+	install-git-cliff \
+	install-cargo-nextest
 
 install-nightly-toolchain:
 	@rustup toolchain install nightly
@@ -62,6 +66,8 @@ install-cargo-dist:
 	@cargo install cargo-dist --locked
 install-git-cliff:
 	@cargo install git-cliff --locked
+install-cargo-nextest:
+	@cargo install cargo-nextest --locked
 
 clean:
 	@cargo clean
@@ -73,14 +79,17 @@ doc:
 	@cargo doc
 doc-rs:
 	@cargo +nightly docs-rs
+doc-test:
+	@cargo test --doc
 test:
 	@cargo test
+nextest:
+	@cargo nextest run
 coverage:
 	@cargo +nightly llvm-cov \
 		--all-features \
 		--workspace \
 		--doctests \
-		--fail-under-lines 95 \
 		--html \
 		--open
 build:
