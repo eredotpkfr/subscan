@@ -22,7 +22,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: Clean workspace
-        run: cargo llvm-cov clean --workspace
+        run: cargo +nightly llvm-cov clean --workspace
 
       # We are using coverage profile to reduce binary size
       # cause of github action runner disk space limitations
@@ -30,12 +30,7 @@ jobs:
       # This is a bit slow but we have to do it because we don't
       # have self-hosted runner right now
       - name: Run nextest
-        run: cargo llvm-cov \
-          --cargo-profile coverage \
-          --all-features \
-          --workspace \
-          --no-report \
-          nextest
+        run: cargo +nightly llvm-cov --cargo-profile coverage --all-features --workspace --no-report nextest
 
       # We are using coverage profile to reduce binary size
       # cause of github action runner disk space limitations
@@ -43,18 +38,10 @@ jobs:
       # This is a bit slow but we have to do it because we don't
       # have self-hosted runner right now
       - name: Run doc-test
-        run: cargo +nightly llvm-cov \
-          --profile coverage \
-          --all-features \
-          --workspace \
-          --no-report \
-          --doc
+        run: cargo +nightly llvm-cov --profile coverage --all-features --workspace --no-report --doc
 
       - name: Generate code coverage report
-        run: cargo +nightly llvm-cov report \
-          --doctests \
-          --lcov \
-          --output-path lcov.info
+        run: cargo +nightly llvm-cov report --doctests --lcov --output-path lcov.info
 
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v5
