@@ -24,6 +24,11 @@ jobs:
       - name: Clean workspace
         run: cargo llvm-cov clean --workspace
 
+      # We are using coverage profile to reduce binary size
+      # cause of github action runner disk space limitations
+      #
+      # This is a bit slow but we have to do it because we don't
+      # have self-hosted runner right now
       - name: Run nextest
         run: cargo llvm-cov \
           --cargo-profile coverage \
@@ -32,6 +37,11 @@ jobs:
           --no-report \
           nextest
 
+      # We are using coverage profile to reduce binary size
+      # cause of github action runner disk space limitations
+      #
+      # This is a bit slow but we have to do it because we don't
+      # have self-hosted runner right now
       - name: Run doc-test
         run: cargo +nightly llvm-cov \
           --profile coverage \
