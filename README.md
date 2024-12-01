@@ -58,20 +58,35 @@
   </a>
 </div>
 <br>
-<h5 align="center">
+<p align="center">
   <a href="#">Install</a> •
   <a href="#">Usage</a> •
   <a href="#">Doc</a> •
   <a href="#">Book</a> •
   <a href="#">Development</a>
-</h5>
+</p>
 <br>
 <!-- markdownlint-enable MD033 MD041 -->
 
-🔍🕵️ **Subscan** is a powerful subdomain enumeration tool built with Rust, specifically designed for penetration testing purposes. It combines multiple discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers
-
+🔍🕵️ **Subscan** is a powerful subdomain enumeration tool built with [Rust](https://www.rust-lang.org/), specifically designed for penetration testing purposes. It combines multiple discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers
+<!-- markdownlint-disable MD007 -->
 ## Features
 
+🎯 Let's dive to what makes `Subscan` super cool
+
+- 🕵️ **Smart Discovery Tricks:**
+   - Leverage multiple search engines including `Google`, `Yahoo`, `Bing`, `Duckduckgo` for extensive subdomain discovery
+   - Seamless integration with leading reconnaissance APIs like `Shodan`, `Censys`, `Virustotal`
+   - Zone transfer check on target
+   - Execute subdomain brute-forcing with optimized wordlists
+- 🔍 **IP Detective:** Resolve IP addresses for all discovered subdomains, transforming raw data into actionable network intelligence
+- 📊 **Flexible Reporting:**
+   - Generate comprehensive output in `CSV`, `HTML`, `JSON`, and `TXT` formats
+   - Detailed `JSON` reporting for in-depth technical analysis
+- 🐳 **Docker Friendly:** Native support for Linux architectures, including `amd64` and `arm64` platforms
+- 🚀 **Super Lightweight:** Tiny container that won't eat up your storage - under 1GB and ready to roll
+
+<!-- markdownlint-enable MD007 -->
 ## Install
 
 ```bash
@@ -95,3 +110,25 @@ Options:
   -h, --help        Print help (see more with '--help')
   -V, --version     Print version
 ```
+
+## Environments
+
+All environments are managed by the `.env` file. Subscan can read your environments from this `.env` file. You can refer to the `.env.template` file to see how to create them. Also you can specify your environments from shell:
+
+```bash
+SUBSCAN_VIRUSTOTAL_APIKEY=foo subscan scan -d foo.com --modules=virustotal
+```
+
+<!-- markdownlint-disable MD033 MD041 -->
+<div align="center">
+
+| Name                           | Required | Description |
+| :----------------------------: | :------: | :---------: |
+| `SUBSCAN_CHROME_PATH`          | `false`  | Specify your Chrome executable. If not specified, the Chrome binary will be fetched automatically by <a href="https://github.com/rust-headless-chrome/rust-headless-chrome/">headless_chrome<a/> based on your system architecture |
+| `SUBSCAN_<MODULE_NAME>_HOST` | `false`  | Some API integration modules can provide user specific host, for these cases, set module specific host |
+| `SUBSCAN_<MODULE_NAME>_APIKEY` | `false`  | Some modules may include API integration and require an API key for authentication. Set the API key in these cases |
+| `SUBSCAN_<MODULE_NAME>_USERNAME` | `false`  | Set the username for a module if it uses HTTP basic authentication |
+| `SUBSCAN_<MODULE_NAME>_PASSWORD` | `false`  | Set the password for a module if it uses HTTP basic authentication |
+
+</div>
+<!-- markdownlint-enable MD033 MD041 -->
