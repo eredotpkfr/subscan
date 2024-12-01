@@ -25,13 +25,26 @@ jobs:
         run: cargo llvm-cov clean --workspace
 
       - name: Run nextest
-        run: cargo llvm-cov --cargo-profile ci --all-features --workspace --no-report nextest
+        run: cargo llvm-cov \
+          --cargo-profile coverage \
+          --all-features \
+          --workspace \
+          --no-report \
+          nextest
 
       - name: Run doc-test
-        run: cargo +nightly llvm-cov --profile ci --all-features --workspace --no-report --doc
+        run: cargo +nightly llvm-cov \
+          --profile coverage \
+          --all-features \
+          --workspace \
+          --no-report \
+          --doc
 
       - name: Generate code coverage report
-        run: cargo +nightly llvm-cov report --doctests --lcov --output-path lcov.info
+        run: cargo +nightly llvm-cov report \
+          --doctests \
+          --lcov \
+          --output-path lcov.info
 
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v5

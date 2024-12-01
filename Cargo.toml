@@ -67,7 +67,7 @@ panic = "abort"
 [profile.dist]
 inherits = "release"
 
-[profile.ci]
+[profile.coverage]
 inherits = "release"
 
 [package.metadata.cargo-machete]
