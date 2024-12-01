@@ -72,19 +72,27 @@
 <!-- markdownlint-disable MD007 -->
 ## Features
 
-🎯 Let's dive to what makes `Subscan` super cool
+🎯 **Let's Dive to What Makes `Subscan` Super Cool**
 
 - 🕵️ **Smart Discovery Tricks:**
    - Leverage multiple search engines including `Google`, `Yahoo`, `Bing`, `Duckduckgo` for extensive subdomain discovery
-   - Seamless integration with leading reconnaissance APIs like `Shodan`, `Censys`, `Virustotal`
-   - Zone transfer check on target
+   - Integrate seamlessly with leading reconnaissance APIs such as `Shodan`, `Censys`, `VirusTotal`, etc.
+   - Perform zone transfer check on target domain
    - Execute subdomain brute-forcing with optimized wordlists
-- 🔍 **IP Detective:** Resolve IP addresses for all discovered subdomains, transforming raw data into actionable network intelligence
-- 📊 **Flexible Reporting:**
-   - Generate comprehensive output in `CSV`, `HTML`, `JSON`, and `TXT` formats
-   - Detailed `JSON` reporting for in-depth technical analysis
-- 🐳 **Docker Friendly:** Native support for Linux architectures, including `amd64` and `arm64` platforms
-- 🚀 **Super Lightweight:** Tiny container that won't eat up your storage - under 1GB and ready to roll
+- 🔍 **IP Detective:** Resolve IP addresses for all discovered subdomains
+- 🛠️ **Completely Configurable:**
+   - Tweak HTTP requests like user-agent, timeout, and more
+   - Rotate HTTP requests through proxies using the `--proxy` argument
+   - Fine-tune the IP resolver component with arguments that start with `--resolver`
+   - Use the `--skips` and `--modules` arguments to filter and run only the specific modules you want
+- 📎 **Flexible Reporting:**
+   - Generate output in `CSV`, `HTML`, `JSON`, and `TXT` formats
+   - Generate in-depth `JSON` reports for technical analysis and insights
+- 🐳 **Docker Friendly:**
+   - Native support for Linux architectures, including `amd64` and `arm64` platforms
+   - Tiny container that won't eat up your storage - under 1GB and ready to roll
+- 💻 **Cross Platform:** Install effortlessly as a single binary compatible across multiple platforms
+- 🚀 **Super Lightweight:** A minimalistic design with a small Docker image size and an even smaller binary
 
 <!-- markdownlint-enable MD007 -->
 ## Install
