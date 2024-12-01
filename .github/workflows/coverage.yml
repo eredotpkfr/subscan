@@ -25,7 +25,7 @@ jobs:
         run: cargo llvm-cov clean --workspace
 
       - name: Run nextest
-        run: cargo llvm-cov --profile ci --all-features --workspace --no-report nextest
+        run: cargo llvm-cov --cargo-profile ci --all-features --workspace --no-report nextest
 
       - name: Run doc-test
         run: cargo +nightly llvm-cov --profile ci --all-features --workspace --no-report --doc
