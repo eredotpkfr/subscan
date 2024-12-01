@@ -15,33 +15,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: llvm-tools-preview
       - uses: taiki-e/install-action@cargo-llvm-cov
-      - uses: taiki-e/install-action@nextest
       - uses: Swatinem/rust-cache@v2
 
-      - name: Clean workspace
-        run: cargo +nightly llvm-cov clean --workspace
-
-      # We are using coverage profile to reduce binary size
-      # cause of github action runner disk space limitations
+      # We are not using nextest in here because of it has some
+      # shortcomings while working with cargo-llvm-cov and can cause
+      # false positive results, just use only cargo-llvm-cov
       #
-      # This is a bit slow but we have to do it because we don't
-      # have self-hosted runner right now
-      - name: Run nextest
-        run: cargo +nightly llvm-cov --cargo-profile coverage --all-features --workspace --no-report nextest
-
-      # We are using coverage profile to reduce binary size
-      # cause of github action runner disk space limitations
-      #
-      # This is a bit slow but we have to do it because we don't
-      # have self-hosted runner right now
-      - name: Run doc-test
-        run: cargo +nightly llvm-cov --profile coverage --all-features --workspace --no-report --doc
-
-      - name: Generate code coverage report
-        run: cargo +nightly llvm-cov report --doctests --lcov --output-path lcov.info
+      # We are using coverage profile to reduce binary sizes
+      # cause of github action runner disk space limitations. This is
+      # a bit slow but we have to do it because we don't have
+      # self-hosted runner right now
+      - name: Generate code coverage
+        run: |
+          cargo +nightly llvm-cov \
+          --profile coverage-ci \
+          --all-features \
+          --workspace \
+          --doctests \
+          --lcov \
+          --output-path lcov.info
 
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v5
