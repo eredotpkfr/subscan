@@ -31,8 +31,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly
-      - uses: dtolnay/install@cargo-docs-rs
       - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/install@cargo-docs-rs
 
       - name: Run doc-rs
         run: make doc-rs
