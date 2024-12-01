@@ -11,8 +11,8 @@ repository = "https://github.com/eredotpkfr/subscan"
 license-file = "LICENSE"
 keywords = [
     "pentesting-tool",
-    "subdomain-enumeration",
-    "subdomain-bruteforcing",
+    "subdomain-finder",
+    "bruteforce",
     "zonetransfer",
     "searchengines",
 ]
