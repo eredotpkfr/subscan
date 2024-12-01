@@ -1,0 +1,469 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [0.1.7] - 2024-12-01
+
+### 🚀 Features
+
+- Extend build targets, [skip ci]
+- Docker multiplatform build workflows, [skip ci]
+- Add linux arm support for docker, [skip ci]
+- Update Cargo.lock file, [skip ci]
+- Update Dockerfile, [skip ci]
+- Add Cargo.lock file, [skip ci]
+- Add Dockerfile, [skip ci]
+- Add brute force command implementations, [skip ci]
+- Add ip resolve feature, [skip ci]
+- Add netcraft module, [skip ci]
+- Add html output format, [skip ci]
+- *(cli)* Implement csv output format
+- *(cli)* Implement txt output format
+- *(cli)* Implement json output format
+- Add zonetransfer module, [skip ci]
+- Add modules and skips arguments to filter modules, [skip ci]
+- Add scan result structures for reporting
+- Add output argument on cli
+- Extend logging messages and colorized log lines
+- Add logging
+- Add subscan module runner struct and runner pool struct to run modules as async
+- Add new cli commands, [skip ci]
+- Add subscan main struct, [skip ci]
+- New dnsrepo integration module, [skip ci]
+- Add new waybackarchive integration, [skip ci]
+- Add new securitytrails module, [skip ci]
+- Add new netlas module integration, [skip ci]
+- Github non-generic module implementations, [skip ci]
+- New dnsdumpster non-generic module implementation, [skip ci]
+- New commoncrawl module, its implemented as a non-generic, [skip ci]
+- Add requester handler system for custom requests
+- Add basic http auth method
+- Add new zoomeye api integration module
+- Extend module environments and refactor env system
+- New whoisxmlapi api integration module
+- Add new virustotal api integration module
+- Add new subdomaincenter api integration module
+- New sitedossier integration module
+- Add coverage ci yml file
+- Add new shodan api integration module
+- Add leakix api integration
+- Add hackertarget integration module
+- New digitorus integration module implementation
+- Add new crt.sh integration module
+- Add new chaos integration module
+- Add new certspotter integration module
+- Use static dispatching for modules
+- Add new censys integration module
+- Add builtwith integration module
+- New bufferover integration module
+- Add pagination system into generic api module
+- Binaryedge module
+- Basic API key system
+- Add generic api integration module and implement anubis and alienvault integrations
+- Add rust cache on ci stages
+- Get rid of requester cache
+- Add new pre-commit hooks
+- Add rust-cargo-test.yml workflow
+- Pre-commit integration and Makefile
+- Add new duckduckgo engine
+- Add get_content method on chrome requester
+- Add requester dispatcher enum for performance increase, add static dispatcher for requesters
+- Configure requesters on startup and refactor extractors
+- Add multiple domain address enumeration
+- Requester interface implementations
+- Implement extractors, rquesters and generic modules
+- Start project structure design
+- Implement base search engine and api integration interfaces and modules
+- Add anubis and alienvault integration basics
+- Add yahoo and bing engines
+- Add google engine logics
+
+### 🐛 Bug Fixes
+
+- Codecov warnings on ci
+- Rustfmt linter job
+- Rustfmt linter job
+- Change default verbosity level, [skip ci]
+- Cargo-dist release yml file, [skip ci]
+- Verbosity flag test, [skip ci]
+- Coverage workflow argument, [skip ci]
+- Dnsdumpster module and add dnsdumpsterapi integration, [skip ci]
+- Chrome panic error, [skip ci]
+- Environment variable izolation on github tests
+- Try to fix coverage
+- Update scraper version, [skip ci]
+- Downgrade scraper version
+- Add llvm-symbolizer package, [skip ci]
+- Add llvm-symbolizer package
+- Remove llvm install steps, [skip ci]
+- Install llvm-lld package
+- Zonetransfer module subdomain extraction fix, [skip ci]
+- Fix windows carriage returns in cli tests
+- Clippy fixes
+- Machete false positive error ignore
+- *(linter)* Update regex.rs to fix clippy
+- Don not panic when chome requester cannot visit the page, [skip ci]
+- Run onyle one runner instance while running sinle module, [skip ci]
+- Runner pool logic
+- Github module exit if apikey is not available
+- Dnsdumpster requeter configuration fixes, [skip ci]
+- Docstring wrong reference
+- Clippy fixes
+- Coverage branch
+- Add codecov token
+- Chrome requester tab cannot closes after got content
+- Do not use default executiable path while opening browser
+- Requester interface configure method logic fixes
+
+### 🚜 Refactor
+
+- *(cli)* Group overlaped imports
+- *(cli)* Update save method
+- Generic api integration module auth method
+- Api key logics
+- Generic api integration
+
+### 📚 Documentation
+
+- Add examples, [skip ci]
+- Update docstrings, [skip ci]
+- Update env docs
+- Update module docstrings
+- Add subdomain module dispatcher docstrings
+- Update docstrings
+- Update docstrings
+- Add example in chrome requester docstring
+- Update requesters, extractors and types documentation
+- Extractors and interfaces documentations and extractor tests
+- Write enums documentations
+- Add requester cache methods docstrings
+- Write basic module docstrings
+
+### 🧪 Testing
+
+- Add resolver tests, [skip ci]
+- Increase coverage on netcraft, [skip ci]
+- Add netcraft module tests, [skip ci], close [#118](https://github.com/eredotpkfr/subscan/pull/118)
+- Add save method tests
+- Add zonetransfer module run method tests, [skip ci]
+- Extend doctests, [skip ci]
+- Add zonetransfer module tests
+- Add attribute tests on command args
+- Add cli tests
+- Add doctests
+- Get rid of static ports
+- Remove unnecessary module definition on cache tests, [skip ci]
+- Add dnsrepo module tests, [skip ci]
+- Add waybackarchive tests, close [#98](https://github.com/eredotpkfr/subscan/pull/98), [skip ci]
+- Add securitytrails module tests, [skip ci]
+- Add netlas module tests, close [#93](https://github.com/eredotpkfr/subscan/pull/93), [skip ci]
+- Add github module tests, close [#91](https://github.com/eredotpkfr/subscan/pull/91), [skip ci]
+- Add dnsdumpster module tests, [skip ci]
+- Add commoncrawl non-generic module tests, close [#43](https://github.com/eredotpkfr/subscan/pull/43), [skip ci]
+- Extend client tests, also refactor, [skip ci]
+- Add zoomeye integration tests, close [#78](https://github.com/eredotpkfr/subscan/pull/78)
+- Add threatcrowd integration tests, close [#70](https://github.com/eredotpkfr/subscan/pull/70)
+- Add threatcrowd api integration module
+- Add whoisxmlapi integration tests, close [#69](https://github.com/eredotpkfr/subscan/pull/69)
+- Virustotal integration module tests, close [#68](https://github.com/eredotpkfr/subscan/pull/68)
+- Add subdomaincenter integration module tests, close [#67](https://github.com/eredotpkfr/subscan/pull/67)
+- Add sitedossier integration module tests, close [#66](https://github.com/eredotpkfr/subscan/pull/66)
+- Add get_next_url tests for each module
+- Add shodan integration module tests
+- Add leakix integration tests, close [#52](https://github.com/eredotpkfr/subscan/pull/52)
+- Add hackertarget integration module tests, close [#49](https://github.com/eredotpkfr/subscan/pull/49)
+- Add digitorus integration tests
+- Add content enumeration method tests
+- Add crtsh integration module tests, close [#44](https://github.com/eredotpkfr/subscan/pull/44)
+- Add censys module tests
+- Add bufferover integration module tests
+- Add binaryedge module tests
+- Extend generic api integration tests according to auth methods
+- Add json extractor tests and docstring updates
+- Extend anubis and alienvault tests
+- Add anubis and alienvault tests
+- Engine module tests and documentations
+- Requester tests and documentations
+- Add requester tests and add new method in chrome requester
+
+### ⚙️ Miscellaneous Tasks
+
+- Update cliff.toml file
+- Update releze-plz workflow
+- Update workflow ymls, [skip ci]
+- Update README.md, [skip ci]
+- Update README.md, [skip ci]
+- Update Makefile, [skip ci]
+- Update security workflow, [skip ci]
+- Update coverage workflow
+- Update coverage yml workflow
+- Add comment line into coverage workflow, [skip ci]
+- Update README.md, [skip ci]
+- Update test workflows, [skip ci]
+- Update test workflows
+- Update coverage workflow
+- Update test workflows
+- Fix hadolint workflow
+- Update coverage workflow
+- Update hadolint workflow
+- Update coverage workflow
+- Add typos config file
+- Update README.md, [skip ci]
+- Update README.md, [skip ci]
+- Update README.md, [skip ci]
+- Update README.md, [skip ci]
+- Update README.md, [skip ci]
+- Update README.md, [skip ci]
+- Update README.md, [skip ci]
+- Update README.md, [skip ci]
+- Update github workflows
+- Update release-plz workflow job names
+- Update release pipeline
+- Update release pipeline, [skip ci]
+- Add docker build badge in README.md, [skip ci]
+- Update deny.toml, ignore instant, [skip ci]
+- Update Cargo.lock, [skip ci]
+- Clippy fixes, [skip ci]
+- Update Cargo.toml, [skip ci]
+- Update Cargo.toml, [skip ci]
+- Update Cargo.toml, [skip ci]
+- Format fixes on dist configurations, [skip ci]
+- Integrate cargo-dist, [skip ci]
+- Update Cargo.lock, [skip ci]
+- Update Makefile, [skip ci]
+- Release-plz workflow, [skip ci]
+- Update Makefile, [skip ci]
+- Use log instead of println, [skip ci]
+- Update Makefile, [skip ci]
+- Update docstring, [skip ci]
+- Update pre-commit hook versions, [skip ci]
+- Update Dockerfile, [skip ci]
+- Update .dockerignore file, [skip ci]
+- Update Dockerfile, [skip ci]
+- Update .gitignore file, [skip ci]
+- Remove Cargo.lock file, [skip ci]
+- Bump version, [skip ci]
+- Change var name on dnsdumpstercrawler test, [skip ci]
+- Change error message text on dnsdumpstercrawler, [skip ci]
+- Sort cache, [skip ci]
+- Update pre-commit hook versions, [skip ci]
+- Update docstrings, [skip ci]
+- Update dependencies, [skip ci]
+- Bump version to 0.1.5, [skip ci]
+- Update Makefile, [skip ci]
+- Refactor subscan module pool, [skip ci]
+- Remove space, [skip ci]
+- Update docstrings, [skip ci]
+- Avoid code duplication on tests, [skip ci]
+- Refactor tests, [skip ci]
+- Refactor on module pool, [skip ci]
+- Minor refactors, [skip ci]
+- Update README.md, [skip ci]
+- Update pre-commit hook dependency versions, [skip ci]
+- Struct name changes, [skip ci]
+- Minor refactor module commons, [skip ci]
+- Minor refactor on output methods, [skip ci]
+- Group imports, [skip ci]
+- Remove unneeded impl, [skip ci]
+- Minor refactor on zonetransfer tests, [skip ci]
+- Minor refactor on zonetransfer module, [skip ci]
+- Change method name, [skip ci]
+- Change tmp vars to temp, [skip ci]
+- Refactor tmp stub creation steps, [skip ci]
+- Change configs to constants, [skip ci]
+- Remove attr tests on cli tests
+- Ignore logger and lib in coverage
+- Change gitleaks-scan token permissions
+- Add doctests to increase coverage
+- Ignore cli in coverage
+- Minor refactors
+- Get rid of unnecessary for loop in run command
+- Minor refactor on log utils, [skip ci]
+- Remove unnecessary docstrings, [skip ci]
+- Minor refactor, [skip ci]
+- Update README.md, [skip ci]
+- Change utils folder to utilities, [skip ci]
+- Update cli docstrings, [skip ci]
+- Split utils.rs file, [skip ci]
+- Minor refactors, [skip ci]
+- Refactor result types and extend doctests, [skip ci]
+- Add docstring, [skip ci]
+- Get rid of clippy warns
+- Move runner pool into pools folder
+- Update dependencies
+- Split enums package into different files
+- Split result definitions in a different module file
+- Remove unused var
+- Update table colors
+- Remove space
+- Minor refactor
+- Minor refactor, [skip ci]
+- Minor refactor, [skip ci]
+- Add banner and refactor cli components, [skip ci]
+- Minor refactor, [skip ci]
+- Refactors on cache and cli, [skip ci]
+- Minor refactor, [skip ci]
+- Minor refactor, [skip ci]
+- Minor refactor, [skip ci]
+- Update docstring, [skip ci]
+- Update readme.md file, [skip ci]
+- Minor refactors, [skip ci]
+- Change logo height, [skip ci]
+- Change badge colors, [skip ci]
+- Change badge colors, [skip ci]
+- Change logo, [skip ci]
+- Change badge colors, [skip ci]
+- Refactor commoncrawl module, [skip ci]
+- Sort cache lines, [skip ci]
+- Minor refactors, [skip ci]
+- Minor refactors, [skip ci]
+- Remove unnecessary line, [skip ci]
+- Revert requester handler function
+- Add pre-commit badge, [skip ci]
+- Add pre-commit badge, [skip ci]
+- Add pre-commit badge, [skip ci]
+- Update docstrings and refactors, extended generic integration tests
+- Remove post_request method rightnow
+- Update readme.md, [skip ci]
+- Update logo size, [skip ci]
+- Update logo size, [skip ci]
+- Change variable name on tests, [skip ci]
+- Update readme.md, [skip ci]
+- Update readme.md, [skip ci]
+- Update readme.md, [skip ci]
+- Update readme.md, [skip ci]
+- Update readme.md, [skip ci]
+- Update readme.md, [skip ci]
+- Update readme.md, [skip ci]
+- Update readme.md, [skip ci]
+- Update readme.md, [skip ci]
+- Update readme.md, [skip ci]
+- Update readme.md, [skip ci]
+- Update readme.md, [skip ci]
+- Update readme.md
+- Update readme.md
+- Update readme.md
+- Update readme.md
+- Update readme.md
+- Update readme.md
+- Update readme.md
+- Update readme.md
+- Update logo
+- Update logo
+- Update readme.md
+- Update readme.md
+- Update logos
+- Update logos
+- Update logos
+- Update logos
+- Update logos
+- Update logos
+- Update logos
+- Update logos
+- Add logo, update readme
+- Remove space
+- Update .env.template file format
+- Refactor query types
+- Testing coverage line
+- Add lint-docs step on workflows
+- Update codecov.yml file
+- Update coverage ci yml file
+- Refactor engine tests, [skip ci]
+- Disable codecov patch and increase code coverage, [skip ci]
+- Add wrapper main method on no_run marked doctests to avoid coverage fp, [skip ci]
+- Add codecov status check configurations
+- Remove tarpaulin
+- Remove tarpaulin
+- Change tarpaulin image tag
+- Change run method test name
+- Change import syntaxes
+- Refactor generic module names
+- Update digitorus description
+- Update rustfmt.toml
+- Bump project version
+- Docstring simplify code
+- Minor changes
+- Update digitorus module docstring, close [#45](https://github.com/eredotpkfr/subscan/pull/45)
+- Test refactors
+- Docstring fixes
+- Update dependency versions
+- Get rid of test baz subdomain
+- Change function name on module common mocks
+- Made private function
+- Refactor integrations
+- Refactor integration tests
+- Add bufferover module into cache
+- Rename stub file name
+- Docstring updates
+- Test uppercase
+- Update .env.template file
+- Update .env.template file
+- Refactor bevigil and binaryedge tests
+- Update docstring
+- Change type names
+- Bump version to 0.1.1
+- Minor refactor
+- Minor refactor on generic api integration
+- Refactor on generic api integration module
+- Minor refactoring
+- Minor syntax fix
+- Rename workflow files
+- Minor syntax fixes
+- Remove unnecessary module doc strings
+- Remove unnecessary integration module docstrings
+- Use new method instead of default while create btreeset
+- Change method names
+- Add blank lines after func definition
+- Change module name on docstring
+- Fix markdown table
+- Update workflow yml files
+- Update workflow yml files
+- Minor refactor
+- Minor refactor
+- Minor refactor
+- Refactor tests folder structure
+- Refactor types and add common mocks module
+- Generic search engine minor refactor
+- Update .pre-commit-config.yaml file
+- Refactor tests
+- Update workflow yml files
+- Update workflow yml files
+- Update workflow yml files
+- Update workflow yml files
+- Update tests yml workflow
+- Update Makefile
+- Update Makefile
+- Split ci yml files
+- Update ci workflow yml file
+- Update Makefile
+- Update Makefile
+- Clippy fixes
+- Update rust-cargo-test.yml
+- Allow deadcode common constants
+- Refactor cache tests
+- Rustfmt fixes
+- Html extractor doctest refactor
+- Refactor chrome requester
+- Refactor cache tests
+- *(dependency)* Change headless_chrome version definition
+- *(dependencies)* Update Cargo.toml dependency versions
+- *(dependency)* Update cargo dependencie versions
+- Formattings
+- Refactor update_many method on searchquery
+- Import format fix
+- Formatting fixes
+- Refactor manager and import fixes
+- Refactoring manager module
+- Refactoring base structure
+- Refactor some code bases and implement memoizing for modules and requesters
+- Change get_start_query method name
+- Refactor generic search engine module
+- Refactor core types
+- Remove unnecessary signatures from types
+- Refactor generic search engine module
+- Cargo fix and refactoring
+- Refactor generic searchengine module
+- Use iterators on google engine
+- Initialize rust cargo
+
+<!-- generated by git-cliff -->
