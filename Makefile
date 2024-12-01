@@ -15,6 +15,7 @@ all: install-pre-commit-mac \
 	install-cargo-dist \
 	install-git-cliff \
 	install-cargo-nextest \
+	install-cargo-machete \
 	clean \
 	check \
 	fix \
@@ -27,7 +28,9 @@ all: install-pre-commit-mac \
 	rustfmt-check \
 	rustfmt \
 	clippy \
-	deny
+	deny \
+	udeps \
+	machete
 
 install-pre-commit-mac:
 	@brew install pre-commit
@@ -48,7 +51,8 @@ install-cargo-tools: install-nightly-toolchain \
 	install-cargo-llvm-cov \
 	install-cargo-dist \
 	install-git-cliff \
-	install-cargo-nextest
+	install-cargo-nextest \
+	install-cargo-machete
 
 install-nightly-toolchain:
 	@rustup toolchain install nightly
@@ -68,6 +72,8 @@ install-git-cliff:
 	@cargo install git-cliff --locked
 install-cargo-nextest:
 	@cargo install cargo-nextest --locked
+install-cargo-machete:
+	@cargo install cargo-machete --locked
 
 clean:
 	@cargo clean
@@ -104,3 +110,5 @@ deny:
 	@cargo deny --all-features --log-level error check
 udeps:
 	@cargo +nightly udeps
+machete:
+	@cargo machete
