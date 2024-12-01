@@ -22,3 +22,7 @@ targets = [
 install-path = "CARGO_HOME"
 # Whether to install an updater program
 install-updater = false
+# Publish jobs to run in CI
+pr-run-mode = "upload"
+# Ignore out-of-date contents
+allow-dirty = ["ci"]
