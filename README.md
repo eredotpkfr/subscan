@@ -57,4 +57,6 @@
     </picture>
   </a>
 </div>
+<br>
 <!-- markdownlint-enable MD033 MD041 -->
+**Subscan** is a powerful subdomain enumeration tool built with Rust, specifically designed for penetration testing purposes. It combines multiple discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers
