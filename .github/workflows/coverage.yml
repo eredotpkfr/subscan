@@ -6,7 +6,7 @@ on:
     branches: ["main"]
 
 env:
-  RUSTFLAGS: "-Dwarnings -Ccodegen-units=1"
+  RUSTFLAGS: "-Dwarnings"
   CARGO_TERM_COLOR: "always"
 
 jobs:
