@@ -61,3 +61,27 @@
 <!-- markdownlint-enable MD033 MD041 -->
 
 🔍🕵️ **Subscan** is a powerful subdomain enumeration tool built with Rust, specifically designed for penetration testing purposes. It combines multiple discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers
+
+## Install
+
+```bash
+cargo install subscan
+```
+
+## Usage
+
+```bash
+Usage: subscan [OPTIONS] <COMMAND>
+
+Commands:
+  scan    Start scan on any domain address
+  brute   Start brute force attack with a given wordlist
+  module  Subcommand to manage implemented modules
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+  -v, --verbose...  Increase logging verbosity
+  -q, --quiet...    Decrease logging verbosity
+  -h, --help        Print help (see more with '--help')
+  -V, --version     Print version
+```
