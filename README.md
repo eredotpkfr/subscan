@@ -82,7 +82,7 @@
 <br>
 <p align="center">
   <a href="https://github.com/eredotpkfr/subscan?tab=readme-ov-file#install">Install</a> •
-  <a href="#">Usage</a> •
+  <a href="https://github.com/eredotpkfr/subscan/tree/update-readme?tab=readme-ov-file#usage">Usage</a> •
   <a href="https://docs.rs/subscan/latest/subscan/">Doc</a> •
   <a href="https://erdoganyoksul.com/subscan/">Book</a> •
   <a href="#">Development</a>
