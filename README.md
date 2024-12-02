@@ -87,6 +87,7 @@
   <a href="https://erdoganyoksul.com/subscan/">Book</a> •
   <a href="#">Development</a>
 </p>
+<br>
 <!-- markdownlint-enable MD033 MD041 -->
 
 🔍🕵️ **Subscan** is a powerful subdomain enumeration tool built with [Rust](https://www.rust-lang.org/), specifically designed for penetration testing purposes. It combines various discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers
