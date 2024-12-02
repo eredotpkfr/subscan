@@ -90,8 +90,34 @@
 <br>
 <!-- markdownlint-enable MD033 MD041 -->
 
+## Overview
+
 🔍🕵️ **Subscan** is a powerful subdomain enumeration tool built with [Rust](https://www.rust-lang.org/), specifically designed for penetration testing purposes. It combines various discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers
 <!-- markdownlint-disable MD007 -->
+
+## Features
+
+🎯 **Let's Dive Into What Makes `Subscan` Super Cool**
+
+- 🕵️ **Smart Discovery Tricks:**
+   - Leverage multiple search engines including `Google`, `Yahoo`, `Bing`, and `Duckduckgo` for extensive subdomain discovery
+   - Integrate seamlessly with leading reconnaissance APIs such as `Shodan`, `Censys`, `VirusTotal` and more
+   - Perform a zone transfer check on the target domain
+   - Execute subdomain brute-forcing with optimized wordlists
+- 🔍 **IP Detective:** Resolve IP addresses for all discovered subdomains
+- 🛠️ **Completely Configurable:**
+   - Customize HTTP requests, such as user-agent, timeout, and more
+   - Rotate HTTP requests through proxies using the `--proxy` argument
+   - Fine-tune the IP resolver component with arguments that start with `--resolver`
+   - Use the `--skips` and `--modules` arguments to filter and run only the specific modules you want
+- 📎 **Flexible Reporting:**
+   - Generate reports in `CSV`, `HTML`, `JSON`, or `TXT` formats
+   - Generate detailed `JSON` reports for technical analysis and insights
+- 🐳 **Docker Friendly:**
+   - Native support for Linux architectures, including `amd64` and `arm64` platforms
+   - A tiny container that won't eat up your storage — under 1GB and ready to roll
+- 💻 **Cross Platform:** Install effortlessly as a single binary compatible across multiple platforms
+- 🚀 **Super Lightweight:** A minimalist design with a small Docker image size and an even smaller binary
 
 ## Install
 
@@ -147,30 +173,6 @@ You can also choose specific modules to run or skip using the `--skips` and `--m
 
 > [!NOTE]
 > If a module is included in both the `--skips` and `--modules` arguments, it will be skipped and not executed
-
-## Features
-
-🎯 **Let's Dive Into What Makes `Subscan` Super Cool**
-
-- 🕵️ **Smart Discovery Tricks:**
-   - Leverage multiple search engines including `Google`, `Yahoo`, `Bing`, and `Duckduckgo` for extensive subdomain discovery
-   - Integrate seamlessly with leading reconnaissance APIs such as `Shodan`, `Censys`, `VirusTotal` and more
-   - Perform a zone transfer check on the target domain
-   - Execute subdomain brute-forcing with optimized wordlists
-- 🔍 **IP Detective:** Resolve IP addresses for all discovered subdomains
-- 🛠️ **Completely Configurable:**
-   - Customize HTTP requests, such as user-agent, timeout, and more
-   - Rotate HTTP requests through proxies using the `--proxy` argument
-   - Fine-tune the IP resolver component with arguments that start with `--resolver`
-   - Use the `--skips` and `--modules` arguments to filter and run only the specific modules you want
-- 📎 **Flexible Reporting:**
-   - Generate reports in `CSV`, `HTML`, `JSON`, or `TXT` formats
-   - Generate detailed `JSON` reports for technical analysis and insights
-- 🐳 **Docker Friendly:**
-   - Native support for Linux architectures, including `amd64` and `arm64` platforms
-   - A tiny container that won't eat up your storage — under 1GB and ready to roll
-- 💻 **Cross Platform:** Install effortlessly as a single binary compatible across multiple platforms
-- 🚀 **Super Lightweight:** A minimalist design with a small Docker image size and an even smaller binary
 
 <!-- markdownlint-enable MD007 -->
 
