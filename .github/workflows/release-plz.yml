@@ -10,31 +10,35 @@ on:
       - main
 
 jobs:
-  # coverage:
-  #   uses: eredotpkfr/subscan/.github/workflows/coverage.yml@main
-  #   secrets:
-  #     codecov_token: ${{ secrets.CODECOV_TOKEN }}
+  coverage:
+    uses: eredotpkfr/subscan/.github/workflows/coverage.yml@main
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
 
-  # linters:
-  #   uses: eredotpkfr/subscan/.github/workflows/linters.yml@main
+  linters:
+    uses: eredotpkfr/subscan/.github/workflows/linters.yml@main
 
-  # security:
-  #   permissions:
-  #     contents: read
-  #     discussions: write
-  #     pull-requests: write
-  #   uses: eredotpkfr/subscan/.github/workflows/security.yml@main
+  security:
+    permissions:
+      contents: read
+      discussions: write
+      pull-requests: write
+    uses: eredotpkfr/subscan/.github/workflows/security.yml@main
 
-  # tests:
-  #   uses: eredotpkfr/subscan/.github/workflows/tests.yml@main
+  tests:
+    uses: eredotpkfr/subscan/.github/workflows/tests.yml@main
+
+  release-checks:
+    uses: eredotpkfr/subscan/.github/workflows/release.yml@main
 
   release-plz:
     runs-on: ubuntu-latest
-    # needs:
-    #   - linters
-    #   - security
-    #   - tests
-    #   - coverage
+    needs:
+      - linters
+      - security
+      - tests
+      - coverage
+      - release-checks
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
