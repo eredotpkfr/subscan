@@ -87,7 +87,6 @@
   <a href="https://erdoganyoksul.com/subscan/">Book</a> •
   <a href="#">Development</a>
 </p>
-<br>
 <!-- markdownlint-enable MD033 MD041 -->
 
 ## Overview
