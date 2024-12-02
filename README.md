@@ -93,9 +93,7 @@
 🔍🕵️ **Subscan** is a powerful subdomain enumeration tool built with [Rust](https://www.rust-lang.org/), specifically designed for penetration testing purposes. It combines various discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers
 <!-- markdownlint-disable MD007 -->
 
-## Quickstart
-
-### Install
+## Install
 
 🦀 Install the subscan tool using Cargo, Rust's package manager. Make sure you have [Rust](https://www.rust-lang.org/) installed on your system. Then, run:
 
@@ -103,7 +101,7 @@
 ~$ cargo install subscan
 ```
 
-### Usage
+## Usage
 
 ✨ Here's a quick overview of how to use it:
 
@@ -125,9 +123,9 @@ Options:
   -V, --version     Print version
 ```
 
-#### Examples
+### Examples
 
-##### Running Modules
+#### Running Modules
 
 To scan a domain using all available modules, use the following command:
 
