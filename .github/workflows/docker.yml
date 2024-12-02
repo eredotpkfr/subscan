@@ -7,8 +7,6 @@ on:
 
 env:
   REGISTRY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}
-  IMAGE_TAG: latest
-  BUILD_CACHE: buildcache
 
 jobs:
   build-and-push:
@@ -50,12 +48,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: ${{ matrix.platform }}
-          push: true
-          tags: ${{ env.REGISTRY_IMAGE }}:${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:${{ env.BUILD_CACHE }}-${{ env.PLATFORM_PAIR }}
-          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:${{ env.BUILD_CACHE }}-${{ env.PLATFORM_PAIR }},mode=max
 
       - name: Export digest
         run: |
