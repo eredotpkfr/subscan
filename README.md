@@ -81,7 +81,7 @@
 </div>
 <br>
 <p align="center">
-  <a href="#">Install</a> •
+  <a href="https://github.com/eredotpkfr/subscan?tab=readme-ov-file#install">Install</a> •
   <a href="#">Usage</a> •
   <a href="https://docs.rs/subscan/latest/subscan/">Doc</a> •
   <a href="https://erdoganyoksul.com/subscan/">Book</a> •
@@ -92,6 +92,64 @@
 
 🔍🕵️ **Subscan** is a powerful subdomain enumeration tool built with [Rust](https://www.rust-lang.org/), specifically designed for penetration testing purposes. It combines various discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers
 <!-- markdownlint-disable MD007 -->
+
+## Quickstart
+
+### Install
+
+🦀 Install the subscan tool using Cargo, Rust's package manager. Make sure you have [Rust](https://www.rust-lang.org/) installed on your system. Then, run:
+
+```bash
+~$ cargo install subscan
+```
+
+### Usage
+
+✨ Here's a quick overview of how to use it:
+
+```bash
+~$ subscan
+
+Usage: subscan [OPTIONS] <COMMAND>
+
+Commands:
+  scan    Start scan on any domain address
+  brute   Start brute force attack with a given wordlist
+  module  Subcommand to manage implemented modules
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+  -v, --verbose...  Increase logging verbosity
+  -q, --quiet...    Decrease logging verbosity
+  -h, --help        Print help (see more with '--help')
+  -V, --version     Print version
+```
+
+#### Examples
+
+##### Running Modules
+
+To scan a domain using all available modules, use the following command:
+
+```bash
+~$ subscan scan -d example.com
+```
+
+You can also choose specific modules to run or skip using the `--skips` and `--modules` arguments. Module names should be provided as a comma-separated list
+
+```bash
+# skip the commoncrawl and google modules during the scan
+~$ subscan scan -d example.com --skips=commoncrawl,google
+```
+
+```bash
+# run only the virustotal module
+~$ subscan scan -d example.com --modules=virustotal
+```
+
+> [!NOTE]
+> If a module is included in both the `--skips` and `--modules` arguments, it will be skipped and not executed
+
 ## Features
 
 🎯 **Let's Dive Into What Makes `Subscan` Super Cool**
@@ -117,29 +175,6 @@
 - 🚀 **Super Lightweight:** A minimalist design with a small Docker image size and an even smaller binary
 
 <!-- markdownlint-enable MD007 -->
-## Install
-
-```bash
-cargo install subscan
-```
-
-## Usage
-
-```bash
-Usage: subscan [OPTIONS] <COMMAND>
-
-Commands:
-  scan    Start scan on any domain address
-  brute   Start brute force attack with a given wordlist
-  module  Subcommand to manage implemented modules
-  help    Print this message or the help of the given subcommand(s)
-
-Options:
-  -v, --verbose...  Increase logging verbosity
-  -q, --quiet...    Decrease logging verbosity
-  -h, --help        Print help (see more with '--help')
-  -V, --version     Print version
-```
 
 ## Environments
 
