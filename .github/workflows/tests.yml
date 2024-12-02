@@ -23,7 +23,8 @@ jobs:
       - uses: taiki-e/install-action@nextest
 
       - name: Run nextest
-        run: RUST_BACKTRACE=1 cargo nextest run
-
+        run: make nextest
+        env:
+          RUST_BACKTRACE: 1
       - name: Run doc-test
         run: make doc-test
