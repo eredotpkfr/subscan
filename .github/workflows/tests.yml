@@ -22,6 +22,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
       - uses: browser-actions/setup-chrome@v1
+        id: setup-chrome
         with:
           chrome-version: 120
 
