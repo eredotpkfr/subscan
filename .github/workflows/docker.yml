@@ -6,8 +6,8 @@ on:
       - 'v[0-9]+\.[0-9]+\.[0-9]+*'
 
 env:
-  BUILD_CACHE: buildcache
   REGISTRY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}
+  IMAGE_TAG: latest
 
 jobs:
   build-and-push:
@@ -17,7 +17,6 @@ jobs:
       matrix:
         platform:
           - linux/amd64
-          - linux/arm/v6
           - linux/arm/v7
           - linux/arm64
 
@@ -50,10 +49,12 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: ${{ matrix.platform }}
+          push: true
+          tags: ${{ env.REGISTRY_IMAGE }}:${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:${{ env.BUILD_CACHE }}-${{ matrix.platform }}
-          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:${{ env.BUILD_CACHE }}-${{ matrix.platform }},mode=max
+          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:${{ env.IMAGE_TAG }}
+          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:${{ env.IMAGE_TAG }},mode=max
 
       - name: Export digest
         run: |
