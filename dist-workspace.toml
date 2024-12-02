@@ -12,17 +12,15 @@ installers = ["shell", "powershell"]
 # Target platforms to build apps for (Rust target-triple syntax)
 targets = [
     "aarch64-apple-darwin",
-    "aarch64-unknown-linux-gnu",
     "x86_64-apple-darwin",
     "x86_64-unknown-linux-gnu",
-    "x86_64-unknown-linux-musl",
     "x86_64-pc-windows-msvc",
 ]
 # Path that installers should place binaries in
 install-path = "CARGO_HOME"
 # Whether to install an updater program
 install-updater = false
-# Publish jobs to run in CI
+# Which actions to run on pull requests
 pr-run-mode = "upload"
 # Ignore out-of-date contents
 allow-dirty = ["ci"]
