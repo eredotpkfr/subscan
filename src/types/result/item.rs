@@ -25,11 +25,11 @@ impl SubscanResultItem {
     /// use subscan::types::result::item::SubscanResultItem;
     ///
     /// let item = SubscanResultItem {
-    ///     subdomain: "bar.foo.com".into(),
+    ///     subdomain: "baz.foo.com".into(),
     ///     ip: None
     /// };
     ///
-    /// assert_eq!(item.as_txt(), "bar.foo.com\t");
+    /// assert_eq!(item.as_txt(), "baz.foo.com\t");
     /// ```
     pub fn as_txt(&self) -> String {
         format!(
