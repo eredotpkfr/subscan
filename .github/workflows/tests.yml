@@ -21,10 +21,14 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
+      - uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: 120
 
       - name: Run nextest
-        run: sudo make nextest
+        run: make nextest
         env:
-          RUST_BACKTRACE: 1
+          SUBSCAN_CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+
       - name: Run doc-test
         run: make doc-test
