@@ -7,7 +7,6 @@ on:
 
 env:
   BUILD_CACHE: buildcache
-  IMAGE_TAG: latest
   REGISTRY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}
 
 jobs:
@@ -53,8 +52,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:$BUILD_CACHE-${{ matrix.platform }}
-          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:$BUILD_CACHE-${{ matrix.platform }},mode=max
+          cache-from: type=registry,ref=${{ env.REGISTRY_IMAGE }}:${{ env.BUILD_CACHE }}-${{ matrix.platform }}
+          cache-to: type=registry,ref=${{ env.REGISTRY_IMAGE }}:${{ env.BUILD_CACHE }}-${{ matrix.platform }},mode=max
 
       - name: Export digest
         run: |
