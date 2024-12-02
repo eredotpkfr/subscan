@@ -179,7 +179,7 @@ SUBSCAN_VIRUSTOTAL_APIKEY=foo subscan scan -d foo.com --modules=virustotal
 <div align="center">
 
 | Name                           | Required | Description |
-| :----------------------------: | :------: | :---------: |
+| :----------------------------- | :------: | :---------: |
 | `SUBSCAN_CHROME_PATH`          | `false`  | Specify your Chrome executable. If not specified, the Chrome binary will be fetched automatically by <a href="https://github.com/rust-headless-chrome/rust-headless-chrome/">headless_chrome<a/> based on your system architecture |
 | `SUBSCAN_<MODULE_NAME>_HOST` | `false`  | Some API integration modules can provide user specific host, for these cases, set module specific host |
 | `SUBSCAN_<MODULE_NAME>_APIKEY` | `false`  | Some modules may include API integration and require an API key for authentication. Set the API key in these cases |
