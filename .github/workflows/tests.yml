@@ -25,10 +25,16 @@ jobs:
         with:
           chrome-version: 120
 
-      - run: echo ${{ steps.setup-chrome.outputs.chrome-path }}
-      - run: echo $SUBSCAN_CHROME_PATH
+      - name: Echo Chrome path (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: echo ${{ steps.setup-chrome.outputs.chrome-path }}
+
+      - name: Echo Chrome path (Windows)
+        if: runner.os == 'Windows'
+        run: echo %SUBSCAN_CHROME_PATH%
         env:
           SUBSCAN_CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+
       - name: Run nextest
         run: make nextest
         env:
