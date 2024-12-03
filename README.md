@@ -84,8 +84,8 @@
 <!-- markdownlint-enable MD033 MD041 -->
 
 🔍🕵️ **Subscan** is a powerful subdomain enumeration tool built with [Rust](https://www.rust-lang.org/), specifically designed for penetration testing purposes. It combines various discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers
-<!-- markdownlint-disable MD007 -->
 
+<!-- markdownlint-disable MD007 -->
 ## Features
 
 🎯 **Let's Dive Into What Makes `Subscan` Super Cool**
@@ -109,6 +109,8 @@
    - A tiny container that won't eat up your storage — under 1GB and ready to roll
 - 💻 **Cross Platform:** Install effortlessly as a single binary compatible across multiple platforms
 - 🚀 **Super Lightweight:** A minimalist design with a small Docker image size and an even smaller binary
+
+<!-- markdownlint-enable MD007 -->
 
 ## Install
 
@@ -164,8 +166,6 @@ You can also choose specific modules to run or skip using the `--skips` and `--m
 
 > [!NOTE]
 > If a module is included in both the `--skips` and `--modules` arguments, it will be skipped and not executed
-
-<!-- markdownlint-enable MD007 -->
 
 ## Environments
 
