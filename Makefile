@@ -9,6 +9,8 @@ all: install-pre-commit-mac \
 	update-pre-commit-hooks \
 	install-nightly-toolchain \
 	install-cargo-clippy \
+	install-cargo-doc-rs \
+	install-cargo-mdbook \
 	install-cargo-deny \
 	install-cargo-udeps \
 	install-cargo-llvm-cov \
@@ -19,6 +21,7 @@ all: install-pre-commit-mac \
 	clean \
 	check \
 	fix \
+	live-book \
 	doc \
 	doc-rs \
 	doc-test \
@@ -46,6 +49,7 @@ update-pre-commit-hooks:
 install-cargo-tools: install-nightly-toolchain \
 	install-cargo-clippy \
 	install-cargo-doc-rs \
+	install-cargo-mdbook \
 	install-cargo-deny \
 	install-cargo-udeps \
 	install-cargo-llvm-cov \
@@ -60,6 +64,8 @@ install-cargo-clippy:
 	@rustup component add clippy
 install-cargo-doc-rs:
 	@cargo install cargo-docs-rs
+install-cargo-mdbook:
+	@cargo install mdbook
 install-cargo-deny:
 	@cargo install cargo-deny --locked
 install-cargo-udeps:
@@ -81,6 +87,8 @@ check:
 	@cargo check
 fix:
 	@cargo fix --allow-dirty --allow-staged
+live-book:
+	@mdbook serve book
 doc:
 	@cargo doc
 doc-rs:
