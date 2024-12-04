@@ -2,13 +2,13 @@
 
 This chapter explains how to use the `Subscan` CLI to discover subdomains. Each subdomain discovery feature is implemented as a `SubscanModule`. These modules are executed automatically when a scan is initiated. For more details, refer to the [Development](/development/index.html) chapter
 
-🛠️ The `Subscan` CLI is a versatile tool that provides the following functionalities
+🛠️ The `Subscan` CLI is a versatile tool that provides the following functionalities:
 
 - [Start a scan](scan.md) to discover subdomains associated with a specific domain
 - [Perform a brute force](brute.md) attack on a domain using a specified wordlist
 - Manage registered modules. See the [module](/user-guide/commands/module.md) command details
 
-✨ Here's a quick overview of how to use it
+✨ Here's a quick overview of how to use it:
 
 ```bash
 ~$ subscan
