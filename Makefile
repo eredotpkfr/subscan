@@ -87,7 +87,9 @@ check:
 	@cargo check
 fix:
 	@cargo fix --allow-dirty --allow-staged
-live-book:
+book-test:
+	@mdbook test book
+live-book: book-test
 	@mdbook serve book
 doc:
 	@cargo doc

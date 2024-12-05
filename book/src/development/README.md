@@ -1,7 +1,11 @@
 # Development
 
-- [Setup Environment]()
+This chapter provides an in-depth guide for developers on how to contribute to and extend `Subscan`. It covers everything from setting up the development environment to understanding the core architecture and adding new features or modules.
+
+Here’s a quick overview of the sections included
+
+- [Setup Development Environment](environment.md)
 - [Components]()
-   - [Requesters]()
-   - [Extractors]()
-   - [Subscan Module]()
+  - [Requesters]()
+  - [Extractors]()
+  - [Subscan Module]()

@@ -6,28 +6,28 @@ This chapter provides step-by-step guidance on how to integrate `Subscan` into y
 
 1. Add `subscan` crate into your project dependencies
 
-    ```bash
-    ~$ cargo add subscan
-    ```
+   ```bash
+   ~$ cargo add subscan
+   ```
 
-1. Create a new instance and start to use it
+2. Create a new instance and start to use it
 
-    ```rust,ignore
-    #[tokio::main]
-    async fn main() {
-        // set module conccurrency to 1
-        // set HTTP timeout to 120
-        let config = SubscanConfig {
-            concurrency: 1,
-            timeout: 120,
-            ..Default::default()
-        };
+   ```rust,ignore
+   #[tokio::main]
+   async fn main() {
+       // set module conccurrency to 1
+       // set HTTP timeout to 120
+       let config = SubscanConfig {
+           concurrency: 1,
+           timeout: 120,
+           ..Default::default()
+       };
 
-        let subscan = Subscan::from(config);
-        let result = subscan.scan("example.com").await;
+       let subscan = Subscan::from(config);
+       let result = subscan.scan("example.com").await;
 
-        for item in result.items {
-            // do something with item
-        }
-    }
-    ```
+       for item in result.items {
+           // do something with item
+       }
+   }
+   ```

@@ -43,38 +43,38 @@ This command runs the specified module and is primarily used to quickly test a n
 
 ### Argument List
 
-| Name                     | Short | Description                                      |
-| :----------------------- | :---: | :----------------------------------------------: |
-| `--domain`               | `-d`  | Target domain to be scanned                      |
-| `--user-agent`           | `-u`  | Set a `User-Agent` header                        |
-| `--http-timeout`         | `-t`  | HTTP timeout as seconds                          |
-| `--proxy`                | `-p`  | Set HTTP proxy                                   |
-| `--resolver-timeout`     |       | IP resolver timeout                              |
-| `--resolver-concurrency` |       | IP resolver concurrency level                    |
-| `--disable-ip-resolve`   |       | Disable IP address resolve process               |
-| `--help`                 | `-h`  | Print help                                       |
+| Name                     | Short |            Description             |
+| :----------------------- | :---: | :--------------------------------: |
+| `--domain`               | `-d`  |    Target domain to be scanned     |
+| `--user-agent`           | `-u`  |     Set a `User-Agent` header      |
+| `--http-timeout`         | `-t`  |      HTTP timeout as seconds       |
+| `--proxy`                | `-p`  |           Set HTTP proxy           |
+| `--resolver-timeout`     |       |        IP resolver timeout         |
+| `--resolver-concurrency` |       |  IP resolver concurrency level     |
+| `--disable-ip-resolve`   |       | Disable IP address resolve process |
+| `--help`                 | `-h`  |             Print help             |
 
 ### Common Use Cases
 
 - Run module by name
 
-    ```bash
-    ~$ # runs google module on example.com
-    ~$ subscan module run google -d example.com
-    ```
+  ```bash
+  ~$ # runs google module on example.com
+  ~$ subscan module run google -d example.com
+  ```
 
 - Run module by name without IP resolve
 
-    ```bash
-    ~$ # runs shodan module on example.com without IP resolve
-    ~$ subscan module run shodan -d example.com --disable-ip-resolve
-    ```
+  ```bash
+  ~$ # runs shodan module on example.com without IP resolve
+  ~$ subscan module run shodan -d example.com --disable-ip-resolve
+  ```
 
 - If the module has authentication, set it as environment variable
 
-    ```bash
-    ~$ # runs censys module on example.com
-    ~$ SUBSCAN_CENSYS_APIKEY=foo subscan module run censys -d example.com --user-agent 'subscan' -t 120
-    ```
+  ```bash
+  ~$ # runs censys module on example.com
+  ~$ SUBSCAN_CENSYS_APIKEY=foo subscan module run censys -d example.com --user-agent 'subscan' -t 120
+  ```
 
-    > For more details about environment variables, refer to the [Environments](/user-guide/environments.md) chapter
+  > For more details about environment variables, refer to the [Environments](/user-guide/environments.md) chapter

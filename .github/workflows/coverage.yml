@@ -27,7 +27,7 @@ jobs:
       # shortcomings while working with cargo-llvm-cov and can cause
       # false positive results, just use only cargo-llvm-cov
       #
-      # We are using coverage profile to reduce binary sizes
+      # We are using `coverage-ci` profile to reduce binary sizes
       # cause of github action runner disk space limitations. This is
       # a bit slow but we have to do it because we don't have
       # self-hosted runner right now
