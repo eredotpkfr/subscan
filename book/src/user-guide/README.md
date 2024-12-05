@@ -9,6 +9,7 @@ This chapter provides an overview of the basic usage of `Subscan`, designed to h
    - [Usage](quickstart/usage.md)
       - [Scan](quickstart/scan.md)
       - [Brute Force](quickstart/brute.md)
+   - [Docker](quickstart/docker.md)
 - [Commands](commands/index.html)
    - [scan](commands/scan.md)
    - [brute](commands/brute.md)

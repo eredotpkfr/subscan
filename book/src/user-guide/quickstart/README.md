@@ -4,3 +4,5 @@
 
 - [Installing Subscan](install.md)
 - [Basic Usage Scenarios](usage.md)
+- [Docker Usage](docker.md)
+- [Details of Commands and Typical Use Cases](/user-guide/commands/index.html)
