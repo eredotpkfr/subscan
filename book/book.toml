@@ -20,6 +20,9 @@ default-theme = "ayu"
 git-repository-url = "https://github.com/eredotpkfr/subscan"
 cname = "www.erdoganyoksul.com"
 
+[output.html.playground]
+runnable = false
+
 [preprocessor.index]
 
 [preprocessor.links]
