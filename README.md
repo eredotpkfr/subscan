@@ -54,7 +54,7 @@
   <a href="https://pre-commit.com/">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white&color=e6e6e6&labelColor=ff3030">
-      <img alt="Pre-cmomit Badge" src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white&color=e6e6e6&labelColor=42445a">
+      <img alt="Pre-commit Badge" src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white&color=e6e6e6&labelColor=42445a">
     </picture>
   </a>
 
