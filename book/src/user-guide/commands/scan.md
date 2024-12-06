@@ -32,7 +32,7 @@ All arguments below can be used with the `scan` command and you can customize a 
 - Use a proxy server to bypass anti-bot systems
 
   ```bash
-  ~$ subscan scan -d example.com -t 120 --proxy 'https://my.prox:4444'
+  ~$ subscan scan -d example.com -t 120 --proxy 'http://my.prox:4444'
   ```
 
 - Increase concurrency to speed up the scan

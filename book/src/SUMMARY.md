@@ -17,9 +17,9 @@
   - [Environments](user-guide/environments.md)
 - [Development](development/README.md)
   - [Setup Environment](development/environment.md)
-  - [Components]()
-    - [Requesters]()
-    - [Extractors]()
-    - [Subscan Module]()
+  - [Components](development/components/README.md)
+    - [Requesters](development/components/requesters.md)
+    - [Extractors](development/components/extractors.md)
+    - [Subscan Module](development/components/module.md)
 
 <!-- markdownlint-enable MD007 -->

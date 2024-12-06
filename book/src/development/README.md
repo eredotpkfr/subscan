@@ -5,7 +5,7 @@ This chapter provides an in-depth guide for developers on how to contribute to a
 Here’s a quick overview of the sections included
 
 - [Setup Development Environment](environment.md)
-- [Components]()
-  - [Requesters]()
-  - [Extractors]()
-  - [Subscan Module]()
+- [Components](components/index.html)
+  - [Requesters](components/requesters.md)
+  - [Extractors](components/extractors.md)
+  - [Subscan Module](components/module.md)
