@@ -11,7 +11,7 @@ env:
   CARGO_TERM_COLOR: "always"
 
 jobs:
-  rust-checks:
+  rust-lint-checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

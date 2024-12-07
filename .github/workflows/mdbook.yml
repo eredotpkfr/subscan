@@ -8,7 +8,7 @@ on:
       - 'v[0-9]+\.[0-9]+\.[0-9]+*'
 
 jobs:
-  tests:
+  mdbook-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,11 +21,11 @@ jobs:
       - name: Run mdBook tests
         run: make book-test
 
-  deploy:
+  mdbook-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    needs: tests
+    needs: mdbook-tests
     steps:
       - uses: actions/checkout@v4
 
