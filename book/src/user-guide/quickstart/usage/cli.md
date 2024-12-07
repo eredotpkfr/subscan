@@ -2,7 +2,7 @@
 
 🛠️ The `Subscan CLI` is a versatile tool that provides the following functionalities
 
-- [Start a scan](#starting-scan) to discover subdomains associated with a specific domain
+- [Start a scan](#start-scan) to discover subdomains associated with a specific domain
 - [Perform a brute force](#brute-force) attack on a domain using a specified wordlist
 - Manage registered modules. See the [module](../../commands/module.md) command details
 
