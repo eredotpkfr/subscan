@@ -1,6 +1,6 @@
 # `module`
 
-`Subscan` is designed with an extensible architecture, where each subdomain discovery component is referred to as a `SubscanModule`. In `Subscan` terminology, any component involved in subdomain discovery is considered a module. You can create your own custom modules and integrate them into `Subscan`. Modules can also include additional components. Details on how to develop and integrate your own modules are available in the [Development](/development/index.html) chapter
+`Subscan` is designed with an extensible architecture, where each subdomain discovery component is referred to as a `SubscanModule`. In `Subscan` terminology, any component involved in subdomain discovery is considered a module. You can create your own custom modules and integrate them into `Subscan`. Modules can also include additional components. Details on how to develop and integrate your own modules are available in the [Development](../../development/index.html) chapter
 
 The module command allows you to list the modules registered in `Subscan`, view their details, and run any module. Below are the subcommands that serve these purposes;
 
@@ -77,4 +77,4 @@ This command runs the specified module and is primarily used to quickly test a n
   ~$ SUBSCAN_CENSYS_APIKEY=foo subscan module run censys -d example.com --user-agent 'subscan' -t 120
   ```
 
-  > For more details about environment variables, refer to the [Environments](/user-guide/environments.md) chapter
+  > For more details about environment variables, refer to the [Environments](../environments.md) chapter

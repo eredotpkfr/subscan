@@ -1,8 +1,8 @@
 # Subscan Module
 
-`SubscanModule` components are the core components that can be executed by `Subscan`. Each module capable of performing subdomain discovery is named a `SubscanModule`, and when the [`subscan scan`](/user-guide/commands/scan.md) command is run, these modules are read from an in-memory cache and executed asynchronously. This architecture makes `Subscan` extensible and modular
+`SubscanModule` components are the core components that can be executed by `Subscan`. Each module capable of performing subdomain discovery is named a `SubscanModule`, and when the [`subscan scan`](../../user-guide/commands/scan.md) command is run, these modules are read from an in-memory cache and executed asynchronously. This architecture makes `Subscan` extensible and modular
 
-A `SubscanModule` may contain various components such as `Requester` and `Extractor`. Most modules implemented in `Subscan` use these components. You can list the implemented modules with their details using the [`subscan module list`](/user-guide/commands/module.md#list) command. If you'd like to view the in-memory cache, you can check the [CacheManager](https://docs.rs/subscan/latest/subscan/cache/struct.CacheManager.html) struct, which is another component designed for operations like filtering the cache or accessing a specific module
+A `SubscanModule` may contain various components such as `Requester` and `Extractor`. Most modules implemented in `Subscan` use these components. You can list the implemented modules with their details using the [`subscan module list`](../../user-guide/commands/module.md#list) command. If you'd like to view the in-memory cache, you can check the [CacheManager](https://docs.rs/subscan/latest/subscan/cache/struct.CacheManager.html) struct, which is another component designed for operations like filtering the cache or accessing a specific module
 
 ## Create Your Own Module
 

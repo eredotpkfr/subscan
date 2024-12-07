@@ -1,6 +1,6 @@
 # Docker Usage
 
-Once you’ve [pulled](/user-guide/quickstart/install.md#pull-docker-image) the pre-built image from [Docker Hub](https://hub.docker.com/), you can easily run the container to perform subdomain enumeration
+Once you’ve [pulled](../../quickstart/install.md#pull-docker-image) the pre-built image from [Docker Hub](https://hub.docker.com/), you can easily run the container to perform subdomain enumeration
 
 ```bash
 ~$ docker run -it --rm eredotpkfr/subscan scan -d example.com

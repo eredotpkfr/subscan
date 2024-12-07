@@ -12,4 +12,4 @@ Here’s a quick overview of the sections included
 - [Generic Modules](generics/index.html)
   - [Integration](generics/integration.md)
   - [Search Engine](generics/engine.md)
-- [Integrate Your Module Step by Step](/development/integration.md)
+- [Integrate Your Module Step by Step](integration.md)

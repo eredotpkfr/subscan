@@ -152,7 +152,7 @@ Options:
   -V, --version     Print version
   ```
 
-### Starting Scan
+### Start Scan
 
 To scan a domain using all available modules, use the following command
 
@@ -160,7 +160,7 @@ To scan a domain using all available modules, use the following command
 ~$ subscan scan -d example.com
 ```
 
-You can also choose specific modules to run or skip using the `--skips` and `--modules` arguments. Module names should be provided as a comma-separated list[^note]
+You can also choose specific modules to run or skip using the `--skips` and `--modules` arguments. Module names should be provided as a comma-separated list
 
 ```bash
 ~$ # skip the commoncrawl and google modules during the scan
