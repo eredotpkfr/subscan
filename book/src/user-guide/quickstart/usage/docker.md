@@ -38,3 +38,17 @@ To specify wordlist into docker container, use `/data` directory
     eredotpkfr/subscan brute -d example.com \
     -w wordlist.txt --print
 ```
+
+## Build a Docker Image
+
+To build a Docker image locally, run the following command
+
+```bash
+~$ docker build -t subscan .
+```
+
+> If you encounter memory issues while building on an Apple Silicon machine, you can run Colima with the following parameters
+>
+> ```bash
+> ~$ colima start --cpu 11 --memory 16
+> ```
