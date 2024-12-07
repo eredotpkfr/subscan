@@ -32,8 +32,7 @@ pub trait SubscanModuleInterface: Sync + Send {
     async fn envs(&self) -> SubscanModuleEnvs {
         self.name().await.into()
     }
-    /// Returns module requester address as a mutable reference
-    /// if available
+    /// Returns module requester address as a mutable reference if available
     async fn requester(&self) -> Option<&Mutex<RequesterDispatcher>>;
     /// Returns module extractor reference if available
     async fn extractor(&self) -> Option<&SubdomainExtractorDispatcher>;

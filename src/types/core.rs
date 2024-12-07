@@ -16,7 +16,7 @@ pub type Result<T> = result::Result<T, SubscanError>;
 
 /// Core subdomain data type
 pub type Subdomain = String;
-/// `Subscan` module type wrapper
+/// `SubscanModule` type wrapper
 pub type SubscanModule = Arc<Mutex<SubscanModuleDispatcher>>;
 
 impl From<SubscanModuleDispatcher> for SubscanModule {
