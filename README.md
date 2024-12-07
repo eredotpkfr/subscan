@@ -81,47 +81,43 @@
 </div>
 <br>
 <p align="center">
-  <a href="https://github.com/eredotpkfr/subscan?tab=readme-ov-file#install">Install</a> •
-  <a href="https://github.com/eredotpkfr/subscan?tab=readme-ov-file#usage">Usage</a> •
+  <a href="https://github.com/eredotpkfr/subscan/?tab=readme-ov-file#install">Install</a> •
+  <a href="https://github.com/eredotpkfr/subscan/?tab=readme-ov-file#usage">Usage</a> •
   <a href="https://docs.rs/subscan/latest/subscan/">Doc</a> •
-  <a href="https://erdoganyoksul.com/subscan/">Book</a> •
-  <a href="#">Development</a>
+  <a href="https://www.erdoganyoksul.com/subscan/">Book</a> •
+  <a href="https://github.com/eredotpkfr/subscan/?tab=readme-ov-file#docker">Docker</a> •
+  <a href="https://github.com/eredotpkfr/subscan/?tab=readme-ov-file#development">Development</a>
 </p>
 <br>
 <!-- markdownlint-enable MD033 MD041 -->
 
-🔍🕵️ **Subscan** is a powerful subdomain enumeration tool built with [Rust](https://www.rust-lang.org/), specifically designed for penetration testing purposes. It combines various discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers
+🔍 Subscan is a powerful subdomain enumeration tool built with [Rust](https://www.rust-lang.org/), specifically designed for penetration testing purposes. It combines various discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers
 
 <!-- markdownlint-disable MD007 -->
 ## Features
 
-🎯 **Let's Dive Into What Makes `Subscan` Super Cool**
-
 - 🕵️ **Smart Discovery Tricks:**
-   - Leverage multiple search engines including `Google`, `Yahoo`, `Bing`, and `Duckduckgo` for extensive subdomain discovery
-   - Integrate seamlessly with leading reconnaissance APIs such as `Shodan`, `Censys`, `VirusTotal` and more
-   - Perform a zone transfer check on the target domain
-   - Execute subdomain brute-forcing with optimized wordlists
-- 🔍 **IP Detective:** Resolve IP addresses for all discovered subdomains
-- 🛠️ **Completely Configurable:**
-   - Customize HTTP requests, such as user-agent, timeout, and more
-   - Rotate HTTP requests through proxies using the `--proxy` argument
-   - Fine-tune the IP resolver component with arguments that start with `--resolver`
-   - Use the `--skips` and `--modules` arguments to filter and run only the specific modules you want
-- 📎 **Flexible Reporting:**
-   - Generate reports in `CSV`, `HTML`, `JSON`, or `TXT` formats
-   - Generate detailed `JSON` reports for technical analysis and insights
+   - Use multiple search engines (`Google`, `Yahoo`, `Bing`, `DuckDuckGo`, etc.)
+   - Integrate with APIs like `Shodan`, `Censys`, `VirusTotal` and more
+   - Perform zone transfer checks
+   - Subdomain brute-forcing with optimized wordlists
+- 🔍 **IP Resolution:** Resolve IP addresses for all subdomains
+- 📎 **Flexible Reporting:** Export reports in `CSV`, `HTML`, `JSON`, or `TXT` formats
+- 🛠️ **Configurable:**
+   - Customize HTTP requests (user-agent, timeout, etc.)
+   - Rotate requests via proxies (`--proxy` argument)
+   - Fine-tune IP resolver with `--resolver` arguments
+   - Filter and run specific modules with `--skips` and `--modules`
 - 🐳 **Docker Friendly:**
-   - Native support for Linux architectures, including `amd64` and `arm64` platforms
-   - A tiny container that won't eat up your storage — under 1GB and ready to roll
-- 💻 **Cross Platform:** Install effortlessly as a single binary compatible across multiple platforms
-- 🚀 **Super Lightweight:** A minimalist design with a small Docker image size and an even smaller binary
+   - Native support for `amd64` and `arm64` Linux platforms
+   - A tiny container that won't eat up your storage — under 1GB and ready to roll 🚀
+- 💻 **Cross-Platform:** Compatible with multiple platforms and easy to install as a single binary
 
 <!-- markdownlint-enable MD007 -->
 
 ## Install
 
-🦀 Install the subscan tool using Cargo, Rust's package manager. Make sure you have [Rust](https://www.rust-lang.org/) installed on your system. Then, run:
+🦀 Install the `subscan` tool using Cargo, Rust's package manager. Make sure you have [Rust](https://www.rust-lang.org/) installed on your system. Then, run
 
 ```bash
 ~$ cargo install subscan
@@ -129,10 +125,17 @@
 
 ## Usage
 
-✨ Here's a quick overview of how to use it:
+✨ Here's a quick overview of how to use it
 
 ```bash
 ~$ subscan
+            _
+           | |
+  ___ _   _| |__  ___  ___ __ _ _ __
+ / __| | | | '_ \/ __|/ __/ _` | '_ \
+ \__ \ |_| | |_) \__ \ (_| (_| | | | |
+ |___/\__,_|_.__/|___/\___\__,_|_| |_|
+
 
 Usage: subscan [OPTIONS] <COMMAND>
 
@@ -147,40 +150,49 @@ Options:
   -q, --quiet...    Decrease logging verbosity
   -h, --help        Print help (see more with '--help')
   -V, --version     Print version
-```
+  ```
 
-### Examples
+### Starting Scan
 
-#### Running Modules
-
-To scan a domain using all available modules, use the following command:
+To scan a domain using all available modules, use the following command
 
 ```bash
 ~$ subscan scan -d example.com
 ```
 
-You can also choose specific modules to run or skip using the `--skips` and `--modules` arguments. Module names should be provided as a comma-separated list
+You can also choose specific modules to run or skip using the `--skips` and `--modules` arguments. Module names should be provided as a comma-separated list[^note]
 
 ```bash
-# skip the commoncrawl and google modules during the scan
+~$ # skip the commoncrawl and google modules during the scan
 ~$ subscan scan -d example.com --skips=commoncrawl,google
 ```
 
 ```bash
-# run only the virustotal module
+~$ # run only the virustotal module
 ~$ subscan scan -d example.com --modules=virustotal
 ```
 
 > [!NOTE]
 > If a module is included in both the `--skips` and `--modules` arguments, it will be skipped and not executed
 
-## Environments
+### Brute Force
 
-All environments are managed by the `.env` file. Subscan can read your environments from this `.env` file. You can refer to the `.env.template` file to see how to create them. Also you can specify your environments from shell:
+Use the `brute` command to start a brute force attack with a specific wordlist
 
 ```bash
-SUBSCAN_VIRUSTOTAL_APIKEY=foo subscan scan -d foo.com --modules=virustotal
+~$ subscan brute -d example.com --wordlist file.txt
 ```
+
+## Environments
+
+All environments are managed by the `.env` file. Subscan can read your environments from this `.env` file. You can refer to the `.env.template` file to see how to create them
+
+> [!TIP]
+> Also you can specify your environments from shell
+>
+> ```bash
+> SUBSCAN_VIRUSTOTAL_APIKEY=foo subscan scan -d foo.com --modules=virustotal
+> ```
 
 <!-- markdownlint-disable MD033 MD041 -->
 <div align="center">
@@ -195,3 +207,38 @@ SUBSCAN_VIRUSTOTAL_APIKEY=foo subscan scan -d foo.com --modules=virustotal
 
 </div>
 <!-- markdownlint-enable MD033 MD041 -->
+
+## Docker
+
+🐳 For containerized usage, you can pull the `eredotpkfr/subscan` Docker image directly from [Docker Hub](https://hub.docker.com/)
+
+```bash
+~$ docker pull eredotpkfr/subscan:latest
+```
+
+After pulling the pre-built image, you can easily run the container to perform subdomain enumeration
+
+```bash
+~$ docker run -it --rm eredotpkfr/subscan scan -d example.com
+```
+
+Specify environment variable via docker `--env`
+
+```bash
+~$ docker run -it --rm \
+    --env SUBSCAN_VIRUSTOTAL_APIKEY=foo \
+    eredotpkfr/subscan scan -d example.com --modules=virustotal
+```
+
+To specify wordlist into docker container, use `/data` directory
+
+```bash
+~$ docker run -it --rm \
+    --volume="$PWD/wordlist.txt:/data/wordlist.txt" \
+    eredotpkfr/subscan brute -d example.com \
+    -w wordlist.txt --print
+```
+
+## Development
+
+You can find all the resources and documentation for developing Subscan in the [Development](https://www.erdoganyoksul.com/subscan/development/index.html) chapter of the project's book page
