@@ -10,6 +10,13 @@
 
 ```bash
 ~$ subscan
+            _
+           | |
+  ___ _   _| |__  ___  ___ __ _ _ __
+ / __| | | | '_ \/ __|/ __/ _` | '_ \
+ \__ \ |_| | |_) \__ \ (_| (_| | | | |
+ |___/\__,_|_.__/|___/\___\__,_|_| |_|
+
 
 Usage: subscan [OPTIONS] <COMMAND>
 
@@ -24,7 +31,7 @@ Options:
   -q, --quiet...    Decrease logging verbosity
   -h, --help        Print help (see more with '--help')
   -V, --version     Print version
-```
+  ```
 
 ## Starting Scan
 

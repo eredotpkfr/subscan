@@ -16,8 +16,8 @@ Requesters are components designed to manage HTTP requests through a unified int
 
 Each requester component should be implemented following the interface below. For a better understanding, you can explore the [docs.rs](https://docs.rs/subscan/latest/subscan/interfaces/requester/index.html) page and review the crates listed below
 
-- [async_trait](https://github.com/dtolnay/async-trait)
-- [enum_dispatch](https://gitlab.com/antonok/enum_dispatch)
+- [`async_trait`](https://github.com/dtolnay/async-trait)
+- [`enum_dispatch`](https://gitlab.com/antonok/enum_dispatch)
 
 ```rust,ignore
 #[async_trait]
