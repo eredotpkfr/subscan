@@ -242,16 +242,31 @@ To specify wordlist into docker container, use `/data` directory
 
 ## Development
 
-You can find all the resources and documentation for developing Subscan in the [Development](https://www.erdoganyoksul.com/subscan/development/index.html) chapter of the project's book page
+📚 You can find all the resources and documentation for developing Subscan in the [Development](https://www.erdoganyoksul.com/subscan/development/index.html) chapter of the project's book page
+
+## Credits
+
+🙏 Parts of the codebase are inspired by
+
+- [subfinder](https://github.com/projectdiscovery/subfinder) - Fast passive subdomain enumeration tool
+- [Sublist3r](https://github.com/aboul3la/Sublist3r) - Fast subdomains enumeration tool for penetration testers
+- [subbrute](https://github.com/TheRook/subbrute) - A DNS meta-query spider that enumerates DNS records, and subdomains
+- [knock](https://github.com/guelfoweb/knock) - Knock subdomain scan
+- [dnsrecon](https://github.com/darkoperator/dnsrecon) - DNS enumeration script
+
+## Contributing
+
+📢 All contributors are welcome! Whether you're fixing bugs, adding new features, improving documentation, or sharing ideas, your contributions are highly valued and appreciated
+
+To get started, please check out the [CONTRIBUTING.md](https://github.com/eredotpkfr/subscan/blob/main/.github/CONTRIBUTING.md) file
 
 ## Donate
 <!-- markdownlint-disable MD033 MD041 -->
 <a href="https://www.buymeacoffee.com/erdoganyokr" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 50px" ></a>
 <!-- markdownlint-enable MD033 MD041 -->
 
-## Contributing
-
 ## Contact
-
-Blog - [erdoganyoksul.com](https://www.erdoganyoksul.com)
+<!-- markdownlint-disable MD033 MD041 -->
+Blog - [erdoganyoksul.com](https://www.erdoganyoksul.com)<br>
 Mail - <erdoganyoksul3@gmail.com>
+<!-- markdownlint-enable MD033 MD041 -->
