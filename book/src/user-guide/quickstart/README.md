@@ -6,4 +6,4 @@ Here's what you'll find in this chapter
 
 - [Installing Subscan](install.md)
 - [Usage Methods and Scenarios](usage/index.html)
-- [Details of Commands and Typical Use Cases](/user-guide/commands/index.html)
+- [Details of Commands and Typical Use Cases](../commands/index.html)

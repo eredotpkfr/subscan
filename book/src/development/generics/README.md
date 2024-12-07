@@ -9,7 +9,7 @@ Some module implementations are very similar to each other, and sometimes we can
   - If there is no pagination, break the loop
 - Return the discovered subdomains for `Subscan`
 
-To reduce the implementation time and avoid code duplication in `Subscan`, there are generic modules. Some of the registered modules in `Subscan` use these generic implementations, which can be viewed with the [`subscan module list`](/user-guide/commands/module.md#list) command. Below are details of two modules, one using a generic module and one not
+To reduce the implementation time and avoid code duplication in `Subscan`, there are generic modules. Some of the registered modules in `Subscan` use these generic implementations, which can be viewed with the [`subscan module list`](../../user-guide/commands/module.md#list) command. Below are details of two modules, one using a generic module and one not
 
 ```bash
 ~$ subscan module get alienvault

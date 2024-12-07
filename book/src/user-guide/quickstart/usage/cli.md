@@ -2,9 +2,9 @@
 
 🛠️ The `Subscan CLI` is a versatile tool that provides the following functionalities
 
-- [Start a scan](#starting-scan) to discover subdomains associated with a specific domain
+- [Start a scan](#start-scan) to discover subdomains associated with a specific domain
 - [Perform a brute force](#brute-force) attack on a domain using a specified wordlist
-- Manage registered modules. See the [module](/user-guide/commands/module.md) command details
+- Manage registered modules. See the [module](../../commands/module.md) command details
 
 ✨ Here's a quick overview of how to use it
 
@@ -33,7 +33,7 @@ Options:
   -V, --version     Print version
   ```
 
-## Starting Scan
+## Start Scan
 
 To scan a domain using all available modules, use the following command:
 
@@ -55,7 +55,7 @@ You can also choose specific modules to run or skip using the `--skips` and `--m
 
 [^note]: If a module is included in both the `--skips` and `--modules` arguments, it will be skipped and not executed
 
-> If the module you’re using requires authentication, you can provide the necessary credentials, such as an API key, through module-specific environment variables. For more details about environment variables, refer to the [Environments](/user-guide/environments.md) chapter
+> If the module you’re using requires authentication, you can provide the necessary credentials, such as an API key, through module-specific environment variables. For more details about environment variables, refer to the [Environments](../../environments.md) chapter
 >
 > ```bash
 > SUBSCAN_VIRUSTOTAL_APIKEY=foo subscan scan -d example.com --modules=virustotal
