@@ -1,5 +1,28 @@
 #![forbid(unsafe_code)]
 
+//! <!-- markdownlint-disable MD033 MD041 -->
+//! <div align="center">
+//!   <picture>
+//!     <source media="(prefers-color-scheme: dark)" srcset="https://github.com/eredotpkfr/subscan/blob/main/assets/logo-light.png?raw=true">
+//!     <img alt="Subscan Logo" height="105px" src="https://github.com/eredotpkfr/subscan/blob/main/assets/logo-dark.png?raw=true">
+//!   </picture>
+//! </div>
+//! <br>
+//! <p align="center">
+//!   <a href="https://github.com/eredotpkfr/subscan/?tab=readme-ov-file#install">Install</a> •
+//!   <a href="https://github.com/eredotpkfr/subscan/?tab=readme-ov-file#usage">Usage</a> •
+//!   <a href="https://docs.rs/subscan/latest/subscan/">Doc</a> •
+//!   <a href="https://www.erdoganyoksul.com/subscan/">Book</a> •
+//!   <a href="https://github.com/eredotpkfr/subscan/?tab=readme-ov-file#docker">Docker</a> •
+//!   <a href="https://github.com/eredotpkfr/subscan/?tab=readme-ov-file#development">Development</a>
+//! </p>
+//! <!-- markdownlint-enable MD033 MD041 -->
+//!
+//! Subscan is a powerful subdomain enumeration tool built with
+//! [Rust](https://www.rust-lang.org/), specifically designed for penetration testing purposes.
+//! It combines various discovery techniques into a single, lightweight binary, making
+//! subdomain hunting easier and faster for security researchers
+
 /// In-memory cache to store all modules
 pub mod cache;
 /// Includes CLI components
