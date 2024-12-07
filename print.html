@@ -1,0 +1,1034 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>subscan</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="A subdomain enumeration tool leveraging diverse techniques, designed for advanced pentesting operations">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">subscan</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/eredotpkfr/subscan" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <!-- markdownlint-disable MD033 MD041 -->
+<center>
+    <br><br><br>
+    <img alt="Subscan Logo" height="105px" src="https://github.com/eredotpkfr/subscan/blob/main/assets/logo-light.png?raw=true">
+    <br><br><br>
+</center>
+<!-- markdownlint-enable MD033 MD041 -->
+<p><code>Subscan</code> is a powerful subdomain enumeration tool built with <a href="https://www.rust-lang.org/">Rust</a>, specifically designed for penetration testing purposes. It combines various discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="user-guide"><a class="header" href="#user-guide">User Guide</a></h1>
+<p>This chapter provides an overview of the basic usage of <code>Subscan</code>, designed to help end users get started quickly and effectively</p>
+<p>Here’s a quick overview of the sections included</p>
+<!-- markdownlint-disable MD007 -->
+<ul>
+<li><a href="user-guide/quickstart/index.html">Quickstart</a>
+<ul>
+<li><a href="user-guide/quickstart/install.html">Install</a></li>
+<li><a href="user-guide/quickstart/usage/index.html">Usage</a>
+<ul>
+<li><a href="user-guide/quickstart/usage/cli.html">CLI</a></li>
+<li><a href="user-guide/quickstart/usage/docker.html">Docker</a></li>
+<li><a href="user-guide/quickstart/usage/crate.html">Crate</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="user-guide/commands/index.html">Commands</a>
+<ul>
+<li><a href="user-guide/commands/scan.html">scan</a></li>
+<li><a href="user-guide/commands/brute.html">brute</a></li>
+<li><a href="user-guide/commands/module.html">module</a>
+<ul>
+<li><a href="user-guide/commands/module.html#list">list</a></li>
+<li><a href="user-guide/commands/module.html#get">get</a></li>
+<li><a href="user-guide/commands/module.html#run">run</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="user-guide/environments.html">Environments</a></li>
+</ul>
+<!-- markdownlint-enable MD007 -->
+<div style="break-before: page; page-break-before: always;"></div><h1 id="quickstart"><a class="header" href="#quickstart">Quickstart</a></h1>
+<p><code>Subscan</code> is a fast and efficient subdomain enumeration tool designed for penetration testers and security researchers. In this chapter, you'll learn how to quickly set up and start using <code>Subscan</code> to discover subdomains and improve your security assessments</p>
+<p>Here's what you'll find in this chapter</p>
+<ul>
+<li><a href="user-guide/quickstart/install.html">Installing Subscan</a></li>
+<li><a href="user-guide/quickstart/usage/index.html">Usage Methods and Scenarios</a></li>
+<li><a href="user-guide/quickstart//user-guide/commands/index.html">Details of Commands and Typical Use Cases</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="install"><a class="header" href="#install">Install</a></h1>
+<p>There are several ways to install <code>Subscan</code>, depending on your preferences. You can install it via <a href="user-guide/quickstart/install.html#install-with-cargo">Cargo</a> (Rust's package manager), use <a href="user-guide/quickstart/install.html#pull-docker-image">Docker</a> for containerized environments, or download prebuilt <a href="user-guide/quickstart/install.html#download-prebuilt-binaries">cross-platform binaries</a>. Choose the method that works best for your setup</p>
+<h2 id="install-with-cargo"><a class="header" href="#install-with-cargo">Install With Cargo</a></h2>
+<p>🦀 Install the subscan tool using Cargo, Rust's package manager. Make sure you have <a href="https://www.rust-lang.org/">Rust</a> installed on your system. Then, run:</p>
+<pre><code class="language-bash">~$ cargo install subscan
+</code></pre>
+<h2 id="pull-docker-image"><a class="header" href="#pull-docker-image">Pull Docker Image</a></h2>
+<p>🐳 For containerized usage, you can pull the subscan Docker image directly from <a href="https://hub.docker.com/">Docker Hub</a></p>
+<pre><code class="language-bash">~$ docker pull eredotpkfr/subscan:latest
+</code></pre>
+<h2 id="download-prebuilt-binaries"><a class="header" href="#download-prebuilt-binaries">Download Prebuilt Binaries</a></h2>
+<p>📦 Prebuilt cross-platform binaries are available on the <a href="https://github.com/eredotpkfr/subscan/releases">releases page</a>. Download the one compatible with your operating system</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="usage"><a class="header" href="#usage">Usage</a></h1>
+<p>This chapter guides you on how to use the <code>Subscan</code> to efficiently discover subdomains. Subdomain discovery features are implemented as modular <code>SubscanModule</code> components, which are automatically executed when a scan is initiated. For technical insights, check out the <a href="user-guide/quickstart/usage//development/index.html">Development</a> chapter</p>
+<p>✨ In this section, you'll find detailed instructions for different usage methods</p>
+<ul>
+<li>How to use the <a href="user-guide/quickstart/usage/cli.html">Subscan CLI</a> for quick and effective subdomain enumeration</li>
+<li><a href="user-guide/quickstart/usage/docker.html">Run Subscan in a Docker container</a> for a lightweight, portable setup</li>
+<li>Integrating <a href="user-guide/quickstart/usage/crate.html">Subscan as a Crate</a> in your Rust project for seamless integration with your codebase</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="subscan-cli-usage"><a class="header" href="#subscan-cli-usage">Subscan CLI Usage</a></h1>
+<p>🛠️ The <code>Subscan CLI</code> is a versatile tool that provides the following functionalities</p>
+<ul>
+<li><a href="user-guide/quickstart/usage/cli.html#starting-scan">Start a scan</a> to discover subdomains associated with a specific domain</li>
+<li><a href="user-guide/quickstart/usage/cli.html#brute-force">Perform a brute force</a> attack on a domain using a specified wordlist</li>
+<li>Manage registered modules. See the <a href="user-guide/quickstart/usage//user-guide/commands/module.html">module</a> command details</li>
+</ul>
+<p>✨ Here's a quick overview of how to use it</p>
+<pre><code class="language-bash">~$ subscan
+            _
+           | |
+  ___ _   _| |__  ___  ___ __ _ _ __
+ / __| | | | '_ \/ __|/ __/ _` | '_ \
+ \__ \ |_| | |_) \__ \ (_| (_| | | | |
+ |___/\__,_|_.__/|___/\___\__,_|_| |_|
+
+
+Usage: subscan [OPTIONS] &lt;COMMAND&gt;
+
+Commands:
+  scan    Start scan on any domain address
+  brute   Start brute force attack with a given wordlist
+  module  Subcommand to manage implemented modules
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+  -v, --verbose...  Increase logging verbosity
+  -q, --quiet...    Decrease logging verbosity
+  -h, --help        Print help (see more with '--help')
+  -V, --version     Print version
+</code></pre>
+<h2 id="starting-scan"><a class="header" href="#starting-scan">Starting Scan</a></h2>
+<p>To scan a domain using all available modules, use the following command:</p>
+<pre><code class="language-bash">~$ subscan scan -d example.com
+</code></pre>
+<p>You can also choose specific modules to run or skip using the <code>--skips</code> and <code>--modules</code> arguments. Module names should be provided as a comma-separated list<sup class="footnote-reference"><a href="#note">1</a></sup></p>
+<pre><code class="language-bash">~$ # skip the commoncrawl and google modules during the scan
+~$ subscan scan -d example.com --skips=commoncrawl,google
+</code></pre>
+<pre><code class="language-bash">~$ # run only the virustotal module
+~$ subscan scan -d example.com --modules=virustotal
+</code></pre>
+<div class="footnote-definition" id="note"><sup class="footnote-definition-label">1</sup>
+<p>If a module is included in both the <code>--skips</code> and <code>--modules</code> arguments, it will be skipped and not executed</p>
+</div>
+<blockquote>
+<p>If the module you’re using requires authentication, you can provide the necessary credentials, such as an API key, through module-specific environment variables. For more details about environment variables, refer to the <a href="user-guide/quickstart/usage//user-guide/environments.html">Environments</a> chapter</p>
+<pre><code class="language-bash">SUBSCAN_VIRUSTOTAL_APIKEY=foo subscan scan -d example.com --modules=virustotal
+</code></pre>
+</blockquote>
+<h2 id="brute-force"><a class="header" href="#brute-force">Brute Force</a></h2>
+<p>Use the <code>brute</code> command to start a brute force attack with a specific wordlist</p>
+<pre><code class="language-bash">~$ subscan brute -d example.com --wordlist file.txt
+</code></pre>
+<blockquote>
+<p>To specify wordlist into docker container, see the <a href="user-guide/quickstart/usage/docker.html">Docker</a> usage</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="docker-usage"><a class="header" href="#docker-usage">Docker Usage</a></h1>
+<p>Once you’ve <a href="user-guide/quickstart/usage//user-guide/quickstart/install.html#pull-docker-image">pulled</a> the pre-built image from <a href="https://hub.docker.com/">Docker Hub</a>, you can easily run the container to perform subdomain enumeration</p>
+<pre><code class="language-bash">~$ docker run -it --rm eredotpkfr/subscan scan -d example.com
+</code></pre>
+<p>Specify environment variable via docker <code>--env</code></p>
+<pre><code class="language-bash">~$ docker run -it --rm \
+    --env SUBSCAN_VIRUSTOTAL_APIKEY=foo \
+    eredotpkfr/subscan scan -d example.com --modules=virustotal
+</code></pre>
+<p>Specify <code>.env</code> file from your host machine, use <code>/data</code> folder</p>
+<pre><code class="language-bash">~$ docker run -it --rm \
+    --volume="$PWD/.env:/data/.env" \
+    eredotpkfr/subscan scan -d example.com --skips=commoncrawl
+</code></pre>
+<p>Saving output reports to host machine, use <code>/data</code> folder</p>
+<pre><code class="language-bash">~$ docker run -it --rm \
+    --volume="$PWD/data:/data" \
+    eredotpkfr/subscan scan -d example.com
+</code></pre>
+<p>To specify wordlist into docker container, use <code>/data</code> directory</p>
+<pre><code class="language-bash">~$ docker run -it --rm \
+    --volume="$PWD/wordlist.txt:/data/wordlist.txt" \
+    eredotpkfr/subscan brute -d example.com \
+    -w wordlist.txt --print
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="crate-usage"><a class="header" href="#crate-usage">Crate Usage</a></h1>
+<p>You can easily add <code>Subscan</code> to your code and use its results in your application. Since <code>Subscan</code> works asynchronously, you need to use it in <code>async</code> code blocks. We recommend using <a href="https://tokio.rs/">Tokio</a> as the async runtime</p>
+<p>This chapter provides step-by-step guidance on how to integrate <code>Subscan</code> into your code. For more detailed usage and additional code examples, visit the project's <a href="https://docs.rs/subscan/latest/subscan/">docs.rs</a> page or check the <a href="https://github.com/eredotpkfr/subscan/tree/main/examples">examples/</a> folder in the repository</p>
+<ol>
+<li>
+<p>Add <code>subscan</code> crate into your project dependencies</p>
+<pre><code class="language-bash">~$ cargo add subscan
+</code></pre>
+</li>
+<li>
+<p>Create a new instance and start to use it</p>
+<pre><code class="language-rust ignore">#[tokio::main]
+async fn main() {
+    // set module conccurrency to 1
+    // set HTTP timeout to 120
+    let config = SubscanConfig {
+        concurrency: 1,
+        timeout: 120,
+        ..Default::default()
+    };
+
+    let subscan = Subscan::from(config);
+    let result = subscan.scan("example.com").await;
+
+    for item in result.items {
+        // do something with item
+    }
+}</code></pre>
+</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="commands"><a class="header" href="#commands">Commands</a></h1>
+<p>This chapter provides a comprehensive guide to the <code>Subscan</code> CLI commands. Below is a list of available commands. For detailed information on usage and arguments, refer to the corresponding sections</p>
+<!-- markdownlint-disable MD007 -->
+<ul>
+<li><a href="user-guide/commands/scan.html">scan</a></li>
+<li><a href="user-guide/commands/brute.html">brute</a></li>
+<li><a href="user-guide/commands/module.html">module</a>
+<ul>
+<li><a href="user-guide/commands/module.html#list">list</a></li>
+<li><a href="user-guide/commands/module.html#get">get</a></li>
+<li><a href="user-guide/commands/module.html#run">run</a></li>
+</ul>
+</li>
+</ul>
+<!-- markdownlint-enable MD007 -->
+<div style="break-before: page; page-break-before: always;"></div><h1 id="scan"><a class="header" href="#scan"><code>scan</code></a></h1>
+<p>This command starts a scan by running registered modules for subdomain discovery. See the <a href="user-guide/commands/module.html">module</a> command to manage registered modules</p>
+<h2 id="argument-list"><a class="header" href="#argument-list">Argument List</a></h2>
+<p>All arguments below can be used with the <code>scan</code> command and you can customize a scan according to your needs, <a href="user-guide/commands/scan.html#common-use-cases">see here</a> for common use cases</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: center">Short</th><th style="text-align: center">Description</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>--domain</code></td><td style="text-align: center"><code>-d</code></td><td style="text-align: center">Target domain to be scanned</td></tr>
+<tr><td style="text-align: left"><code>--user-agent</code></td><td style="text-align: center"><code>-u</code></td><td style="text-align: center">Set a <code>User-Agent</code> header</td></tr>
+<tr><td style="text-align: left"><code>--http-timeout</code></td><td style="text-align: center"><code>-t</code></td><td style="text-align: center">HTTP timeout as seconds</td></tr>
+<tr><td style="text-align: left"><code>--proxy</code></td><td style="text-align: center"><code>-p</code></td><td style="text-align: center">Set HTTP proxy</td></tr>
+<tr><td style="text-align: left"><code>--output</code></td><td style="text-align: center"><code>-o</code></td><td style="text-align: center">Set output format (<code>txt</code>, <code>csv</code>, <code>json</code>, <code>html</code>)</td></tr>
+<tr><td style="text-align: left"><code>--module-concurrency</code></td><td style="text-align: center"><code>-c</code></td><td style="text-align: center">Module runner concurrency level</td></tr>
+<tr><td style="text-align: left"><code>--resolver-timeout</code></td><td style="text-align: center"></td><td style="text-align: center">IP resolver timeout</td></tr>
+<tr><td style="text-align: left"><code>--resolver-concurrency</code></td><td style="text-align: center"></td><td style="text-align: center"> IP resolver concurrency level    </td></tr>
+<tr><td style="text-align: left"><code>--disable-ip-resolve</code></td><td style="text-align: center"> </td><td style="text-align: center">Disable IP address resolve process</td></tr>
+<tr><td style="text-align: left"><code>--modules</code></td><td style="text-align: center"><code>-m</code></td><td style="text-align: center">Comma separated list of modules to run</td></tr>
+<tr><td style="text-align: left"><code>--skips</code></td><td style="text-align: center"><code>-s</code></td><td style="text-align: center">Comma separated list of modules to skip</td></tr>
+<tr><td style="text-align: left"><code>--help</code></td><td style="text-align: center"><code>-h</code></td><td style="text-align: center">Print help</td></tr>
+</tbody></table>
+</div>
+<h2 id="common-use-cases"><a class="header" href="#common-use-cases">Common Use Cases</a></h2>
+<ul>
+<li>
+<p>Adjust HTTP request timeouts for slow networks</p>
+<pre><code class="language-bash">~$ subscan scan -d example.com -t 120
+</code></pre>
+</li>
+<li>
+<p>Use a proxy server to bypass anti-bot systems</p>
+<pre><code class="language-bash">~$ subscan scan -d example.com -t 120 --proxy 'http://my.prox:4444'
+</code></pre>
+</li>
+<li>
+<p>Increase concurrency to speed up the scan</p>
+<pre><code class="language-bash">~$ subscan scan -d example.com -c 10
+</code></pre>
+</li>
+<li>
+<p>Fine-tune IP address resolver component according to your network</p>
+<pre><code class="language-bash">~$ subscan scan -d example.com --resolver-timeout 1 --resolver-concurrency 100
+</code></pre>
+</li>
+<li>
+<p>Disable the IP resolution process</p>
+<pre><code class="language-bash">~$ subscan scan -d example.com --disable-ip-resolve
+</code></pre>
+</li>
+<li>
+<p>Customize the scan by filtering modules</p>
+<pre><code class="language-bash"># skip the commoncrawl and google modules during the scan
+~$ subscan scan -d example.com --skips=commoncrawl,google
+</code></pre>
+<pre><code class="language-bash"># run only the virustotal module
+~$ subscan scan -d example.com --modules=virustotal
+</code></pre>
+<blockquote>
+<p>If a module is included in both the <code>--skips</code> and <code>--modules</code> arguments, it will be skipped and not executed</p>
+</blockquote>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="brute"><a class="header" href="#brute"><code>brute</code></a></h1>
+<p>With this command you can use the brute force technique to discover subdomains on a domain</p>
+<h2 id="argument-list-1"><a class="header" href="#argument-list-1">Argument List</a></h2>
+<p>All arguments below can be used with the <code>brute</code> command, <a href="user-guide/commands/brute.html#common-use-cases">see here</a> for common use cases</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: center">Short</th><th style="text-align: center">Description</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>--domain</code></td><td style="text-align: center"><code>-d</code></td><td style="text-align: center">Target domain to be scanned</td></tr>
+<tr><td style="text-align: left"><code>--wordlist</code></td><td style="text-align: center"><code>-w</code></td><td style="text-align: center">Wordlist file to be used during attack</td></tr>
+<tr><td style="text-align: left"><code>--print</code></td><td style="text-align: center"><code>-p</code></td><td style="text-align: center">If sets, output will be logged on stdout</td></tr>
+<tr><td style="text-align: left"><code>--output</code></td><td style="text-align: center"><code>-o</code></td><td style="text-align: center">Set output format (<code>txt</code>, <code>csv</code>, <code>json</code>, <code>html</code>)</td></tr>
+<tr><td style="text-align: left"><code>--resolver-timeout</code></td><td style="text-align: center"></td><td style="text-align: center">IP resolver timeout</td></tr>
+<tr><td style="text-align: left"><code>--resolver-concurrency</code></td><td style="text-align: center"></td><td style="text-align: center"> IP resolver concurrency level    </td></tr>
+<tr><td style="text-align: left"><code>--help</code></td><td style="text-align: center"><code>-h</code></td><td style="text-align: center">Print help</td></tr>
+</tbody></table>
+</div>
+<h2 id="common-use-cases-1"><a class="header" href="#common-use-cases-1">Common Use Cases</a></h2>
+<ul>
+<li>
+<p>Run a basic brute force attack with default settings</p>
+<pre><code class="language-bash">~$ subscan brute -d example.com -w wordlist.txt
+</code></pre>
+</li>
+<li>
+<p>Increase resolver concurrency to improve attack speed</p>
+<pre><code class="language-bash">~$ subscan brute -d example.com -w wordlist.txt --resolver-concurrency 200
+</code></pre>
+</li>
+<li>
+<p>Fine-tune IP address resolver component according to your network</p>
+<pre><code class="language-bash">~$ subscan brute -d example.com -w wordlist.txt --resolver-timeout 1 --resolver-concurrency 100
+</code></pre>
+</li>
+<li>
+<p>Skip creating a report and print results directly to <code>stdout</code></p>
+<pre><code class="language-bash">~$ subscan brute -d example.com -w wordlist.txt --print
+</code></pre>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="module"><a class="header" href="#module"><code>module</code></a></h1>
+<p><code>Subscan</code> is designed with an extensible architecture, where each subdomain discovery component is referred to as a <code>SubscanModule</code>. In <code>Subscan</code> terminology, any component involved in subdomain discovery is considered a module. You can create your own custom modules and integrate them into <code>Subscan</code>. Modules can also include additional components. Details on how to develop and integrate your own modules are available in the <a href="user-guide/commands//development/index.html">Development</a> chapter</p>
+<p>The module command allows you to list the modules registered in <code>Subscan</code>, view their details, and run any module. Below are the subcommands that serve these purposes;</p>
+<h2 id="list"><a class="header" href="#list"><code>list</code></a></h2>
+<p>Lists the modules registered on <code>Subscan</code> as a table with their details. The output looks like the following</p>
+<pre><code class="language-bash">~$ subscan module list
+
++--------------------+---------------+----------------+-------------+
+| Name               | Requester     | Extractor      | Is Generic? |
++--------------------+---------------+----------------+-------------+
+| bing               | HTTPClient    | HTMLExtractor  | true        |
+| duckduckgo         | ChromeBrowser | HTMLExtractor  | true        |
+| google             | HTTPClient    | HTMLExtractor  | true        |
+| yahoo              | HTTPClient    | HTMLExtractor  | true        |
+| alienvault         | HTTPClient    | JSONExtractor  | true        |
+| anubis             | HTTPClient    | JSONExtractor  | true        |
++--------------------+---------------+----------------+-------------+
+</code></pre>
+<h2 id="get"><a class="header" href="#get"><code>get</code></a></h2>
+<p>Gets a single module with details</p>
+<pre><code class="language-bash">~$ subscan module get zonetransfer
+
++--------------+-----------+-----------+-------------+
+| Name         | Requester | Extractor | Is Generic? |
++--------------+-----------+-----------+-------------+
+| zonetransfer | None      | None      | false       |
++--------------+-----------+-----------+-------------+
+</code></pre>
+<h2 id="run"><a class="header" href="#run"><code>run</code></a></h2>
+<p>This command runs the specified module and is primarily used to quickly test a new module during its implementation. It has a similar set of arguments as the <code>scan</code> command</p>
+<h3 id="argument-list-2"><a class="header" href="#argument-list-2">Argument List</a></h3>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: center">Short</th><th style="text-align: center">Description</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>--domain</code></td><td style="text-align: center"><code>-d</code></td><td style="text-align: center">Target domain to be scanned</td></tr>
+<tr><td style="text-align: left"><code>--user-agent</code></td><td style="text-align: center"><code>-u</code></td><td style="text-align: center">Set a <code>User-Agent</code> header</td></tr>
+<tr><td style="text-align: left"><code>--http-timeout</code></td><td style="text-align: center"><code>-t</code></td><td style="text-align: center">HTTP timeout as seconds</td></tr>
+<tr><td style="text-align: left"><code>--proxy</code></td><td style="text-align: center"><code>-p</code></td><td style="text-align: center">Set HTTP proxy</td></tr>
+<tr><td style="text-align: left"><code>--resolver-timeout</code></td><td style="text-align: center"></td><td style="text-align: center">IP resolver timeout</td></tr>
+<tr><td style="text-align: left"><code>--resolver-concurrency</code></td><td style="text-align: center"></td><td style="text-align: center"> IP resolver concurrency level    </td></tr>
+<tr><td style="text-align: left"><code>--disable-ip-resolve</code></td><td style="text-align: center"> </td><td style="text-align: center">Disable IP address resolve process</td></tr>
+<tr><td style="text-align: left"><code>--help</code></td><td style="text-align: center"><code>-h</code></td><td style="text-align: center">Print help</td></tr>
+</tbody></table>
+</div>
+<h3 id="common-use-cases-2"><a class="header" href="#common-use-cases-2">Common Use Cases</a></h3>
+<ul>
+<li>
+<p>Run module by name</p>
+<pre><code class="language-bash">~$ # runs google module on example.com
+~$ subscan module run google -d example.com
+</code></pre>
+</li>
+<li>
+<p>Run module by name without IP resolve</p>
+<pre><code class="language-bash">~$ # runs shodan module on example.com without IP resolve
+~$ subscan module run shodan -d example.com --disable-ip-resolve
+</code></pre>
+</li>
+<li>
+<p>If the module has authentication, set it as environment variable</p>
+<pre><code class="language-bash">~$ # runs censys module on example.com
+~$ SUBSCAN_CENSYS_APIKEY=foo subscan module run censys -d example.com --user-agent 'subscan' -t 120
+</code></pre>
+<blockquote>
+<p>For more details about environment variables, refer to the <a href="user-guide/commands//user-guide/environments.html">Environments</a> chapter</p>
+</blockquote>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="environments"><a class="header" href="#environments">Environments</a></h1>
+<p><code>Subscan</code> has the ability to read all your environment variables from the <code>.env</code> file in your working directory. To learn how to define your environment variables in the <code>.env</code> file, you can refer to the <code>.env.template</code> file. All the <code>Subscan</code> environment variables uses <code>SUBSCAN</code> namespace as a prefix</p>
+<p>There are two types of environment variables:</p>
+<ul>
+<li><strong>Dynamic:</strong> These environment variables follow a specific format (e.g., <code>SUBSCAN_&lt;MODULE_NAME&gt;_FOO</code>) and <code>Subscan</code> can read them automatically</li>
+<li><strong>Static:</strong> These are predefined environment variables that we know already</li>
+</ul>
+<h2 id="statics"><a class="header" href="#statics">Statics</a></h2>
+<!-- markdownlint-disable MD033 MD041 -->
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: center">Required</th><th style="text-align: center">Description</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>SUBSCAN_CHROME_PATH</code></td><td style="text-align: center"><code>false</code></td><td style="text-align: center">Specify your Chrome executable. If not specified, the Chrome binary will be fetched automatically by <a href="https://github.com/rust-headless-chrome/rust-headless-chrome/">headless_chrome<a/> based on your system architecture</td></tr>
+</tbody></table>
+</div><!-- markdownlint-enable MD033 MD041 -->
+<h2 id="dynamics"><a class="header" href="#dynamics">Dynamics</a></h2>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: center">Required</th><th style="text-align: center">Description</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>SUBSCAN_&lt;MODULE_NAME&gt;_HOST</code></td><td style="text-align: center"><code>false</code></td><td style="text-align: center">Some API integration modules can provide user specific host, for these cases, set module specific host</td></tr>
+<tr><td style="text-align: left"><code>SUBSCAN_&lt;MODULE_NAME&gt;_APIKEY</code></td><td style="text-align: center"><code>false</code></td><td style="text-align: center">Some modules may include API integration and require an API key for authentication. Set the API key in these cases</td></tr>
+<tr><td style="text-align: left"><code>SUBSCAN_&lt;MODULE_NAME&gt;_USERNAME</code></td><td style="text-align: center"><code>false</code></td><td style="text-align: center">Set the username for a module if it uses HTTP basic authentication</td></tr>
+<tr><td style="text-align: left"><code>SUBSCAN_&lt;MODULE_NAME&gt;_PASSWORD</code></td><td style="text-align: center"><code>false</code></td><td style="text-align: center">Set the password for a module if it uses HTTP basic authentication</td></tr>
+</tbody></table>
+</div>
+<h2 id="creating-env-file"><a class="header" href="#creating-env-file">Creating <code>.env</code> File</a></h2>
+<p>Please see the <a href="https://github.com/eredotpkfr/subscan/blob/main/.env.template">.env.template</a> file in project repository. Your <code>.env</code> file should follow a similar format as shown below</p>
+<pre><code class="language-bash">SUBSCAN_BEVIGIL_APIKEY=foo
+SUBSCAN_BINARYEDGE_APIKEY=bar
+SUBSCAN_BUFFEROVER_APIKEY=baz
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="development"><a class="header" href="#development">Development</a></h1>
+<p>This chapter provides an in-depth guide for developers on how to contribute to and extend <code>Subscan</code>. It covers everything from setting up the development environment to understanding the core architecture and adding new features or modules.</p>
+<p>Here’s a quick overview of the sections included</p>
+<ul>
+<li><a href="development/environment.html">Setup Development Environment</a></li>
+<li><a href="development/components/index.html">Components</a>
+<ul>
+<li><a href="development/components/requesters.html">Requesters</a></li>
+<li><a href="development/components/extractors.html">Extractors</a></li>
+<li><a href="development/components/module.html">Subscan Module</a></li>
+</ul>
+</li>
+<li><a href="development/generics/index.html">Generic Modules</a>
+<ul>
+<li><a href="development/generics/integration.html">Integration</a></li>
+<li><a href="development/generics/engine.html">Search Engine</a></li>
+</ul>
+</li>
+<li><a href="development//development/integration.html">Integrate Your Module Step by Step</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="setup-development-environment"><a class="header" href="#setup-development-environment">Setup Development Environment</a></h1>
+<p>This section covers topics like setting up a development environment and running tests for those who want to contribute to <code>Subscan</code></p>
+<p>To set up your development environment, please follow the instructions below</p>
+<ol>
+<li>
+<p>Clone repository</p>
+<pre><code class="language-bash">~$ git clone https://github.com/eredotpkfr/subscan &amp;&amp; cd subscan
+</code></pre>
+</li>
+<li>
+<p>Install <code>pre-commit</code> and its hooks</p>
+<pre><code class="language-bash">~$ # Install pre-commit Mac or Linux
+~$ make install-pre-commit-mac
+~$ # Install pre-commit hooks
+~$ make install-pre-commit-hooks
+~$ # Check everything is OK
+~$ pre-commit run -a
+</code></pre>
+</li>
+<li>
+<p>Insatall required cargo tools for development</p>
+<pre><code class="language-bash">~$ # Install cargo tools
+~$ make install-cargo-tools
+</code></pre>
+</li>
+<li>
+<p>Create <code>.env</code> file from <code>.env.template</code></p>
+<pre><code class="language-bash">~$ cp .env.template .env
+</code></pre>
+</li>
+<li>
+<p>Finally build the project and run CLI</p>
+<pre><code class="language-bash">~$ cargo build &amp;&amp; target/debug/subscan --help
+</code></pre>
+</li>
+</ol>
+<h2 id="running-tests"><a class="header" href="#running-tests">Running Tests</a></h2>
+<p>You have many options to run the tests, below are the command sets on how to run the tests differently</p>
+<pre><code class="language-bash">~$ # run all tests
+~$ cargo test # or `make test`
+~$ # capture outputs
+~$ cargo test -- --nocapture
+~$ # run only doc tests
+~$ cargo test --doc
+~$ # run a single test
+~$ cargo test -- engines::bing_test::bing_run_test
+~$ # run only integration tests
+~$ cargo test --tests modules::integrations
+</code></pre>
+<p>To run tests via <a href="https://nexte.st/">nextest</a>, run following command</p>
+<pre><code class="language-bash">~$ make nextest
+</code></pre>
+<p>Create coverage report with <a href="https://github.com/taiki-e/cargo-llvm-cov">cargo-llvm-cov</a></p>
+<pre><code class="language-bash">~$ make coverage
+</code></pre>
+<h2 id="building-docs"><a class="header" href="#building-docs">Building Docs</a></h2>
+<p>To build documentations, run following command</p>
+<pre><code class="language-bash">~$ make doc # or `cargo doc`
+</code></pre>
+<p>To serve project book with hot reload, use following command</p>
+<pre><code class="language-bash">~$ # run book tests and serve
+~$ make live-book
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="components"><a class="header" href="#components">Components</a></h1>
+<p>This chapter provides detailed information about the functionality of the core components that make up <code>Subscan</code>. These components are reusable structures designed to simplify repetitive tasks, such as organizing HTTP requests or facilitating subdomain extraction operations. By using these components, you can streamline your workflow and avoid redundant code</p>
+<p>You can also create custom components tailored to your specific needs and integrate them into the subdomain discovery process. These components add modularity to <code>Subscan</code>, allowing it to be easily extended and customized</p>
+<p>The core components in <code>Subscan</code> are listed below. Follow the links for more details</p>
+<ul>
+<li><a href="development/components/requesters.html">Requesters</a></li>
+<li><a href="development/components/extractors.html">Extractors</a></li>
+<li><a href="development/components/module.html">Subscan Module</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="requesters"><a class="header" href="#requesters">Requesters</a></h1>
+<p>Requesters are components designed to manage HTTP requests through a unified interface. Each requester offers unique features, and when HTTP requests are needed during subdomain discovery, the appropriate requester can be selected based on the requirements.</p>
+<p><code>Subscan</code> includes predefined requesters like</p>
+<ul>
+<li>
+<p><a href="https://docs.rs/subscan/latest/subscan/requesters/chrome/struct.ChromeBrowser.html">ChromeBrowser</a></p>
+<p>This requester component runs a <code>Chrome</code> process in the background, allowing HTTP requests through the browser. It has advantages such as rendering <code>JavaScript</code>, bypassing anti-bot systems, etc.</p>
+</li>
+<li>
+<p><a href="https://docs.rs/subscan/latest/subscan/requesters/client/struct.HTTPClient.html">HTTPClient</a></p>
+<p>The HTTP client requester component is identical to the standard HTTP client, using the <a href="https://docs.rs/reqwest/latest/reqwest/">reqwest</a> crate's client as its implementation</p>
+</li>
+</ul>
+<h2 id="create-your-custom-requester"><a class="header" href="#create-your-custom-requester">Create Your Custom Requester</a></h2>
+<p>Each requester component should be implemented following the interface below. For a better understanding, you can explore the <a href="https://docs.rs/subscan/latest/subscan/interfaces/requester/index.html">docs.rs</a> page and review the crates listed below</p>
+<ul>
+<li><a href="https://github.com/dtolnay/async-trait"><code>async_trait</code></a></li>
+<li><a href="https://gitlab.com/antonok/enum_dispatch"><code>enum_dispatch</code></a></li>
+</ul>
+<pre><code class="language-rust ignore">#[async_trait]
+#[enum_dispatch]
+pub trait RequesterInterface: Sync + Send {
+    // Returns requester configurations as a RequesterConfig object
+    async fn config(&amp;mut self) -&gt; &amp;mut RequesterConfig;
+    // Configure current requester object by using new RequesterConfig object
+    async fn configure(&amp;mut self, config: RequesterConfig);
+    // HTTP GET method implementation to fetch HTML content from given source URL
+    async fn get_content(&amp;self, url: Url) -&gt; Result&lt;Content&gt;;
+}</code></pre>
+<p>Below is a simple example of a custom requester. For more examples, you can check the <a href="https://github.com/eredotpkfr/subscan/tree/main/examples">examples/</a> folder on the project's GitHub page. You can also refer to the source code of predefined requester implementations for a better understanding</p>
+<pre><code class="language-rust ignore">pub struct CustomRequester {
+    config: RequesterConfig,
+}
+
+#[async_trait]
+impl RequesterInterface for CustomRequester {
+    async fn config(&amp;mut self) -&gt; &amp;mut RequesterConfig {
+        &amp;mut self.config
+    }
+
+    async fn configure(&amp;mut self, config: RequesterConfig) {
+        self.config = config;
+    }
+
+    async fn get_content(&amp;self, _url: Url) -&gt; Result&lt;Content&gt; {
+        Ok(Content::Empty)
+    }
+}</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="extractors"><a class="header" href="#extractors">Extractors</a></h1>
+<p>Extractor components are responsible for parsing subdomain addresses from any <code>Content</code> object</p>
+<p>The extractor components already implemented in <code>Subscan</code> are as follows</p>
+<ul>
+<li>
+<p><a href="https://docs.rs/subscan/latest/subscan/extractors/html/struct.HTMLExtractor.html">HTMLExtractor</a></p>
+<p>Extracts subdomain addresses from inner text by given <code>XPath</code> or <code>CSS</code> selector</p>
+</li>
+<li>
+<p><a href="https://docs.rs/subscan/latest/subscan/extractors/json/struct.JSONExtractor.html">JSONExtractor</a></p>
+<p>Extracts subdomain addresses from <code>JSON</code> content. <code>JSON</code> parsing function must be given for this extractor</p>
+</li>
+<li>
+<p><a href="https://docs.rs/subscan/latest/subscan/extractors/regex/struct.RegexExtractor.html">RegexExtractor</a></p>
+<p>Regex extractor component generates subdomain pattern by given domain address and extracts subdomains via this pattern</p>
+</li>
+</ul>
+<h2 id="create-your-custom-extractor"><a class="header" href="#create-your-custom-extractor">Create Your Custom Extractor</a></h2>
+<p>Each extractor component should be implemented following the interface below. For a better understanding, you can explore the <a href="https://docs.rs/subscan/latest/subscan/interfaces/extractor/index.html">docs.rs</a> page and review the crates listed below</p>
+<ul>
+<li><a href="https://github.com/dtolnay/async-trait"><code>async_trait</code></a></li>
+<li><a href="https://gitlab.com/antonok/enum_dispatch"><code>enum_dispatch</code></a></li>
+</ul>
+<pre><code class="language-rust ignore">#[async_trait]
+#[enum_dispatch]
+pub trait SubdomainExtractorInterface: Send + Sync {
+    // Generic extract method, it should extract subdomain addresses
+    // from given Content
+    async fn extract(&amp;self, content: Content, domain: &amp;str) -&gt; Result&lt;BTreeSet&lt;Subdomain&gt;&gt;;
+}</code></pre>
+<p>Below is a simple example of a custom extractor. For more examples, you can check the <a href="https://github.com/eredotpkfr/subscan/tree/main/examples">examples/</a> folder on the project's GitHub page. You can also refer to the source code of predefined requester implementations for a better understanding</p>
+<pre><code class="language-rust ignore">pub struct CustomExtractor {}
+
+#[async_trait]
+impl SubdomainExtractorInterface for CustomExtractor {
+    async fn extract(&amp;self, content: Content, _domain: &amp;str) -&gt; Result&lt;BTreeSet&lt;Subdomain&gt;&gt; {
+        let subdomain = content.as_string().replace("-", "");
+
+        Ok([subdomain].into())
+    }
+}</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="subscan-module"><a class="header" href="#subscan-module">Subscan Module</a></h1>
+<p><code>SubscanModule</code> components are the core components that can be executed by <code>Subscan</code>. Each module capable of performing subdomain discovery is named a <code>SubscanModule</code>, and when the <a href="development/components//user-guide/commands/scan.html"><code>subscan scan</code></a> command is run, these modules are read from an in-memory cache and executed asynchronously. This architecture makes <code>Subscan</code> extensible and modular</p>
+<p>A <code>SubscanModule</code> may contain various components such as <code>Requester</code> and <code>Extractor</code>. Most modules implemented in <code>Subscan</code> use these components. You can list the implemented modules with their details using the <a href="development/components//user-guide/commands/module.html#list"><code>subscan module list</code></a> command. If you'd like to view the in-memory cache, you can check the <a href="https://docs.rs/subscan/latest/subscan/cache/struct.CacheManager.html">CacheManager</a> struct, which is another component designed for operations like filtering the cache or accessing a specific module</p>
+<h2 id="create-your-own-module"><a class="header" href="#create-your-own-module">Create Your Own Module</a></h2>
+<p>Each <code>SubscanModule</code> component should be implemented following the interface below. For a better understanding, you can explore the <a href="https://docs.rs/subscan/latest/subscan/interfaces/module/index.html">docs.rs</a> page and review the crates listed below</p>
+<ul>
+<li><a href="https://github.com/dtolnay/async-trait"><code>async_trait</code></a></li>
+<li><a href="https://gitlab.com/antonok/enum_dispatch"><code>enum_dispatch</code></a></li>
+</ul>
+<pre><code class="language-rust ignore">#[async_trait]
+#[enum_dispatch]
+pub trait SubscanModuleInterface: Sync + Send {
+    // Returns module name, name should clarify what does module
+    async fn name(&amp;self) -&gt; &amp;str;
+    // Loads `.env` file and fetches module environment variables with variable name.
+    // If system environment variable set with same name, `.env` file will be overrode
+    async fn envs(&amp;self) -&gt; SubscanModuleEnvs {
+        self.name().await.into()
+    }
+    // Returns module requester address as a mutable reference if available
+    async fn requester(&amp;self) -&gt; Option&lt;&amp;Mutex&lt;RequesterDispatcher&gt;&gt;;
+    // Returns module extractor reference if available
+    async fn extractor(&amp;self) -&gt; Option&lt;&amp;SubdomainExtractorDispatcher&gt;;
+    // Just like a `main` method, when the module run this `run` method will be called.
+    // So this method should do everything
+    async fn run(&amp;mut self, domain: &amp;str) -&gt; Result&lt;SubscanModuleResult&gt;;
+}</code></pre>
+<p>Below is a simple example of a custom module. For more examples, you can check the <a href="https://github.com/eredotpkfr/subscan/tree/main/examples">examples/</a> folder on the project's GitHub page. You can also refer to the source code of predefined requester implementations for a better understanding</p>
+<pre><code class="language-rust ignore">pub struct CustomModule {
+    pub requester: Mutex&lt;RequesterDispatcher&gt;,
+    pub extractor: SubdomainExtractorDispatcher,
+}
+
+#[async_trait]
+impl SubscanModuleInterface for CustomModule {
+    async fn name(&amp;self) -&gt; &amp;str {
+        &amp;"name"
+    }
+
+    async fn requester(&amp;self) -&gt; Option&lt;&amp;Mutex&lt;RequesterDispatcher&gt;&gt; {
+        Some(&amp;self.requester)
+    }
+
+    async fn extractor(&amp;self) -&gt; Option&lt;&amp;SubdomainExtractorDispatcher&gt; {
+        Some(&amp;self.extractor)
+    }
+
+    async fn run(&amp;mut self, _domain: &amp;str) -&gt; Result&lt;SubscanModuleResult&gt; {
+        let mut result: SubscanModuleResult = self.name().await.into();
+
+        let subdomains = BTreeSet::from_iter([
+            Subdomain::from("bar.foo.com"),
+            Subdomain::from("baz.foo.com"),
+        ]);
+
+        result.extend(subdomains);
+
+        Ok(result.with_finished().await)
+    }
+}</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="generic-modules"><a class="header" href="#generic-modules">Generic Modules</a></h1>
+<p>Some module implementations are very similar to each other, and sometimes we can use the same logic and algorithms while performing subdomain discovery. For example, during an API integration, the following steps will almost always be the same for most modules</p>
+<ul>
+<li>Make an API call to the endpoint</li>
+<li>Parse the subdomains from the incoming <code>JSON</code> content</li>
+<li>Check if there is a pagination
+<ul>
+<li>If pagination exists, go back to step 1 for the next page</li>
+<li>If there is no pagination, break the loop</li>
+</ul>
+</li>
+<li>Return the discovered subdomains for <code>Subscan</code></li>
+</ul>
+<p>To reduce the implementation time and avoid code duplication in <code>Subscan</code>, there are generic modules. Some of the registered modules in <code>Subscan</code> use these generic implementations, which can be viewed with the <a href="development/generics//user-guide/commands/module.html#list"><code>subscan module list</code></a> command. Below are details of two modules, one using a generic module and one not</p>
+<pre><code class="language-bash">~$ subscan module get alienvault
++------------+------------+---------------+-------------+
+| Name       | Requester  | Extractor     | Is Generic? |
++------------+------------+---------------+-------------+
+| alienvault | HTTPClient | JSONExtractor | true        |
++------------+------------+---------------+-------------+
+</code></pre>
+<pre><code class="language-bash">~$ subscan module get zonetransfer
++--------------+-----------+-----------+-------------+
+| Name         | Requester | Extractor | Is Generic? |
++--------------+-----------+-----------+-------------+
+| zonetransfer | None      | None      | false       |
++--------------+-----------+-----------+-------------+
+</code></pre>
+<p>The <code>zonetransfer</code> module is a very custom subdomain discovery method that performs DNS queries, so we cannot define it generically. Also as you can see, it has not any <code>Requester</code> or <code>Extractor</code> component. However, a module that makes API calls and parses the resulting output, such as the <code>alienvault</code> module, can use a generic module like <a href="https://docs.rs/subscan/latest/subscan/modules/generics/integration/struct.GenericIntegrationModule.html"><code>GenericIntegrationModule</code></a> within its implementation and return an instance of <a href="https://docs.rs/subscan/latest/subscan/modules/generics/integration/struct.GenericIntegrationModule.html"><code>GenericIntegrationModule</code></a> during its implementation</p>
+<p>The following generic modules are defined within <code>Subscan</code>. For more details, follow the links provided</p>
+<ul>
+<li><a href="development/generics/integration.html">GenericIntegrationModule</a></li>
+<li><a href="development/generics/engine.html">GenericSearchEngineModule</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="generic-integration-module"><a class="header" href="#generic-integration-module">Generic Integration Module</a></h1>
+<p>The <a href="https://docs.rs/subscan/latest/subscan/modules/generics/integration/struct.GenericIntegrationModule.html"><code>GenericIntegrationModule</code></a> is primarily used for simple <code>API</code> integrations. To understand how it works, check the source code on the <a href="https://docs.rs/subscan/latest/subscan/modules/generics/integration/struct.GenericIntegrationModule.html">docs.rs</a> page. Additionally, looking at the source code of other modules that use this implementation will help you understand how to utilize it</p>
+<p>A module that uses this one internally would look like the following</p>
+<pre><code class="language-rust ignore">pub const EXAMPLE_MODULE_NAME: &amp;str = "example";
+pub const EXAMPLE_URL: &amp;str = "https://api.example.com/api/v1";
+
+pub struct ExampleModule {}
+
+impl ExampleModule {
+    pub fn dispatcher() -&gt; SubscanModuleDispatcher {
+        let requester: RequesterDispatcher = HTTPClient::default().into();
+        let extractor: JSONExtractor = JSONExtractor::new(Box::new(Self::extract));
+
+        let generic = GenericIntegrationModule {
+            name: EXAMPLE_MODULE_NAME.into(),
+            auth: AuthenticationMethod::NoAuthentication,
+            funcs: GenericIntegrationCoreFuncs {
+                url: Box::new(Self::get_query_url),
+                next: Box::new(Self::get_next_url),
+            },
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
+        };
+
+        generic.into()
+    }
+
+    pub fn get_query_url(domain: &amp;str) -&gt; String {
+        format!("{EXAMPLE_URL}/{domain}/subdomains")
+    }
+
+    pub fn get_next_url(_url: Url, _content: Content) -&gt; Option&lt;Url&gt; {
+        None
+    }
+
+    pub fn extract(content: Value, _domain: &amp;str) -&gt; Result&lt;BTreeSet&lt;Subdomain&gt;&gt; {
+        if let Some(items) = content["items"].as_array() {
+            let filter = |item: &amp;Value| Some(item["hostname"].as_str()?.to_string());
+
+            return Ok(items.iter().filter_map(filter).collect());
+        }
+
+        Err(JSONExtract.into())
+    }
+}</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="generic-search-engine-module"><a class="header" href="#generic-search-engine-module">Generic Search Engine Module</a></h1>
+<p>The <a href="https://docs.rs/subscan/latest/subscan/modules/generics/engine/struct.GenericSearchEngineModule.html"><code>GenericSearchEngineModule</code></a> is primarily used for search engine integrations. It performs subdomain discovery by conducting dork searches on search engines and provides a generic implementation for search engines that use the same dork structure. To understand how it works, review the source code on the <a href="https://docs.rs/subscan/latest/subscan/modules/generics/engine/struct.GenericSearchEngineModule.html">docs.rs</a> page. Additionally, the source code of other module implementations that use this implementation can help guide you in its usage</p>
+<p>A search engine module that uses this internally would look like the example below</p>
+<pre><code class="language-rust ignore">pub const EXAMPLE_MODULE_NAME: &amp;str = "example";
+pub const EXAMPLE_SEARCH_URL: &amp;str = "https://www.example.com/search";
+pub const EXAMPLE_SEARCH_PARAM: &amp;str = "q";
+pub const EXAMPLE_CITE_TAG: &amp;str = "cite";
+
+pub struct ExampleModule {}
+
+impl ExampleModule {
+    pub fn dispatcher() -&gt; SubscanModuleDispatcher {
+        let url = Url::parse(EXAMPLE_SEARCH_URL);
+
+        let extractor: HTMLExtractor = HTMLExtractor::new(EXAMPLE_CITE_TAG.into(), vec![]);
+        let requester: RequesterDispatcher = HTTPClient::default().into();
+
+        let generic = GenericSearchEngineModule {
+            name: EXAMPLE_MODULE_NAME.into(),
+            param: EXAMPLE_SEARCH_PARAM.into(),
+            url: url.unwrap(),
+            components: SubscanModuleCoreComponents {
+                requester: requester.into(),
+                extractor: extractor.into(),
+            },
+        };
+
+        generic.into()
+    }
+}</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="integrate-your-module-step-by-step"><a class="header" href="#integrate-your-module-step-by-step">Integrate Your Module Step by Step</a></h1>
+<p>This chapter provides a step-by-step guide on how to convert your custom subdomain discovery module into a <code>SubscanModule</code> component and integrate it with <code>Subscan</code></p>
+<p>Follow the steps below to integrate your module with <code>Subscan</code></p>
+<h2 id="1-create-your-custom-module"><a class="header" href="#1-create-your-custom-module">1. Create Your Custom Module</a></h2>
+<p>At first, you need to implement a module that follows the <a href="https://docs.rs/subscan/latest/subscan/interfaces/module/trait.SubscanModuleInterface.html"><code>SubscanModuleInterface</code></a> so that <code>Subscan</code> can run your module. If you're unsure how to implement it, you can follow the <a href="development/components/module.html#create-your-own-module">Create Your Own Module</a> title. Also, if your module will use a generic implementation, refer to the <a href="development/generics/index.html">Generic Modules</a> chapter</p>
+<blockquote>
+<p>The file should be created in the <a href="https://github.com/eredotpkfr/subscan/tree/main/src/modules"><code>src/modules</code></a> directory, where the modules are organized by their functionality: generics are stored in <a href="https://github.com/eredotpkfr/subscan/tree/main/src/modules/generics"><code>generics/</code></a>, integrations in <a href="https://github.com/eredotpkfr/subscan/tree/main/src/modules/integrations"><code>integrations/</code></a>, and search engines in <a href="https://github.com/eredotpkfr/subscan/tree/main/src/modules/engines"><code>engines/</code></a>. Since we are integrating a custom module, we can create our file as <code>src/modules/example.rs</code></p>
+</blockquote>
+<p>Here is an example module that is compatible with the <a href="https://docs.rs/subscan/latest/subscan/interfaces/module/trait.SubscanModuleInterface.html"><code>SubscanModuleInterface</code></a>. Let's integrate it into <code>Subscan</code></p>
+<pre><code class="language-rust ignore">pub struct ExampleModule {
+    pub name: String,
+}
+
+#[async_trait]
+impl SubscanModuleInterface for ExampleModule {
+    async fn name(&amp;self) -&gt; &amp;str {
+        &amp;self.name
+    }
+
+    async fn requester(&amp;self) -&gt; Option&lt;&amp;Mutex&lt;RequesterDispatcher&gt;&gt; {
+        None
+    }
+
+    async fn extractor(&amp;self) -&gt; Option&lt;&amp;SubdomainExtractorDispatcher&gt; {
+        None
+    }
+
+    async fn run(&amp;mut self, _domain: &amp;str) -&gt; Result&lt;SubscanModuleResult&gt; {
+        let mut result: SubscanModuleResult = self.name().await.into();
+
+        let subdomains = BTreeSet::from_iter([
+            Subdomain::from("bar.foo.com"),
+            Subdomain::from("baz.foo.com"),
+        ]);
+
+        result.extend(subdomains);
+
+        Ok(result.with_finished().await)
+    }
+}</code></pre>
+<h2 id="2-define-your-module-as-subscanmodule"><a class="header" href="#2-define-your-module-as-subscanmodule">2. Define Your Module as <code>SubscanModule</code></a></h2>
+<p>To define this module as a <code>SubscanModule</code>, we need to wrap it with a <a href="https://docs.rs/subscan/latest/subscan/enums/dispatchers/enum.SubscanModuleDispatcher.html"><code>SubscanModuleDispatcher</code></a>, as shown in the implementation of the <code>SubscanModule</code> type below</p>
+<pre><code class="language-rust ignore">// `SubscanModule` type wrapper
+pub type SubscanModule = Arc&lt;Mutex&lt;SubscanModuleDispatcher&gt;&gt;;
+
+impl From&lt;SubscanModuleDispatcher&gt; for SubscanModule {
+    fn from(module: SubscanModuleDispatcher) -&gt; Self {
+        Self::new(Mutex::new(module))
+    }
+}</code></pre>
+<h3 id="21-add-a-new-dispatcher-variant"><a class="header" href="#21-add-a-new-dispatcher-variant">2.1. Add a New Dispatcher Variant</a></h3>
+<p>Dispatchers are enumeration structures defined in the <a href="https://docs.rs/subscan/latest/subscan/enums/dispatchers/index.html"><code>src/enums/dispatchers.rs</code></a> file. Instead of using <code>Box</code> for dynamic dispatching when running modules, we can store the module variants within an enum. This allows the compiler to know the types based on the dispatcher during module execution and enables static dispatching. For more detailed technical information, you can refer to the <a href="https://gitlab.com/antonok/enum_dispatch"><code>enum_dispatch</code></a> crate</p>
+<p>Now, let's add a dispatcher variant for our module. If we are using a generic implementation, we don't need to do this, as a variant has already been created for generic implementations, as shown below</p>
+<pre><code class="language-rust ignore">#[enum_dispatch(SubscanModuleInterface)]
+pub enum SubscanModuleDispatcher {
+    // Enum variant of generic API integrations. It can be used for all generic API modules
+    // at the same time, for this only requirement is the module should be implemented as
+    // a GenericIntegrationModule
+    GenericIntegrationModule(GenericIntegrationModule),
+    // Also another generic variant for search engines, It can be used for all generic search
+    // engine modules at the same time. Just modules should be implemented as
+    // a GenericSearchEngineModule
+    GenericSearchEngineModule(GenericSearchEngineModule),
+    // Non-generic `ExampleModule` module variant
+    ExampleModule(ExampleModule), // Add this line
+}</code></pre>
+<h3 id="22-implement-the-dispatcher-method-for-your-module"><a class="header" href="#22-implement-the-dispatcher-method-for-your-module">2.2. Implement the <code>dispatcher()</code> Method for Your Module</a></h3>
+<p>After adding the dispatcher variant, we can add a method named <code>dispatcher(</code> to our module that will return it as a dispatcher variant</p>
+<pre><code class="language-rust ignore">impl ExampleModule {
+    pub fn dispatcher() -&gt; SubscanModuleDispatcher {
+        let example = Self {
+            name: "example".into(),
+        };
+
+        example.into()
+    }
+}</code></pre>
+<h2 id="3-add-your-module-to-the-in-memory-cache"><a class="header" href="#3-add-your-module-to-the-in-memory-cache">3. Add Your Module to the In-Memory Cache</a></h2>
+<p>The only thing left to do is add our module to the in-memory cache as a <code>SubscanModule</code> so that the <a href="https://docs.rs/subscan/latest/subscan/cache/struct.CacheManager.html">CacheManager</a> component can use it. To do this, let's add our module to the in-memory cache called <code>MODULE_CACHE</code> in <a href="https://docs.rs/subscan/latest/subscan/cache/index.html"><code>cache.rs</code></a> file</p>
+<pre><code class="language-rust ignore">lazy_static! {
+    static ref MODULE_CACHE: Vec&lt;SubscanModule&gt; = vec![
+        // Search engines
+        SubscanModule::from(bing::Bing::dispatcher()),
+        SubscanModule::from(duckduckgo::DuckDuckGo::dispatcher()),
+        // Integrations
+        SubscanModule::from(alienvault::AlienVault::dispatcher()),
+        SubscanModule::from(example::ExampleModule::dispatcher()), // Add this line
+    ]
+}</code></pre>
+<h2 id="4-run-your-module"><a class="header" href="#4-run-your-module">4. Run Your Module</a></h2>
+<pre><code class="language-bash">~$ cargo build &amp;&amp; target/debug/subscan module run example -d example.com
+</code></pre>
+<h2 id="5-write-tests-for-your-module"><a class="header" href="#5-write-tests-for-your-module">5. Write Tests for Your Module</a></h2>
+<p>Please write unit tests for your module. You can use the <a href="https://github.com/eredotpkfr/subscan/tree/main/tests"><code>tests/</code></a> folder as a reference</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>

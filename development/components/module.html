@@ -1,0 +1,269 @@
+<!DOCTYPE HTML>
+<html lang="en" class="ayu sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Subscan Module - subscan</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="A subdomain enumeration tool leveraging diverse techniques, designed for advanced pentesting operations">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../favicon.svg">
+        <link rel="shortcut icon" href="../../favicon.png">
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">subscan</h1>
+
+                    <div class="right-buttons">
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/eredotpkfr/subscan" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="subscan-module"><a class="header" href="#subscan-module">Subscan Module</a></h1>
+<p><code>SubscanModule</code> components are the core components that can be executed by <code>Subscan</code>. Each module capable of performing subdomain discovery is named a <code>SubscanModule</code>, and when the <a href="/user-guide/commands/scan.html"><code>subscan scan</code></a> command is run, these modules are read from an in-memory cache and executed asynchronously. This architecture makes <code>Subscan</code> extensible and modular</p>
+<p>A <code>SubscanModule</code> may contain various components such as <code>Requester</code> and <code>Extractor</code>. Most modules implemented in <code>Subscan</code> use these components. You can list the implemented modules with their details using the <a href="/user-guide/commands/module.html#list"><code>subscan module list</code></a> command. If you'd like to view the in-memory cache, you can check the <a href="https://docs.rs/subscan/latest/subscan/cache/struct.CacheManager.html">CacheManager</a> struct, which is another component designed for operations like filtering the cache or accessing a specific module</p>
+<h2 id="create-your-own-module"><a class="header" href="#create-your-own-module">Create Your Own Module</a></h2>
+<p>Each <code>SubscanModule</code> component should be implemented following the interface below. For a better understanding, you can explore the <a href="https://docs.rs/subscan/latest/subscan/interfaces/module/index.html">docs.rs</a> page and review the crates listed below</p>
+<ul>
+<li><a href="https://github.com/dtolnay/async-trait"><code>async_trait</code></a></li>
+<li><a href="https://gitlab.com/antonok/enum_dispatch"><code>enum_dispatch</code></a></li>
+</ul>
+<pre><code class="language-rust ignore">#[async_trait]
+#[enum_dispatch]
+pub trait SubscanModuleInterface: Sync + Send {
+    // Returns module name, name should clarify what does module
+    async fn name(&amp;self) -&gt; &amp;str;
+    // Loads `.env` file and fetches module environment variables with variable name.
+    // If system environment variable set with same name, `.env` file will be overrode
+    async fn envs(&amp;self) -&gt; SubscanModuleEnvs {
+        self.name().await.into()
+    }
+    // Returns module requester address as a mutable reference if available
+    async fn requester(&amp;self) -&gt; Option&lt;&amp;Mutex&lt;RequesterDispatcher&gt;&gt;;
+    // Returns module extractor reference if available
+    async fn extractor(&amp;self) -&gt; Option&lt;&amp;SubdomainExtractorDispatcher&gt;;
+    // Just like a `main` method, when the module run this `run` method will be called.
+    // So this method should do everything
+    async fn run(&amp;mut self, domain: &amp;str) -&gt; Result&lt;SubscanModuleResult&gt;;
+}</code></pre>
+<p>Below is a simple example of a custom module. For more examples, you can check the <a href="https://github.com/eredotpkfr/subscan/tree/main/examples">examples/</a> folder on the project's GitHub page. You can also refer to the source code of predefined requester implementations for a better understanding</p>
+<pre><code class="language-rust ignore">pub struct CustomModule {
+    pub requester: Mutex&lt;RequesterDispatcher&gt;,
+    pub extractor: SubdomainExtractorDispatcher,
+}
+
+#[async_trait]
+impl SubscanModuleInterface for CustomModule {
+    async fn name(&amp;self) -&gt; &amp;str {
+        &amp;"name"
+    }
+
+    async fn requester(&amp;self) -&gt; Option&lt;&amp;Mutex&lt;RequesterDispatcher&gt;&gt; {
+        Some(&amp;self.requester)
+    }
+
+    async fn extractor(&amp;self) -&gt; Option&lt;&amp;SubdomainExtractorDispatcher&gt; {
+        Some(&amp;self.extractor)
+    }
+
+    async fn run(&amp;mut self, _domain: &amp;str) -&gt; Result&lt;SubscanModuleResult&gt; {
+        let mut result: SubscanModuleResult = self.name().await.into();
+
+        let subdomains = BTreeSet::from_iter([
+            Subdomain::from("bar.foo.com"),
+            Subdomain::from("baz.foo.com"),
+        ]);
+
+        result.extend(subdomains);
+
+        Ok(result.with_finished().await)
+    }
+}</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../development/components/extractors.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../development/generics/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../development/components/extractors.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../development/generics/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../elasticlunr.min.js"></script>
+        <script src="../../mark.min.js"></script>
+        <script src="../../searcher.js"></script>
+
+        <script src="../../clipboard.min.js"></script>
+        <script src="../../highlight.js"></script>
+        <script src="../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
