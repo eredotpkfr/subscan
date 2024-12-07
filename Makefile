@@ -21,6 +21,8 @@ all: install-pre-commit-mac \
 	clean \
 	check \
 	fix \
+	book-build \
+	book-test \
 	live-book \
 	doc \
 	doc-rs \
@@ -87,6 +89,8 @@ check:
 	@cargo check
 fix:
 	@cargo fix --allow-dirty --allow-staged
+book-build:
+	@mdbook build book
 book-test:
 	@mdbook test book
 live-book: book-test
