@@ -21,5 +21,9 @@
     - [Requesters](development/components/requesters.md)
     - [Extractors](development/components/extractors.md)
     - [Subscan Module](development/components/module.md)
+  - [Generic Modules](development/generics/README.md)
+    - [Integration](development/generics/integration.md)
+    - [Search Engine](development/generics/engine.md)
+  - [Integrate Your Module Step by Step](development/integration.md)
 
 <!-- markdownlint-enable MD007 -->

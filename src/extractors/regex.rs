@@ -10,10 +10,9 @@ use crate::{
     utilities::regex::generate_subdomain_regex,
 };
 
-/// Regex extractor component generates subdomain pattern by
-/// given domain address and extracts subdomains via this pattern.
-/// Also this object compatible with [`SubdomainExtractorInterface`]
-/// and it uses `extract` method
+/// Regex extractor component generates subdomain pattern by given domain address and
+/// extracts subdomains via this pattern. Also this object compatible with
+/// [`SubdomainExtractorInterface`] and it uses `extract` method
 #[derive(Default)]
 pub struct RegexExtractor {}
 

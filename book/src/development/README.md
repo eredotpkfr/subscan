@@ -9,3 +9,7 @@ Here’s a quick overview of the sections included
   - [Requesters](components/requesters.md)
   - [Extractors](components/extractors.md)
   - [Subscan Module](components/module.md)
+- [Generic Modules](generics/index.html)
+  - [Integration](generics/integration.md)
+  - [Search Engine](generics/engine.md)
+- [Integrate Your Module Step by Step](/development/integration.md)

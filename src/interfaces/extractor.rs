@@ -18,6 +18,6 @@ use crate::{
 #[enum_dispatch]
 pub trait SubdomainExtractorInterface: Send + Sync {
     /// Generic extract method, it should extract subdomain addresses
-    /// from given [`String`] content
+    /// from given [`Content`]
     async fn extract(&self, content: Content, domain: &str) -> Result<BTreeSet<Subdomain>>;
 }

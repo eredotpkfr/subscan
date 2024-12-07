@@ -10,9 +10,8 @@ use crate::{
     types::core::{Result, Subdomain},
 };
 
-/// This object compatible with [`SubdomainExtractorInterface`]
-/// and it uses `extract` method to extract subdomain addresses
-/// from inner text by given `XPath` or `CSS` selector
+/// This object compatible with [`SubdomainExtractorInterface`] and it uses `extract` method
+/// to extract subdomain addresses from inner text by given `XPath` or `CSS` selector
 #[derive(Default)]
 pub struct HTMLExtractor {
     selector: String,
