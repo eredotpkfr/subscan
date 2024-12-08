@@ -25,3 +25,6 @@ publish_allow_dirty = false
 
 # disable running `cargo-semver-checks`
 semver_check = false
+
+# try to release everytime
+release_always = true
