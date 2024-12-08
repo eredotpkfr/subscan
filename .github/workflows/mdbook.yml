@@ -5,7 +5,7 @@ on:
     branches: ["main"]
   push:
     tags:
-      - 'v*'
+      - '*'
 
 jobs:
   mdbook-tests:

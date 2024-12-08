@@ -3,7 +3,7 @@ name: Docker
 on:
   push:
     tags:
-      - 'v*'
+      - '*'
 
 env:
   REGISTRY_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.IMAGE_NAME }}
