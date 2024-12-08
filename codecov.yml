@@ -1,5 +1,5 @@
 coverage: # https://docs.codecov.com/docs/codecovyml-reference#coverage
-  precision: 2 # e.g. 91.67%
+  precision: 2 # e.g. 91.67%
   round: nearest
   range: 65..85 # https://docs.codecov.com/docs/coverage-configuration#section-range
 
