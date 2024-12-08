@@ -5,36 +5,17 @@ permissions:
   contents: write
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows:
+      - Coverage
+      - Tests
+    types: [completed]
+    branches: [main]
 
 jobs:
-  release-pre-coverage:
-    uses: eredotpkfr/subscan/.github/workflows/coverage.yml@main
-    secrets:
-      codecov_token: ${{ secrets.CODECOV_TOKEN }}
-
-  release-pre-linters:
-    uses: eredotpkfr/subscan/.github/workflows/linters.yml@main
-
-  release-pre-security:
-    permissions:
-      contents: read
-      discussions: write
-      pull-requests: write
-    uses: eredotpkfr/subscan/.github/workflows/security.yml@main
-
-  release-pre-tests:
-    uses: eredotpkfr/subscan/.github/workflows/test.yml@main
-
   release-plz:
     runs-on: ubuntu-latest
-    needs:
-      - release-pre-linters
-      - release-pre-security
-      - release-pre-tests
-      - release-pre-coverage
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
