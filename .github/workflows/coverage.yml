@@ -15,8 +15,8 @@ env:
 
 jobs:
   cargo-llvm-cov:
-    if: ${{ !startsWith(github.ref_name, 'release-plz') }}
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.ref_name, 'release-plz') }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@nightly
