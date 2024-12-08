@@ -1,9 +1,10 @@
 name: Coverage
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
+    secrets:
+      codecov_token:
+        required: true
 
   pull_request:
     branches:
