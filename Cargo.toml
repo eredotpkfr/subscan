@@ -1,6 +1,6 @@
 [package]
 name = "subscan"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 description = "A subdomain enumeration tool leveraging diverse techniques, designed for advanced pentesting operations"
 documentation = "https://docs.rs/subscan"
