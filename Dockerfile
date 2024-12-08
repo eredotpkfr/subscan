@@ -2,12 +2,11 @@ FROM rust:1.82-slim-bookworm AS builder
 
 WORKDIR /builder
 
-ENV CHROMIUM_VERSION=131.0.6778.85-1~deb12u1
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
-    chromium=${CHROMIUM_VERSION} \
+    chromium \
     libssl-dev \
     pkg-config \
     tini \
