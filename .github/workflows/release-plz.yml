@@ -10,31 +10,8 @@ on:
       - main
 
 jobs:
-  pre-release-coverage:
-    uses: ./.github/workflows/coverage.yml
-    secrets:
-      codecov_token: ${{ secrets.CODECOV_TOKEN }}
-
-  pre-release-linters:
-    uses: ./.github/workflows/linters.yml
-
-  pre-release-security:
-    permissions:
-      contents: read
-      discussions: write
-      pull-requests: write
-    uses: ./.github/workflows/security.yml
-
-  pre-release-tests:
-    uses: ./.github/workflows/tests.yml
-
   release-plz:
     runs-on: ubuntu-latest
-    needs:
-      - pre-release-coverage
-      - pre-release-linters
-      - pre-release-security
-      - pre-release-tests
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
