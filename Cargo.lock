@@ -3358,7 +3358,7 @@ dependencies = [
 
 [[package]]
 name = "subscan"
-version = "0.2.2"
+version = "1.0.0"
 dependencies = [
  "async-trait",
  "automod",
