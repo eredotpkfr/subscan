@@ -42,7 +42,7 @@ jobs:
 
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v5
-        if: ${{ !startsWith(github.ref_name, 'release-plz') }}
+        if: ${{ !startsWith(github.head_ref, 'release-plz') }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: lcov.info
