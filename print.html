@@ -163,7 +163,35 @@
     <br><br><br>
 </center>
 <!-- markdownlint-enable MD033 MD041 -->
-<p><code>Subscan</code> is a powerful subdomain enumeration tool built with <a href="https://www.rust-lang.org/">Rust</a>, specifically designed for penetration testing purposes. It combines various discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers</p>
+<p>Subscan is a powerful subdomain enumeration tool built with <a href="https://www.rust-lang.org/">Rust</a>, specifically designed for penetration testing purposes. It combines various discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers</p>
+<h3 id="features"><a class="header" href="#features">Features</a></h3>
+<ul>
+<li>🕵️ Smart Discovery Tricks
+<ul>
+<li>Use multiple search engines (<code>Google</code>, <code>Yahoo</code>, <code>Bing</code>, <code>DuckDuckGo</code>, etc.)</li>
+<li>Integrate with APIs like <code>Shodan</code>, <code>Censys</code>, <code>VirusTotal</code> and more</li>
+<li>Perform zone transfer checks</li>
+<li>Subdomain brute-forcing with optimized wordlists</li>
+</ul>
+</li>
+<li>🔍 Resolve IP addresses for all subdomains</li>
+<li>📎 Export reports in <code>CSV</code>, <code>HTML</code>, <code>JSON</code>, or <code>TXT</code> formats</li>
+<li>🛠️ Configurable
+<ul>
+<li>Customize HTTP requests (user-agent, timeout, etc.)</li>
+<li>Rotate requests via proxies (<code>--proxy</code> argument)</li>
+<li>Fine-tune IP resolver with <code>--resolver</code> arguments</li>
+<li>Filter and run specific modules with <code>--skips</code> and <code>--modules</code></li>
+</ul>
+</li>
+<li>🐳 Docker Friendly
+<ul>
+<li>Native support for <code>amd64</code> and <code>arm64</code> Linux platforms</li>
+<li>A tiny container that won't eat up your storage — under 1GB and ready to roll 🚀</li>
+</ul>
+</li>
+<li>💻 Compatible with multiple platforms and easy to install as a single binary</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="user-guide"><a class="header" href="#user-guide">User Guide</a></h1>
 <p>This chapter provides an overview of the basic usage of <code>Subscan</code>, designed to help end users get started quickly and effectively</p>
 <p>Here’s a quick overview of the sections included</p>
@@ -203,7 +231,7 @@
 <ul>
 <li><a href="user-guide/quickstart/install.html">Installing Subscan</a></li>
 <li><a href="user-guide/quickstart/usage/index.html">Usage Methods and Scenarios</a></li>
-<li><a href="user-guide/quickstart//user-guide/commands/index.html">Details of Commands and Typical Use Cases</a></li>
+<li><a href="user-guide/quickstart/../commands/index.html">Details of Commands and Typical Use Cases</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="install"><a class="header" href="#install">Install</a></h1>
 <p>There are several ways to install <code>Subscan</code>, depending on your preferences. You can install it via <a href="user-guide/quickstart/install.html#install-with-cargo">Cargo</a> (Rust's package manager), use <a href="user-guide/quickstart/install.html#pull-docker-image">Docker</a> for containerized environments, or download prebuilt <a href="user-guide/quickstart/install.html#download-prebuilt-binaries">cross-platform binaries</a>. Choose the method that works best for your setup</p>
@@ -218,7 +246,7 @@
 <h2 id="download-prebuilt-binaries"><a class="header" href="#download-prebuilt-binaries">Download Prebuilt Binaries</a></h2>
 <p>📦 Prebuilt cross-platform binaries are available on the <a href="https://github.com/eredotpkfr/subscan/releases">releases page</a>. Download the one compatible with your operating system</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="usage"><a class="header" href="#usage">Usage</a></h1>
-<p>This chapter guides you on how to use the <code>Subscan</code> to efficiently discover subdomains. Subdomain discovery features are implemented as modular <code>SubscanModule</code> components, which are automatically executed when a scan is initiated. For technical insights, check out the <a href="user-guide/quickstart/usage//development/index.html">Development</a> chapter</p>
+<p>This chapter guides you on how to use the <code>Subscan</code> to efficiently discover subdomains. Subdomain discovery features are implemented as modular <code>SubscanModule</code> components, which are automatically executed when a scan is initiated. For technical insights, check out the <a href="user-guide/quickstart/usage/../../../development/index.html">Development</a> chapter</p>
 <p>✨ In this section, you'll find detailed instructions for different usage methods</p>
 <ul>
 <li>How to use the <a href="user-guide/quickstart/usage/cli.html">Subscan CLI</a> for quick and effective subdomain enumeration</li>
@@ -228,9 +256,9 @@
 <div style="break-before: page; page-break-before: always;"></div><h1 id="subscan-cli-usage"><a class="header" href="#subscan-cli-usage">Subscan CLI Usage</a></h1>
 <p>🛠️ The <code>Subscan CLI</code> is a versatile tool that provides the following functionalities</p>
 <ul>
-<li><a href="user-guide/quickstart/usage/cli.html#starting-scan">Start a scan</a> to discover subdomains associated with a specific domain</li>
+<li><a href="user-guide/quickstart/usage/cli.html#start-scan">Start a scan</a> to discover subdomains associated with a specific domain</li>
 <li><a href="user-guide/quickstart/usage/cli.html#brute-force">Perform a brute force</a> attack on a domain using a specified wordlist</li>
-<li>Manage registered modules. See the <a href="user-guide/quickstart/usage//user-guide/commands/module.html">module</a> command details</li>
+<li>Manage registered modules. See the <a href="user-guide/quickstart/usage/../../commands/module.html">module</a> command details</li>
 </ul>
 <p>✨ Here's a quick overview of how to use it</p>
 <pre><code class="language-bash">~$ subscan
@@ -256,7 +284,7 @@ Options:
   -h, --help        Print help (see more with '--help')
   -V, --version     Print version
 </code></pre>
-<h2 id="starting-scan"><a class="header" href="#starting-scan">Starting Scan</a></h2>
+<h2 id="start-scan"><a class="header" href="#start-scan">Start Scan</a></h2>
 <p>To scan a domain using all available modules, use the following command:</p>
 <pre><code class="language-bash">~$ subscan scan -d example.com
 </code></pre>
@@ -271,7 +299,7 @@ Options:
 <p>If a module is included in both the <code>--skips</code> and <code>--modules</code> arguments, it will be skipped and not executed</p>
 </div>
 <blockquote>
-<p>If the module you’re using requires authentication, you can provide the necessary credentials, such as an API key, through module-specific environment variables. For more details about environment variables, refer to the <a href="user-guide/quickstart/usage//user-guide/environments.html">Environments</a> chapter</p>
+<p>If the module you’re using requires authentication, you can provide the necessary credentials, such as an API key, through module-specific environment variables. For more details about environment variables, refer to the <a href="user-guide/quickstart/usage/../../environments.html">Environments</a> chapter</p>
 <pre><code class="language-bash">SUBSCAN_VIRUSTOTAL_APIKEY=foo subscan scan -d example.com --modules=virustotal
 </code></pre>
 </blockquote>
@@ -283,7 +311,7 @@ Options:
 <p>To specify wordlist into docker container, see the <a href="user-guide/quickstart/usage/docker.html">Docker</a> usage</p>
 </blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="docker-usage"><a class="header" href="#docker-usage">Docker Usage</a></h1>
-<p>Once you’ve <a href="user-guide/quickstart/usage//user-guide/quickstart/install.html#pull-docker-image">pulled</a> the pre-built image from <a href="https://hub.docker.com/">Docker Hub</a>, you can easily run the container to perform subdomain enumeration</p>
+<p>Once you’ve <a href="user-guide/quickstart/usage/../../quickstart/install.html#pull-docker-image">pulled</a> the pre-built image from <a href="https://hub.docker.com/">Docker Hub</a>, you can easily run the container to perform subdomain enumeration</p>
 <pre><code class="language-bash">~$ docker run -it --rm eredotpkfr/subscan scan -d example.com
 </code></pre>
 <p>Specify environment variable via docker <code>--env</code></p>
@@ -307,6 +335,15 @@ Options:
     eredotpkfr/subscan brute -d example.com \
     -w wordlist.txt --print
 </code></pre>
+<h2 id="build-a-docker-image"><a class="header" href="#build-a-docker-image">Build a Docker Image</a></h2>
+<p>To build a Docker image locally, run the following command</p>
+<pre><code class="language-bash">~$ docker build -t subscan .
+</code></pre>
+<blockquote>
+<p>If you encounter memory issues while building on an Apple Silicon machine, you can run Colima with the following parameters</p>
+<pre><code class="language-bash">~$ colima start --cpu 11 --memory 16
+</code></pre>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="crate-usage"><a class="header" href="#crate-usage">Crate Usage</a></h1>
 <p>You can easily add <code>Subscan</code> to your code and use its results in your application. Since <code>Subscan</code> works asynchronously, you need to use it in <code>async</code> code blocks. We recommend using <a href="https://tokio.rs/">Tokio</a> as the async runtime</p>
 <p>This chapter provides step-by-step guidance on how to integrate <code>Subscan</code> into your code. For more detailed usage and additional code examples, visit the project's <a href="https://docs.rs/subscan/latest/subscan/">docs.rs</a> page or check the <a href="https://github.com/eredotpkfr/subscan/tree/main/examples">examples/</a> folder in the repository</p>
@@ -449,7 +486,7 @@ async fn main() {
 </li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="module"><a class="header" href="#module"><code>module</code></a></h1>
-<p><code>Subscan</code> is designed with an extensible architecture, where each subdomain discovery component is referred to as a <code>SubscanModule</code>. In <code>Subscan</code> terminology, any component involved in subdomain discovery is considered a module. You can create your own custom modules and integrate them into <code>Subscan</code>. Modules can also include additional components. Details on how to develop and integrate your own modules are available in the <a href="user-guide/commands//development/index.html">Development</a> chapter</p>
+<p><code>Subscan</code> is designed with an extensible architecture, where each subdomain discovery component is referred to as a <code>SubscanModule</code>. In <code>Subscan</code> terminology, any component involved in subdomain discovery is considered a module. You can create your own custom modules and integrate them into <code>Subscan</code>. Modules can also include additional components. Details on how to develop and integrate your own modules are available in the <a href="user-guide/commands/../../development/index.html">Development</a> chapter</p>
 <p>The module command allows you to list the modules registered in <code>Subscan</code>, view their details, and run any module. Below are the subcommands that serve these purposes;</p>
 <h2 id="list"><a class="header" href="#list"><code>list</code></a></h2>
 <p>Lists the modules registered on <code>Subscan</code> as a table with their details. The output looks like the following</p>
@@ -510,7 +547,7 @@ async fn main() {
 ~$ SUBSCAN_CENSYS_APIKEY=foo subscan module run censys -d example.com --user-agent 'subscan' -t 120
 </code></pre>
 <blockquote>
-<p>For more details about environment variables, refer to the <a href="user-guide/commands//user-guide/environments.html">Environments</a> chapter</p>
+<p>For more details about environment variables, refer to the <a href="user-guide/commands/../environments.html">Environments</a> chapter</p>
 </blockquote>
 </li>
 </ul>
@@ -559,7 +596,7 @@ SUBSCAN_BUFFEROVER_APIKEY=baz
 <li><a href="development/generics/engine.html">Search Engine</a></li>
 </ul>
 </li>
-<li><a href="development//development/integration.html">Integrate Your Module Step by Step</a></li>
+<li><a href="development/integration.html">Integrate Your Module Step by Step</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="setup-development-environment"><a class="header" href="#setup-development-environment">Setup Development Environment</a></h1>
 <p>This section covers topics like setting up a development environment and running tests for those who want to contribute to <code>Subscan</code></p>
@@ -723,8 +760,8 @@ impl SubdomainExtractorInterface for CustomExtractor {
     }
 }</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="subscan-module"><a class="header" href="#subscan-module">Subscan Module</a></h1>
-<p><code>SubscanModule</code> components are the core components that can be executed by <code>Subscan</code>. Each module capable of performing subdomain discovery is named a <code>SubscanModule</code>, and when the <a href="development/components//user-guide/commands/scan.html"><code>subscan scan</code></a> command is run, these modules are read from an in-memory cache and executed asynchronously. This architecture makes <code>Subscan</code> extensible and modular</p>
-<p>A <code>SubscanModule</code> may contain various components such as <code>Requester</code> and <code>Extractor</code>. Most modules implemented in <code>Subscan</code> use these components. You can list the implemented modules with their details using the <a href="development/components//user-guide/commands/module.html#list"><code>subscan module list</code></a> command. If you'd like to view the in-memory cache, you can check the <a href="https://docs.rs/subscan/latest/subscan/cache/struct.CacheManager.html">CacheManager</a> struct, which is another component designed for operations like filtering the cache or accessing a specific module</p>
+<p><code>SubscanModule</code> components are the core components that can be executed by <code>Subscan</code>. Each module capable of performing subdomain discovery is named a <code>SubscanModule</code>, and when the <a href="development/components/../../user-guide/commands/scan.html"><code>subscan scan</code></a> command is run, these modules are read from an in-memory cache and executed asynchronously. This architecture makes <code>Subscan</code> extensible and modular</p>
+<p>A <code>SubscanModule</code> may contain various components such as <code>Requester</code> and <code>Extractor</code>. Most modules implemented in <code>Subscan</code> use these components. You can list the implemented modules with their details using the <a href="development/components/../../user-guide/commands/module.html#list"><code>subscan module list</code></a> command. If you'd like to view the in-memory cache, you can check the <a href="https://docs.rs/subscan/latest/subscan/cache/struct.CacheManager.html">CacheManager</a> struct, which is another component designed for operations like filtering the cache or accessing a specific module</p>
 <h2 id="create-your-own-module"><a class="header" href="#create-your-own-module">Create Your Own Module</a></h2>
 <p>Each <code>SubscanModule</code> component should be implemented following the interface below. For a better understanding, you can explore the <a href="https://docs.rs/subscan/latest/subscan/interfaces/module/index.html">docs.rs</a> page and review the crates listed below</p>
 <ul>
@@ -795,7 +832,7 @@ impl SubscanModuleInterface for CustomModule {
 </li>
 <li>Return the discovered subdomains for <code>Subscan</code></li>
 </ul>
-<p>To reduce the implementation time and avoid code duplication in <code>Subscan</code>, there are generic modules. Some of the registered modules in <code>Subscan</code> use these generic implementations, which can be viewed with the <a href="development/generics//user-guide/commands/module.html#list"><code>subscan module list</code></a> command. Below are details of two modules, one using a generic module and one not</p>
+<p>To reduce the implementation time and avoid code duplication in <code>Subscan</code>, there are generic modules. Some of the registered modules in <code>Subscan</code> use these generic implementations, which can be viewed with the <a href="development/generics/../../user-guide/commands/module.html#list"><code>subscan module list</code></a> command. Below are details of two modules, one using a generic module and one not</p>
 <pre><code class="language-bash">~$ subscan module get alienvault
 +------------+------------+---------------+-------------+
 | Name       | Requester  | Extractor     | Is Generic? |

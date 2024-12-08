@@ -162,7 +162,35 @@
     <br><br><br>
 </center>
 <!-- markdownlint-enable MD033 MD041 -->
-<p><code>Subscan</code> is a powerful subdomain enumeration tool built with <a href="https://www.rust-lang.org/">Rust</a>, specifically designed for penetration testing purposes. It combines various discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers</p>
+<p>Subscan is a powerful subdomain enumeration tool built with <a href="https://www.rust-lang.org/">Rust</a>, specifically designed for penetration testing purposes. It combines various discovery techniques into a single, lightweight binary, making subdomain hunting easier and faster for security researchers</p>
+<h3 id="features"><a class="header" href="#features">Features</a></h3>
+<ul>
+<li>🕵️ Smart Discovery Tricks
+<ul>
+<li>Use multiple search engines (<code>Google</code>, <code>Yahoo</code>, <code>Bing</code>, <code>DuckDuckGo</code>, etc.)</li>
+<li>Integrate with APIs like <code>Shodan</code>, <code>Censys</code>, <code>VirusTotal</code> and more</li>
+<li>Perform zone transfer checks</li>
+<li>Subdomain brute-forcing with optimized wordlists</li>
+</ul>
+</li>
+<li>🔍 Resolve IP addresses for all subdomains</li>
+<li>📎 Export reports in <code>CSV</code>, <code>HTML</code>, <code>JSON</code>, or <code>TXT</code> formats</li>
+<li>🛠️ Configurable
+<ul>
+<li>Customize HTTP requests (user-agent, timeout, etc.)</li>
+<li>Rotate requests via proxies (<code>--proxy</code> argument)</li>
+<li>Fine-tune IP resolver with <code>--resolver</code> arguments</li>
+<li>Filter and run specific modules with <code>--skips</code> and <code>--modules</code></li>
+</ul>
+</li>
+<li>🐳 Docker Friendly
+<ul>
+<li>Native support for <code>amd64</code> and <code>arm64</code> Linux platforms</li>
+<li>A tiny container that won't eat up your storage — under 1GB and ready to roll 🚀</li>
+</ul>
+</li>
+<li>💻 Compatible with multiple platforms and easy to install as a single binary</li>
+</ul>
 
                     </main>
 

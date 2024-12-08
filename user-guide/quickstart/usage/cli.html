@@ -158,9 +158,9 @@
                         <h1 id="subscan-cli-usage"><a class="header" href="#subscan-cli-usage">Subscan CLI Usage</a></h1>
 <p>🛠️ The <code>Subscan CLI</code> is a versatile tool that provides the following functionalities</p>
 <ul>
-<li><a href="#starting-scan">Start a scan</a> to discover subdomains associated with a specific domain</li>
+<li><a href="#start-scan">Start a scan</a> to discover subdomains associated with a specific domain</li>
 <li><a href="#brute-force">Perform a brute force</a> attack on a domain using a specified wordlist</li>
-<li>Manage registered modules. See the <a href="/user-guide/commands/module.html">module</a> command details</li>
+<li>Manage registered modules. See the <a href="../../commands/module.html">module</a> command details</li>
 </ul>
 <p>✨ Here's a quick overview of how to use it</p>
 <pre><code class="language-bash">~$ subscan
@@ -186,7 +186,7 @@ Options:
   -h, --help        Print help (see more with '--help')
   -V, --version     Print version
 </code></pre>
-<h2 id="starting-scan"><a class="header" href="#starting-scan">Starting Scan</a></h2>
+<h2 id="start-scan"><a class="header" href="#start-scan">Start Scan</a></h2>
 <p>To scan a domain using all available modules, use the following command:</p>
 <pre><code class="language-bash">~$ subscan scan -d example.com
 </code></pre>
@@ -201,7 +201,7 @@ Options:
 <p>If a module is included in both the <code>--skips</code> and <code>--modules</code> arguments, it will be skipped and not executed</p>
 </div>
 <blockquote>
-<p>If the module you’re using requires authentication, you can provide the necessary credentials, such as an API key, through module-specific environment variables. For more details about environment variables, refer to the <a href="/user-guide/environments.html">Environments</a> chapter</p>
+<p>If the module you’re using requires authentication, you can provide the necessary credentials, such as an API key, through module-specific environment variables. For more details about environment variables, refer to the <a href="../../environments.html">Environments</a> chapter</p>
 <pre><code class="language-bash">SUBSCAN_VIRUSTOTAL_APIKEY=foo subscan scan -d example.com --modules=virustotal
 </code></pre>
 </blockquote>

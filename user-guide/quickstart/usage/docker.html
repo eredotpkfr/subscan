@@ -156,7 +156,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="docker-usage"><a class="header" href="#docker-usage">Docker Usage</a></h1>
-<p>Once you’ve <a href="/user-guide/quickstart/install.html#pull-docker-image">pulled</a> the pre-built image from <a href="https://hub.docker.com/">Docker Hub</a>, you can easily run the container to perform subdomain enumeration</p>
+<p>Once you’ve <a href="../../quickstart/install.html#pull-docker-image">pulled</a> the pre-built image from <a href="https://hub.docker.com/">Docker Hub</a>, you can easily run the container to perform subdomain enumeration</p>
 <pre><code class="language-bash">~$ docker run -it --rm eredotpkfr/subscan scan -d example.com
 </code></pre>
 <p>Specify environment variable via docker <code>--env</code></p>
@@ -180,6 +180,15 @@
     eredotpkfr/subscan brute -d example.com \
     -w wordlist.txt --print
 </code></pre>
+<h2 id="build-a-docker-image"><a class="header" href="#build-a-docker-image">Build a Docker Image</a></h2>
+<p>To build a Docker image locally, run the following command</p>
+<pre><code class="language-bash">~$ docker build -t subscan .
+</code></pre>
+<blockquote>
+<p>If you encounter memory issues while building on an Apple Silicon machine, you can run Colima with the following parameters</p>
+<pre><code class="language-bash">~$ colima start --cpu 11 --memory 16
+</code></pre>
+</blockquote>
 
                     </main>
 
