@@ -42,12 +42,12 @@ repos:
       - id: cargo-check
 
   - repo: https://github.com/est31/cargo-udeps
-    rev: v0.1.52
+    rev: v0.1.53
     hooks:
     - id: udeps
 
   - repo: https://github.com/EmbarkStudios/cargo-deny
-    rev: 0.16.2
+    rev: 0.16.3
     hooks:
       - id: cargo-deny
         name: cargo-deny
@@ -61,7 +61,7 @@ repos:
         additional_dependencies: ['@commitlint/config-conventional']
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.28.0
+    rev: typos-dict-v0.11.37
     hooks:
       - id: typos
 
@@ -81,6 +81,10 @@ repos:
     hooks:
       - id: markdownlint
         name: markdownlint
+        exclude: |
+          (?x)^(
+            CHANGELOG.md
+          )$
 
   - repo: https://github.com/hadolint/hadolint
     rev: v2.13.1-beta
