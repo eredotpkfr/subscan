@@ -41,7 +41,7 @@ jobs:
 
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v5
-        if: ${{ !startsWith(github.head_ref, 'release-plz') }}
+        if: ${{ !(startsWith(github.head_ref, 'release-plz') || startsWith(github.head_ref, 'dependabot')) }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: lcov.info
