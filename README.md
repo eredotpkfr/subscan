@@ -231,7 +231,15 @@ Specify environment variable via docker `--env`
     eredotpkfr/subscan scan -d example.com --modules=virustotal
 ```
 
-To specify wordlist into docker container, use `/data` directory
+Saving output reports to host machine, use `/data` folder
+
+```bash
+~$ docker run -it --rm \
+    --volume="$PWD/data:/data" \
+    eredotpkfr/subscan scan -d example.com
+```
+
+To specify wordlist into docker container, use `/data` folder
 
 ```bash
 ~$ docker run -it --rm \

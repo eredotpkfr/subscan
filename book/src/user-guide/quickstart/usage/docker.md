@@ -30,7 +30,7 @@ Saving output reports to host machine, use `/data` folder
     eredotpkfr/subscan scan -d example.com
 ```
 
-To specify wordlist into docker container, use `/data` directory
+To specify wordlist into docker container, use `/data` folder
 
 ```bash
 ~$ docker run -it --rm \
