@@ -21,7 +21,7 @@ To set up your development environment, please follow the instructions below
    ~$ pre-commit run -a
    ```
 
-3. Insatall required cargo tools for development
+3. Install required cargo tools for development
 
    ```bash
    ~$ # Install cargo tools
