@@ -329,7 +329,7 @@ Options:
     --volume="$PWD/data:/data" \
     eredotpkfr/subscan scan -d example.com
 </code></pre>
-<p>To specify wordlist into docker container, use <code>/data</code> directory</p>
+<p>To specify wordlist into docker container, use <code>/data</code> folder</p>
 <pre><code class="language-bash">~$ docker run -it --rm \
     --volume="$PWD/wordlist.txt:/data/wordlist.txt" \
     eredotpkfr/subscan brute -d example.com \
@@ -618,7 +618,7 @@ SUBSCAN_BUFFEROVER_APIKEY=baz
 </code></pre>
 </li>
 <li>
-<p>Insatall required cargo tools for development</p>
+<p>Install required cargo tools for development</p>
 <pre><code class="language-bash">~$ # Install cargo tools
 ~$ make install-cargo-tools
 </code></pre>
