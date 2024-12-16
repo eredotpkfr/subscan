@@ -30,5 +30,4 @@ license-files = [
 # Add the unmaintained crate here
 ignore = [
     { id = "RUSTSEC-2024-0384", reason = "Not maintained, but no upgrade option" },
-    { id = "RUSTSEC-2024-0421", reason = "No upgrade option right now" },
 ]
