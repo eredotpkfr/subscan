@@ -270,7 +270,7 @@ To get started, please check out the [CONTRIBUTING.md](https://github.com/eredot
 
 ## Donate
 <!-- markdownlint-disable MD033 MD041 -->
-<a href="https://www.buymeacoffee.com/erdoganyokr" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 50px" ></a>
+<a href="https://www.buymeacoffee.com/eredotpkfr" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 50px" ></a>
 <!-- markdownlint-enable MD033 MD041 -->
 
 ## Contact
