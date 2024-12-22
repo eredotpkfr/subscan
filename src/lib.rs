@@ -65,7 +65,7 @@ use tokio::sync::OnceCell;
 use crate::{
     cache::CacheManager,
     cli::Cli,
-    interfaces::module::SubscanModuleInterface,
+    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     pools::{brute::SubscanBrutePool, module::SubscanModulePool},
     types::{config::subscan::SubscanConfig, core::SubscanModule, result::subscan::SubscanResult},
 };
@@ -143,13 +143,19 @@ impl Subscan {
     }
 
     pub async fn run(&self, name: &str, domain: &str) -> SubscanResult {
-        self.init().await;
-
         let mut result: SubscanResult = domain.into();
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
         let pool = SubscanModulePool::from(domain, self.config.clone());
         let module = self.module(name).await;
+
+        if let Some(requester) = module.lock().await.requester().await {
+            requester
+                .lock()
+                .await
+                .configure(self.config.clone().into())
+                .await;
+        }
 
         log::info!(
             "Running {} module on {} ({})",
