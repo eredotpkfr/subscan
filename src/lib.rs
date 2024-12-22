@@ -150,11 +150,9 @@ impl Subscan {
         let module = self.module(name).await;
 
         if let Some(requester) = module.lock().await.requester().await {
-            requester
-                .lock()
-                .await
-                .configure(self.config.clone().into())
-                .await;
+            let rconfig = self.config.clone().into();
+
+            requester.lock().await.configure(rconfig).await;
         }
 
         log::info!(
