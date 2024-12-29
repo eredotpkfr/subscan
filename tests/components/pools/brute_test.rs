@@ -7,13 +7,12 @@ use subscan::{pools::brute::SubscanBrutePool, types::result::item::PoolResultIte
 
 use crate::common::{
     constants::{LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mock::funcs::spawn_mock_dns_server,
+    mock::resolver::MockResolver,
 };
 
 #[tokio::test]
 async fn submit_test() {
-    let server = spawn_mock_dns_server().await;
-    let resolver = server.get_resolver().await;
+    let resolver = MockResolver::default_boxed();
 
     let pool = SubscanBrutePool::new(TEST_DOMAIN.into(), resolver);
     let item = PoolResultItem {
@@ -34,8 +33,7 @@ async fn submit_test() {
 
 #[tokio::test]
 async fn result_test() {
-    let server = spawn_mock_dns_server().await;
-    let resolver = server.get_resolver().await;
+    let resolver = MockResolver::default_boxed();
 
     let pool = SubscanBrutePool::new(TEST_DOMAIN.into(), resolver);
 

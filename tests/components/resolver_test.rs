@@ -1,29 +1,27 @@
-use subscan::{resolver::Resolver, types::config::resolver::ResolverConfig};
+use subscan::{interfaces::lookup::LookUpHostFuture, types::config::resolver::ResolverConfig};
 
 use crate::common::{
     constants::{LOCAL_HOST, TEST_DOMAIN},
-    mock::funcs::spawn_mock_dns_server,
+    mock::resolver::MockResolver,
 };
 
 #[tokio::test]
-async fn lookup_ip_future_test_with_returns_none() {
+async fn lookup_host_future_test_with_returns_none() {
     let rconfig = ResolverConfig {
         disabled: true,
         ..Default::default()
     };
-    let resolver = Resolver::from(rconfig);
-    let lookup_ip = resolver.lookup_ip_future().await;
+    let resolver = MockResolver::boxed(rconfig);
+    let lookup_host = resolver.lookup_host_future().await;
 
-    assert!(lookup_ip(&resolver, TEST_DOMAIN.into()).await.is_none());
+    assert!(lookup_host(TEST_DOMAIN.into()).await.is_none());
 }
 
 #[tokio::test]
-async fn lookup_ip_future_test_with_returns_ip() {
-    let server = spawn_mock_dns_server().await;
-    let resolver = server.get_resolver().await;
-
-    let lookup_ip = resolver.lookup_ip_future().await;
-    let ip = lookup_ip(&resolver, TEST_DOMAIN.into()).await.unwrap();
+async fn lookup_host_future_test_with_returns_ip() {
+    let resolver = MockResolver::default_boxed();
+    let lookup_host = resolver.lookup_host_future().await;
+    let ip = lookup_host(TEST_DOMAIN.into()).await.unwrap();
 
     assert_eq!(ip.to_string(), LOCAL_HOST);
 }

@@ -22,8 +22,8 @@ pub struct BruteCommandArgs {
     /// Set output format
     #[arg(value_enum, short, long, default_value_t = OutputFormat::JSON)]
     pub output: OutputFormat,
-    /// IP resolver timeout value as a seconds
-    #[arg(long, default_value_t = DEFAULT_RESOLVER_TIMEOUT.as_secs())]
+    /// IP resolver timeout value as a milliseconds
+    #[arg(long, default_value_t = DEFAULT_RESOLVER_TIMEOUT.as_millis() as u64)]
     pub resolver_timeout: u64,
     /// IP resolver concurrency level, thread counts of resolver instances
     #[arg(long, default_value_t = DEFAULT_RESOLVER_CONCURRENCY)]

@@ -12,18 +12,12 @@ use hickory_client::{
         RData, Record, RecordType,
     },
 };
-use hickory_resolver::{
-    config::{
-        NameServerConfig, Protocol::Tcp, ResolverConfig as HickoryResolverConfig, ResolverOpts,
-    },
-    Name,
-};
+use hickory_resolver::Name;
 use hickory_server::{
     authority::MessageResponseBuilder,
     server::{Request, RequestHandler, ResponseHandler, ResponseInfo},
     ServerFuture,
 };
-use subscan::{resolver::Resolver, types::config::resolver::ResolverConfig};
 use tokio::net::TcpListener;
 
 use crate::common::{constants::LOCAL_HOST, utils::get_random_port};
@@ -48,25 +42,6 @@ impl MockDNSServer {
         Self {
             handler: MockDNSHandler::new(zone.into()),
             socket: socket.unwrap(),
-        }
-    }
-
-    pub async fn get_resolver(&self) -> Resolver {
-        self.get_resolver_config().await.into()
-    }
-
-    pub async fn get_resolver_config(&self) -> ResolverConfig {
-        let mut config = HickoryResolverConfig::new();
-        let mut opts = ResolverOpts::default();
-
-        config.add_name_server(NameServerConfig::new(self.socket, Tcp));
-        opts.timeout = Duration::from_secs(2);
-
-        ResolverConfig {
-            config,
-            opts,
-            concurrency: 1,
-            disabled: false,
         }
     }
 

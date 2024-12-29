@@ -13,7 +13,7 @@ pub const DEFAULT_RESOLVER_CONCURRENCY: u64 = 50;
 /// Default HTTP timeout as a [`Duration`]
 pub const DEFAULT_HTTP_TIMEOUT: Duration = Duration::from_secs(30);
 /// Default DNS resolver timeout as a [`Duration`]
-pub const DEFAULT_RESOLVER_TIMEOUT: Duration = Duration::from_secs(2);
+pub const DEFAULT_RESOLVER_TIMEOUT: Duration = Duration::from_millis(10);
 /// Default User-Agent headers for HTTP requests
 pub const DEFAULT_USER_AGENT: &str = "\
     Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) \

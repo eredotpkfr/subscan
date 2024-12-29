@@ -14,14 +14,13 @@ use subscan::{
 
 use crate::common::{
     constants::{LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mock::funcs,
+    mock::{funcs, resolver::MockResolver},
 };
 
 #[tokio::test]
 #[stubr::mock("module/engines/google.json")]
 async fn submit_test() {
-    let server = funcs::spawn_mock_dns_server().await;
-    let resolver = server.get_resolver().await;
+    let resolver = MockResolver::default_boxed();
 
     let mut dispatcher = Google::dispatcher();
 
@@ -52,8 +51,7 @@ async fn submit_test() {
 #[tokio::test]
 #[stubr::mock("module/engines/google.json")]
 async fn result_test() {
-    let server = funcs::spawn_mock_dns_server().await;
-    let resolver = server.get_resolver().await;
+    let resolver = MockResolver::default_boxed();
 
     let mut dispatcher = Google::dispatcher();
 
@@ -78,8 +76,7 @@ async fn result_test() {
 #[tokio::test]
 #[stubr::mock("module/engines/google.json")]
 async fn result_test_with_filter() {
-    let server = funcs::spawn_mock_dns_server().await;
-    let resolver = server.get_resolver().await;
+    let resolver = MockResolver::default_boxed();
 
     let filter = CacheFilter::FilterByName(ModuleNameFilter {
         valids: vec!["google".to_string()],
@@ -114,8 +111,7 @@ async fn result_test_with_filter() {
 
 #[tokio::test]
 async fn result_test_with_error() {
-    let server = funcs::spawn_mock_dns_server().await;
-    let resolver = server.get_resolver().await;
+    let resolver = MockResolver::default_boxed();
 
     let mut dispatcher = AlienVault::dispatcher();
 
