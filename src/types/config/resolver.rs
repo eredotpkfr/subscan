@@ -33,11 +33,12 @@ impl ResolverConfig {
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut config = ResolverConfig::default();
+    ///     let lookup_ip = config.lookup_host_future().await;
     ///
     ///     config.disabled = true;
     ///
     ///     let lookup_ip = config.lookup_host_future().await;
-    ///     let resolver: Resolver = config.into();
+    ///     let resolver: Resolver = config.clone().into();
     ///
     ///     assert!(lookup_ip("foo.com".into()).await.is_none());
     /// }
