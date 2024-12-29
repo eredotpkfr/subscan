@@ -26,6 +26,8 @@ async fn submit_test() {
     pool.clone().spawn_bruters(1).await;
 
     assert_eq!(pool.clone().len().await, 1);
+
+    pool.clone().kill_bruters(1).await;
     pool.clone().join().await;
 
     assert_eq!(pool.result().await.items, [item].into());
@@ -39,6 +41,7 @@ async fn result_test() {
 
     pool.clone().submit("bar".into()).await;
     pool.clone().spawn_bruters(1).await;
+    pool.clone().kill_bruters(1).await;
     pool.clone().join().await;
 
     let binding = pool.result().await;

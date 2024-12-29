@@ -125,7 +125,7 @@ impl Subscan {
     pub async fn scan(&self, domain: &str) -> SubscanResult {
         self.init().await;
 
-        let mut result: SubscanResult = domain.into();
+        let mut result = SubscanResult::from(domain);
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
         let pool = SubscanModulePool::from(domain, self.config.clone());
@@ -143,7 +143,7 @@ impl Subscan {
     }
 
     pub async fn run(&self, name: &str, domain: &str) -> SubscanResult {
-        let mut result: SubscanResult = domain.into();
+        let mut result = SubscanResult::from(domain);
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
         let pool = SubscanModulePool::from(domain, self.config.clone());
@@ -170,7 +170,7 @@ impl Subscan {
     }
 
     pub async fn brute(&self, domain: &str) -> SubscanResult {
-        let mut result: SubscanResult = domain.into();
+        let mut result = SubscanResult::from(domain);
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
         let pool = SubscanBrutePool::from(domain, self.config.clone());
@@ -183,11 +183,13 @@ impl Subscan {
 
         let reader = BufReader::new(file.expect("Cannot read wordlist!"));
 
+        pool.clone().spawn_bruters(concurrency).await;
+
         for subdomain in reader.lines().map_while(Result::ok) {
             pool.clone().submit(subdomain).await;
         }
 
-        pool.clone().spawn_bruters(concurrency).await;
+        pool.clone().kill_bruters(concurrency).await;
         pool.clone().join().await;
 
         result.update_with_pool_result(pool.result().await).await;

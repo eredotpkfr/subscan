@@ -37,14 +37,9 @@ async fn submit_test() {
     assert!(pool.clone().is_empty().await);
 
     pool.clone().submit(google).await;
-    pool.clone().spawn_runners(1).await;
+    pool.clone().start(1).await;
 
-    assert_eq!(pool.clone().len().await, 1);
-    pool.clone().join().await;
-
-    pool.clone().spawn_resolvers(1).await;
-    pool.clone().join().await;
-
+    assert_eq!(pool.clone().len().await, 0);
     assert_eq!(pool.result().await.items, [item].into());
 }
 
