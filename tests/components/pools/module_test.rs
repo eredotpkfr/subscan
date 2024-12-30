@@ -27,7 +27,7 @@ async fn submit_test() {
     funcs::wrap_module_url(&mut dispatcher, &stubr.path("/search"));
 
     let google = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), resolver, CacheFilter::default());
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), 1, resolver, CacheFilter::default());
 
     let item = PoolResultItem {
         subdomain: TEST_BAR_SUBDOMAIN.into(),
@@ -36,8 +36,7 @@ async fn submit_test() {
 
     assert!(pool.clone().is_empty().await);
 
-    pool.clone().submit(google).await;
-    pool.clone().start(1).await;
+    pool.clone().start(&vec![google]).await;
 
     assert_eq!(pool.clone().len().await, 0);
     assert_eq!(pool.result().await.items, [item].into());
@@ -53,10 +52,9 @@ async fn result_test() {
     funcs::wrap_module_url(&mut dispatcher, &stubr.path("/search"));
 
     let google = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), resolver, CacheFilter::NoFilter);
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), 1, resolver, CacheFilter::NoFilter);
 
-    pool.clone().submit(google).await;
-    pool.clone().start(1).await;
+    pool.clone().start(&vec![google]).await;
 
     let binding = pool.result().await;
     let result = binding.items.first();
@@ -87,11 +85,9 @@ async fn result_test_with_filter() {
     let google = SubscanModule::from(google_dispatcher);
     let alienvault = SubscanModule::from(alienvault_dispatcher);
 
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), resolver, filter);
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), 1, resolver, filter);
 
-    pool.clone().submit(google).await;
-    pool.clone().submit(alienvault).await;
-    pool.clone().start(1).await;
+    pool.clone().start(&vec![google, alienvault]).await;
 
     let binding = pool.result().await;
     let result = binding.items.first();
@@ -115,10 +111,9 @@ async fn result_test_with_error() {
     }
 
     let alienvault = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), resolver, CacheFilter::NoFilter);
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), 1, resolver, CacheFilter::NoFilter);
 
-    pool.clone().submit(alienvault).await;
-    pool.clone().start(1).await;
+    pool.clone().start(&vec![alienvault]).await;
 
     let result = pool.result().await;
     let stat = result.statistics.module.first();

@@ -38,7 +38,7 @@ impl ResolverConfig {
     ///     config.disabled = true;
     ///
     ///     let lookup_ip = config.lookup_host_future().await;
-    ///     let resolver: Resolver = config.clone().into();
+    ///     let resolver = Resolver::from(config.clone());
     ///
     ///     assert!(lookup_ip("foo.com".into()).await.is_none());
     /// }

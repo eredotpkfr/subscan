@@ -4,9 +4,7 @@ use tokio::{sync::Mutex, task::JoinSet};
 
 use crate::{
     interfaces::lookup::LookUpHostFuture,
-    resolver::Resolver,
     types::{
-        config::subscan::SubscanConfig,
         core::{Subdomain, UnboundedFlumeChannel},
         result::{item::PoolResultItem, pool::PoolResult},
     },
@@ -22,32 +20,6 @@ pub struct SubscanBrutePool {
 }
 
 impl SubscanBrutePool {
-    /// Create easily [`SubscanBrutePool`] from given domain and [`SubscanConfig`]
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::types::config::subscan::SubscanConfig;
-    /// use subscan::pools::brute::SubscanBrutePool;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let config = SubscanConfig::default();
-    ///     let pool = SubscanBrutePool::from("foo.com", config);
-    ///
-    ///     assert_eq!(pool.len().await, 0);
-    /// }
-    /// ```
-    pub fn from(domain: &str, config: SubscanConfig) -> Arc<Self> {
-        Arc::new(Self {
-            domain: domain.to_string(),
-            result: PoolResult::default().into(),
-            resolver: Box::new(Resolver::from(config.resolver)),
-            channel: flume::unbounded::<Option<Subdomain>>().into(),
-            workers: Mutex::new(JoinSet::new()),
-        })
-    }
-
     pub fn new(domain: String, resolver: Box<dyn LookUpHostFuture>) -> Arc<Self> {
         let result = PoolResult::default().into();
         let channel = flume::unbounded::<Option<Subdomain>>().into();
@@ -95,13 +67,17 @@ impl SubscanBrutePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver: Resolver = ResolverConfig::default().into();
-    ///     let pool = SubscanBrutePool::new("foo.com".into(), Box::new(resolver));
+    ///     let domain = String::from("foo.com");
+    ///     let resolver = Resolver::from(ResolverConfig::default());
+    ///     let pool = SubscanBrutePool::new(domain, Box::new(resolver));
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters(2).await;
     ///
     ///     assert_eq!(pool.clone().len().await, 2);
+    ///
+    ///     pool.clone().kill_bruters(2).await;
+    ///     pool.clone().join().await;
     /// }
     /// ```
     pub async fn len(self: Arc<Self>) -> usize {
@@ -119,15 +95,19 @@ impl SubscanBrutePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver: Resolver = ResolverConfig::default().into();
-    ///     let pool = SubscanBrutePool::new("foo.com".into(), Box::new(resolver));
+    ///     let domain = String::from("foo.com");
+    ///     let resolver = Resolver::from(ResolverConfig::default());
+    ///     let pool = SubscanBrutePool::new(domain, Box::new(resolver));
     ///
     ///     assert!(pool.clone().is_empty().await);
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters(2).await;
     ///
-    ///     assert!(!pool.is_empty().await);
+    ///     assert!(!pool.clone().is_empty().await);
+    ///
+    ///     pool.clone().kill_bruters(2).await;
+    ///     pool.join().await;
     /// }
     /// ```
     pub async fn is_empty(self: Arc<Self>) -> bool {
@@ -145,13 +125,17 @@ impl SubscanBrutePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver: Resolver = ResolverConfig::default().into();
-    ///     let pool = SubscanBrutePool::new("foo.com".into(), Box::new(resolver));
+    ///     let domain = String::from("foo.com");
+    ///     let resolver = Resolver::from(ResolverConfig::default());
+    ///     let pool = SubscanBrutePool::new(domain, Box::new(resolver));
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters(1).await;
     ///
-    ///     assert!(!pool.is_empty().await);
+    ///     assert!(!pool.clone().is_empty().await);
+    ///
+    ///     pool.clone().kill_bruters(1).await;
+    ///     pool.join().await;
     /// }
     /// ```
     pub async fn spawn_bruters(self: Arc<Self>, count: u64) {
@@ -171,8 +155,9 @@ impl SubscanBrutePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver: Resolver = ResolverConfig::default().into();
-    ///     let pool = SubscanBrutePool::new("foo.com".into(), Box::new(resolver));
+    ///     let domain = String::from("foo.com");
+    ///     let resolver = Resolver::from(ResolverConfig::default());
+    ///     let pool = SubscanBrutePool::new(domain, Box::new(resolver));
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters(1).await;
@@ -199,14 +184,16 @@ impl SubscanBrutePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver: Resolver = ResolverConfig::default().into();
-    ///     let pool = SubscanBrutePool::new("foo.com".into(), Box::new(resolver));
+    ///     let domain = String::from("foo.com");
+    ///     let resolver = Resolver::from(ResolverConfig::default());
+    ///     let pool = SubscanBrutePool::new(domain, Box::new(resolver));
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters(1).await;
     ///     // submit subdomain into pool
     ///     pool.clone().submit("api".into()).await;
     ///     // join all bruters in main thread
+    ///     pool.clone().kill_bruters(1).await;
     ///     pool.join().await;
     /// }
     /// ```
@@ -240,12 +227,15 @@ impl SubscanBrutePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver: Resolver = ResolverConfig::default().into();
-    ///     let pool = SubscanBrutePool::new("foo.com".into(), Box::new(resolver));
+    ///     let domain = String::from("foo.com");
+    ///     let resolver = Resolver::from(ResolverConfig::default());
+    ///     let pool = SubscanBrutePool::new(domain, Box::new(resolver));
     ///
+    ///     pool.clone().spawn_bruters(1).await;
     ///     // submit subdomain into pool
     ///     pool.clone().submit("api".into()).await;
     ///     // join all bruters in main thread
+    ///     pool.clone().kill_bruters(1).await;
     ///     pool.clone().join().await;
     ///
     ///     // do something with pool result

@@ -109,7 +109,6 @@ impl ResolverStatistic {
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct PoolStatistics {
     pub module: Vec<SubscanModuleStatistic>,
-    pub resolve: ResolverStatistic,
 }
 
 impl PoolStatistics {
@@ -122,22 +121,23 @@ impl PoolStatistics {
     /// use subscan::types::result::statistics::{
     ///     PoolStatistics,
     ///     ResolverStatistic,
+    ///     SubscanModuleStatistic,
     /// };
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut stats = PoolStatistics::default();
+    ///
     ///     let new = PoolStatistics {
-    ///         module: vec![],
-    ///         resolve: ResolverStatistic {
-    ///             elapsed: TimeDelta::seconds(10),
-    ///             ..Default::default()
-    ///         },
+    ///         module: vec![
+    ///             SubscanModuleStatistic::skipped("foo"),
+    ///         ]
     ///     };
     ///
     ///     stats.set(new).await;
     ///
-    ///     assert_eq!(stats.resolve.elapsed.num_seconds(), 10);
+    ///     assert_eq!(stats.module.len(), 1);
+    ///     assert_eq!(stats.module.first().unwrap().module, "foo");
     /// }
     /// ```
     pub async fn set(&mut self, new: PoolStatistics) {

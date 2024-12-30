@@ -39,7 +39,7 @@ impl LookUpHostFuture for Resolver {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver: Resolver = ResolverConfig::default().into();
+    ///     let resolver = Resolver::from(ResolverConfig::default());
     ///
     ///     assert!(!resolver.config().await.disabled)
     /// }

@@ -60,6 +60,7 @@ use std::{
 };
 
 use constants::LOG_TIME_FORMAT;
+use resolver::Resolver;
 use tokio::sync::OnceCell;
 
 use crate::{
@@ -132,11 +133,7 @@ impl Subscan {
 
         log::info!("Started scan on {} ({})", domain, time);
 
-        for module in self.modules().await {
-            pool.clone().submit(module.clone()).await;
-        }
-
-        pool.clone().start(self.config.concurrency).await;
+        pool.clone().start(self.modules().await).await;
 
         result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await
@@ -162,8 +159,7 @@ impl Subscan {
             time
         );
 
-        pool.clone().submit(module.clone()).await;
-        pool.clone().start(1).await;
+        pool.clone().start(&vec![module.clone()]).await;
 
         result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await
@@ -173,7 +169,8 @@ impl Subscan {
         let mut result = SubscanResult::from(domain);
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
-        let pool = SubscanBrutePool::from(domain, self.config.clone());
+        let resolver = Box::new(Resolver::from(self.config.resolver.clone()));
+        let pool = SubscanBrutePool::new(domain.to_owned(), resolver);
 
         let concurrency = self.config.resolver.concurrency;
         let wordlist = self.config.wordlist.clone();
