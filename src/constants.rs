@@ -9,7 +9,7 @@ pub const SUBSCAN_CHROME_PATH_ENV: &str = "SUBSCAN_CHROME_PATH";
 /// Concurrency level of module runner instances, count of threads
 pub const DEFAULT_MODULE_CONCURRENCY: u64 = 5;
 /// Concurrency level of resolver instances, count of threads
-pub const DEFAULT_RESOLVER_CONCURRENCY: u64 = 50;
+pub const DEFAULT_RESOLVER_CONCURRENCY: u64 = 100;
 /// Default HTTP timeout as a [`Duration`]
 pub const DEFAULT_HTTP_TIMEOUT: Duration = Duration::from_secs(30);
 /// Default DNS resolver timeout as a [`Duration`]

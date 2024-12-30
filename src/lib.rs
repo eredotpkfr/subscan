@@ -54,11 +54,6 @@ pub mod types;
 /// Utilities for the handle different stuff things
 pub mod utilities;
 
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-};
-
 use constants::LOG_TIME_FORMAT;
 use resolver::Resolver;
 use tokio::sync::OnceCell;
@@ -169,25 +164,19 @@ impl Subscan {
         let mut result = SubscanResult::from(domain);
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
-        let resolver = Box::new(Resolver::from(self.config.resolver.clone()));
-        let pool = SubscanBrutePool::new(domain.to_owned(), resolver);
-
         let concurrency = self.config.resolver.concurrency;
-        let wordlist = self.config.wordlist.clone();
-        let file = File::open(wordlist.expect("Wordlist must be specified!"));
+
+        let resolver = Box::new(Resolver::from(self.config.resolver.clone()));
+        let pool = SubscanBrutePool::new(domain.into(), concurrency, resolver);
+        let wordlist = self
+            .config
+            .wordlist
+            .clone()
+            .expect("Wordlist must be specified!");
 
         log::info!("Started brute force attack on {} ({})", domain, time);
 
-        let reader = BufReader::new(file.expect("Cannot read wordlist!"));
-
-        pool.clone().spawn_bruters(concurrency).await;
-
-        for subdomain in reader.lines().map_while(Result::ok) {
-            pool.clone().submit(subdomain).await;
-        }
-
-        pool.clone().kill_bruters(concurrency).await;
-        pool.clone().join().await;
+        pool.clone().start(wordlist).await;
 
         result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await
