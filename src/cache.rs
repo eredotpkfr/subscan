@@ -1,7 +1,7 @@
 use lazy_static::lazy_static;
 
 use crate::{
-    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
+    interfaces::module::SubscanModuleInterface,
     modules::{
         engines::{bing, duckduckgo, google, yahoo},
         integrations::{
@@ -135,9 +135,7 @@ impl CacheManager {
     /// ```
     pub async fn configure(&self, config: RequesterConfig) {
         for module in self.modules().await.iter() {
-            if let Some(requester) = module.lock().await.requester().await {
-                requester.lock().await.configure(config.clone()).await
-            }
+            module.lock().await.configure(config.clone()).await;
         }
     }
 }

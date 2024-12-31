@@ -2,6 +2,7 @@ use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
 use tokio::sync::Mutex;
 
+use super::requester::RequesterInterface;
 use crate::{
     enums::dispatchers::{
         RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
@@ -14,7 +15,10 @@ use crate::{
         },
         zonetransfer::ZoneTransfer,
     },
-    types::{core::Result, env::SubscanModuleEnvs, result::module::SubscanModuleResult},
+    types::{
+        config::requester::RequesterConfig, core::Result, env::SubscanModuleEnvs,
+        result::module::SubscanModuleResult,
+    },
 };
 
 /// Generic `subscan` module trait definition to implement subdomain enumeration modules
@@ -36,6 +40,12 @@ pub trait SubscanModuleInterface: Sync + Send {
     async fn requester(&self) -> Option<&Mutex<RequesterDispatcher>>;
     /// Returns module extractor reference if available
     async fn extractor(&self) -> Option<&SubdomainExtractorDispatcher>;
+    /// Configure module requester instance
+    async fn configure(&self, rconfig: RequesterConfig) {
+        if let Some(requester) = self.requester().await {
+            requester.lock().await.configure(rconfig).await;
+        }
+    }
     /// Just like a `main` method, when the module run this `run` method will be called.
     /// So this method should do everything
     async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult>;
