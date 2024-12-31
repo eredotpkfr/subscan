@@ -75,8 +75,8 @@ impl SubscanBrutePool {
     /// #[tokio::main]
     /// async fn main() {
     ///     let domain = String::from("foo.com");
-    ///     let resolver = Resolver::from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(domain, 2, Box::new(resolver));
+    ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
+    ///     let pool = SubscanBrutePool::new(domain, 2, resolver);
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters().await;
@@ -103,8 +103,8 @@ impl SubscanBrutePool {
     /// #[tokio::main]
     /// async fn main() {
     ///     let domain = String::from("foo.com");
-    ///     let resolver = Resolver::from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(domain, 2, Box::new(resolver));
+    ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
+    ///     let pool = SubscanBrutePool::new(domain, 2, resolver);
     ///
     ///     assert!(pool.clone().is_empty().await);
     ///
@@ -133,8 +133,8 @@ impl SubscanBrutePool {
     /// #[tokio::main]
     /// async fn main() {
     ///     let domain = String::from("foo.com");
-    ///     let resolver = Resolver::from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(domain, 1, Box::new(resolver));
+    ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
+    ///     let pool = SubscanBrutePool::new(domain, 1, resolver);
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters().await;
@@ -163,8 +163,8 @@ impl SubscanBrutePool {
     /// #[tokio::main]
     /// async fn main() {
     ///     let domain = String::from("foo.com");
-    ///     let resolver = Resolver::from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(domain, 1, Box::new(resolver));
+    ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
+    ///     let pool = SubscanBrutePool::new(domain, 1, resolver);
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters().await;
@@ -207,8 +207,8 @@ impl SubscanBrutePool {
     /// #[tokio::main]
     /// async fn main() {
     ///     let domain = String::from("foo.com");
-    ///     let resolver = Resolver::from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(domain, 1, Box::new(resolver));
+    ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
+    ///     let pool = SubscanBrutePool::new(domain, 1, resolver);
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters().await;
@@ -250,8 +250,8 @@ impl SubscanBrutePool {
     /// #[tokio::main]
     /// async fn main() {
     ///     let domain = String::from("foo.com");
-    ///     let resolver = Resolver::from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(domain, 1, Box::new(resolver));
+    ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
+    ///     let pool = SubscanBrutePool::new(domain, 1, resolver);
     ///
     ///     pool.clone().spawn_bruters().await;
     ///     // submit subdomain into pool

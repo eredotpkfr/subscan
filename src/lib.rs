@@ -163,7 +163,7 @@ impl Subscan {
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
         let concurrency = self.config.resolver.concurrency;
 
-        let resolver = Box::new(Resolver::from(self.config.resolver.clone()));
+        let resolver = Resolver::boxed_from(self.config.resolver.clone());
         let pool = SubscanBrutePool::new(domain.into(), concurrency, resolver);
         let wordlist = self
             .config

@@ -51,9 +51,9 @@ impl ResolverConfig {
         } else {
             Box::new(move |domain: String| {
                 Box::pin(async move {
-                    let future = timeout(config.timeout, lookup_host(&domain));
-
-                    future.await.unwrap_or(None)
+                    timeout(config.timeout, lookup_host(&domain))
+                        .await
+                        .unwrap_or(None)
                 })
             })
         }

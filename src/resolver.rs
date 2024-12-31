@@ -11,6 +11,12 @@ pub struct Resolver {
     pub config: ResolverConfig,
 }
 
+impl Resolver {
+    pub fn boxed_from(config: ResolverConfig) -> Box<Self> {
+        Box::new(Self { config })
+    }
+}
+
 impl From<ResolverConfig> for Resolver {
     fn from(rconfig: ResolverConfig) -> Self {
         Self {

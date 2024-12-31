@@ -61,7 +61,7 @@ repos:
         additional_dependencies: ['@commitlint/config-conventional']
 
   - repo: https://github.com/crate-ci/typos
-    rev: typos-dict-v0.11.37
+    rev: v1.28.4
     hooks:
       - id: typos
 
@@ -93,7 +93,7 @@ repos:
         name: hadolint
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.21.2
+    rev: v8.22.1
     hooks:
       - id: gitleaks
         name: gitleaks
