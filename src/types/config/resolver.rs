@@ -1,21 +1,20 @@
 use std::time::Duration;
 
-use hickory_resolver::config::{ResolverConfig as HickoryResolverConfig, ResolverOpts};
+use tokio::time::timeout;
 
 use crate::{
     cli::commands::{
         brute::BruteCommandArgs, module::run::ModuleRunSubCommandArgs, scan::ScanCommandArgs,
     },
-    constants::DEFAULT_RESOLVER_CONCURRENCY,
-    resolver::Resolver,
+    constants::{DEFAULT_RESOLVER_CONCURRENCY, DEFAULT_RESOLVER_TIMEOUT},
     types::func::AsyncIPResolveFunc,
+    utilities::net::lookup_host,
 };
 
 /// IP address resolver component configurations
 #[derive(Clone, Debug)]
 pub struct ResolverConfig {
-    pub config: HickoryResolverConfig,
-    pub opts: ResolverOpts,
+    pub timeout: Duration,
     pub concurrency: u64,
     pub disabled: bool,
 }
@@ -29,27 +28,33 @@ impl ResolverConfig {
     ///
     /// ```
     /// use subscan::types::config::resolver::ResolverConfig;
+    /// use subscan::resolver::Resolver;
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut config = ResolverConfig::default();
+    ///     let lookup_ip = config.lookup_host_future().await;
     ///
     ///     config.disabled = true;
     ///
-    ///     let lookup_ip = config.lookup_ip_future().await;
-    ///     let resolver = config.into();
+    ///     let lookup_ip = config.lookup_host_future().await;
+    ///     let resolver = Resolver::from(config.clone());
     ///
-    ///     assert!(lookup_ip(&resolver, "foo.com".into()).await.is_none());
+    ///     assert!(lookup_ip("foo.com".into()).await.is_none());
     /// }
     /// ```
-    pub async fn lookup_ip_future(&self) -> AsyncIPResolveFunc {
-        if self.disabled {
-            Box::new(|_: &Resolver, _: String| Box::pin(async move { None }))
-        } else {
-            Box::new(|resolver: &Resolver, domain: String| {
-                let resolver = resolver.clone();
+    pub async fn lookup_host_future(&self) -> AsyncIPResolveFunc {
+        let config = self.clone();
 
-                Box::pin(async move { resolver.inner.lookup_ip(domain).await.ok()?.iter().next() })
+        if self.disabled {
+            Box::new(|_: String| Box::pin(async move { None }))
+        } else {
+            Box::new(move |domain: String| {
+                Box::pin(async move {
+                    timeout(config.timeout, lookup_host(&domain))
+                        .await
+                        .unwrap_or(None)
+                })
             })
         }
     }
@@ -58,8 +63,7 @@ impl ResolverConfig {
 impl Default for ResolverConfig {
     fn default() -> Self {
         Self {
-            config: HickoryResolverConfig::default(),
-            opts: ResolverOpts::default(),
+            timeout: DEFAULT_RESOLVER_TIMEOUT,
             concurrency: DEFAULT_RESOLVER_CONCURRENCY,
             disabled: false,
         }
@@ -85,13 +89,8 @@ impl From<ModuleRunSubCommandArgs> for ResolverConfig {
     /// assert_eq!(config.concurrency, args.resolver_concurrency);
     /// ```
     fn from(args: ModuleRunSubCommandArgs) -> Self {
-        let mut options = ResolverOpts::default();
-
-        options.timeout = Duration::from_secs(args.resolver_timeout);
-
         Self {
-            config: HickoryResolverConfig::default(),
-            opts: options,
+            timeout: Duration::from_millis(args.resolver_timeout),
             concurrency: args.resolver_concurrency,
             disabled: args.resolver_disabled,
         }
@@ -117,13 +116,8 @@ impl From<BruteCommandArgs> for ResolverConfig {
     /// assert_eq!(config.concurrency, args.resolver_concurrency);
     /// ```
     fn from(args: BruteCommandArgs) -> Self {
-        let mut options = ResolverOpts::default();
-
-        options.timeout = Duration::from_secs(args.resolver_timeout);
-
         Self {
-            config: HickoryResolverConfig::default(),
-            opts: options,
+            timeout: Duration::from_millis(args.resolver_timeout),
             concurrency: args.resolver_concurrency,
             disabled: false,
         }
@@ -149,13 +143,8 @@ impl From<ScanCommandArgs> for ResolverConfig {
     /// assert_eq!(config.concurrency, args.resolver_concurrency);
     /// ```
     fn from(args: ScanCommandArgs) -> Self {
-        let mut options = ResolverOpts::default();
-
-        options.timeout = Duration::from_secs(args.resolver_timeout);
-
         Self {
-            config: HickoryResolverConfig::default(),
-            opts: options,
+            timeout: Duration::from_millis(args.resolver_timeout),
             concurrency: args.resolver_concurrency,
             disabled: args.resolver_disabled,
         }

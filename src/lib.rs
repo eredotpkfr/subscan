@@ -54,12 +54,8 @@ pub mod types;
 /// Utilities for the handle different stuff things
 pub mod utilities;
 
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-};
-
 use constants::LOG_TIME_FORMAT;
+use resolver::Resolver;
 use tokio::sync::OnceCell;
 
 use crate::{
@@ -125,31 +121,28 @@ impl Subscan {
     pub async fn scan(&self, domain: &str) -> SubscanResult {
         self.init().await;
 
-        let mut result: SubscanResult = domain.into();
+        let mut result = SubscanResult::from(domain);
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
         let pool = SubscanModulePool::from(domain, self.config.clone());
 
         log::info!("Started scan on {} ({})", domain, time);
 
-        for module in self.modules().await {
-            pool.clone().submit(module.clone()).await;
-        }
-
-        pool.clone().start(self.config.concurrency).await;
+        pool.clone().start(self.modules().await).await;
 
         result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await
     }
 
     pub async fn run(&self, name: &str, domain: &str) -> SubscanResult {
-        self.init().await;
-
-        let mut result: SubscanResult = domain.into();
+        let mut result = SubscanResult::from(domain);
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
         let pool = SubscanModulePool::from(domain, self.config.clone());
         let module = self.module(name).await;
+        let rconfig = self.config.clone().into();
+
+        module.lock().await.configure(rconfig).await;
 
         log::info!(
             "Running {} module on {} ({})",
@@ -158,33 +151,29 @@ impl Subscan {
             time
         );
 
-        pool.clone().submit(module.clone()).await;
-        pool.clone().start(1).await;
+        pool.clone().start(&vec![module.clone()]).await;
 
         result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await
     }
 
     pub async fn brute(&self, domain: &str) -> SubscanResult {
-        let mut result: SubscanResult = domain.into();
+        let mut result = SubscanResult::from(domain);
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
-        let pool = SubscanBrutePool::from(domain, self.config.clone());
-
         let concurrency = self.config.resolver.concurrency;
-        let wordlist = self.config.wordlist.clone();
-        let file = File::open(wordlist.expect("Wordlist must be specified!"));
+
+        let resolver = Resolver::boxed_from(self.config.resolver.clone());
+        let pool = SubscanBrutePool::new(domain.into(), concurrency, resolver);
+        let wordlist = self
+            .config
+            .wordlist
+            .clone()
+            .expect("Wordlist must be specified!");
 
         log::info!("Started brute force attack on {} ({})", domain, time);
 
-        let reader = BufReader::new(file.expect("Cannot read wordlist!"));
-
-        for subdomain in reader.lines().map_while(Result::ok) {
-            pool.clone().submit(subdomain).await;
-        }
-
-        pool.clone().spawn_bruters(concurrency).await;
-        pool.clone().join().await;
+        pool.clone().start(wordlist).await;
 
         result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await

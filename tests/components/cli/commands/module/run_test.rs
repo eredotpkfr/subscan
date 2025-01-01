@@ -29,7 +29,10 @@ async fn module_run_default_args_test() {
                 assert_eq!(args.proxy, None);
                 assert_eq!(args.http_timeout, DEFAULT_HTTP_TIMEOUT.as_secs());
                 assert_eq!(args.resolver_concurrency, DEFAULT_RESOLVER_CONCURRENCY);
-                assert_eq!(args.resolver_timeout, DEFAULT_RESOLVER_TIMEOUT.as_secs());
+                assert_eq!(
+                    args.resolver_timeout,
+                    DEFAULT_RESOLVER_TIMEOUT.as_millis() as u64
+                );
             }
             _ => panic!("Expected ModuleSubCommands::Run"),
         },

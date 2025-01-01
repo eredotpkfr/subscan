@@ -21,7 +21,7 @@ pub fn read_stub(path: &str) -> Value {
     serde_json::from_str(&content).unwrap()
 }
 
-fn testdata_path() -> PathBuf {
+pub fn testdata_path() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("testing/testdata")
 }
 

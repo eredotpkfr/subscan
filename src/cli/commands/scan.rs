@@ -29,8 +29,8 @@ pub struct ScanCommandArgs {
     /// Module runner concurrency level, thread counts of runner instances
     #[arg(short = 'c', long, default_value_t = DEFAULT_MODULE_CONCURRENCY)]
     pub module_concurrency: u64,
-    /// IP resolver timeout value as a seconds
-    #[arg(long, default_value_t = DEFAULT_RESOLVER_TIMEOUT.as_secs())]
+    /// IP resolver timeout value as a milliseconds
+    #[arg(long, default_value_t = DEFAULT_RESOLVER_TIMEOUT.as_millis() as u64)]
     pub resolver_timeout: u64,
     /// IP resolver concurrency level, thread counts of resolver instances
     #[arg(long, default_value_t = DEFAULT_RESOLVER_CONCURRENCY)]

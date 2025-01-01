@@ -33,7 +33,10 @@ async fn scan_default_args_test() {
             assert_eq!(args.skips, "");
             assert_eq!(args.output, OutputFormat::JSON);
             assert_eq!(args.resolver_concurrency, DEFAULT_RESOLVER_CONCURRENCY);
-            assert_eq!(args.resolver_timeout, DEFAULT_RESOLVER_TIMEOUT.as_secs());
+            assert_eq!(
+                args.resolver_timeout,
+                DEFAULT_RESOLVER_TIMEOUT.as_millis() as u64
+            );
         }
         _ => panic!("Expected Commands::Scan"),
     }

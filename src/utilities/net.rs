@@ -1,3 +1,5 @@
+use std::net::IpAddr;
+
 use hickory_resolver::{
     config::{NameServerConfig, NameServerConfigGroup, Protocol::Tcp},
     system_conf,
@@ -28,4 +30,21 @@ pub fn get_default_ns() -> Option<NameServerConfig> {
         .iter()
         .find(tcp)
         .cloned()
+}
+
+/// Lookup IP address of any hostname
+///
+/// # Examples
+///
+/// ```no_run
+/// use subscan::utilities::net::lookup_host;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let ip = lookup_host("foo.com").await;
+///     // do something with ip
+/// }
+/// ```
+pub async fn lookup_host(domain: &str) -> Option<IpAddr> {
+    dns_lookup::lookup_host(domain).ok()?.first().cloned()
 }
