@@ -30,6 +30,8 @@ jobs:
         with:
           version: "latest"
           args: "--all-targets"
+        env:
+          RUSTFLAGS: ""
 
   rust-cargo-machete:
     runs-on: ubuntu-latest
