@@ -37,7 +37,7 @@ futures = "0.3.31"
 headless_chrome = { version = "1.0.15", default-features = false, features = ["fetch"] }
 hickory-client = { version = "0.24.2", default-features = false }
 hickory-resolver = { version = "0.24.2", default-features = false, features = ["system-config"] }
-itertools = "0.13.0"
+itertools = "0.14.0"
 lazy_static = "1.5.0"
 log = "0.4.22"
 prettytable-rs = "0.10.0"
