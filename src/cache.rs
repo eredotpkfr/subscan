@@ -1,4 +1,5 @@
 use lazy_static::lazy_static;
+use tokio::task::JoinSet;
 
 use crate::{
     interfaces::module::SubscanModuleInterface,
@@ -134,8 +135,15 @@ impl CacheManager {
     /// }
     /// ```
     pub async fn configure(&self, config: RequesterConfig) {
-        for module in self.modules().await.iter() {
-            module.lock().await.configure(config.clone()).await;
-        }
+        let mut futures = JoinSet::new();
+
+        self.modules().await.iter().for_each(|module| {
+            let module = module.clone();
+            let rconfig = config.clone();
+
+            futures.spawn(async move { module.lock().await.configure(rconfig).await });
+        });
+
+        futures.join_all().await;
     }
 }
