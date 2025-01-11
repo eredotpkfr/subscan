@@ -55,21 +55,23 @@ impl ZoneTransfer {
         zonetransfer.into()
     }
 
-    pub async fn get_async_client(&self, server: SocketAddr) -> Option<AsyncClient> {
+    pub async fn get_async_client(&self, server: SocketAddr) -> Result<AsyncClient> {
         type WrappedStream = AsyncIoTokioAsStd<TokioTcpStream>;
 
         let (stream, sender) = TcpClientStream::<WrappedStream>::new(server);
         let result = AsyncClient::new(stream, sender, None).await;
 
-        result.ok().map(|(client, bg)| {
-            tokio::spawn(bg);
-            client
-        })
+        result
+            .map_err(|_| Custom("client error".into()))
+            .map(|(client, bg)| {
+                tokio::spawn(bg);
+                Ok(client)
+            })?
     }
 
     pub async fn get_ns_as_ip(&self, server: SocketAddr, domain: &str) -> Option<Vec<SocketAddr>> {
         let mut ips = vec![];
-        let mut client = self.get_async_client(server).await?;
+        let mut client = self.get_async_client(server).await.ok()?;
 
         let name = Name::from_str(domain).ok()?;
         let ns_response = client.query(name, DNSClass::IN, RecordType::NS);
@@ -100,11 +102,9 @@ impl ZoneTransfer {
         domain: &str,
     ) -> Result<Vec<Subdomain>> {
         let pattern = regex::generate_subdomain_regex(domain)?;
-        let mut client = self
-            .get_async_client(server)
-            .await
-            .ok_or(Custom("client error".into()))?;
-        let mut subs = vec![];
+
+        let mut subs = Vec::new();
+        let mut client = self.get_async_client(server).await?;
 
         let name = Name::from_str(domain).unwrap();
         let axfr_response = client.query(name, DNSClass::IN, RecordType::AXFR);
@@ -154,7 +154,11 @@ impl SubscanModuleInterface for ZoneTransfer {
                 .ok_or(Custom("connection error".into()))?;
 
             for ip in ips {
-                result.extend(self.attempt_zone_transfer(ip, domain).await?);
+                result.extend(
+                    self.attempt_zone_transfer(ip, domain)
+                        .await
+                        .unwrap_or_default(),
+                );
             }
 
             return Ok(result.with_finished().await);
