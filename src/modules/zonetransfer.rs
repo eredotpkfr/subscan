@@ -94,9 +94,16 @@ impl ZoneTransfer {
         Some(ips)
     }
 
-    pub async fn attempt_zone_transfer(&self, server: SocketAddr, domain: &str) -> Vec<Subdomain> {
-        let pattern = regex::generate_subdomain_regex(domain).unwrap();
-        let mut client = self.get_async_client(server).await.unwrap();
+    pub async fn attempt_zone_transfer(
+        &self,
+        server: SocketAddr,
+        domain: &str,
+    ) -> Result<Vec<Subdomain>> {
+        let pattern = regex::generate_subdomain_regex(domain)?;
+        let mut client = self
+            .get_async_client(server)
+            .await
+            .ok_or(Custom("client error".into()))?;
         let mut subs = vec![];
 
         let name = Name::from_str(domain).unwrap();
@@ -119,7 +126,7 @@ impl ZoneTransfer {
             }
         }
 
-        subs
+        Ok(subs)
     }
 }
 
@@ -147,7 +154,7 @@ impl SubscanModuleInterface for ZoneTransfer {
                 .ok_or(Custom("connection error".into()))?;
 
             for ip in ips {
-                result.extend(self.attempt_zone_transfer(ip, domain).await);
+                result.extend(self.attempt_zone_transfer(ip, domain).await?);
             }
 
             return Ok(result.with_finished().await);

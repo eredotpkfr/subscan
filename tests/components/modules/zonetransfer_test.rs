@@ -53,7 +53,7 @@ async fn attempt_zone_transfer_test() {
             .attempt_zone_transfer(server.socket, TEST_DOMAIN)
             .await;
 
-        assert_eq!(subs, [TEST_BAR_SUBDOMAIN]);
+        assert_eq!(subs.unwrap(), [TEST_BAR_SUBDOMAIN]);
     }
 }
 
