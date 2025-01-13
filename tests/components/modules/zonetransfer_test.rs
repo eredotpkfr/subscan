@@ -17,7 +17,7 @@ async fn get_async_client_test() {
     let zonetransfer = ZoneTransfer::dispatcher();
 
     if let SubscanModuleDispatcher::ZoneTransfer(zonetransfer) = zonetransfer {
-        assert!(zonetransfer.get_async_client(server.socket).await.is_some());
+        assert!(zonetransfer.get_async_client(server.socket).await.is_ok());
     }
 }
 
@@ -27,7 +27,7 @@ async fn get_async_client_fail_test() {
     let addr = SocketAddr::from_str(&format!("{LOCAL_HOST}:0")).unwrap();
 
     if let SubscanModuleDispatcher::ZoneTransfer(zonetransfer) = zonetransfer {
-        assert!(zonetransfer.get_async_client(addr).await.is_none());
+        assert!(zonetransfer.get_async_client(addr).await.is_err());
     }
 }
 
@@ -53,7 +53,7 @@ async fn attempt_zone_transfer_test() {
             .attempt_zone_transfer(server.socket, TEST_DOMAIN)
             .await;
 
-        assert_eq!(subs, [TEST_BAR_SUBDOMAIN]);
+        assert_eq!(subs.unwrap(), [TEST_BAR_SUBDOMAIN]);
     }
 }
 
