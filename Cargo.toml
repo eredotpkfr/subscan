@@ -35,7 +35,7 @@ env_logger = "0.11.6"
 flume = "0.11.1"
 futures = "0.3.31"
 headless_chrome = { version = "1.0.15", default-features = false, features = ["fetch"] }
-hickory-client = { version = "0.24.2", default-features = false }
+hickory-client = { version = "0.24.3", default-features = false }
 hickory-resolver = { version = "0.24.2", default-features = false, features = ["system-config"] }
 itertools = "0.14.0"
 lazy_static = "1.5.0"
