@@ -20,7 +20,7 @@ keywords = [
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-async-trait = "0.1.86"
+async-trait = "0.1.87"
 chrono = "0.4.38"
 clap = { version = "4.5.31", features = ["derive"] }
 clap-verbosity-flag = "3.0.2"
