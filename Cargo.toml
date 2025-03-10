@@ -55,7 +55,7 @@ automod = "1.0.15"
 hickory-server = "0.24.3"
 md5 = "0.7.0"
 stubr = "0.6.2"
-tempfile = "3.17.1"
+tempfile = "3.18.0"
 
 [profile.release]
 lto = true
