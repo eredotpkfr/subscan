@@ -34,7 +34,7 @@ enum_dispatch = "0.3.13"
 env_logger = "0.11.6"
 flume = "0.11.1"
 futures = "0.3.31"
-headless_chrome = { version = "1.0.16", default-features = false, features = ["fetch"] }
+headless_chrome = { version = "1.0.17", default-features = false, features = ["fetch"] }
 hickory-client = { version = "0.24.3", default-features = false }
 hickory-resolver = { version = "0.24.4", default-features = false, features = ["system-config"] }
 itertools = "0.14.0"
