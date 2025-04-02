@@ -32,10 +32,11 @@
         <!-- Custom theme stylesheets -->
 
 
-        <!-- Provide site root to javascript -->
+        <!-- Provide site root and default themes to javascript -->
         <script>
-            var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "ayu";
+            const path_to_root = "";
+            const default_light_theme = "ayu";
+            const default_dark_theme = "navy";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc.js"></script>
@@ -45,8 +46,8 @@
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
         <script>
             try {
-                var theme = localStorage.getItem('mdbook-theme');
-                var sidebar = localStorage.getItem('mdbook-sidebar');
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
 
                 if (theme.startsWith('"') && theme.endsWith('"')) {
                     localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
@@ -60,7 +61,8 @@
 
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script>
-            var theme;
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             const html = document.documentElement;
@@ -73,8 +75,8 @@
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
-            var sidebar = null;
-            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
@@ -110,6 +112,7 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
@@ -288,16 +291,13 @@ Options:
 <p>To scan a domain using all available modules, use the following command:</p>
 <pre><code class="language-bash">~$ subscan scan -d example.com
 </code></pre>
-<p>You can also choose specific modules to run or skip using the <code>--skips</code> and <code>--modules</code> arguments. Module names should be provided as a comma-separated list<sup class="footnote-reference"><a href="#note">1</a></sup></p>
+<p>You can also choose specific modules to run or skip using the <code>--skips</code> and <code>--modules</code> arguments. Module names should be provided as a comma-separated list<sup class="footnote-reference" id="fr-note-1"><a href="#footnote-note">1</a></sup></p>
 <pre><code class="language-bash">~$ # skip the commoncrawl and google modules during the scan
 ~$ subscan scan -d example.com --skips=commoncrawl,google
 </code></pre>
 <pre><code class="language-bash">~$ # run only the virustotal module
 ~$ subscan scan -d example.com --modules=virustotal
 </code></pre>
-<div class="footnote-definition" id="note"><sup class="footnote-definition-label">1</sup>
-<p>If a module is included in both the <code>--skips</code> and <code>--modules</code> arguments, it will be skipped and not executed</p>
-</div>
 <blockquote>
 <p>If the module you’re using requires authentication, you can provide the necessary credentials, such as an API key, through module-specific environment variables. For more details about environment variables, refer to the <a href="user-guide/quickstart/usage/../../environments.html">Environments</a> chapter</p>
 <pre><code class="language-bash">SUBSCAN_VIRUSTOTAL_APIKEY=foo subscan scan -d example.com --modules=virustotal
@@ -310,7 +310,11 @@ Options:
 <blockquote>
 <p>To specify wordlist into docker container, see the <a href="user-guide/quickstart/usage/docker.html">Docker</a> usage</p>
 </blockquote>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="docker-usage"><a class="header" href="#docker-usage">Docker Usage</a></h1>
+<hr>
+<ol class="footnote-definition"><li id="footnote-note">
+<p>If a module is included in both the <code>--skips</code> and <code>--modules</code> arguments, it will be skipped and not executed <a href="#fr-note-1">↩</a></p>
+</li>
+</ol><div style="break-before: page; page-break-before: always;"></div><h1 id="docker-usage"><a class="header" href="#docker-usage">Docker Usage</a></h1>
 <p>Once you’ve <a href="user-guide/quickstart/usage/../../quickstart/install.html#pull-docker-image">pulled</a> the pre-built image from <a href="https://hub.docker.com/">Docker Hub</a>, you can easily run the container to perform subdomain enumeration</p>
 <pre><code class="language-bash">~$ docker run -it --rm eredotpkfr/subscan scan -d example.com
 </code></pre>
