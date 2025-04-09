@@ -1,6 +1,7 @@
 use std::{net::SocketAddr, str::FromStr};
 
-use hickory_resolver::config::{NameServerConfig, Protocol};
+use hickory_client::proto::xfer::Protocol;
+use hickory_resolver::config::NameServerConfig;
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher, error::ModuleErrorKind::Custom,
     interfaces::module::SubscanModuleInterface, modules::zonetransfer::ZoneTransfer,
@@ -12,22 +13,22 @@ use crate::common::{
 };
 
 #[tokio::test]
-async fn get_async_client_test() {
+async fn get_tcp_client_test() {
     let server = spawn_mock_dns_server().await;
     let zonetransfer = ZoneTransfer::dispatcher();
 
     if let SubscanModuleDispatcher::ZoneTransfer(zonetransfer) = zonetransfer {
-        assert!(zonetransfer.get_async_client(server.socket).await.is_ok());
+        assert!(zonetransfer.get_tcp_client(server.socket).await.is_ok());
     }
 }
 
 #[tokio::test]
-async fn get_async_client_fail_test() {
+async fn get_tcp_client_fail_test() {
     let zonetransfer = ZoneTransfer::dispatcher();
     let addr = SocketAddr::from_str(&format!("{LOCAL_HOST}:0")).unwrap();
 
     if let SubscanModuleDispatcher::ZoneTransfer(zonetransfer) = zonetransfer {
-        assert!(zonetransfer.get_async_client(addr).await.is_err());
+        assert!(zonetransfer.get_tcp_client(addr).await.is_err());
     }
 }
 
