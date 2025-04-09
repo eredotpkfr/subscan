@@ -35,8 +35,8 @@ env_logger = "0.11.8"
 flume = "0.11.1"
 futures = "0.3.31"
 headless_chrome = { version = "1.0.17", default-features = false, features = ["fetch"] }
-hickory-client = { version = "0.24.3", default-features = false }
-hickory-resolver = { version = "0.24.4", default-features = false, features = ["system-config"] }
+hickory-client = { version = "0.25.1", default-features = false }
+hickory-resolver = { version = "0.25.1", default-features = false, features = ["system-config"] }
 itertools = "0.14.0"
 lazy_static = "1.5.0"
 log = "0.4.27"
@@ -52,7 +52,7 @@ url = "2.5.4"
 
 [dev-dependencies]
 automod = "1.0.15"
-hickory-server = "0.24.3"
+hickory-server = "0.25.1"
 md5 = "0.7.0"
 stubr = "0.6.2"
 tempfile = "3.19.1"

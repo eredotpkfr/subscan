@@ -4,12 +4,11 @@ use std::{
     time::Duration,
 };
 
-use hickory_client::{
+use hickory_client::proto::{
     op::{Header, MessageType, OpCode, ResponseCode},
-    proto::rr::LowerName,
     rr::{
         rdata::{A, AAAA, NS},
-        RData, Record, RecordType,
+        LowerName, RData, Record, RecordType,
     },
 };
 use hickory_resolver::Name;
@@ -64,7 +63,7 @@ impl MockDNSHandler {
         request: &Request,
         responder: R,
     ) -> Option<ResponseInfo> {
-        match request.query().query_type() {
+        match request.queries().first().unwrap().query_type() {
             RecordType::A | RecordType::AAAA => {
                 self.handle_a_and_aaaa_query(request, responder).await
             }
@@ -83,7 +82,7 @@ impl MockDNSHandler {
             return None;
         }
 
-        match request.query().name() {
+        match request.queries().first().unwrap().name() {
             name if self.zone.zone_of(name) => self.handle_zone(request, response).await,
             _ => None,
         }
@@ -100,7 +99,11 @@ impl MockDNSHandler {
         let name = Name::from_utf8("ns.foo.com").unwrap();
         let rdata = RData::NS(NS(name));
 
-        let records = vec![Record::from_rdata(request.query().name().into(), 60, rdata)];
+        let records = vec![Record::from_rdata(
+            request.queries().first().unwrap().name().into(),
+            60,
+            rdata,
+        )];
         let response = builder.build(header, records.iter(), &[], &[], &[]);
 
         responder.send_response(response).await.ok()
@@ -144,7 +147,11 @@ impl MockDNSHandler {
             IpAddr::V6(ipv6) => RData::AAAA(AAAA(ipv6)),
         };
 
-        let records = vec![Record::from_rdata(request.query().name().into(), 60, rdata)];
+        let records = vec![Record::from_rdata(
+            request.queries().first().unwrap().name().into(),
+            60,
+            rdata,
+        )];
         let response = builder.build(header, records.iter(), &[], &[], &[]);
 
         responder.send_response(response).await.ok()

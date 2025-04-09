@@ -1,7 +1,8 @@
 use std::net::IpAddr;
 
+use hickory_client::proto::xfer::Protocol::Tcp;
 use hickory_resolver::{
-    config::{NameServerConfig, NameServerConfigGroup, Protocol::Tcp},
+    config::{NameServerConfig, NameServerConfigGroup},
     system_conf,
 };
 
