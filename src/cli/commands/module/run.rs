@@ -1,8 +1,11 @@
 use clap::Args;
 
-use crate::constants::{
-    DEFAULT_HTTP_TIMEOUT, DEFAULT_RESOLVER_CONCURRENCY, DEFAULT_RESOLVER_TIMEOUT,
-    DEFAULT_USER_AGENT,
+use crate::{
+    constants::{
+        DEFAULT_HTTP_TIMEOUT, DEFAULT_RESOLVER_CONCURRENCY, DEFAULT_RESOLVER_TIMEOUT,
+        DEFAULT_USER_AGENT,
+    },
+    enums::output::OutputFormat,
 };
 
 /// Run command to start any module
@@ -13,6 +16,9 @@ pub struct ModuleRunSubCommandArgs {
     /// Target domain address to be enumerated
     #[arg(short, long)]
     pub domain: String,
+    /// Set output format
+    #[arg(value_enum, short, long, default_value = None)]
+    pub output: Option<OutputFormat>,
     /// Set User-Agent header value for HTTP requests
     #[arg(short, long, default_value = DEFAULT_USER_AGENT)]
     pub user_agent: String,

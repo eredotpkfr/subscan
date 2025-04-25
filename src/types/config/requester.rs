@@ -3,7 +3,8 @@ use std::{collections::HashMap, time::Duration};
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue, USER_AGENT};
 
 use crate::{
-    constants::DEFAULT_HTTP_TIMEOUT,
+    cli::commands::{module::run::ModuleRunSubCommandArgs, scan::ScanCommandArgs},
+    constants::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
     types::{config::subscan::SubscanConfig, env::Credentials},
 };
 
@@ -21,10 +22,75 @@ pub struct RequesterConfig {
 impl Default for RequesterConfig {
     fn default() -> Self {
         Self {
-            headers: HeaderMap::new(),
+            headers: HeaderMap::from_iter([(
+                USER_AGENT,
+                HeaderValue::from_static(DEFAULT_USER_AGENT),
+            )]),
             timeout: DEFAULT_HTTP_TIMEOUT,
             proxy: None,
             credentials: Credentials::default(),
+        }
+    }
+}
+
+impl From<ModuleRunSubCommandArgs> for RequesterConfig {
+    /// Create [`RequesterConfig`] object from [`ModuleRunSubCommandArgs`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::cli::commands::module::run::ModuleRunSubCommandArgs;
+    /// use subscan::types::config::requester::RequesterConfig;
+    ///
+    /// let args = ModuleRunSubCommandArgs {
+    ///     http_timeout: 120,
+    ///     ..Default::default()
+    /// };
+    ///
+    /// let config: RequesterConfig = args.clone().into();
+    ///
+    /// assert_eq!(config.timeout.as_secs(), args.http_timeout);
+    /// ```
+    fn from(args: ModuleRunSubCommandArgs) -> Self {
+        Self {
+            headers: HeaderMap::from_iter([(
+                USER_AGENT,
+                HeaderValue::from_str(&args.user_agent).unwrap(),
+            )]),
+            timeout: Duration::from_secs(args.http_timeout),
+            proxy: args.proxy,
+            ..Default::default()
+        }
+    }
+}
+
+impl From<ScanCommandArgs> for RequesterConfig {
+    /// Create [`RequesterConfig`] object from [`ScanCommandArgs`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::cli::commands::scan::ScanCommandArgs;
+    /// use subscan::types::config::requester::RequesterConfig;
+    ///
+    /// let args = ScanCommandArgs {
+    ///     http_timeout: 120,
+    ///     ..Default::default()
+    /// };
+    ///
+    /// let config: RequesterConfig = args.clone().into();
+    ///
+    /// assert_eq!(config.timeout.as_secs(), args.http_timeout);
+    /// ```
+    fn from(args: ScanCommandArgs) -> Self {
+        Self {
+            headers: HeaderMap::from_iter([(
+                USER_AGENT,
+                HeaderValue::from_str(&args.user_agent).unwrap(),
+            )]),
+            timeout: Duration::from_secs(args.http_timeout),
+            proxy: args.proxy,
+            ..Default::default()
         }
     }
 }
@@ -41,18 +107,10 @@ impl From<SubscanConfig> for RequesterConfig {
     /// let config = SubscanConfig::default();
     /// let rconfig = RequesterConfig::from(config.clone());
     ///
-    /// assert_eq!(rconfig.timeout.as_secs(), config.timeout);
+    /// assert_eq!(rconfig.timeout, config.requester.timeout);
     /// ```
     fn from(config: SubscanConfig) -> Self {
-        Self {
-            headers: HeaderMap::from_iter([(
-                USER_AGENT,
-                HeaderValue::from_str(&config.user_agent).unwrap(),
-            )]),
-            timeout: Duration::from_secs(config.timeout),
-            proxy: config.proxy.clone(),
-            credentials: Credentials::default(),
-        }
+        config.requester
     }
 }
 

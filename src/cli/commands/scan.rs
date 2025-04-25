@@ -74,17 +74,17 @@ impl ScanCommandArgs {
         };
 
         let split = self.modules.trim().split(",");
-        let valids = split.filter_map(filter_empty).collect();
+        let modules = split.filter_map(filter_empty).collect();
 
         let split = self.skips.trim().split(",");
-        let invalids = split.filter_map(filter_empty).collect();
+        let skips = split.filter_map(filter_empty).collect();
 
         if self.modules == ASTERISK && self.skips.is_empty() {
             CacheFilter::NoFilter
         } else if self.modules == ASTERISK && !self.skips.is_empty() {
-            CacheFilter::FilterByName((vec![], invalids).into())
+            CacheFilter::FilterByName((vec![], skips).into())
         } else {
-            CacheFilter::FilterByName((valids, invalids).into())
+            CacheFilter::FilterByName((modules, skips).into())
         }
     }
 }
