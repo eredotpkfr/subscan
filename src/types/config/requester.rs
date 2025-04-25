@@ -150,19 +150,22 @@ impl RequesterConfig {
     ///
     /// ```
     /// use subscan::types::config::requester::RequesterConfig;
-    /// use reqwest::header::{USER_AGENT, HeaderValue};
+    /// use reqwest::header::{USER_AGENT, HeaderValue, HeaderName};
     ///
     /// let mut config = RequesterConfig::default();
-    /// let user_agent = HeaderValue::from_str("foo").expect("Value error!");
     ///
-    /// assert_eq!(config.headers.len(), 0);
+    /// let name = HeaderName::from_static("foo");
+    /// let value = HeaderValue::from_static("foo");
     ///
-    /// config.add_header(USER_AGENT, user_agent);
-    ///
+    /// assert!(config.headers.get(USER_AGENT).is_some());
     /// assert!(config.headers.contains_key(USER_AGENT));
     ///
-    /// assert_eq!(config.headers.len(), 1);
-    /// assert_eq!(config.headers.get(USER_AGENT).unwrap(), "foo");
+    /// config.add_header(name.clone(), value);
+    ///
+    /// assert!(config.headers.contains_key(&name));
+    ///
+    /// assert_eq!(config.headers.len(), 2);
+    /// assert_eq!(config.headers.get(name).unwrap(), "foo");
     /// ```
     pub fn add_header(&mut self, name: HeaderName, value: HeaderValue) {
         self.headers.insert(name, value);
