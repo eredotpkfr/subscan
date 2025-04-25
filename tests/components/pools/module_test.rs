@@ -9,7 +9,10 @@ use subscan::{
     error::ModuleErrorKind::UrlParse,
     modules::{engines::google::Google, integrations::alienvault::AlienVault},
     pools::module::SubscanModulePool,
-    types::{core::SubscanModule, filters::ModuleNameFilter, result::item::PoolResultItem},
+    types::{
+        config::pool::PoolConfig, core::SubscanModule, filters::ModuleNameFilter,
+        result::item::PoolResultItem,
+    },
 };
 
 use crate::common::{
@@ -21,13 +24,19 @@ use crate::common::{
 #[stubr::mock("module/engines/google.json")]
 async fn submit_test() {
     let resolver = MockResolver::default_boxed();
+    let config = PoolConfig {
+        filter: CacheFilter::NoFilter,
+        concurrency: 1,
+        print: false,
+        output: None,
+    };
 
     let mut dispatcher = Google::dispatcher();
 
     funcs::wrap_module_url(&mut dispatcher, &stubr.path("/search"));
 
     let google = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), 1, resolver, CacheFilter::default());
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), config, resolver);
 
     let item = PoolResultItem {
         subdomain: TEST_BAR_SUBDOMAIN.into(),
@@ -46,13 +55,19 @@ async fn submit_test() {
 #[stubr::mock("module/engines/google.json")]
 async fn result_test() {
     let resolver = MockResolver::default_boxed();
+    let config = PoolConfig {
+        filter: CacheFilter::NoFilter,
+        concurrency: 1,
+        print: false,
+        output: None,
+    };
 
     let mut dispatcher = Google::dispatcher();
 
     funcs::wrap_module_url(&mut dispatcher, &stubr.path("/search"));
 
     let google = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), 1, resolver, CacheFilter::NoFilter);
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), config, resolver);
 
     pool.clone().start(&vec![google]).await;
 
@@ -70,11 +85,16 @@ async fn result_test() {
 #[stubr::mock("module/engines/google.json")]
 async fn result_test_with_filter() {
     let resolver = MockResolver::default_boxed();
-
     let filter = CacheFilter::FilterByName(ModuleNameFilter {
         modules: vec!["google".to_string()],
         skips: vec!["alienvault".to_string()],
     });
+    let config = PoolConfig {
+        filter,
+        concurrency: 1,
+        print: false,
+        output: None,
+    };
 
     let mut google_dispatcher = Google::dispatcher();
     let mut alienvault_dispatcher = AlienVault::dispatcher();
@@ -84,8 +104,7 @@ async fn result_test_with_filter() {
 
     let google = SubscanModule::from(google_dispatcher);
     let alienvault = SubscanModule::from(alienvault_dispatcher);
-
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), 1, resolver, filter);
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), config, resolver);
 
     pool.clone().start(&vec![google, alienvault]).await;
 
@@ -103,6 +122,12 @@ async fn result_test_with_filter() {
 #[tokio::test]
 async fn result_test_with_error() {
     let resolver = MockResolver::default_boxed();
+    let config = PoolConfig {
+        filter: CacheFilter::NoFilter,
+        concurrency: 1,
+        print: false,
+        output: None,
+    };
 
     let mut dispatcher = AlienVault::dispatcher();
 
@@ -111,7 +136,7 @@ async fn result_test_with_error() {
     }
 
     let alienvault = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), 1, resolver, CacheFilter::NoFilter);
+    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), config, resolver);
 
     pool.clone().start(&vec![alienvault]).await;
 
