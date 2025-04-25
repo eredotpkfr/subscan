@@ -72,8 +72,8 @@ async fn result_test_with_filter() {
     let resolver = MockResolver::default_boxed();
 
     let filter = CacheFilter::FilterByName(ModuleNameFilter {
-        valids: vec!["google".to_string()],
-        invalids: vec!["alienvault".to_string()],
+        modules: vec!["google".to_string()],
+        skips: vec!["alienvault".to_string()],
     });
 
     let mut google_dispatcher = Google::dispatcher();

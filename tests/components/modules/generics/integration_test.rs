@@ -1,7 +1,11 @@
 use std::env;
 
-use reqwest::Url;
+use reqwest::{
+    header::{HeaderValue, USER_AGENT},
+    Url,
+};
 use subscan::{
+    constants::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
     enums::{auth::AuthenticationMethod, content::Content},
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     types::{
@@ -50,7 +54,11 @@ async fn authenticate_test_no_auth() {
 
     // Should be not changed anything
     assert_eq!(url, url);
-    assert_eq!(rconfig.headers.len(), 0)
+    assert_eq!(
+        rconfig.headers.get(USER_AGENT).unwrap(),
+        HeaderValue::from_static(DEFAULT_USER_AGENT)
+    );
+    assert_eq!(rconfig.timeout, DEFAULT_HTTP_TIMEOUT);
 }
 
 #[tokio::test]
