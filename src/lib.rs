@@ -140,9 +140,12 @@ impl Subscan {
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
         let pool = SubscanModulePool::from(domain, self.config.clone());
         let module = self.module(name).await;
-        let rconfig = self.config.clone().into();
 
-        module.lock().await.configure(rconfig).await;
+        module
+            .lock()
+            .await
+            .configure(self.config.clone().into())
+            .await;
 
         log::info!(
             "Running {} module on {} ({})",
