@@ -19,15 +19,13 @@ async fn main() {
 
     // filter modules by name, only runs google and alienvault modules
     let filter = ModuleNameFilter {
-        valids: vec!["google".into(), "alienvault".into()],
-        invalids: vec![],
+        modules: vec!["google".into(), "alienvault".into()],
+        skips: vec![],
     };
 
     // set module conccurrency to 1
-    // set HTTP timeout to 120
     let config = SubscanConfig {
         concurrency: 1,
-        timeout: 120,
         filter: FilterByName(filter),
         ..Default::default()
     };
