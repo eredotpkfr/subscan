@@ -43,16 +43,17 @@ This command runs the specified module and is primarily used to quickly test a n
 
 ### Argument List
 
-| Name                     | Short |            Description             |
-| :----------------------- | :---: | :--------------------------------: |
-| `--domain`               | `-d`  |    Target domain to be scanned     |
-| `--user-agent`           | `-u`  |     Set a `User-Agent` header      |
-| `--http-timeout`         | `-t`  |      HTTP timeout as seconds       |
-| `--proxy`                | `-p`  |           Set HTTP proxy           |
-| `--resolver-timeout`     |       |        IP resolver timeout         |
-| `--resolver-concurrency` |       |  IP resolver concurrency level     |
-| `--disable-ip-resolve`   |       | Disable IP address resolve process |
-| `--help`                 | `-h`  |             Print help             |
+| Name                     | Short |            Description                           |
+| :----------------------- | :---: | :----------------------------------------------: |
+| `--domain`               | `-d`  |    Target domain to be scanned                   |
+| `--user-agent`           | `-u`  |     Set a `User-Agent` header                    |
+| `--http-timeout`         | `-t`  |      HTTP timeout as seconds                     |
+| `--proxy`                | `-p`  |           Set HTTP proxy                         |
+| `--output`               | `-o`  | Set output format (`txt`, `csv`, `json`, `html`) |
+| `--resolver-timeout`     |       |        IP resolver timeout                       |
+| `--resolver-concurrency` |       |  IP resolver concurrency level                   |
+| `--disable-ip-resolve`   |       | Disable IP address resolve process               |
+| `--help`                 | `-h`  |             Print help                           |
 
 ### Common Use Cases
 
