@@ -7,11 +7,14 @@ use std::{
 use subscan::{
     enums::{cache::CacheFilter, dispatchers::SubscanModuleDispatcher},
     error::ModuleErrorKind::UrlParse,
-    modules::{engines::google::Google, integrations::alienvault::AlienVault},
+    modules::{
+        engines::google::Google,
+        integrations::alienvault::{AlienVault, ALIENVAULT_MODULE_NAME},
+    },
     pools::module::SubscanModulePool,
     types::{
         config::pool::PoolConfig, core::SubscanModule, filters::ModuleNameFilter,
-        result::item::PoolResultItem,
+        result::item::SubscanResultItem,
     },
 };
 
@@ -38,7 +41,7 @@ async fn submit_test() {
     let google = SubscanModule::from(dispatcher);
     let pool = SubscanModulePool::new(TEST_DOMAIN.into(), config, resolver);
 
-    let item = PoolResultItem {
+    let item = SubscanResultItem {
         subdomain: TEST_BAR_SUBDOMAIN.into(),
         ip: Some(IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap())),
     };
@@ -141,11 +144,11 @@ async fn result_test_with_error() {
     pool.clone().start(&vec![alienvault]).await;
 
     let result = pool.result().await;
-    let stat = result.statistics.module.first();
+    let stat = result.statistics.get(ALIENVAULT_MODULE_NAME);
 
     assert!(stat.is_some());
 
-    assert_eq!(result.statistics.module.len(), 1);
+    assert_eq!(result.statistics.len(), 1);
     assert_eq!(stat.unwrap().status, UrlParse.into());
     assert_eq!(result.items, BTreeSet::new());
 }

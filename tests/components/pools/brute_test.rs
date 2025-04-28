@@ -3,7 +3,7 @@ use std::{
     str::FromStr,
 };
 
-use subscan::{pools::brute::SubscanBrutePool, types::result::item::PoolResultItem};
+use subscan::{pools::brute::SubscanBrutePool, types::result::item::SubscanResultItem};
 
 use crate::common::{
     constants::{LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
@@ -16,7 +16,7 @@ async fn submit_test() {
     let resolver = MockResolver::default_boxed();
 
     let pool = SubscanBrutePool::new(TEST_DOMAIN.into(), 1, resolver);
-    let item = PoolResultItem {
+    let item = SubscanResultItem {
         subdomain: TEST_BAR_SUBDOMAIN.into(),
         ip: Some(IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap())),
     };
