@@ -9,7 +9,7 @@ use crate::{
     types::{
         config::{pool::PoolConfig, subscan::SubscanConfig},
         core::{Subdomain, SubscanModule, UnboundedFlumeChannel},
-        result::{item::PoolResultItem, pool::PoolResult, statistics::SubscanModuleStatistic},
+        result::{item::SubscanResultItem, pool::PoolResult, statistics::SubscanModuleStatistic},
     },
 };
 
@@ -205,7 +205,7 @@ impl SubscanModulePool {
 
         while let Ok(sub) = self.channels.subs.rx.recv_async().await {
             if let Some(subdomain) = sub {
-                let item = PoolResultItem {
+                let item = SubscanResultItem {
                     subdomain: subdomain.clone(),
                     ip: lookup_host(subdomain).await,
                 };
@@ -221,7 +221,10 @@ impl SubscanModulePool {
     pub async fn runner(self: Arc<Self>) {
         while let Ok(msg) = self.channels.module.rx.recv_async().await {
             if let Some(module) = msg {
-                let mut module = module.lock().await;
+                let mut module: tokio::sync::MutexGuard<
+                    '_,
+                    crate::enums::dispatchers::SubscanModuleDispatcher,
+                > = module.lock().await;
 
                 if !self.config.filter.is_filtered(module.name().await).await {
                     let subresult = module.run(&self.domain).await;
@@ -231,24 +234,32 @@ impl SubscanModulePool {
                         let stats = subresult.stats().await;
 
                         stats.status.log(name);
-                        self.result.lock().await.statistic(stats).await;
+                        self.result
+                            .lock()
+                            .await
+                            .statistics
+                            .insert(name.to_string(), stats);
 
                         for sub in subresult.valids(&self.domain) {
                             self.channels.subs.tx.send(Some(sub.to_string())).unwrap()
                         }
                     } else {
                         let error = subresult.unwrap_err();
-                        let stats = error.stats(name);
+                        let stats = error.stats();
 
                         stats.status.log(name);
-                        self.result.lock().await.statistic(stats).await;
+                        self.result
+                            .lock()
+                            .await
+                            .statistics
+                            .insert(name.to_string(), stats);
                     }
                 } else {
-                    let name = module.name().await;
-                    let stats = SubscanModuleStatistic::skipped(name);
+                    let name = module.name().await.to_string();
+                    let stats = SubscanModuleStatistic::skipped();
 
-                    stats.status.log(name);
-                    self.result.lock().await.statistic(stats).await;
+                    stats.status.log(&name);
+                    self.result.lock().await.statistics.insert(name, stats);
                 }
             } else {
                 break;

@@ -65,16 +65,14 @@ impl SubscanError {
     /// };
     ///
     /// let failed = SubscanError::from(SkippedByUser);
-    /// let stats = failed.stats("foo");
+    /// let stats = failed.stats();
     ///
-    /// assert_eq!(stats.module, "foo");
     /// assert_eq!(stats.status, SkippedByUser.into());
     /// assert_eq!(stats.count, 0);
     /// assert_eq!(stats.elapsed.num_seconds(), 0);
     /// ```
-    pub fn stats(&self, module: &str) -> SubscanModuleStatistic {
+    pub fn stats(&self) -> SubscanModuleStatistic {
         SubscanModuleStatistic {
-            module: module.to_string(),
             status: self.status(),
             count: 0,
             started_at: Utc::now(),

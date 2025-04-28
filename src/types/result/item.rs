@@ -1,12 +1,12 @@
-use std::net::IpAddr;
+use std::{collections::BTreeSet, net::IpAddr};
 
 use prettytable::{row, Row};
 use serde::Serialize;
 
 use crate::types::core::Subdomain;
 
-/// Pool result item, alias for [`SubscanResultItem`]
-pub type PoolResultItem = SubscanResultItem;
+/// Subscan result items data type
+pub type SubscanResultItems = BTreeSet<SubscanResultItem>;
 
 /// Core scan result item, simply stores single discovered subdomain and
 /// its IP address

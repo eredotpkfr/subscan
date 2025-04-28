@@ -1,4 +1,4 @@
-use std::{collections::BTreeSet, io::Write};
+use std::io::Write;
 
 use chrono::Utc;
 use colored::Colorize;
@@ -6,10 +6,14 @@ use csv::WriterBuilder;
 use serde::Serialize;
 use serde_json;
 
-use super::{pool::PoolResult, statistics::SubscanResultStatistics};
+use super::pool::PoolResult;
 use crate::{
     enums::output::OutputFormat,
-    types::result::{item::SubscanResultItem, metadata::SubscanResultMetadata},
+    types::result::{
+        item::{SubscanResultItem, SubscanResultItems},
+        metadata::SubscanResultMetadata,
+        statistics::SubscanResultStatistics,
+    },
     utilities::cli,
 };
 
@@ -18,7 +22,7 @@ use crate::{
 pub struct SubscanResult {
     pub metadata: SubscanResultMetadata,
     pub statistics: SubscanResultStatistics,
-    pub items: BTreeSet<SubscanResultItem>,
+    pub items: SubscanResultItems,
     pub total: usize,
 }
 
@@ -104,30 +108,32 @@ impl SubscanResult {
     ///     pool::PoolResult,
     /// };
     /// use subscan::types::core::Subdomain;
-    /// use subscan::types::result::item::PoolResultItem;
-    /// use subscan::types::result::statistics::PoolStatistics;
+    /// use subscan::types::result::{
+    ///     statistics::SubscanResultStatistics,
+    ///     item::SubscanResultItem,
+    /// };
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut result = SubscanResult::default();
-    ///     let item = PoolResultItem {
+    ///     let item = SubscanResultItem {
     ///         subdomain: Subdomain::from("bar.foo.com"),
     ///         ip: None,
     ///     };
     ///
     ///     let poolres = PoolResult {
-    ///         statistics: PoolStatistics::default(),
+    ///         statistics: SubscanResultStatistics::default(),
     ///         items: BTreeSet::from_iter([item]),
     ///     };
     ///
     ///     result.update_with_pool_result(poolres).await;
     ///
-    ///     assert_eq!(result.statistics.module.len(), 0);
+    ///     assert_eq!(result.statistics.len(), 0);
     ///     assert_eq!(result.items.len(), 1);
     /// }
     /// ```
     pub async fn update_with_pool_result(&mut self, result: PoolResult) {
-        self.statistics.set(result.statistics).await;
+        self.statistics = result.statistics;
         self.items.extend(result.items);
     }
 
@@ -139,21 +145,23 @@ impl SubscanResult {
     /// use std::collections::BTreeSet;
     /// use subscan::types::result::{
     ///     subscan::SubscanResult,
-    ///     statistics::PoolStatistics,
     ///     pool::PoolResult,
     /// };
-    /// use subscan::types::result::item::PoolResultItem;
+    /// use subscan::types::result::{
+    ///     item::SubscanResultItem,
+    ///     statistics::SubscanResultStatistics
+    /// };
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let item = PoolResultItem {
+    ///     let item = SubscanResultItem {
     ///         subdomain: "bar.foo.com".to_string(),
     ///         ip: None,
     ///     };
     ///
     ///     let mut result: SubscanResult = "foo.com".into();
     ///     let poolres = PoolResult {
-    ///         statistics: PoolStatistics::default(),
+    ///         statistics: SubscanResultStatistics::default(),
     ///         items: BTreeSet::from_iter([item]),
     ///     };
     ///

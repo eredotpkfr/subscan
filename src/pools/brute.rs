@@ -11,7 +11,7 @@ use crate::{
     interfaces::lookup::LookUpHostFuture,
     types::{
         core::{Subdomain, UnboundedFlumeChannel},
-        result::{item::PoolResultItem, pool::PoolResult},
+        result::{item::SubscanResultItem, pool::PoolResult},
     },
 };
 
@@ -50,7 +50,7 @@ impl SubscanBrutePool {
                 let subdomain = format!("{subdomain}.{}", self.domain);
 
                 if let Some(ip) = lookup_host(subdomain.clone()).await {
-                    let item = PoolResultItem {
+                    let item = SubscanResultItem {
                         subdomain,
                         ip: Some(ip),
                     };
