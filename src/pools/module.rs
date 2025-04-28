@@ -221,10 +221,7 @@ impl SubscanModulePool {
     pub async fn runner(self: Arc<Self>) {
         while let Ok(msg) = self.channels.module.rx.recv_async().await {
             if let Some(module) = msg {
-                let mut module: tokio::sync::MutexGuard<
-                    '_,
-                    crate::enums::dispatchers::SubscanModuleDispatcher,
-                > = module.lock().await;
+                let mut module = module.lock().await;
 
                 if !self.config.filter.is_filtered(module.name().await).await {
                     let subresult = module.run(&self.domain).await;
