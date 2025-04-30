@@ -59,7 +59,7 @@ impl SubscanBrutePool {
 
         while let Ok(sub) = self.channel.rx.recv_async().await {
             if let Some(subdomain) = sub {
-                let subdomain = format!("{subdomain}.{}", domain);
+                let subdomain = format!("{subdomain}.{domain}");
 
                 if let Some(ip) = lookup_host(subdomain.clone()).await {
                     let item = SubscanResultItem {
