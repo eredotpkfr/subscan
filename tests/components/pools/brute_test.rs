@@ -15,7 +15,7 @@ use crate::common::{
 async fn submit_test() {
     let resolver = MockResolver::default_boxed();
 
-    let pool = SubscanBrutePool::new(TEST_DOMAIN.into(), 1, resolver);
+    let pool = SubscanBrutePool::new(1, resolver);
     let item = SubscanResultItem {
         subdomain: TEST_BAR_SUBDOMAIN.into(),
         ip: Some(IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap())),
@@ -24,7 +24,7 @@ async fn submit_test() {
     assert!(pool.clone().is_empty().await);
 
     pool.clone().submit("bar".into()).await;
-    pool.clone().spawn_bruters().await;
+    pool.clone().spawn_bruters(TEST_DOMAIN).await;
 
     assert_eq!(pool.clone().len().await, 1);
 
@@ -38,10 +38,10 @@ async fn submit_test() {
 async fn result_test() {
     let resolver = MockResolver::default_boxed();
 
-    let pool = SubscanBrutePool::new(TEST_DOMAIN.into(), 1, resolver);
+    let pool = SubscanBrutePool::new(1, resolver);
 
     pool.clone().submit("bar".into()).await;
-    pool.clone().spawn_bruters().await;
+    pool.clone().spawn_bruters(TEST_DOMAIN).await;
     pool.clone().kill_bruters().await;
     pool.clone().join().await;
 
@@ -59,10 +59,10 @@ async fn result_test() {
 async fn start_test() {
     let resolver = MockResolver::default_boxed();
 
-    let pool = SubscanBrutePool::new(TEST_DOMAIN.into(), 1, resolver);
+    let pool = SubscanBrutePool::new(1, resolver);
     let wordlist = testdata_path().join("txt/wordlist.txt");
 
-    pool.clone().start(wordlist).await;
+    pool.clone().start(TEST_DOMAIN, wordlist).await;
 
     let binding = pool.result().await;
     let result = binding.items.first();

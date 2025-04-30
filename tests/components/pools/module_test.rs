@@ -39,7 +39,7 @@ async fn submit_test() {
     funcs::wrap_module_url(&mut dispatcher, &stubr.path("/search"));
 
     let google = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), config, resolver);
+    let pool = SubscanModulePool::new(config, resolver);
 
     let item = SubscanResultItem {
         subdomain: TEST_BAR_SUBDOMAIN.into(),
@@ -48,7 +48,7 @@ async fn submit_test() {
 
     assert!(pool.clone().is_empty().await);
 
-    pool.clone().start(&vec![google]).await;
+    pool.clone().start(TEST_DOMAIN, &vec![google]).await;
 
     assert_eq!(pool.clone().len().await, 0);
     assert_eq!(pool.result().await.items, [item].into());
@@ -70,9 +70,9 @@ async fn result_test() {
     funcs::wrap_module_url(&mut dispatcher, &stubr.path("/search"));
 
     let google = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), config, resolver);
+    let pool = SubscanModulePool::new(config, resolver);
 
-    pool.clone().start(&vec![google]).await;
+    pool.clone().start(TEST_DOMAIN, &vec![google]).await;
 
     let binding = pool.result().await;
     let result = binding.items.first();
@@ -107,9 +107,11 @@ async fn result_test_with_filter() {
 
     let google = SubscanModule::from(google_dispatcher);
     let alienvault = SubscanModule::from(alienvault_dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), config, resolver);
+    let pool = SubscanModulePool::new(config, resolver);
 
-    pool.clone().start(&vec![google, alienvault]).await;
+    pool.clone()
+        .start(TEST_DOMAIN, &vec![google, alienvault])
+        .await;
 
     let binding = pool.result().await;
     let result = binding.items.first();
@@ -139,9 +141,9 @@ async fn result_test_with_error() {
     }
 
     let alienvault = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), config, resolver);
+    let pool = SubscanModulePool::new(config, resolver);
 
-    pool.clone().start(&vec![alienvault]).await;
+    pool.clone().start(TEST_DOMAIN, &vec![alienvault]).await;
 
     let result = pool.result().await;
     let stat = result.statistics.get(ALIENVAULT_MODULE_NAME);
