@@ -9,7 +9,9 @@ use tokio::{sync::Mutex, task::JoinSet};
 
 use crate::{
     interfaces::lookup::LookUpHostFuture,
+    resolver::Resolver,
     types::{
+        config::subscan::SubscanConfig,
         core::{Subdomain, UnboundedFlumeChannel},
         result::{item::SubscanResultItem, pool::PoolResult},
     },
@@ -17,7 +19,6 @@ use crate::{
 
 /// Subscan brute pool to make brute force attack asynchronously
 pub struct SubscanBrutePool {
-    domain: String,
     concurrency: u64,
     result: Mutex<PoolResult>,
     resolver: Box<dyn LookUpHostFuture>,
@@ -25,14 +26,25 @@ pub struct SubscanBrutePool {
     workers: Mutex<JoinSet<()>>,
 }
 
+impl From<SubscanConfig> for Arc<SubscanBrutePool> {
+    fn from(config: SubscanConfig) -> Self {
+        Arc::new(SubscanBrutePool {
+            concurrency: config.resolver.concurrency,
+            result: PoolResult::default().into(),
+            resolver: Resolver::boxed_from(config.resolver),
+            channel: flume::unbounded::<Option<Subdomain>>().into(),
+            workers: Mutex::new(JoinSet::new()),
+        })
+    }
+}
+
 impl SubscanBrutePool {
-    pub fn new(domain: String, concurrency: u64, resolver: Box<dyn LookUpHostFuture>) -> Arc<Self> {
+    pub fn new(concurrency: u64, resolver: Box<dyn LookUpHostFuture>) -> Arc<Self> {
         let result = PoolResult::default().into();
         let channel = flume::unbounded::<Option<Subdomain>>().into();
         let workers = Mutex::new(JoinSet::new());
 
         Arc::new(Self {
-            domain,
             concurrency,
             result,
             resolver,
@@ -42,12 +54,12 @@ impl SubscanBrutePool {
     }
 
     /// Bruter method, simply tries to resolve IP address of subdomain
-    pub async fn bruter(self: Arc<Self>) {
+    pub async fn bruter(self: Arc<Self>, domain: String) {
         let lookup_host = self.resolver.lookup_host_future().await;
 
         while let Ok(sub) = self.channel.rx.recv_async().await {
             if let Some(subdomain) = sub {
-                let subdomain = format!("{subdomain}.{}", self.domain);
+                let subdomain = format!("{subdomain}.{}", domain);
 
                 if let Some(ip) = lookup_host(subdomain.clone()).await {
                     let item = SubscanResultItem {
@@ -74,12 +86,11 @@ impl SubscanBrutePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(domain, 2, resolver);
+    ///     let pool = SubscanBrutePool::new(2, resolver);
     ///
     ///     // spawn bruters that listen async channel
-    ///     pool.clone().spawn_bruters().await;
+    ///     pool.clone().spawn_bruters("foo.com").await;
     ///
     ///     assert_eq!(pool.clone().len().await, 2);
     ///
@@ -102,14 +113,13 @@ impl SubscanBrutePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(domain, 2, resolver);
+    ///     let pool = SubscanBrutePool::new(2, resolver);
     ///
     ///     assert!(pool.clone().is_empty().await);
     ///
     ///     // spawn bruters that listen async channel
-    ///     pool.clone().spawn_bruters().await;
+    ///     pool.clone().spawn_bruters("foo.com").await;
     ///
     ///     assert!(!pool.clone().is_empty().await);
     ///
@@ -132,12 +142,11 @@ impl SubscanBrutePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(domain, 1, resolver);
+    ///     let pool = SubscanBrutePool::new(1, resolver);
     ///
     ///     // spawn bruters that listen async channel
-    ///     pool.clone().spawn_bruters().await;
+    ///     pool.clone().spawn_bruters("foo.com").await;
     ///
     ///     assert!(!pool.clone().is_empty().await);
     ///
@@ -145,9 +154,12 @@ impl SubscanBrutePool {
     ///     pool.join().await;
     /// }
     /// ```
-    pub async fn spawn_bruters(self: Arc<Self>) {
+    pub async fn spawn_bruters(self: Arc<Self>, domain: &str) {
         for _ in 0..self.concurrency {
-            self.workers.lock().await.spawn(self.clone().bruter());
+            self.workers
+                .lock()
+                .await
+                .spawn(self.clone().bruter(domain.to_string()));
         }
     }
 
@@ -162,12 +174,11 @@ impl SubscanBrutePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(domain, 1, resolver);
+    ///     let pool = SubscanBrutePool::new(1, resolver);
     ///
     ///     // spawn bruters that listen async channel
-    ///     pool.clone().spawn_bruters().await;
+    ///     pool.clone().spawn_bruters("foo.com").await;
     ///     pool.clone().kill_bruters().await;
     ///     pool.clone().join().await;
     ///
@@ -181,11 +192,11 @@ impl SubscanBrutePool {
     }
 
     /// Start brute force with wordlist file
-    pub async fn start(self: Arc<Self>, wordlist: PathBuf) {
+    pub async fn start(self: Arc<Self>, domain: &str, wordlist: PathBuf) {
         let file = File::open(wordlist);
         let reader = BufReader::new(file.expect("Cannot read wordlist!"));
 
-        self.clone().spawn_bruters().await;
+        self.clone().spawn_bruters(domain).await;
 
         for subdomain in reader.lines().map_while(Result::ok) {
             self.clone().submit(subdomain).await;
@@ -206,12 +217,11 @@ impl SubscanBrutePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(domain, 1, resolver);
+    ///     let pool = SubscanBrutePool::new(1, resolver);
     ///
     ///     // spawn bruters that listen async channel
-    ///     pool.clone().spawn_bruters().await;
+    ///     pool.clone().spawn_bruters("foo.com").await;
     ///     // submit subdomain into pool
     ///     pool.clone().submit("api".into()).await;
     ///     // join all bruters in main thread
@@ -249,11 +259,10 @@ impl SubscanBrutePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(domain, 1, resolver);
+    ///     let pool = SubscanBrutePool::new(1, resolver);
     ///
-    ///     pool.clone().spawn_bruters().await;
+    ///     pool.clone().spawn_bruters("foo.com").await;
     ///     // submit subdomain into pool
     ///     pool.clone().submit("api".into()).await;
     ///     // join all bruters in main thread

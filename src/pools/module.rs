@@ -64,7 +64,6 @@ impl SubscanModulePoolWorkers {
 
 /// Subscan module pool to run modules and resolve IPs
 pub struct SubscanModulePool {
-    domain: String,
     config: PoolConfig,
     resolver: Box<dyn LookUpHostFuture>,
     result: Mutex<PoolResult>,
@@ -72,26 +71,9 @@ pub struct SubscanModulePool {
     workers: SubscanModulePoolWorkers,
 }
 
-impl SubscanModulePool {
-    /// Create easily [`SubscanModulePool`] from given target domain and [`SubscanConfig`]
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::types::config::subscan::SubscanConfig;
-    /// use subscan::pools::module::SubscanModulePool;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let config = SubscanConfig::default();
-    ///     let pool = SubscanModulePool::from("foo.com", config);
-    ///
-    ///     assert_eq!(pool.len().await, 0);
-    /// }
-    /// ```
-    pub fn from(domain: &str, config: SubscanConfig) -> Arc<Self> {
-        Arc::new(Self {
-            domain: domain.to_string(),
+impl From<SubscanConfig> for Arc<SubscanModulePool> {
+    fn from(config: SubscanConfig) -> Self {
+        Arc::new(SubscanModulePool {
             config: config.clone().into(),
             resolver: Resolver::boxed_from(config.resolver),
             result: PoolResult::default().into(),
@@ -102,12 +84,10 @@ impl SubscanModulePool {
             workers: SubscanModulePoolWorkers::default(),
         })
     }
+}
 
-    pub fn new(
-        domain: String,
-        config: PoolConfig,
-        resolver: Box<dyn LookUpHostFuture>,
-    ) -> Arc<Self> {
+impl SubscanModulePool {
+    pub fn new(config: PoolConfig, resolver: Box<dyn LookUpHostFuture>) -> Arc<Self> {
         let result = PoolResult::default().into();
         let channels = SubscanModulePoolChannels {
             module: flume::unbounded::<Option<SubscanModule>>().into(),
@@ -116,7 +96,6 @@ impl SubscanModulePool {
         let workers = SubscanModulePoolWorkers::default();
 
         Arc::new(Self {
-            domain,
             config,
             resolver,
             result,
@@ -137,7 +116,6 @@ impl SubscanModulePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let config = PoolConfig {
     ///         filter: NoFilter,
     ///         concurrency: 2,
@@ -146,10 +124,10 @@ impl SubscanModulePool {
     ///     };
     ///
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanModulePool::new(domain, config, resolver);
+    ///     let pool = SubscanModulePool::new(config, resolver);
     ///
     ///     // spawn runners that listen async channel
-    ///     pool.clone().spawn_runners().await;
+    ///     pool.clone().spawn_runners("foo.com").await;
     ///
     ///     assert_eq!(pool.clone().len().await, 2);
     ///
@@ -173,7 +151,6 @@ impl SubscanModulePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let config = PoolConfig {
     ///         filter: NoFilter,
     ///         concurrency: 1,
@@ -182,12 +159,12 @@ impl SubscanModulePool {
     ///     };
     ///
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanModulePool::new(domain, config, resolver);
+    ///     let pool = SubscanModulePool::new(config, resolver);
     ///
     ///     assert!(pool.clone().is_empty().await);
     ///
     ///     // spawn runners that listen async channel
-    ///     pool.clone().spawn_runners().await;
+    ///     pool.clone().spawn_runners("foo.com").await;
     ///
     ///     assert!(!pool.clone().is_empty().await);
     ///
@@ -218,13 +195,13 @@ impl SubscanModulePool {
     }
 
     /// [`SubscanModule`] runner method, simply calls `.run(` method
-    pub async fn runner(self: Arc<Self>) {
+    pub async fn runner(self: Arc<Self>, domain: String) {
         while let Ok(msg) = self.channels.module.rx.recv_async().await {
             if let Some(module) = msg {
                 let mut module = module.lock().await;
 
                 if !self.config.filter.is_filtered(module.name().await).await {
-                    let subresult = module.run(&self.domain).await;
+                    let subresult = module.run(&domain).await;
                     let name = module.name().await;
 
                     if let Ok(subresult) | Err(ModuleErrorWithResult(subresult)) = subresult {
@@ -237,7 +214,7 @@ impl SubscanModulePool {
                             .statistics
                             .insert(name.to_string(), stats);
 
-                        for sub in subresult.valids(&self.domain) {
+                        for sub in subresult.valids(&domain) {
                             self.channels.subs.tx.send(Some(sub.to_string())).unwrap()
                         }
                     } else {
@@ -276,7 +253,6 @@ impl SubscanModulePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let config = PoolConfig {
     ///         filter: NoFilter,
     ///         concurrency: 1,
@@ -285,10 +261,10 @@ impl SubscanModulePool {
     ///     };
     ///
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanModulePool::new(domain, config, resolver);
+    ///     let pool = SubscanModulePool::new(config, resolver);
     ///
     ///     // spawn runners that listen async channel
-    ///     pool.clone().spawn_runners().await;
+    ///     pool.clone().spawn_runners("foo.com").await;
     ///
     ///     assert!(!pool.clone().is_empty().await);
     ///
@@ -296,13 +272,13 @@ impl SubscanModulePool {
     ///     pool.join_runners().await;
     /// }
     /// ```
-    pub async fn spawn_runners(self: Arc<Self>) {
+    pub async fn spawn_runners(self: Arc<Self>, domain: &str) {
         for _ in 0..self.config.concurrency {
             self.workers
                 .runners
                 .lock()
                 .await
-                .spawn(self.clone().runner());
+                .spawn(self.clone().runner(domain.to_string()));
         }
     }
 
@@ -318,7 +294,6 @@ impl SubscanModulePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let config = PoolConfig {
     ///         filter: NoFilter,
     ///         concurrency: 1,
@@ -327,10 +302,10 @@ impl SubscanModulePool {
     ///     };
     ///
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanModulePool::new(domain, config, resolver);
+    ///     let pool = SubscanModulePool::new(config, resolver);
     ///
     ///     // spawn runners that listen async channel
-    ///     pool.clone().spawn_runners().await;
+    ///     pool.clone().spawn_runners("foo.com").await;
     ///     pool.clone().kill_runners().await;
     ///     pool.clone().join_runners().await;
     ///
@@ -355,7 +330,6 @@ impl SubscanModulePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let config = PoolConfig {
     ///         filter: NoFilter,
     ///         concurrency: 1,
@@ -364,7 +338,7 @@ impl SubscanModulePool {
     ///     };
     ///
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanModulePool::new(domain, config, resolver);
+    ///     let pool = SubscanModulePool::new(config, resolver);
     ///
     ///     // spawn runners that listen async channel
     ///     pool.clone().spawn_resolvers().await;
@@ -397,7 +371,6 @@ impl SubscanModulePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let config = PoolConfig {
     ///         filter: NoFilter,
     ///         concurrency: 1,
@@ -406,7 +379,7 @@ impl SubscanModulePool {
     ///     };
     ///
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanModulePool::new(domain, config, resolver);
+    ///     let pool = SubscanModulePool::new(config, resolver);
     ///
     ///     // spawn runners that listen async channel
     ///     pool.clone().spawn_resolvers().await;
@@ -445,15 +418,15 @@ impl SubscanModulePool {
     ///         output: None
     ///     };
     ///
-    ///     let pool = SubscanModulePool::new("foo.com".into(), config, resolver);
+    ///     let pool = SubscanModulePool::new(config, resolver);
     ///     let module = SubscanModule::from(Google::dispatcher());
     ///
-    ///     pool.start(&vec![module]).await;
+    ///     pool.start("foo.com", &vec![module]).await;
     /// }
     /// ```
-    pub async fn start(self: Arc<Self>, modules: &Vec<SubscanModule>) {
+    pub async fn start(self: Arc<Self>, domain: &str, modules: &Vec<SubscanModule>) {
         self.clone().spawn_resolvers().await;
-        self.clone().spawn_runners().await;
+        self.clone().spawn_runners(domain).await;
 
         for module in modules {
             self.clone().submit(module.clone()).await;
@@ -489,13 +462,13 @@ impl SubscanModulePool {
     ///         output: None
     ///     };
     ///
-    ///     let pool = SubscanModulePool::new("foo.com".into(), config, resolver);
+    ///     let pool = SubscanModulePool::new(config, resolver);
     ///     let module = SubscanModule::from(Google::dispatcher());
     ///
     ///     // spawn resolvers
     ///     pool.clone().spawn_resolvers().await;
     ///     // spawn runners that listen async channel
-    ///     pool.clone().spawn_runners().await;
+    ///     pool.clone().spawn_runners("foo.com").await;
     ///     // submit module into pool
     ///     pool.clone().submit(module).await;
     ///
@@ -556,7 +529,6 @@ impl SubscanModulePool {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let domain = String::from("foo.com");
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
     ///     let config = PoolConfig {
     ///         filter: NoFilter,
@@ -565,11 +537,11 @@ impl SubscanModulePool {
     ///         output: None
     ///     };
     ///
-    ///     let pool = SubscanModulePool::new(domain, config, resolver);
+    ///     let pool = SubscanModulePool::new(config, resolver);
     ///     let module = SubscanModule::from(Google::dispatcher());
     ///
     ///     // start pool
-    ///     pool.clone().start(&vec![module]).await;
+    ///     pool.clone().start("foo.com", &vec![module]).await;
     ///
     ///     // do something with pool result
     ///     let result = pool.result().await;
