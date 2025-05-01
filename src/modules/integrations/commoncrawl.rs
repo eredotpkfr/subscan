@@ -2,6 +2,7 @@ use std::{collections::BTreeSet, io::Error};
 
 use async_trait::async_trait;
 use chrono::Datelike;
+use flume::Sender;
 use futures::TryStreamExt;
 use reqwest::Url;
 use serde_json::Value;
@@ -9,8 +10,9 @@ use tokio::{io::AsyncBufReadExt, sync::Mutex};
 use tokio_util::io::StreamReader;
 
 use crate::{
-    enums::dispatchers::{
-        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        result::SubscanModuleResult,
     },
     error::ModuleErrorKind::Custom,
     extractors::regex::RegexExtractor,
@@ -21,7 +23,7 @@ use crate::{
     requesters::client::HTTPClient,
     types::{
         core::{Result, SubscanModuleCoreComponents},
-        result::module::SubscanModuleResult,
+        result::status::SubscanModuleStatus::Finished,
     },
 };
 
@@ -96,48 +98,80 @@ impl SubscanModuleInterface for CommonCrawl {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
-
+    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
         let requester = self.requester().await.unwrap().lock().await;
         let extractor = self.extractor().await.unwrap();
 
         if let RequesterDispatcher::HTTPClient(requester) = &*requester {
             let year = chrono::Utc::now().year().to_string();
             let query = format!("*.{domain}");
-            let content = requester.get_content(self.url.clone()).await?;
+            let content = requester.get_content(self.url.clone()).await;
 
-            if let Some(cdxs) = self.extract_cdx_urls(content.as_json(), &year) {
-                for cdx in cdxs {
-                    let cdx_url = Url::parse_with_params(&cdx, &[("url", &query)]);
-                    let request = requester
-                        .client
-                        .get(cdx_url.unwrap())
-                        .timeout(requester.config.timeout)
-                        .headers(requester.config.headers.clone())
-                        .build()?;
+            match content {
+                Ok(content) => {
+                    if let Some(cdxs) = self.extract_cdx_urls(content.as_json(), &year) {
+                        for cdx in cdxs {
+                            let parsed: Result<Url> =
+                                Url::parse_with_params(&cdx, &[("url", &query)])
+                                    .map_err(|err| err.into());
 
-                    if let Ok(response) = requester.client.execute(request).await {
-                        let stream = response.bytes_stream().map_err(Error::other);
-                        let reader = StreamReader::new(stream);
-                        let mut lines = reader.lines();
+                            match parsed {
+                                Ok(cdx_url) => {
+                                    let rbuilder = requester
+                                        .client
+                                        .get(cdx_url)
+                                        .timeout(requester.config.timeout)
+                                        .headers(requester.config.headers.clone());
 
-                        while let Ok(next_line) = lines.next_line().await {
-                            if let Some(line) = next_line {
-                                result.extend(extractor.extract(line.into(), domain).await?);
-                            } else {
-                                break;
-                            }
+                                    if let Ok(request) = rbuilder.build() {
+                                        if let Ok(response) =
+                                            requester.client.execute(request).await
+                                        {
+                                            let stream =
+                                                response.bytes_stream().map_err(Error::other);
+                                            let reader = StreamReader::new(stream);
+                                            let mut lines = reader.lines();
+
+                                            while let Ok(next_line) = lines.next_line().await {
+                                                if let Some(line) = next_line {
+                                                    let subdomains = extractor
+                                                        .extract(line.into(), domain)
+                                                        .await
+                                                        .unwrap_or_default();
+
+                                                    for subdomain in &subdomains {
+                                                        results
+                                                            .send(Some(
+                                                                (self.name().await, subdomain)
+                                                                    .into(),
+                                                            ))
+                                                            .unwrap();
+                                                    }
+                                                } else {
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                Err(err) => {
+                                    results.send(err.status().into()).unwrap();
+                                    break;
+                                }
+                            };
                         }
+                        results.send(Finished.into()).unwrap();
                     } else {
-                        continue;
+                        results
+                            .send(Custom("not get cdx URLs".into()).into())
+                            .unwrap();
                     }
                 }
-            } else {
-                return Err(Custom("not get cdx URLs".into()).into());
+                Err(err) => {
+                    results.send(err.status().into()).unwrap();
+                }
             }
         }
-
-        Ok(result.with_finished().await)
+        results.send(Finished.into()).unwrap();
     }
 }

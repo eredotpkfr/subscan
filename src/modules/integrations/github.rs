@@ -1,6 +1,7 @@
 use std::collections::BTreeSet;
 
 use async_trait::async_trait;
+use flume::Sender;
 use reqwest::{
     header::{HeaderValue, AUTHORIZATION},
     Url,
@@ -12,6 +13,7 @@ use crate::{
     enums::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        result::SubscanModuleResult,
     },
     error::ModuleErrorKind::Custom,
     extractors::regex::RegexExtractor,
@@ -21,8 +23,8 @@ use crate::{
     },
     requesters::client::HTTPClient,
     types::{
-        core::{Result, SubscanModuleCoreComponents},
-        result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
+        core::SubscanModuleCoreComponents,
+        result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Finished},
     },
 };
 
@@ -103,9 +105,7 @@ impl SubscanModuleInterface for GitHub {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
-
+    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
         let envs = self.envs().await;
 
         if let Some(apikey) = envs.apikey.value {
@@ -121,21 +121,32 @@ impl SubscanModuleInterface for GitHub {
             rconfig.add_header(AUTHORIZATION, auth.unwrap());
             url.set_query(Some(&query));
 
-            let content = requester.get_content(url).await?;
+            let content = requester.get_content(url).await.unwrap_or_default();
 
             if let Some(raws) = self.get_html_urls(content).await {
                 for raw_url in raws {
-                    let raw_content = requester.get_content(raw_url.clone()).await?;
+                    let raw_content = requester
+                        .get_content(raw_url.clone())
+                        .await
+                        .unwrap_or_default();
+                    let subdomains = extractor
+                        .extract(raw_content, domain)
+                        .await
+                        .unwrap_or_default();
 
-                    result.extend(extractor.extract(raw_content, domain).await?);
+                    for subdomain in &subdomains {
+                        results
+                            .send(Some((self.name().await, subdomain).into()))
+                            .unwrap();
+                    }
                 }
-
-                return Ok(result.with_finished().await);
+                results.send(Finished.into()).unwrap();
             }
-
-            return Err(Custom("not get raw URLs".into()).into());
+            results
+                .send(Custom("not get raw URLs".into()).into())
+                .unwrap();
         }
 
-        Err(AuthenticationNotProvided.into())
+        results.send(AuthenticationNotProvided.into()).unwrap();
     }
 }

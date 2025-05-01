@@ -1,16 +1,18 @@
 use std::collections::BTreeSet;
 
 use async_trait::async_trait;
+use flume::Sender;
 use reqwest::{
     header::{HeaderName, HeaderValue},
-    Url,
+    Response, Url,
 };
 use serde_json::{json, Value};
 use tokio::sync::Mutex;
 
 use crate::{
-    enums::dispatchers::{
-        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        result::SubscanModuleResult,
     },
     error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
@@ -21,7 +23,7 @@ use crate::{
     requesters::client::HTTPClient,
     types::{
         core::{Result, Subdomain, SubscanModuleCoreComponents},
-        result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
+        result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Finished},
     },
 };
 
@@ -90,8 +92,7 @@ impl SubscanModuleInterface for Netlas {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
+    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
         let mut url = self.url.clone();
 
         let requester = &mut *self.requester().await.unwrap().lock().await;
@@ -108,7 +109,11 @@ impl SubscanModuleInterface for Netlas {
         url.set_path("api/domains_count/");
         url.set_query(Some(&format!("q={query}")));
 
-        let json = requester.get_content(url.clone()).await?.as_json();
+        let json = requester
+            .get_content(url.clone())
+            .await
+            .unwrap_or_default()
+            .as_json();
         let count = json["count"].as_i64();
 
         if let (Some(count), RequesterDispatcher::HTTPClient(requester)) = (count, requester) {
@@ -122,22 +127,44 @@ impl SubscanModuleInterface for Netlas {
                 "size": count
             });
 
-            let request = requester
+            let rbuilder = requester
                 .client
                 .post(url)
                 .json(&body)
                 .timeout(requester.config.timeout)
-                .headers(requester.config.headers.clone())
-                .build()?;
+                .headers(requester.config.headers.clone());
 
-            let response = requester.client.execute(request).await?;
-            let content = response.text().await?;
+            if let Ok(request) = rbuilder.build() {
+                let response: Result<Response> = requester
+                    .client
+                    .execute(request)
+                    .await
+                    .map_err(|err| err.into());
 
-            result.extend(extractor.extract(content.into(), domain).await?);
+                match response {
+                    Ok(response) => {
+                        let content = response.text().await.unwrap_or_default();
+                        let subdomains = extractor
+                            .extract(content.into(), domain)
+                            .await
+                            .unwrap_or_default();
 
-            return Ok(result.with_finished().await);
+                        for subdomain in &subdomains {
+                            results
+                                .send(Some((self.name().await, subdomain).into()))
+                                .unwrap();
+                        }
+
+                        results.send(Finished.into()).unwrap();
+                    }
+                    Err(err) => {
+                        results.send(err.status().into()).unwrap();
+                    }
+                }
+            }
+            results.send(Finished.into()).unwrap();
         }
 
-        Err(AuthenticationNotProvided.into())
+        results.send(AuthenticationNotProvided.into()).unwrap();
     }
 }

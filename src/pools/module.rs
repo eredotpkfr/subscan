@@ -3,19 +3,19 @@ use std::sync::Arc;
 use tokio::{sync::Mutex, task::JoinSet};
 
 use crate::{
-    error::SubscanError::ModuleErrorWithResult,
+    enums::result::SubscanModuleResult,
     interfaces::{lookup::LookUpHostFuture, module::SubscanModuleInterface},
     resolver::Resolver,
     types::{
         config::{pool::PoolConfig, subscan::SubscanConfig},
-        core::{Subdomain, SubscanModule, UnboundedFlumeChannel},
-        result::{item::SubscanResultItem, pool::PoolResult, statistics::SubscanModuleStatistic},
+        core::{SubscanModule, UnboundedFlumeChannel},
+        result::{pool::PoolResult, statistics::SubscanModuleStatistic},
     },
 };
 
 struct SubscanModulePoolChannels {
     module: UnboundedFlumeChannel<Option<SubscanModule>>,
-    subs: UnboundedFlumeChannel<Option<Subdomain>>,
+    results: UnboundedFlumeChannel<Option<SubscanModuleResult>>,
 }
 
 #[derive(Default)]
@@ -79,7 +79,7 @@ impl From<SubscanConfig> for Arc<SubscanModulePool> {
             result: PoolResult::default().into(),
             channels: SubscanModulePoolChannels {
                 module: flume::unbounded::<Option<SubscanModule>>().into(),
-                subs: flume::unbounded::<Option<Subdomain>>().into(),
+                results: flume::unbounded::<Option<SubscanModuleResult>>().into(),
             },
             workers: SubscanModulePoolWorkers::default(),
         })
@@ -91,7 +91,7 @@ impl SubscanModulePool {
         let result = PoolResult::default().into();
         let channels = SubscanModulePoolChannels {
             module: flume::unbounded::<Option<SubscanModule>>().into(),
-            subs: flume::unbounded::<Option<Subdomain>>().into(),
+            results: flume::unbounded::<Option<SubscanModuleResult>>().into(),
         };
         let workers = SubscanModulePoolWorkers::default();
 
@@ -178,16 +178,18 @@ impl SubscanModulePool {
 
     /// [`SubscanModule`] resolver method, simply resolves given subdomain's IP address
     pub async fn resolver(self: Arc<Self>) {
-        let lookup_host = self.resolver.lookup_host_future().await;
+        let _lookup_host = self.resolver.lookup_host_future().await;
 
-        while let Ok(sub) = self.channels.subs.rx.recv_async().await {
-            if let Some(subdomain) = sub {
-                let item = SubscanResultItem {
-                    subdomain: subdomain.clone(),
-                    ip: lookup_host(subdomain).await,
-                };
-
-                self.result.lock().await.items.insert(item);
+        while let Ok(msg) = self.channels.results.rx.recv_async().await {
+            if let Some(result) = msg {
+                match result {
+                    SubscanModuleResult::SubscanModuleResultItem(item) => {
+                        println!("{:#?}", item)
+                    }
+                    SubscanModuleResult::SubscanModuleStatus(status) => {
+                        println!("{:#?}", status)
+                    }
+                }
             } else {
                 break;
             }
@@ -200,40 +202,14 @@ impl SubscanModulePool {
             if let Some(module) = msg {
                 let mut module = module.lock().await;
 
-                if !self.config.filter.is_filtered(module.name().await).await {
-                    let subresult = module.run(&domain).await;
-                    let name = module.name().await;
-
-                    if let Ok(subresult) | Err(ModuleErrorWithResult(subresult)) = subresult {
-                        let stats = subresult.stats().await;
-
-                        stats.status.log(name);
-                        self.result
-                            .lock()
-                            .await
-                            .statistics
-                            .insert(name.to_string(), stats);
-
-                        for sub in subresult.valids(&domain) {
-                            self.channels.subs.tx.send(Some(sub.to_string())).unwrap()
-                        }
-                    } else {
-                        let error = subresult.unwrap_err();
-                        let stats = error.stats();
-
-                        stats.status.log(name);
-                        self.result
-                            .lock()
-                            .await
-                            .statistics
-                            .insert(name.to_string(), stats);
-                    }
-                } else {
+                if self.config.filter.is_filtered(module.name().await).await {
                     let name = module.name().await.to_string();
                     let stats = SubscanModuleStatistic::skipped();
 
                     stats.status.log(&name);
                     self.result.lock().await.statistics.insert(name, stats);
+                } else {
+                    module.run(&domain, self.channels.results.tx.clone()).await;
                 }
             } else {
                 break;
@@ -391,7 +367,7 @@ impl SubscanModulePool {
     /// ```
     pub async fn kill_resolvers(self: Arc<Self>) {
         for _ in 0..self.resolver.config().await.concurrency {
-            self.channels.subs.tx.send(None).unwrap()
+            self.channels.results.tx.send(None).unwrap()
         }
     }
 

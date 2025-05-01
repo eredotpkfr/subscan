@@ -1,11 +1,13 @@
 use async_trait::async_trait;
 use enum_dispatch::enum_dispatch;
+use flume::Sender;
 use tokio::sync::Mutex;
 
 use super::requester::RequesterInterface;
 use crate::{
-    enums::dispatchers::{
-        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        result::SubscanModuleResult,
     },
     modules::{
         generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
@@ -15,10 +17,7 @@ use crate::{
         },
         zonetransfer::ZoneTransfer,
     },
-    types::{
-        config::requester::RequesterConfig, core::Result, env::SubscanModuleEnvs,
-        result::module::SubscanModuleResult,
-    },
+    types::{config::requester::RequesterConfig, env::SubscanModuleEnvs},
 };
 
 /// Generic `subscan` module trait definition to implement subdomain enumeration modules
@@ -48,5 +47,5 @@ pub trait SubscanModuleInterface: Sync + Send {
     }
     /// Just like a `main` method, when the module run this `run` method will be called.
     /// So this method should do everything
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult>;
+    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>);
 }

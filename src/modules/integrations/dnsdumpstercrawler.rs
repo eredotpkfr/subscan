@@ -1,8 +1,9 @@
 use async_trait::async_trait;
+use flume::Sender;
 use regex::Regex;
 use reqwest::{
     header::{HeaderMap, HeaderName, HeaderValue},
-    Url,
+    Response, Url,
 };
 use tokio::sync::Mutex;
 
@@ -10,6 +11,7 @@ use crate::{
     enums::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        result::SubscanModuleResult,
     },
     error::ModuleErrorKind::Custom,
     extractors::html::HTMLExtractor,
@@ -20,7 +22,7 @@ use crate::{
     requesters::client::HTTPClient,
     types::{
         core::{Result, SubscanModuleCoreComponents},
-        result::module::SubscanModuleResult,
+        result::status::SubscanModuleStatus::Finished,
     },
 };
 
@@ -99,13 +101,14 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
-
+    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
         let requester = &mut *self.requester().await.unwrap().lock().await;
         let extractor = self.extractor().await.unwrap();
 
-        let content = requester.get_content(self.base_url.clone()).await?;
+        let content = requester
+            .get_content(self.base_url.clone())
+            .await
+            .unwrap_or_default();
         let token = self.get_auth_token(content).await;
 
         if let (Some(token), RequesterDispatcher::HTTPClient(requester)) = (token, requester) {
@@ -117,22 +120,44 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
 
             requester.config.headers.extend(headers);
 
-            let request = requester
+            let rbuilder = requester
                 .client
                 .post(self.url.clone())
                 .form(params)
                 .timeout(requester.config.timeout)
-                .headers(requester.config.headers.clone())
-                .build()?;
+                .headers(requester.config.headers.clone());
 
-            let response = requester.client.execute(request).await?;
-            let content = response.text().await?;
+            if let Ok(request) = rbuilder.build() {
+                let response: Result<Response> = requester
+                    .client
+                    .execute(request)
+                    .await
+                    .map_err(|err| err.into());
 
-            result.extend(extractor.extract(content.into(), domain).await?);
+                match response {
+                    Ok(response) => {
+                        let content = response.text().await.unwrap_or_default();
+                        let subdomains = extractor
+                            .extract(content.into(), domain)
+                            .await
+                            .unwrap_or_default();
 
-            return Ok(result.with_finished().await);
+                        for subdomain in &subdomains {
+                            results
+                                .send(Some((self.name().await, subdomain).into()))
+                                .unwrap();
+                        }
+
+                        results.send(Finished.into()).unwrap();
+                    }
+                    Err(err) => {
+                        results.send(err.status().into()).unwrap();
+                    }
+                }
+            }
+            results.send(Finished.into()).unwrap();
         }
 
-        Err(Custom("not get token".into()).into())
+        results.send(Custom("not get token".into()).into()).unwrap();
     }
 }

@@ -8,3 +8,5 @@ pub mod content;
 pub mod dispatchers;
 /// Output format options
 pub mod output;
+/// Result data types
+pub mod result;

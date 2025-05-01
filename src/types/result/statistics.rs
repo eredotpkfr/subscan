@@ -4,10 +4,7 @@ use chrono::{DateTime, TimeDelta, Utc};
 use serde::Serialize;
 
 use super::status::{SkipReason::SkippedByUser, SubscanModuleStatus};
-use crate::{
-    types::result::module::SubscanModuleResult,
-    utilities::serializers::{dt_to_string_method, td_num_seconds_method},
-};
+use crate::utilities::serializers::{dt_to_string_method, td_num_seconds_method};
 
 /// Subscan result statistics data type
 pub type SubscanResultStatistics = HashMap<String, SubscanModuleStatistic>;
@@ -49,18 +46,6 @@ impl SubscanModuleStatistic {
             started_at: Utc::now(),
             finished_at: Utc::now(),
             elapsed: TimeDelta::zero(),
-        }
-    }
-}
-
-impl From<SubscanModuleResult> for SubscanModuleStatistic {
-    fn from(result: SubscanModuleResult) -> Self {
-        Self {
-            status: result.status.clone(),
-            count: result.subdomains.len(),
-            started_at: result.started_at,
-            finished_at: result.finished_at,
-            elapsed: result.elapsed(),
         }
     }
 }

@@ -1,6 +1,7 @@
 use std::{net::SocketAddr, str::FromStr};
 
 use async_trait::async_trait;
+use flume::Sender;
 use hickory_client::{
     client::{Client, ClientHandle},
     proto::{
@@ -13,14 +14,15 @@ use hickory_resolver::config::NameServerConfig;
 use tokio::sync::Mutex;
 
 use crate::{
-    enums::dispatchers::{
-        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        result::SubscanModuleResult,
     },
     error::ModuleErrorKind::Custom,
     interfaces::module::SubscanModuleInterface,
     types::{
         core::{Result, Subdomain},
-        result::module::SubscanModuleResult,
+        result::status::SubscanModuleStatus::Finished,
     },
     utilities::{net, regex},
 };
@@ -143,26 +145,32 @@ impl SubscanModuleInterface for ZoneTransfer {
         None
     }
 
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
-
+    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
         if let Some(ns) = &self.ns {
-            let ips = self
-                .get_ns_as_ip(ns.socket_addr, domain)
-                .await
-                .ok_or(Custom("connection error".into()))?;
+            let err = Custom("connection error".into());
 
-            for ip in ips {
-                result.extend(
-                    self.attempt_zone_transfer(ip, domain)
-                        .await
-                        .unwrap_or_default(),
-                );
+            match self.get_ns_as_ip(ns.socket_addr, domain).await.ok_or(err) {
+                Ok(ips) => {
+                    for ip in ips {
+                        let subdomains = self
+                            .attempt_zone_transfer(ip, domain)
+                            .await
+                            .unwrap_or_default();
+
+                        for subdomain in &subdomains {
+                            results
+                                .send(Some((self.name().await, subdomain).into()))
+                                .unwrap();
+                        }
+                    }
+                    results.send(Finished.into()).unwrap()
+                }
+                Err(err) => results.send(err.status().into()).unwrap(),
             }
+        } else {
+            let err = Custom("no default ns".into());
 
-            return Ok(result.with_finished().await);
+            results.send(err.into()).unwrap();
         }
-
-        Err(Custom("no default ns".into()).into())
     }
 }

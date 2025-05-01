@@ -1,17 +1,20 @@
 use async_trait::async_trait;
+use flume::Sender;
 use reqwest::Url;
 use tokio::sync::Mutex;
 
 use crate::{
-    enums::dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
+        result::SubscanModuleResult,
+    },
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     types::{
-        core::{Result, SubscanModuleCoreComponents},
-        query::SearchQueryParam,
-        result::module::SubscanModuleResult,
+        core::SubscanModuleCoreComponents, query::SearchQueryParam,
+        result::status::SubscanModuleStatus::Finished,
     },
 };
 
@@ -63,9 +66,7 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
-
+    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
         let requester = &*self.components.requester.lock().await;
         let extractor = &self.components.extractor;
 
@@ -75,23 +76,32 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
 
         loop {
             let url = query.as_url(self.url.clone(), &extra_params);
-            let content = requester
-                .get_content(url)
-                .await
-                .map_err(result.graceful_exit().await)?;
+            let content = requester.get_content(url).await;
 
-            let subdomains = extractor
-                .extract(content, domain)
-                .await
-                .map_err(result.graceful_exit().await)?;
+            match content {
+                Ok(content) => match extractor.extract(content, domain).await {
+                    Ok(subdomains) => {
+                        for subdomain in &subdomains {
+                            results
+                                .send(Some((self.name().await, subdomain).into()))
+                                .unwrap();
+                        }
 
-            result.extend(subdomains.clone());
-
-            if !query.update_many(subdomains) {
-                break;
-            }
+                        if !query.update_many(subdomains) {
+                            results.send(Finished.into()).unwrap();
+                            break;
+                        }
+                    }
+                    Err(err) => {
+                        results.send(err.status().into()).unwrap();
+                        break;
+                    }
+                },
+                Err(err) => {
+                    results.send(err.status().into()).unwrap();
+                    break;
+                }
+            };
         }
-
-        Ok(result.with_finished().await)
     }
 }

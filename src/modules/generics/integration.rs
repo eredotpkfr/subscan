@@ -1,16 +1,19 @@
 use std::str::FromStr;
 
 use async_trait::async_trait;
+use flume::Sender;
 use reqwest::{
     header::{HeaderName, HeaderValue},
     Url,
 };
 use tokio::sync::Mutex;
+use url::ParseError;
 
 use crate::{
     enums::{
         auth::AuthenticationMethod,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
+        result::SubscanModuleResult,
     },
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -20,7 +23,7 @@ use crate::{
         core::{Result, SubscanModuleCoreComponents},
         env::{Credentials, Env},
         func::GenericIntegrationCoreFuncs,
-        result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
+        result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Finished},
     },
     utilities::http,
 };
@@ -112,37 +115,51 @@ impl SubscanModuleInterface for GenericIntegrationModule {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
-        let mut url: Url = (self.funcs.url)(domain).parse()?;
+    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
+        let url: Result<Url> = (self.funcs.url)(domain)
+            .parse()
+            .map_err(|err: ParseError| err.into());
 
-        if self.auth.is_set() && !self.authenticate(&mut url).await {
-            return Err(AuthenticationNotProvided.into());
-        }
-
-        let requester = self.components.requester.lock().await;
-        let extractor = &self.components.extractor;
-
-        loop {
-            let content = requester
-                .get_content(url.clone())
-                .await
-                .map_err(result.graceful_exit().await)?;
-
-            let subdomains = extractor
-                .extract(content.clone(), domain)
-                .await
-                .map_err(result.graceful_exit().await)?;
-
-            result.extend(subdomains);
-
-            if let Some(next) = (self.funcs.next)(url, content) {
-                url = next;
+        if let Ok(mut url) = url {
+            if self.auth.is_set() && !self.authenticate(&mut url).await {
+                results.send(AuthenticationNotProvided.into()).unwrap();
             } else {
-                break;
-            }
-        }
+                let requester = self.components.requester.lock().await;
+                let extractor = &self.components.extractor;
 
-        Ok(result.with_finished().await)
+                loop {
+                    let content = requester.get_content(url.clone()).await;
+
+                    match content {
+                        Ok(content) => match extractor.extract(content.clone(), domain).await {
+                            Ok(subdomains) => {
+                                for subdomain in &subdomains {
+                                    results
+                                        .send(Some((self.name().await, subdomain).into()))
+                                        .unwrap();
+                                }
+
+                                if let Some(next) = (self.funcs.next)(url, content) {
+                                    url = next;
+                                } else {
+                                    results.send(Finished.into()).unwrap();
+                                    break;
+                                }
+                            }
+                            Err(err) => {
+                                results.send(err.status().into()).unwrap();
+                                break;
+                            }
+                        },
+                        Err(err) => {
+                            results.send(err.status().into()).unwrap();
+                            break;
+                        }
+                    }
+                }
+            }
+        } else {
+            results.send(url.unwrap_err().status().into()).unwrap();
+        }
     }
 }

@@ -18,8 +18,6 @@ pub enum SubscanModuleStatus {
     #[from]
     #[display("FAILED")]
     Failed(ModuleErrorKind),
-    #[display("FAILED")]
-    FailedWithResult,
 }
 
 impl Serialize for SubscanModuleStatus {
@@ -84,7 +82,6 @@ impl SubscanModuleStatus {
             SubscanModuleStatus::Started => format!("[{self}]"),
             SubscanModuleStatus::Finished => format!("[{self}]"),
             SubscanModuleStatus::Failed(err) => format!("[{err} {self}]"),
-            SubscanModuleStatus::FailedWithResult => format!("[failed with result {self}]"),
             SubscanModuleStatus::Skipped(reason) => format!("[{reason} {self}]"),
         }
     }
@@ -102,11 +99,6 @@ impl SubscanModuleStatus {
             SubscanModuleStatus::Failed(err) => {
                 log::error!("{:.<25}{:.>35}", module.red(), err.with_msg().red())
             }
-            SubscanModuleStatus::FailedWithResult => log::warn!(
-                "{:.<25}{:.>35}",
-                module.yellow(),
-                self.with_reason().yellow()
-            ),
         }
     }
 }

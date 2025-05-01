@@ -3,7 +3,6 @@ use derive_more::{Display, From};
 use scraper::error::SelectorErrorKind;
 
 use crate::types::result::{
-    module::SubscanModuleResult,
     statistics::SubscanModuleStatistic,
     status::{SkipReason, SubscanModuleStatus},
 };
@@ -15,12 +14,6 @@ pub enum SubscanError {
     #[from(ModuleErrorKind, SkipReason, SelectorErrorKind<'_>, regex::Error, reqwest::Error, url::ParseError)]
     #[display("{_0}")]
     ModuleError(ModuleErrorKind),
-    /// This error type uses for the make graceful returns from module `.run(`
-    /// method. If the module has already discovered subdomains and encountered
-    /// an error during runtime we need to save already discovered subdomains. So
-    /// implemented this error type to ensure this
-    #[display("failed with result")]
-    ModuleErrorWithResult(SubscanModuleResult),
 }
 
 impl SubscanError {
@@ -49,7 +42,6 @@ impl SubscanError {
     pub fn status(&self) -> SubscanModuleStatus {
         match self {
             SubscanError::ModuleError(kind) => kind.status(),
-            SubscanError::ModuleErrorWithResult(_) => SubscanModuleStatus::FailedWithResult,
         }
     }
 
