@@ -5,7 +5,7 @@ use flume::Sender;
 use subscan::{
     enums::{
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
-        result::SubscanModuleResult,
+        result::{OptionalSubscanModuleResult, SubscanModuleResult},
     },
     extractors::regex::RegexExtractor,
     interfaces::module::SubscanModuleInterface,
@@ -33,13 +33,11 @@ impl SubscanModuleInterface for CustomModule {
         Some(&self.extractor)
     }
 
-    async fn run(&mut self, _domain: &str, results: Sender<Option<SubscanModuleResult>>) {
+    async fn run(&mut self, _domain: &str, results: Sender<OptionalSubscanModuleResult>) {
         let subdomains = BTreeSet::from_iter([Subdomain::from("bar.foo.com")]);
 
         for subdomain in &subdomains {
-            results
-                .send(Some((self.name().await, subdomain).into()))
-                .unwrap();
+            results.send((self.name().await, subdomain).into()).unwrap();
         }
     }
 }
@@ -49,7 +47,7 @@ async fn main() {
     let requester: RequesterDispatcher = HTTPClient::default().into();
     let extracator: RegexExtractor = RegexExtractor::default();
 
-    let (tx, rx) = flume::unbounded::<Option<SubscanModuleResult>>();
+    let (tx, rx) = flume::unbounded::<OptionalSubscanModuleResult>();
 
     let mut module = CustomModule {
         requester: requester.into(),
@@ -68,10 +66,8 @@ async fn main() {
         module: "name".into(),
         subdomain: Subdomain::from("bar.foo.com"),
     };
+    let expected = &SubscanModuleResult::SubscanModuleResultItem(item);
 
     assert!(result.is_some());
-    assert_eq!(
-        result.unwrap(),
-        SubscanModuleResult::SubscanModuleResultItem(item)
-    );
+    assert_eq!(result.as_ref().unwrap(), expected);
 }
