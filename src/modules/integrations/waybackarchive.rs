@@ -10,11 +10,12 @@ use tokio_util::io::StreamReader;
 use crate::{
     enums::{
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        result::SubscanModuleResult,
+        result::{OptionalSubscanModuleResult, SubscanModuleResult},
     },
+    error::ModuleErrorKind::Custom,
     extractors::regex::RegexExtractor,
     interfaces::{extractor::SubdomainExtractorInterface, module::SubscanModuleInterface},
-    requesters::client::HTTPClient,
+    requesters::{chrome::ChromeBrowser, client::HTTPClient},
     types::{
         core::{Result, SubscanModuleCoreComponents},
         result::status::SubscanModuleStatus::Finished,
@@ -76,7 +77,7 @@ impl SubscanModuleInterface for WaybackArchive {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
+    async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>) {
         let mut url = self.url.clone();
 
         let requester = &*self.requester().await.unwrap().lock().await;
@@ -114,9 +115,7 @@ impl SubscanModuleInterface for WaybackArchive {
                                     .unwrap_or_default();
 
                                 for subdomain in &subdomains {
-                                    results
-                                        .send(Some((self.name().await, subdomain).into()))
-                                        .unwrap();
+                                    results.send((self.name().await, subdomain).into()).unwrap();
                                 }
                             } else {
                                 break;
@@ -127,8 +126,8 @@ impl SubscanModuleInterface for WaybackArchive {
                     Err(err) => results.send(err.status().into()).unwrap(),
                 };
             }
-            results.send(Finished.into()).unwrap();
+        } else {
+            results.send("misconfigured requester".into()).unwrap();
         }
-        results.send(Finished.into()).unwrap();
     }
 }

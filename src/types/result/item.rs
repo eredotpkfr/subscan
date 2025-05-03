@@ -1,5 +1,6 @@
 use std::{collections::BTreeSet, net::IpAddr};
 
+use derive_more::From;
 use prettytable::{row, Row};
 use serde::Serialize;
 
@@ -8,19 +9,11 @@ use crate::types::core::Subdomain;
 /// Subscan result items data type
 pub type SubscanResultItems = BTreeSet<SubscanResultItem>;
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, From, PartialEq)]
+#[from((&str, &Subdomain))]
 pub struct SubscanModuleResultItem {
     pub module: String,
     pub subdomain: Subdomain,
-}
-
-impl From<(&str, &Subdomain)> for SubscanModuleResultItem {
-    fn from(values: (&str, &Subdomain)) -> Self {
-        Self {
-            module: values.0.to_owned(),
-            subdomain: values.1.to_string(),
-        }
-    }
 }
 
 /// Core scan result item, simply stores single discovered subdomain and

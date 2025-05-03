@@ -12,7 +12,7 @@ use tokio_util::io::StreamReader;
 use crate::{
     enums::{
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        result::SubscanModuleResult,
+        result::{OptionalSubscanModuleResult, SubscanModuleResult},
     },
     error::ModuleErrorKind::Custom,
     extractors::regex::RegexExtractor,
@@ -98,7 +98,7 @@ impl SubscanModuleInterface for CommonCrawl {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
+    async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>) {
         let requester = self.requester().await.unwrap().lock().await;
         let extractor = self.extractor().await.unwrap();
 
@@ -108,70 +108,49 @@ impl SubscanModuleInterface for CommonCrawl {
             let content = requester.get_content(self.url.clone()).await;
 
             match content {
-                Ok(content) => {
-                    if let Some(cdxs) = self.extract_cdx_urls(content.as_json(), &year) {
+                Ok(content) => match self.extract_cdx_urls(content.as_json(), &year) {
+                    Some(cdxs) => {
                         for cdx in cdxs {
-                            let parsed: Result<Url> =
-                                Url::parse_with_params(&cdx, &[("url", &query)])
-                                    .map_err(|err| err.into());
+                            let parsed = Url::parse_with_params(&cdx, &[("url", &query)]);
 
-                            match parsed {
-                                Ok(cdx_url) => {
-                                    let rbuilder = requester
-                                        .client
-                                        .get(cdx_url)
-                                        .timeout(requester.config.timeout)
-                                        .headers(requester.config.headers.clone());
+                            if let Ok(cdx_url) = parsed {
+                                let rbuilder = requester
+                                    .client
+                                    .get(cdx_url)
+                                    .timeout(requester.config.timeout)
+                                    .headers(requester.config.headers.clone());
 
-                                    if let Ok(request) = rbuilder.build() {
-                                        if let Ok(response) =
-                                            requester.client.execute(request).await
-                                        {
-                                            let stream =
-                                                response.bytes_stream().map_err(Error::other);
-                                            let reader = StreamReader::new(stream);
-                                            let mut lines = reader.lines();
+                                if let Ok(request) = rbuilder.build() {
+                                    if let Ok(response) = requester.client.execute(request).await {
+                                        let stream = response.bytes_stream().map_err(Error::other);
+                                        let reader = StreamReader::new(stream);
+                                        let mut lines = reader.lines();
 
-                                            while let Ok(next_line) = lines.next_line().await {
-                                                if let Some(line) = next_line {
-                                                    let subdomains = extractor
-                                                        .extract(line.into(), domain)
-                                                        .await
-                                                        .unwrap_or_default();
+                                        while let Ok(next_line) = lines.next_line().await {
+                                            if let Some(line) = next_line {
+                                                let subdomains =
+                                                    extractor.extract(line.into(), domain).await;
 
-                                                    for subdomain in &subdomains {
-                                                        results
-                                                            .send(Some(
-                                                                (self.name().await, subdomain)
-                                                                    .into(),
-                                                            ))
-                                                            .unwrap();
-                                                    }
-                                                } else {
-                                                    break;
+                                                for subdomain in &subdomains.unwrap_or_default() {
+                                                    let result = (self.name().await, subdomain);
+                                                    results.send(result.into()).unwrap();
                                                 }
+                                            } else {
+                                                break;
                                             }
                                         }
                                     }
                                 }
-                                Err(err) => {
-                                    results.send(err.status().into()).unwrap();
-                                    break;
-                                }
-                            };
+                            }
                         }
                         results.send(Finished.into()).unwrap();
-                    } else {
-                        results
-                            .send(Custom("not get cdx URLs".into()).into())
-                            .unwrap();
                     }
-                }
-                Err(err) => {
-                    results.send(err.status().into()).unwrap();
-                }
+                    None => results.send("not get cdx URLs".into()).unwrap(),
+                },
+                Err(err) => results.send(err.status().into()).unwrap(),
             }
+        } else {
+            results.send("misconfigured requester".into()).unwrap();
         }
-        results.send(Finished.into()).unwrap();
     }
 }

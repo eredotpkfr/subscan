@@ -6,7 +6,7 @@ use tokio::sync::Mutex;
 use crate::{
     enums::{
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
-        result::SubscanModuleResult,
+        result::OptionalSubscanModuleResult,
     },
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -66,7 +66,7 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
+    async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>) {
         let requester = &*self.components.requester.lock().await;
         let extractor = &self.components.extractor;
 
@@ -82,9 +82,7 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
                 Ok(content) => match extractor.extract(content, domain).await {
                     Ok(subdomains) => {
                         for subdomain in &subdomains {
-                            results
-                                .send(Some((self.name().await, subdomain).into()))
-                                .unwrap();
+                            results.send((self.name().await, subdomain).into()).unwrap();
                         }
 
                         if !query.update_many(subdomains) {

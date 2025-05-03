@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{error::Error, str::FromStr};
 
 use async_trait::async_trait;
 use flume::Sender;
@@ -13,8 +13,9 @@ use crate::{
     enums::{
         auth::AuthenticationMethod,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
-        result::SubscanModuleResult,
+        result::OptionalSubscanModuleResult,
     },
+    error::SubscanError,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
@@ -115,51 +116,50 @@ impl SubscanModuleInterface for GenericIntegrationModule {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
-        let url: Result<Url> = (self.funcs.url)(domain)
-            .parse()
-            .map_err(|err: ParseError| err.into());
+    async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>) {
+        let url = (self.funcs.url)(domain).parse();
 
-        if let Ok(mut url) = url {
-            if self.auth.is_set() && !self.authenticate(&mut url).await {
-                results.send(AuthenticationNotProvided.into()).unwrap();
-            } else {
-                let requester = self.components.requester.lock().await;
-                let extractor = &self.components.extractor;
+        match url.clone().map_err(|err| SubscanError::from(err)) {
+            Ok(mut url) => {
+                if self.auth.is_set() && !self.authenticate(&mut url).await {
+                    results.send(AuthenticationNotProvided.into()).unwrap();
+                } else {
+                    let requester = self.components.requester.lock().await;
+                    let extractor = &self.components.extractor;
 
-                loop {
-                    let content = requester.get_content(url.clone()).await;
+                    loop {
+                        let content = requester.get_content(url.clone()).await;
 
-                    match content {
-                        Ok(content) => match extractor.extract(content.clone(), domain).await {
-                            Ok(subdomains) => {
-                                for subdomain in &subdomains {
-                                    results
-                                        .send(Some((self.name().await, subdomain).into()))
-                                        .unwrap();
+                        match content {
+                            Ok(content) => match extractor.extract(content.clone(), domain).await {
+                                Ok(subdomains) => {
+                                    for subdomain in &subdomains {
+                                        results
+                                            .send((self.name().await, subdomain).into())
+                                            .unwrap();
+                                    }
+
+                                    if let Some(next) = (self.funcs.next)(url, content) {
+                                        url = next;
+                                    } else {
+                                        results.send(Finished.into()).unwrap();
+                                        break;
+                                    }
                                 }
-
-                                if let Some(next) = (self.funcs.next)(url, content) {
-                                    url = next;
-                                } else {
-                                    results.send(Finished.into()).unwrap();
+                                Err(err) => {
+                                    results.send(err.status().into()).unwrap();
                                     break;
                                 }
-                            }
+                            },
                             Err(err) => {
                                 results.send(err.status().into()).unwrap();
                                 break;
                             }
-                        },
-                        Err(err) => {
-                            results.send(err.status().into()).unwrap();
-                            break;
                         }
                     }
                 }
             }
-        } else {
-            results.send(url.unwrap_err().status().into()).unwrap();
-        }
+            Err(err) => results.send(err.status().into()).unwrap(),
+        };
     }
 }

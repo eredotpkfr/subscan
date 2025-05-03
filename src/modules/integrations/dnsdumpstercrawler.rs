@@ -11,7 +11,7 @@ use crate::{
     enums::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        result::SubscanModuleResult,
+        result::{OptionalSubscanModuleResult, SubscanModuleResult},
     },
     error::ModuleErrorKind::Custom,
     extractors::html::HTMLExtractor,
@@ -101,63 +101,60 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
+    async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>) {
         let requester = &mut *self.requester().await.unwrap().lock().await;
         let extractor = self.extractor().await.unwrap();
 
-        let content = requester
-            .get_content(self.base_url.clone())
-            .await
-            .unwrap_or_default();
-        let token = self.get_auth_token(content).await;
+        let content = requester.get_content(self.base_url.clone()).await;
 
-        if let (Some(token), RequesterDispatcher::HTTPClient(requester)) = (token, requester) {
-            let headers = HeaderMap::from_iter([(
-                HeaderName::from_static("authorization"),
-                HeaderValue::from_str(&token).unwrap(),
-            )]);
-            let params = &[("target", domain)];
+        match content {
+            Ok(content) => match self.get_auth_token(content).await {
+                Some(token) => {
+                    if let RequesterDispatcher::HTTPClient(requester) = requester {
+                        let headers = HeaderMap::from_iter([(
+                            HeaderName::from_static("authorization"),
+                            HeaderValue::from_str(&token).unwrap(),
+                        )]);
+                        let params = &[("target", domain)];
 
-            requester.config.headers.extend(headers);
+                        requester.config.headers.extend(headers);
 
-            let rbuilder = requester
-                .client
-                .post(self.url.clone())
-                .form(params)
-                .timeout(requester.config.timeout)
-                .headers(requester.config.headers.clone());
+                        let rbuilder = requester
+                            .client
+                            .post(self.url.clone())
+                            .form(params)
+                            .timeout(requester.config.timeout)
+                            .headers(requester.config.headers.clone());
 
-            if let Ok(request) = rbuilder.build() {
-                let response: Result<Response> = requester
-                    .client
-                    .execute(request)
-                    .await
-                    .map_err(|err| err.into());
+                        if let Ok(request) = rbuilder.build() {
+                            let response: Result<Response> = requester
+                                .client
+                                .execute(request)
+                                .await
+                                .map_err(|err| err.into());
 
-                match response {
-                    Ok(response) => {
-                        let content = response.text().await.unwrap_or_default();
-                        let subdomains = extractor
-                            .extract(content.into(), domain)
-                            .await
-                            .unwrap_or_default();
+                            match response {
+                                Ok(response) => {
+                                    let content = response.text().await.unwrap_or_default();
+                                    let subdomains =
+                                        extractor.extract(content.into(), domain).await;
 
-                        for subdomain in &subdomains {
-                            results
-                                .send(Some((self.name().await, subdomain).into()))
-                                .unwrap();
+                                    for subdomain in &subdomains.unwrap_or_default() {
+                                        let result = (self.name().await, subdomain);
+                                        results.send(result.into()).unwrap();
+                                    }
+                                }
+                                Err(err) => results.send(err.status().into()).unwrap(),
+                            }
                         }
-
                         results.send(Finished.into()).unwrap();
-                    }
-                    Err(err) => {
-                        results.send(err.status().into()).unwrap();
+                    } else {
+                        results.send("misconfigured requester".into()).unwrap();
                     }
                 }
-            }
-            results.send(Finished.into()).unwrap();
+                None => results.send("not get token".into()).unwrap(),
+            },
+            Err(err) => results.send(err.status().into()).unwrap(),
         }
-
-        results.send(Custom("not get token".into()).into()).unwrap();
     }
 }

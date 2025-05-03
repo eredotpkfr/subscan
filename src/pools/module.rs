@@ -3,7 +3,7 @@ use std::sync::Arc;
 use tokio::{sync::Mutex, task::JoinSet};
 
 use crate::{
-    enums::result::SubscanModuleResult,
+    enums::result::{OptionalSubscanModuleResult, SubscanModuleResult},
     interfaces::{lookup::LookUpHostFuture, module::SubscanModuleInterface},
     resolver::Resolver,
     types::{
@@ -15,7 +15,7 @@ use crate::{
 
 struct SubscanModulePoolChannels {
     module: UnboundedFlumeChannel<Option<SubscanModule>>,
-    results: UnboundedFlumeChannel<Option<SubscanModuleResult>>,
+    results: UnboundedFlumeChannel<OptionalSubscanModuleResult>,
 }
 
 #[derive(Default)]
@@ -79,7 +79,7 @@ impl From<SubscanConfig> for Arc<SubscanModulePool> {
             result: PoolResult::default().into(),
             channels: SubscanModulePoolChannels {
                 module: flume::unbounded::<Option<SubscanModule>>().into(),
-                results: flume::unbounded::<Option<SubscanModuleResult>>().into(),
+                results: flume::unbounded::<OptionalSubscanModuleResult>().into(),
             },
             workers: SubscanModulePoolWorkers::default(),
         })
@@ -91,7 +91,7 @@ impl SubscanModulePool {
         let result = PoolResult::default().into();
         let channels = SubscanModulePoolChannels {
             module: flume::unbounded::<Option<SubscanModule>>().into(),
-            results: flume::unbounded::<Option<SubscanModuleResult>>().into(),
+            results: flume::unbounded::<OptionalSubscanModuleResult>().into(),
         };
         let workers = SubscanModulePoolWorkers::default();
 
@@ -181,13 +181,13 @@ impl SubscanModulePool {
         let _lookup_host = self.resolver.lookup_host_future().await;
 
         while let Ok(msg) = self.channels.results.rx.recv_async().await {
-            if let Some(result) = msg {
+            if let Some(result) = msg.as_ref() {
                 match result {
                     SubscanModuleResult::SubscanModuleResultItem(item) => {
                         println!("{:#?}", item)
                     }
                     SubscanModuleResult::SubscanModuleStatus(status) => {
-                        println!("{:#?}", status)
+                        println!("{:#?}", status);
                     }
                 }
             } else {
@@ -367,7 +367,11 @@ impl SubscanModulePool {
     /// ```
     pub async fn kill_resolvers(self: Arc<Self>) {
         for _ in 0..self.resolver.config().await.concurrency {
-            self.channels.results.tx.send(None).unwrap()
+            self.channels
+                .results
+                .tx
+                .send(OptionalSubscanModuleResult(None))
+                .unwrap()
         }
     }
 

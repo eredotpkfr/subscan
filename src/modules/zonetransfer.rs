@@ -16,7 +16,7 @@ use tokio::sync::Mutex;
 use crate::{
     enums::{
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        result::SubscanModuleResult,
+        result::{OptionalSubscanModuleResult, SubscanModuleResult},
     },
     error::ModuleErrorKind::Custom,
     interfaces::module::SubscanModuleInterface,
@@ -145,32 +145,26 @@ impl SubscanModuleInterface for ZoneTransfer {
         None
     }
 
-    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>) {
-        if let Some(ns) = &self.ns {
-            let err = Custom("connection error".into());
+    async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>) {
+        match &self.ns {
+            Some(ns) => {
+                let err = Custom("connection error".into());
 
-            match self.get_ns_as_ip(ns.socket_addr, domain).await.ok_or(err) {
-                Ok(ips) => {
-                    for ip in ips {
-                        let subdomains = self
-                            .attempt_zone_transfer(ip, domain)
-                            .await
-                            .unwrap_or_default();
+                match self.get_ns_as_ip(ns.socket_addr, domain).await.ok_or(err) {
+                    Ok(ips) => {
+                        for ip in ips {
+                            let subdomains = self.attempt_zone_transfer(ip, domain).await;
 
-                        for subdomain in &subdomains {
-                            results
-                                .send(Some((self.name().await, subdomain).into()))
-                                .unwrap();
+                            for subdomain in &subdomains.unwrap_or_default() {
+                                results.send((self.name().await, subdomain).into()).unwrap();
+                            }
                         }
+                        results.send(Finished.into()).unwrap()
                     }
-                    results.send(Finished.into()).unwrap()
+                    Err(err) => results.send(err.status().into()).unwrap(),
                 }
-                Err(err) => results.send(err.status().into()).unwrap(),
             }
-        } else {
-            let err = Custom("no default ns".into());
-
-            results.send(err.into()).unwrap();
-        }
+            None => results.send("no default ns".into()).unwrap(),
+        };
     }
 }

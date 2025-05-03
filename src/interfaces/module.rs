@@ -7,7 +7,7 @@ use super::requester::RequesterInterface;
 use crate::{
     enums::{
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        result::SubscanModuleResult,
+        result::{OptionalSubscanModuleResult, SubscanModuleResult},
     },
     modules::{
         generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
@@ -47,5 +47,5 @@ pub trait SubscanModuleInterface: Sync + Send {
     }
     /// Just like a `main` method, when the module run this `run` method will be called.
     /// So this method should do everything
-    async fn run(&mut self, domain: &str, results: Sender<Option<SubscanModuleResult>>);
+    async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>);
 }
