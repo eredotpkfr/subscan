@@ -1,4 +1,5 @@
-use lazy_static::lazy_static;
+use std::sync::LazyLock;
+
 use tokio::task::JoinSet;
 
 use crate::{
@@ -20,9 +21,9 @@ use crate::{
 #[derive(Default)]
 pub struct CacheManager {}
 
-lazy_static! {
-    /// All `Subscan` modules are stores in-memory [`Vec`] as a [`SubscanModule`](crate::types::core::SubscanModule)
-    static ref MODULE_CACHE: Vec<SubscanModule> = vec![
+/// All `Subscan` modules are stores in-memory [`Vec`] as a [`SubscanModule`](crate::types::core::SubscanModule)
+static MODULE_CACHE: LazyLock<Vec<SubscanModule>> = LazyLock::new(|| {
+    vec![
         // Search engines
         SubscanModule::from(bing::Bing::dispatcher()),
         SubscanModule::from(duckduckgo::DuckDuckGo::dispatcher()),
@@ -59,9 +60,9 @@ lazy_static! {
         SubscanModule::from(whoisxmlapi::WhoisXMLAPI::dispatcher()),
         SubscanModule::from(zoomeye::ZoomEye::dispatcher()),
         // Others
-        SubscanModule::from(zonetransfer::ZoneTransfer::dispatcher())
-    ];
-}
+        SubscanModule::from(zonetransfer::ZoneTransfer::dispatcher()),
+    ]
+});
 
 impl CacheManager {
     /// Get module by name
