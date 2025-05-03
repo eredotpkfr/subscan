@@ -1,13 +1,10 @@
 use derive_more::Deref;
 
-use crate::{
-    error::ModuleErrorKind,
-    types::{
-        core::Subdomain,
-        result::{
-            item::SubscanModuleResultItem,
-            status::{SkipReason, SubscanModuleStatus},
-        },
+use crate::types::{
+    core::Subdomain,
+    result::{
+        item::{SubscanModuleResultItem, SubscanModuleStatusItem},
+        status::SubscanModuleStatus,
     },
 };
 
@@ -15,7 +12,7 @@ use crate::{
 #[derive(Clone, Debug, PartialEq)]
 pub enum SubscanModuleResult {
     SubscanModuleResultItem(SubscanModuleResultItem),
-    SubscanModuleStatus(SubscanModuleStatus),
+    SubscanModuleStatusItem(SubscanModuleStatusItem),
 }
 
 /// Optional subscan module result type
@@ -30,32 +27,18 @@ impl From<(&str, &Subdomain)> for OptionalSubscanModuleResult {
     }
 }
 
-impl From<&str> for OptionalSubscanModuleResult {
-    fn from(err_msg: &str) -> Self {
-        Self(Some(SubscanModuleResult::SubscanModuleStatus(
-            ModuleErrorKind::Custom(err_msg.to_owned()).into(),
+impl From<(&str, SubscanModuleStatus)> for OptionalSubscanModuleResult {
+    fn from(values: (&str, SubscanModuleStatus)) -> Self {
+        Self(Some(SubscanModuleResult::SubscanModuleStatusItem(
+            values.into(),
         )))
     }
 }
 
-impl From<SubscanModuleStatus> for OptionalSubscanModuleResult {
-    fn from(status: SubscanModuleStatus) -> Self {
-        Self(Some(SubscanModuleResult::SubscanModuleStatus(status)))
-    }
-}
-
-impl From<SkipReason> for OptionalSubscanModuleResult {
-    fn from(reason: SkipReason) -> Self {
-        Self(Some(SubscanModuleResult::SubscanModuleStatus(
-            reason.into(),
-        )))
-    }
-}
-
-impl From<ModuleErrorKind> for OptionalSubscanModuleResult {
-    fn from(kind: ModuleErrorKind) -> Self {
-        Self(Some(SubscanModuleResult::SubscanModuleStatus(
-            kind.status(),
+impl From<(&str, &str)> for OptionalSubscanModuleResult {
+    fn from(values: (&str, &str)) -> Self {
+        Self(Some(SubscanModuleResult::SubscanModuleStatusItem(
+            values.into(),
         )))
     }
 }

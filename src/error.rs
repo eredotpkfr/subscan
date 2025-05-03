@@ -101,6 +101,7 @@ pub enum ModuleErrorKind {
     #[display("{_0}")]
     Skip(SkipReason),
     /// Indicates that the module encountered a error with a custom error message
+    #[from(String, &str)]
     #[display("{_0}")]
     Custom(String),
 }

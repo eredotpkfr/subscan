@@ -92,9 +92,7 @@ impl ChromeBrowser {
             headless: true,
             sandbox: false,
             enable_gpu: false,
-            path: Env::from(SUBSCAN_CHROME_PATH_ENV)
-                .value
-                .map(|path| path.into()),
+            path: Env::from(SUBSCAN_CHROME_PATH_ENV).value.map(|path| path.into()),
             args: vec![
                 OsStr::new("--disable-dev-shm-usage"),
                 OsStr::new("--disable-software-rasterizer"),

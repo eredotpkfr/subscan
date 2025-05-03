@@ -12,19 +12,15 @@ use tokio_util::io::StreamReader;
 use crate::{
     enums::{
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        result::{OptionalSubscanModuleResult, SubscanModuleResult},
+        result::OptionalSubscanModuleResult,
     },
-    error::ModuleErrorKind::Custom,
     extractors::regex::RegexExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     requesters::client::HTTPClient,
-    types::{
-        core::{Result, SubscanModuleCoreComponents},
-        result::status::SubscanModuleStatus::Finished,
-    },
+    types::{core::SubscanModuleCoreComponents, result::status::SubscanModuleStatus::Finished},
 };
 
 pub const COMMONCRAWL_MODULE_NAME: &str = "commoncrawl";
@@ -132,8 +128,9 @@ impl SubscanModuleInterface for CommonCrawl {
                                                     extractor.extract(line.into(), domain).await;
 
                                                 for subdomain in &subdomains.unwrap_or_default() {
-                                                    let result = (self.name().await, subdomain);
-                                                    results.send(result.into()).unwrap();
+                                                    results
+                                                        .send(self.item(subdomain).await)
+                                                        .unwrap();
                                                 }
                                             } else {
                                                 break;
@@ -143,14 +140,14 @@ impl SubscanModuleInterface for CommonCrawl {
                                 }
                             }
                         }
-                        results.send(Finished.into()).unwrap();
+                        results.send(self.status(Finished).await).unwrap();
                     }
-                    None => results.send("not get cdx URLs".into()).unwrap(),
+                    None => results.send(self.error("not get cdx URLs").await).unwrap(),
                 },
-                Err(err) => results.send(err.status().into()).unwrap(),
+                Err(err) => results.send(self.status(err.into()).await).unwrap(),
             }
         } else {
-            results.send("misconfigured requester".into()).unwrap();
+            results.send(self.error("misconfigured requester").await).unwrap();
         }
     }
 }

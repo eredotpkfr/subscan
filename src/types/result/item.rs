@@ -4,7 +4,8 @@ use derive_more::From;
 use prettytable::{row, Row};
 use serde::Serialize;
 
-use crate::types::core::Subdomain;
+use super::status::SubscanModuleStatus;
+use crate::{error::ModuleErrorKind, types::core::Subdomain};
 
 /// Subscan result items data type
 pub type SubscanResultItems = BTreeSet<SubscanResultItem>;
@@ -14,6 +15,21 @@ pub type SubscanResultItems = BTreeSet<SubscanResultItem>;
 pub struct SubscanModuleResultItem {
     pub module: String,
     pub subdomain: Subdomain,
+}
+
+#[derive(Clone, Debug, From, PartialEq)]
+#[from((&str, ModuleErrorKind))]
+#[from((&str, SubscanModuleStatus))]
+#[from((&str, &str))]
+pub struct SubscanModuleStatusItem {
+    pub module: String,
+    pub status: SubscanModuleStatus,
+}
+
+impl SubscanModuleStatusItem {
+    pub async fn log(&self) {
+        self.status.log(&self.module);
+    }
 }
 
 /// Core scan result item, simply stores single discovered subdomain and

@@ -11,9 +11,8 @@ use crate::{
     enums::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        result::{OptionalSubscanModuleResult, SubscanModuleResult},
+        result::OptionalSubscanModuleResult,
     },
-    error::ModuleErrorKind::Custom,
     extractors::html::HTMLExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -127,11 +126,8 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
                             .headers(requester.config.headers.clone());
 
                         if let Ok(request) = rbuilder.build() {
-                            let response: Result<Response> = requester
-                                .client
-                                .execute(request)
-                                .await
-                                .map_err(|err| err.into());
+                            let response: Result<Response> =
+                                requester.client.execute(request).await.map_err(|err| err.into());
 
                             match response {
                                 Ok(response) => {
@@ -140,21 +136,20 @@ impl SubscanModuleInterface for DNSDumpsterCrawler {
                                         extractor.extract(content.into(), domain).await;
 
                                     for subdomain in &subdomains.unwrap_or_default() {
-                                        let result = (self.name().await, subdomain);
-                                        results.send(result.into()).unwrap();
+                                        results.send(self.item(subdomain).await).unwrap();
                                     }
                                 }
-                                Err(err) => results.send(err.status().into()).unwrap(),
+                                Err(err) => results.send(self.status(err.into()).await).unwrap(),
                             }
                         }
-                        results.send(Finished.into()).unwrap();
+                        results.send(self.status(Finished).await).unwrap();
                     } else {
-                        results.send("misconfigured requester".into()).unwrap();
+                        results.send(self.error("misconfigured requester").await).unwrap();
                     }
                 }
-                None => results.send("not get token".into()).unwrap(),
+                None => results.send(self.error("not get token").await).unwrap(),
             },
-            Err(err) => results.send(err.status().into()).unwrap(),
+            Err(err) => results.send(self.status(err.into()).await).unwrap(),
         }
     }
 }

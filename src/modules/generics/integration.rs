@@ -1,4 +1,4 @@
-use std::{error::Error, str::FromStr};
+use std::str::FromStr;
 
 use async_trait::async_trait;
 use flume::Sender;
@@ -7,7 +7,6 @@ use reqwest::{
     Url,
 };
 use tokio::sync::Mutex;
-use url::ParseError;
 
 use crate::{
     enums::{
@@ -21,7 +20,7 @@ use crate::{
         requester::RequesterInterface,
     },
     types::{
-        core::{Result, SubscanModuleCoreComponents},
+        core::SubscanModuleCoreComponents,
         env::{Credentials, Env},
         func::GenericIntegrationCoreFuncs,
         result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Finished},
@@ -122,7 +121,7 @@ impl SubscanModuleInterface for GenericIntegrationModule {
         match url.clone().map_err(|err| SubscanError::from(err)) {
             Ok(mut url) => {
                 if self.auth.is_set() && !self.authenticate(&mut url).await {
-                    results.send(AuthenticationNotProvided.into()).unwrap();
+                    results.send(self.status(AuthenticationNotProvided.into()).await).unwrap();
                 } else {
                     let requester = self.components.requester.lock().await;
                     let extractor = &self.components.extractor;
@@ -134,32 +133,30 @@ impl SubscanModuleInterface for GenericIntegrationModule {
                             Ok(content) => match extractor.extract(content.clone(), domain).await {
                                 Ok(subdomains) => {
                                     for subdomain in &subdomains {
-                                        results
-                                            .send((self.name().await, subdomain).into())
-                                            .unwrap();
+                                        results.send(self.item(subdomain).await).unwrap();
                                     }
 
                                     if let Some(next) = (self.funcs.next)(url, content) {
                                         url = next;
                                     } else {
-                                        results.send(Finished.into()).unwrap();
+                                        results.send(self.status(Finished).await).unwrap();
                                         break;
                                     }
                                 }
                                 Err(err) => {
-                                    results.send(err.status().into()).unwrap();
+                                    results.send(self.status(err.into()).await).unwrap();
                                     break;
                                 }
                             },
                             Err(err) => {
-                                results.send(err.status().into()).unwrap();
+                                results.send(self.status(err.into()).await).unwrap();
                                 break;
                             }
                         }
                     }
                 }
             }
-            Err(err) => results.send(err.status().into()).unwrap(),
+            Err(err) => results.send(self.status(err.into()).await).unwrap(),
         };
     }
 }

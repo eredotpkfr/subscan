@@ -186,8 +186,9 @@ impl SubscanModulePool {
                     SubscanModuleResult::SubscanModuleResultItem(item) => {
                         println!("{:#?}", item)
                     }
-                    SubscanModuleResult::SubscanModuleStatus(status) => {
+                    SubscanModuleResult::SubscanModuleStatusItem(status) => {
                         println!("{:#?}", status);
+                        status.log().await;
                     }
                 }
             } else {
@@ -250,11 +251,7 @@ impl SubscanModulePool {
     /// ```
     pub async fn spawn_runners(self: Arc<Self>, domain: &str) {
         for _ in 0..self.config.concurrency {
-            self.workers
-                .runners
-                .lock()
-                .await
-                .spawn(self.clone().runner(domain.to_string()));
+            self.workers.runners.lock().await.spawn(self.clone().runner(domain.to_string()));
         }
     }
 
@@ -327,11 +324,7 @@ impl SubscanModulePool {
     /// ```
     pub async fn spawn_resolvers(self: Arc<Self>) {
         for _ in 0..self.resolver.config().await.concurrency {
-            self.workers
-                .resolvers
-                .lock()
-                .await
-                .spawn(self.clone().resolver());
+            self.workers.resolvers.lock().await.spawn(self.clone().resolver());
         }
     }
 
@@ -367,11 +360,7 @@ impl SubscanModulePool {
     /// ```
     pub async fn kill_resolvers(self: Arc<Self>) {
         for _ in 0..self.resolver.config().await.concurrency {
-            self.channels
-                .results
-                .tx
-                .send(OptionalSubscanModuleResult(None))
-                .unwrap()
+            self.channels.results.tx.send(OptionalSubscanModuleResult(None)).unwrap()
         }
     }
 

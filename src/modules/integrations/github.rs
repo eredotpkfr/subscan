@@ -13,9 +13,8 @@ use crate::{
     enums::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        result::{OptionalSubscanModuleResult, SubscanModuleResult},
+        result::OptionalSubscanModuleResult,
     },
-    error::ModuleErrorKind::Custom,
     extractors::regex::RegexExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -139,17 +138,17 @@ impl SubscanModuleInterface for GitHub {
                                     .unwrap_or_default();
 
                                 for subdomain in &subdomains {
-                                    results.send((self.name().await, subdomain).into()).unwrap();
+                                    results.send(self.item(subdomain).await).unwrap();
                                 }
                             }
-                            results.send(Finished.into()).unwrap();
+                            results.send(self.status(Finished).await).unwrap();
                         }
-                        None => results.send("not get raw URLs".into()).unwrap(),
+                        None => results.send(self.error("not get raw URLs").await).unwrap(),
                     },
-                    Err(err) => results.send(err.status().into()).unwrap(),
+                    Err(err) => results.send(self.status(err.into()).await).unwrap(),
                 }
             }
-            None => results.send(AuthenticationNotProvided.into()).unwrap(),
+            None => results.send(self.status(AuthenticationNotProvided.into()).await).unwrap(),
         }
     }
 }

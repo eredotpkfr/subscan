@@ -7,7 +7,7 @@ use super::requester::RequesterInterface;
 use crate::{
     enums::{
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        result::{OptionalSubscanModuleResult, SubscanModuleResult},
+        result::OptionalSubscanModuleResult,
     },
     modules::{
         generics::{engine::GenericSearchEngineModule, integration::GenericIntegrationModule},
@@ -17,7 +17,10 @@ use crate::{
         },
         zonetransfer::ZoneTransfer,
     },
-    types::{config::requester::RequesterConfig, env::SubscanModuleEnvs},
+    types::{
+        config::requester::RequesterConfig, core::Subdomain, env::SubscanModuleEnvs,
+        result::status::SubscanModuleStatus,
+    },
 };
 
 /// Generic `subscan` module trait definition to implement subdomain enumeration modules
@@ -48,4 +51,19 @@ pub trait SubscanModuleInterface: Sync + Send {
     /// Just like a `main` method, when the module run this `run` method will be called.
     /// So this method should do everything
     async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>);
+    /// Builds [`OptionalSubscanModuleResult`](crate::enums::result::OptionalSubscanModuleResult)
+    /// with any [`Subdomain`](crate::types::core::Subdomain)
+    async fn item(&self, sub: &Subdomain) -> OptionalSubscanModuleResult {
+        (self.name().await, sub).into()
+    }
+    /// Builds [`OptionalSubscanModuleResult`](crate::enums::result::OptionalSubscanModuleResult)
+    /// with any [`SubscanModuleStatus`](crate::types::result::status::SubscanModuleStatus)
+    async fn status(&self, status: SubscanModuleStatus) -> OptionalSubscanModuleResult {
+        (self.name().await, status).into()
+    }
+    /// Builds [`OptionalSubscanModuleResult`](crate::enums::result::OptionalSubscanModuleResult)
+    /// with custom error message
+    async fn error(&self, msg: &str) -> OptionalSubscanModuleResult {
+        (self.name().await, msg).into()
+    }
 }

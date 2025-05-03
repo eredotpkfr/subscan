@@ -113,8 +113,7 @@ impl Subscan {
             INIT.get_or_init(|| async { module.lock().await.configure(rconfig).await })
                 .await;
         } else {
-            INIT.get_or_init(|| async { self.manager.configure(rconfig).await })
-                .await;
+            INIT.get_or_init(|| async { self.manager.configure(rconfig).await }).await;
         }
     }
 
@@ -166,11 +165,7 @@ impl Subscan {
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
 
-        let wordlist = self
-            .config
-            .wordlist
-            .clone()
-            .expect("Wordlist must be specified!");
+        let wordlist = self.config.wordlist.clone().expect("Wordlist must be specified!");
 
         log::info!("Started brute force attack on {domain} ({time})");
 

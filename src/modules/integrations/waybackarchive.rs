@@ -10,12 +10,11 @@ use tokio_util::io::StreamReader;
 use crate::{
     enums::{
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        result::{OptionalSubscanModuleResult, SubscanModuleResult},
+        result::OptionalSubscanModuleResult,
     },
-    error::ModuleErrorKind::Custom,
     extractors::regex::RegexExtractor,
     interfaces::{extractor::SubdomainExtractorInterface, module::SubscanModuleInterface},
-    requesters::{chrome::ChromeBrowser, client::HTTPClient},
+    requesters::client::HTTPClient,
     types::{
         core::{Result, SubscanModuleCoreComponents},
         result::status::SubscanModuleStatus::Finished,
@@ -95,11 +94,8 @@ impl SubscanModuleInterface for WaybackArchive {
                 .headers(requester.config.headers.clone());
 
             if let Ok(request) = rbuilder.build() {
-                let response: Result<Response> = requester
-                    .client
-                    .execute(request)
-                    .await
-                    .map_err(|err| err.into());
+                let response: Result<Response> =
+                    requester.client.execute(request).await.map_err(|err| err.into());
 
                 match response {
                     Ok(response) => {
@@ -115,19 +111,19 @@ impl SubscanModuleInterface for WaybackArchive {
                                     .unwrap_or_default();
 
                                 for subdomain in &subdomains {
-                                    results.send((self.name().await, subdomain).into()).unwrap();
+                                    results.send(self.item(subdomain).await).unwrap();
                                 }
                             } else {
                                 break;
                             }
                         }
-                        results.send(Finished.into()).unwrap();
+                        results.send(self.status(Finished).await).unwrap();
                     }
-                    Err(err) => results.send(err.status().into()).unwrap(),
+                    Err(err) => results.send(self.status(err.into()).await).unwrap(),
                 };
             }
         } else {
-            results.send("misconfigured requester".into()).unwrap();
+            results.send(self.error("misconfigured requester").await).unwrap();
         }
     }
 }

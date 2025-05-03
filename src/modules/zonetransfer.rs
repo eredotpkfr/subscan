@@ -16,7 +16,7 @@ use tokio::sync::Mutex;
 use crate::{
     enums::{
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
-        result::{OptionalSubscanModuleResult, SubscanModuleResult},
+        result::OptionalSubscanModuleResult,
     },
     error::ModuleErrorKind::Custom,
     interfaces::module::SubscanModuleInterface,
@@ -64,12 +64,10 @@ impl ZoneTransfer {
         let (stream, handler) = TcpClientStream::new(server, None, None, provider);
         let result = Client::new(stream, handler, None).await;
 
-        result
-            .map_err(|_| Custom("client error".into()))
-            .map(|(client, bg)| {
-                tokio::spawn(bg);
-                Ok(client)
-            })?
+        result.map_err(|_| Custom("client error".into())).map(|(client, bg)| {
+            tokio::spawn(bg);
+            Ok(client)
+        })?
     }
 
     pub async fn get_ns_as_ip(&self, server: SocketAddr, domain: &str) -> Option<Vec<SocketAddr>> {
@@ -86,14 +84,7 @@ impl ZoneTransfer {
             let with_port = |answer: &Record| Some(format!("{}:{}", answer.data(), server.port()));
             let as_ip = |with_port: String| SocketAddr::from_str(&with_port).ok();
 
-            ips.extend(
-                a_response
-                    .ok()?
-                    .answers()
-                    .iter()
-                    .filter_map(with_port)
-                    .filter_map(as_ip),
-            );
+            ips.extend(a_response.ok()?.answers().iter().filter_map(with_port).filter_map(as_ip));
         }
 
         Some(ips)
@@ -156,15 +147,15 @@ impl SubscanModuleInterface for ZoneTransfer {
                             let subdomains = self.attempt_zone_transfer(ip, domain).await;
 
                             for subdomain in &subdomains.unwrap_or_default() {
-                                results.send((self.name().await, subdomain).into()).unwrap();
+                                results.send(self.item(subdomain).await).unwrap();
                             }
                         }
-                        results.send(Finished.into()).unwrap()
+                        results.send(self.status(Finished).await).unwrap();
                     }
-                    Err(err) => results.send(err.status().into()).unwrap(),
+                    Err(err) => results.send(self.status(err.into()).await).unwrap(),
                 }
             }
-            None => results.send("no default ns".into()).unwrap(),
+            None => results.send(self.error("no default ns").await).unwrap(),
         };
     }
 }

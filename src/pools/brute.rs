@@ -156,10 +156,7 @@ impl SubscanBrutePool {
     /// ```
     pub async fn spawn_bruters(self: Arc<Self>, domain: &str) {
         for _ in 0..self.concurrency {
-            self.workers
-                .lock()
-                .await
-                .spawn(self.clone().bruter(domain.to_string()));
+            self.workers.lock().await.spawn(self.clone().bruter(domain.to_string()));
         }
     }
 

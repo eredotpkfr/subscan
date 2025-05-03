@@ -82,21 +82,21 @@ impl SubscanModuleInterface for GenericSearchEngineModule {
                 Ok(content) => match extractor.extract(content, domain).await {
                     Ok(subdomains) => {
                         for subdomain in &subdomains {
-                            results.send((self.name().await, subdomain).into()).unwrap();
+                            results.send(self.item(subdomain).await).unwrap();
                         }
 
                         if !query.update_many(subdomains) {
-                            results.send(Finished.into()).unwrap();
+                            results.send(self.status(Finished).await).unwrap();
                             break;
                         }
                     }
                     Err(err) => {
-                        results.send(err.status().into()).unwrap();
+                        results.send(self.status(err.into()).await).unwrap();
                         break;
                     }
                 },
                 Err(err) => {
-                    results.send(err.status().into()).unwrap();
+                    results.send(self.status(err.into()).await).unwrap();
                     break;
                 }
             };
