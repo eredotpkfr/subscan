@@ -52,7 +52,7 @@ url = "2.5.4"
 
 [dev-dependencies]
 automod = "1.0.15"
-hickory-server = "0.25.1"
+hickory-server = "0.25.2"
 md5 = "0.7.0"
 stubr = "0.6.2"
 tempfile = "3.19.1"
