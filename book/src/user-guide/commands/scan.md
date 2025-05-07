@@ -13,6 +13,7 @@ All arguments below can be used with the `scan` command and you can customize a 
 | `--http-timeout`         | `-t`  |             HTTP timeout as seconds              |
 | `--proxy`                | `-p`  |                  Set HTTP proxy                  |
 | `--output`               | `-o`  | Set output format (`txt`, `csv`, `json`, `html`) |
+| `--print`                |       |     If sets, output will be logged on stdout     |
 | `--module-concurrency`   | `-c`  |         Module runner concurrency level          |
 | `--resolver-timeout`     |       |               IP resolver timeout                |
 | `--resolver-concurrency` |       |         IP resolver concurrency level            |
