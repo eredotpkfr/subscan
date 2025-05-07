@@ -116,7 +116,7 @@ impl SubscanModuleInterface for GitHub {
             let extractor = self.extractor().await.unwrap();
 
             let rconfig = requester.config().await;
-            let auth = HeaderValue::from_str(&format!("token {}", apikey));
+            let auth = HeaderValue::from_str(&format!("token {apikey}"));
 
             rconfig.add_header(AUTHORIZATION, auth.unwrap());
             url.set_query(Some(&query));

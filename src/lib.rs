@@ -126,7 +126,7 @@ impl Subscan {
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
         let pool = SubscanModulePool::from(domain, self.config.clone());
 
-        log::info!("Started scan on {} ({})", domain, time);
+        log::info!("Started scan on {domain} ({time})");
 
         pool.clone().start(self.modules().await).await;
 
@@ -171,7 +171,7 @@ impl Subscan {
             .clone()
             .expect("Wordlist must be specified!");
 
-        log::info!("Started brute force attack on {} ({})", domain, time);
+        log::info!("Started brute force attack on {domain} ({time})");
 
         pool.clone().start(wordlist).await;
 
