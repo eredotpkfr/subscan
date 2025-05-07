@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
-use chrono::{DateTime, TimeDelta, Utc};
+use chrono::{serde::ts_seconds, DateTime, TimeDelta, Utc};
 use serde::Serialize;
 
 use super::status::{SkipReason::SkippedByUser, SubscanModuleStatus};
-use crate::utilities::serializers::{dt_to_string_method, td_num_seconds_method};
+use crate::utilities::serializers::td_to_seconds;
 
 /// Subscan result statistics data type
 pub type SubscanResultStatistics = HashMap<String, SubscanModuleStatistic>;
@@ -14,12 +14,24 @@ pub type SubscanResultStatistics = HashMap<String, SubscanModuleStatistic>;
 pub struct SubscanModuleStatistic {
     pub status: SubscanModuleStatus,
     pub count: usize,
-    #[serde(serialize_with = "dt_to_string_method")]
+    #[serde(with = "ts_seconds")]
     pub started_at: DateTime<Utc>,
-    #[serde(serialize_with = "dt_to_string_method")]
+    #[serde(with = "ts_seconds")]
     pub finished_at: DateTime<Utc>,
-    #[serde(serialize_with = "td_num_seconds_method")]
+    #[serde(serialize_with = "td_to_seconds")]
     pub elapsed: TimeDelta,
+}
+
+impl Default for SubscanModuleStatistic {
+    fn default() -> Self {
+        Self {
+            status: SubscanModuleStatus::Started,
+            count: 0,
+            started_at: Utc::now(),
+            finished_at: Utc::now(),
+            elapsed: TimeDelta::zero(),
+        }
+    }
 }
 
 impl SubscanModuleStatistic {
@@ -47,5 +59,11 @@ impl SubscanModuleStatistic {
             finished_at: Utc::now(),
             elapsed: TimeDelta::zero(),
         }
+    }
+
+    pub async fn finish_with_status(&mut self, status: SubscanModuleStatus) {
+        self.finished_at = Utc::now();
+        self.status = status;
+        self.elapsed = self.finished_at - self.started_at;
     }
 }

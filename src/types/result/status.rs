@@ -95,7 +95,7 @@ impl SubscanModuleStatus {
     pub fn log(&self, module: &str) {
         match self {
             SubscanModuleStatus::Started | SubscanModuleStatus::Finished => {
-                log::info!("{:.<25}{:.>35}", module.white(), self.with_reason().white())
+                log::debug!("{:.<25}{:.>35}", module.white(), self.with_reason().white())
             }
             SubscanModuleStatus::Skipped(_) => {
                 log::warn!(

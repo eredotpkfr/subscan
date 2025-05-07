@@ -26,6 +26,9 @@ pub struct ScanCommandArgs {
     /// Set output format
     #[arg(value_enum, short, long, default_value_t = OutputFormat::JSON)]
     pub output: OutputFormat,
+    /// If sets, output will be logged on stdout
+    #[arg(long, default_value_t = false)]
+    pub print: bool,
     /// Module runner concurrency level, thread counts of runner instances
     #[arg(short = 'c', long, default_value_t = DEFAULT_MODULE_CONCURRENCY)]
     pub module_concurrency: u64,

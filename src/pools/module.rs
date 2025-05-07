@@ -9,7 +9,7 @@ use crate::{
     types::{
         config::{pool::PoolConfig, subscan::SubscanConfig},
         core::{SubscanModule, UnboundedFlumeChannel},
-        result::{pool::PoolResult, statistics::SubscanModuleStatistic},
+        result::{item::SubscanResultItem, pool::PoolResult, statistics::SubscanModuleStatistic},
     },
 };
 
@@ -178,17 +178,32 @@ impl SubscanModulePool {
 
     /// [`SubscanModule`] resolver method, simply resolves given subdomain's IP address
     pub async fn resolver(self: Arc<Self>) {
-        let _lookup_host = self.resolver.lookup_host_future().await;
+        let lookup_host = self.resolver.lookup_host_future().await;
 
         while let Ok(msg) = self.channels.results.rx.recv_async().await {
             if let Some(result) = msg.as_ref() {
                 match result {
                     SubscanModuleResult::SubscanModuleResultItem(item) => {
-                        println!("{:#?}", item)
+                        let sub = SubscanResultItem {
+                            subdomain: item.subdomain.clone(),
+                            ip: lookup_host(item.subdomain.clone()).await,
+                        };
+
+                        let module = &item.module;
+                        let inserted = self.result.lock().await.insert(module, sub.clone()).await;
+
+                        if inserted && self.config.print {
+                            sub.log().await;
+                        }
                     }
-                    SubscanModuleResult::SubscanModuleStatusItem(status) => {
-                        println!("{:#?}", status);
-                        status.log().await;
+                    SubscanModuleResult::SubscanModuleStatusItem(item) => {
+                        let module = &item.module;
+
+                        if let Some(stats) = self.result.lock().await.statistics.get_mut(module) {
+                            stats.finish_with_status(item.status.clone()).await;
+                        }
+
+                        item.log().await;
                     }
                 }
             } else {
@@ -202,13 +217,19 @@ impl SubscanModulePool {
         while let Ok(msg) = self.channels.module.rx.recv_async().await {
             if let Some(module) = msg {
                 let mut module = module.lock().await;
+                let name = module.name().await;
 
-                if self.config.filter.is_filtered(module.name().await).await {
-                    let name = module.name().await.to_string();
-                    let stats = SubscanModuleStatistic::skipped();
+                let is_filtered = self.config.filter.is_filtered(name).await;
+                let stats = if is_filtered {
+                    SubscanModuleStatistic::skipped()
+                } else {
+                    SubscanModuleStatistic::default()
+                };
 
-                    stats.status.log(&name);
-                    self.result.lock().await.statistics.insert(name, stats);
+                self.result.lock().await.statistics.insert(name.to_owned(), stats.clone());
+
+                if is_filtered {
+                    stats.status.log(name);
                 } else {
                     module.run(&domain, self.channels.results.tx.clone()).await;
                 }
@@ -249,9 +270,9 @@ impl SubscanModulePool {
     ///     pool.join_runners().await;
     /// }
     /// ```
-    pub async fn spawn_runners(self: Arc<Self>, domain: &str) {
+    pub async fn spawn_runners(self: Arc<Self>, domain: String) {
         for _ in 0..self.config.concurrency {
-            self.workers.runners.lock().await.spawn(self.clone().runner(domain.to_string()));
+            self.workers.runners.lock().await.spawn(self.clone().runner(domain.clone()));
         }
     }
 
@@ -395,7 +416,7 @@ impl SubscanModulePool {
     /// ```
     pub async fn start(self: Arc<Self>, domain: &str, modules: &Vec<SubscanModule>) {
         self.clone().spawn_resolvers().await;
-        self.clone().spawn_runners(domain).await;
+        self.clone().spawn_runners(domain.to_string()).await;
 
         for module in modules {
             self.clone().submit(module.clone()).await;

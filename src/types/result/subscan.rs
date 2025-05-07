@@ -18,7 +18,7 @@ use crate::{
 };
 
 /// `Subscan` scan result type
-#[derive(Clone, Default, Serialize)]
+#[derive(Clone, Debug, Default, Serialize)]
 pub struct SubscanResult {
     pub metadata: SubscanResultMetadata,
     pub statistics: SubscanResultStatistics,
@@ -27,19 +27,17 @@ pub struct SubscanResult {
 }
 
 impl SubscanResult {
-    pub async fn save(&self, output: &OutputFormat) -> String {
-        let (file, filename) = output.get_file(&self.metadata.target).await;
+    pub async fn save(&self, output: &OutputFormat) {
+        let file = output.get_file(&self.metadata.target).await;
 
         match output {
-            OutputFormat::TXT => self.save_txt(file).await,
-            OutputFormat::CSV => self.save_csv(file).await,
-            OutputFormat::JSON => self.save_json(file).await,
-            OutputFormat::HTML => self.save_html(file).await,
+            OutputFormat::TXT => self.save_txt(&file.descriptor).await,
+            OutputFormat::CSV => self.save_csv(&file.descriptor).await,
+            OutputFormat::JSON => self.save_json(&file.descriptor).await,
+            OutputFormat::HTML => self.save_html(&file.descriptor).await,
         }
 
-        log::info!("Scan results saved to {filename}");
-
-        filename
+        log::debug!("Scan results saved to {} file", file.name);
     }
 
     async fn save_txt<W: Write>(&self, mut writer: W) {

@@ -17,8 +17,11 @@ pub struct ModuleRunSubCommandArgs {
     #[arg(short, long)]
     pub domain: String,
     /// Set output format
-    #[arg(value_enum, short, long, default_value = None)]
-    pub output: Option<OutputFormat>,
+    #[arg(value_enum, short, long, default_value_t = OutputFormat::JSON)]
+    pub output: OutputFormat,
+    /// If sets, output will be logged on stdout
+    #[arg(long, default_value_t = false)]
+    pub print: bool,
     /// Set User-Agent header value for HTTP requests
     #[arg(short, long, default_value = DEFAULT_USER_AGENT)]
     pub user_agent: String,

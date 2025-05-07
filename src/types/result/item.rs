@@ -1,5 +1,6 @@
 use std::{collections::BTreeSet, net::IpAddr};
 
+use colored::Colorize;
 use derive_more::From;
 use prettytable::{row, Row};
 use serde::Serialize;
@@ -34,7 +35,7 @@ impl SubscanModuleStatusItem {
 
 /// Core scan result item, simply stores single discovered subdomain and
 /// its IP address
-#[derive(Clone, Default, Debug, Eq, Ord, PartialEq, PartialOrd, Serialize)]
+#[derive(Clone, Debug, Default, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct SubscanResultItem {
     pub subdomain: Subdomain,
     pub ip: Option<IpAddr>,
@@ -91,5 +92,9 @@ impl SubscanResultItem {
             self.subdomain,
             self.ip.map_or("".to_string(), |ip| ip.to_string())
         ]
+    }
+
+    pub async fn log(&self) {
+        log::info!("{}", self.as_txt().white());
     }
 }

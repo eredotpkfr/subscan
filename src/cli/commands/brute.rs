@@ -17,7 +17,7 @@ pub struct BruteCommandArgs {
     #[arg(short, long)]
     pub wordlist: PathBuf,
     /// If sets, output will be logged on stdout
-    #[arg(short, long, default_value_t = false)]
+    #[arg(long, default_value_t = false)]
     pub print: bool,
     /// Set output format
     #[arg(value_enum, short, long, default_value_t = OutputFormat::JSON)]

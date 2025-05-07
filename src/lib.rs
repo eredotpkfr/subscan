@@ -151,7 +151,7 @@ impl Subscan {
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
 
-        log::info!("Running {name} module on {domain} ({time})");
+        log::debug!("Running {name} module on {domain} ({time})");
 
         pool.clone().start(domain, &vec![module.clone()]).await;
 

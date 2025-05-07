@@ -12,7 +12,7 @@ use crate::{
         Cli,
     },
     constants::DEFAULT_MODULE_CONCURRENCY,
-    enums::{cache::CacheFilter, output::OutputFormat},
+    enums::cache::CacheFilter,
     types::config::resolver::ResolverConfig,
 };
 
@@ -21,7 +21,6 @@ use crate::{
 pub struct SubscanConfig {
     pub concurrency: u64,
     pub filter: CacheFilter,
-    pub output: Option<OutputFormat>,
     pub print: bool,
     pub resolver: ResolverConfig,
     pub requester: RequesterConfig,
@@ -51,7 +50,6 @@ impl Default for SubscanConfig {
         Self {
             concurrency: DEFAULT_MODULE_CONCURRENCY,
             filter: CacheFilter::default(),
-            output: None,
             print: false,
             resolver: ResolverConfig::default(),
             requester: RequesterConfig::default(),
@@ -80,9 +78,9 @@ impl From<ModuleRunSubCommandArgs> for SubscanConfig {
     /// ```
     fn from(args: ModuleRunSubCommandArgs) -> Self {
         Self {
+            concurrency: 1,
+            print: args.print,
             requester: args.clone().into(),
-            output: args.output,
-            print: true,
             resolver: args.into(),
             ..Default::default()
         }
@@ -110,8 +108,7 @@ impl From<ScanCommandArgs> for SubscanConfig {
         Self {
             concurrency: args.module_concurrency,
             filter: args.filter(),
-            output: Some(args.output),
-            print: false,
+            print: args.print,
             resolver: args.clone().into(),
             requester: args.into(),
             ..Default::default()
@@ -141,7 +138,6 @@ impl From<BruteCommandArgs> for SubscanConfig {
     /// ```
     fn from(args: BruteCommandArgs) -> Self {
         Self {
-            output: Some(args.output),
             print: args.print,
             resolver: args.clone().into(),
             wordlist: Some(args.wordlist),
