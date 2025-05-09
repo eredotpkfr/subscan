@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{BufRead, BufReader},
+    io::{BufRead, BufReader, Write},
     path::PathBuf,
     sync::Arc,
 };
@@ -11,7 +11,7 @@ use crate::{
     interfaces::lookup::LookUpHostFuture,
     resolver::Resolver,
     types::{
-        config::subscan::SubscanConfig,
+        config::{pool::PoolConfig, subscan::SubscanConfig},
         core::{Subdomain, UnboundedFlumeChannel},
         result::{item::SubscanResultItem, pool::PoolResult},
     },
@@ -19,9 +19,9 @@ use crate::{
 
 /// Subscan brute pool to make brute force attack asynchronously
 pub struct SubscanBrutePool {
-    concurrency: u64,
-    result: Mutex<PoolResult>,
+    config: PoolConfig,
     resolver: Box<dyn LookUpHostFuture>,
+    result: Mutex<PoolResult>,
     channel: UnboundedFlumeChannel<Option<Subdomain>>,
     workers: Mutex<JoinSet<()>>,
 }
@@ -29,7 +29,7 @@ pub struct SubscanBrutePool {
 impl From<SubscanConfig> for Arc<SubscanBrutePool> {
     fn from(config: SubscanConfig) -> Self {
         Arc::new(SubscanBrutePool {
-            concurrency: config.resolver.concurrency,
+            config: config.clone().into(),
             result: PoolResult::default().into(),
             resolver: Resolver::boxed_from(config.resolver),
             channel: flume::unbounded::<Option<Subdomain>>().into(),
@@ -39,13 +39,13 @@ impl From<SubscanConfig> for Arc<SubscanBrutePool> {
 }
 
 impl SubscanBrutePool {
-    pub fn new(concurrency: u64, resolver: Box<dyn LookUpHostFuture>) -> Arc<Self> {
+    pub fn new(config: PoolConfig, resolver: Box<dyn LookUpHostFuture>) -> Arc<Self> {
         let result = PoolResult::default().into();
         let channel = flume::unbounded::<Option<Subdomain>>().into();
         let workers = Mutex::new(JoinSet::new());
 
         Arc::new(Self {
-            concurrency,
+            config,
             result,
             resolver,
             channel,
@@ -67,7 +67,13 @@ impl SubscanBrutePool {
                         ip: Some(ip),
                     };
 
-                    self.result.lock().await.items.insert(item);
+                    if self.result.lock().await.items.insert(item.clone()) && self.config.print {
+                        item.log().await;
+                    }
+
+                    if let Some(sfile) = self.config.get_stream_file().await {
+                        writeln!(sfile.write().unwrap(), "{}", item.as_txt()).unwrap();
+                    }
                 }
             } else {
                 break;
@@ -155,7 +161,7 @@ impl SubscanBrutePool {
     /// }
     /// ```
     pub async fn spawn_bruters(self: Arc<Self>, domain: &str) {
-        for _ in 0..self.concurrency {
+        for _ in 0..self.resolver.config().await.concurrency {
             self.workers.lock().await.spawn(self.clone().bruter(domain.to_string()));
         }
     }
@@ -183,7 +189,7 @@ impl SubscanBrutePool {
     /// }
     /// ```
     pub async fn kill_bruters(self: Arc<Self>) {
-        for _ in 0..self.concurrency {
+        for _ in 0..self.resolver.config().await.concurrency {
             self.channel.tx.send(None).unwrap()
         }
     }

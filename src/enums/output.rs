@@ -23,9 +23,9 @@ pub enum OutputFormat {
 static OUTPUT_FILE: OnceLock<OutputFile> = OnceLock::new();
 
 impl OutputFormat {
-    pub async fn get_file(&self, domain: &str) -> &OutputFile {
+    pub async fn get_output_file(&self, domain: &str) -> &OutputFile {
         let inner = || {
-            let file_name = self.get_file_name(domain);
+            let file_name = self.get_output_file_name(domain);
             let file = File::create(&file_name).unwrap();
 
             (file_name, file).into()
@@ -34,7 +34,7 @@ impl OutputFormat {
         OUTPUT_FILE.get_or_init(inner)
     }
 
-    fn get_file_name(&self, domain: &str) -> String {
+    fn get_output_file_name(&self, domain: &str) -> String {
         let now = Utc::now().timestamp();
 
         match self {

@@ -118,7 +118,10 @@ impl Subscan {
     }
 
     pub async fn module(&self, name: &str) -> &SubscanModule {
-        self.manager.module(name).await.expect("Module not found!")
+        self.manager
+            .module(name)
+            .await
+            .expect(&format!("Module not found with {name}!"))
     }
 
     pub async fn modules(&self) -> &Vec<SubscanModule> {

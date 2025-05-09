@@ -24,6 +24,7 @@ pub struct SubscanConfig {
     pub print: bool,
     pub resolver: ResolverConfig,
     pub requester: RequesterConfig,
+    pub stream: Option<PathBuf>,
     pub wordlist: Option<PathBuf>,
 }
 
@@ -53,6 +54,7 @@ impl Default for SubscanConfig {
             print: false,
             resolver: ResolverConfig::default(),
             requester: RequesterConfig::default(),
+            stream: None,
             wordlist: None,
         }
     }
@@ -140,6 +142,7 @@ impl From<BruteCommandArgs> for SubscanConfig {
         Self {
             print: args.print,
             resolver: args.clone().into(),
+            stream: args.stream_to_txt,
             wordlist: Some(args.wordlist),
             ..Default::default()
         }

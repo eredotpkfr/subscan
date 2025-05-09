@@ -28,7 +28,7 @@ pub struct SubscanResult {
 
 impl SubscanResult {
     pub async fn save(&self, output: &OutputFormat) {
-        let file = output.get_file(&self.metadata.target).await;
+        let file = output.get_output_file(&self.metadata.target).await;
 
         match output {
             OutputFormat::TXT => self.save_txt(&file.descriptor).await,

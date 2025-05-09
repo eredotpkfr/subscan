@@ -19,6 +19,10 @@ pub struct BruteCommandArgs {
     /// If sets, output will be logged on stdout
     #[arg(long, default_value_t = false)]
     pub print: bool,
+    /// Optional TXT file to create file stream for the subdomains that found.
+    /// The `--output` parameter will be disabled
+    #[arg(short, long, default_value = None)]
+    pub stream_to_txt: Option<PathBuf>,
     /// Set output format
     #[arg(value_enum, short, long, default_value_t = OutputFormat::JSON)]
     pub output: OutputFormat,
