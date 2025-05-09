@@ -18,9 +18,10 @@ allow = [
 ]
 
 # List of license exceptions
-exceptions = [
-    { name = "webpki-roots", license = "CDLA-Permissive-2.0" },
-]
+[[licenses.exceptions]]
+name = "webpki-roots"
+license = "CDLA-Permissive-2.0"
+allow = true
 
 [[licenses.clarify]]
 crate = "ring"
