@@ -6,7 +6,7 @@ use serde::Serializer;
 /// # Examples
 ///
 /// ```
-/// use subscan::utilities::serializers::td_num_seconds_method;
+/// use subscan::utilities::serializers::td_to_seconds;
 /// use chrono::TimeDelta;
 /// use serde_json::Serializer;
 ///

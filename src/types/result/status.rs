@@ -60,7 +60,6 @@ impl SubscanModuleStatus {
     ///         Started,
     ///         Finished,
     ///         Failed,
-    ///         FailedWithResult,
     ///         Skipped
     ///     },
     ///     SkipReason::AuthenticationNotProvided,
@@ -73,10 +72,6 @@ impl SubscanModuleStatus {
     /// assert_eq!(
     ///     Failed(Custom("foo".into())).with_reason(),
     ///     "[foo FAILED]"
-    /// );
-    /// assert_eq!(
-    ///     FailedWithResult.with_reason(),
-    ///     "[failed with result FAILED]"
     /// );
     /// assert_eq!(
     ///     Skipped(AuthenticationNotProvided.into()).with_reason(),

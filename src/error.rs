@@ -23,21 +23,11 @@ impl SubscanError {
     ///
     /// ```
     /// use subscan::error::{SubscanError, ModuleErrorKind::Custom};
-    /// use subscan::types::result::{
-    ///     status::SubscanModuleStatus::FailedWithResult,
-    ///     module::SubscanModuleResult
-    /// };
-    ///
-    /// let result = SubscanModuleResult::default();
     ///
     /// let failed = SubscanError::from(Custom("foo".into()));
-    /// let failed_with_result = SubscanError::ModuleErrorWithResult(result);
     ///
     /// assert_eq!(failed.status(), Custom("foo".into()).into());
-    /// assert_eq!(failed_with_result.status(), FailedWithResult);
-    ///
     /// assert_eq!(format!("{failed}"), "foo");
-    /// assert_eq!(format!("{failed_with_result}"), "failed with result");
     /// ```
     pub fn status(&self) -> SubscanModuleStatus {
         match self {
@@ -51,10 +41,7 @@ impl SubscanError {
     ///
     /// ```
     /// use subscan::error::{SubscanError, ModuleErrorKind::Custom};
-    /// use subscan::types::result::{
-    ///     status::SkipReason::SkippedByUser,
-    ///     module::SubscanModuleResult
-    /// };
+    /// use subscan::types::result::status::SkipReason::SkippedByUser;
     ///
     /// let failed = SubscanError::from(SkippedByUser);
     /// let stats = failed.stats();

@@ -88,12 +88,21 @@ impl SubscanBrutePool {
     /// ```
     /// use subscan::pools::brute::SubscanBrutePool;
     /// use subscan::types::config::resolver::ResolverConfig;
+    /// use subscan::types::config::pool::PoolConfig;
     /// use subscan::resolver::Resolver;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(2, resolver);
+    ///     let config = PoolConfig {
+    ///         concurrency: 1,
+    ///         ..Default::default()
+    ///     };
+    ///     let rconfig = ResolverConfig {
+    ///         concurrency: 2,
+    ///         ..Default::default()
+    ///     };
+    ///     let resolver = Resolver::boxed_from(rconfig);
+    ///     let pool = SubscanBrutePool::new(config, resolver);
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters("foo.com").await;
@@ -115,12 +124,21 @@ impl SubscanBrutePool {
     /// ```
     /// use subscan::pools::brute::SubscanBrutePool;
     /// use subscan::types::config::resolver::ResolverConfig;
+    /// use subscan::types::config::pool::PoolConfig;
     /// use subscan::resolver::Resolver;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(2, resolver);
+    ///     let config = PoolConfig {
+    ///         concurrency: 1,
+    ///         ..Default::default()
+    ///     };
+    ///     let rconfig = ResolverConfig {
+    ///         concurrency: 1,
+    ///         ..Default::default()
+    ///     };
+    ///     let resolver = Resolver::boxed_from(rconfig);
+    ///     let pool = SubscanBrutePool::new(config, resolver);
     ///
     ///     assert!(pool.clone().is_empty().await);
     ///
@@ -144,12 +162,21 @@ impl SubscanBrutePool {
     /// ```
     /// use subscan::pools::brute::SubscanBrutePool;
     /// use subscan::types::config::resolver::ResolverConfig;
+    /// use subscan::types::config::pool::PoolConfig;
     /// use subscan::resolver::Resolver;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(1, resolver);
+    ///     let config = PoolConfig {
+    ///         concurrency: 1,
+    ///         ..Default::default()
+    ///     };
+    ///     let rconfig = ResolverConfig {
+    ///         concurrency: 1,
+    ///         ..Default::default()
+    ///     };
+    ///     let resolver = Resolver::boxed_from(rconfig);
+    ///     let pool = SubscanBrutePool::new(config, resolver);
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters("foo.com").await;
@@ -173,12 +200,21 @@ impl SubscanBrutePool {
     /// ```
     /// use subscan::pools::brute::SubscanBrutePool;
     /// use subscan::types::config::resolver::ResolverConfig;
+    /// use subscan::types::config::pool::PoolConfig;
     /// use subscan::resolver::Resolver;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(1, resolver);
+    ///     let config = PoolConfig {
+    ///         concurrency: 1,
+    ///         ..Default::default()
+    ///     };
+    ///     let rconfig = ResolverConfig {
+    ///         concurrency: 1,
+    ///         ..Default::default()
+    ///     };
+    ///     let resolver = Resolver::boxed_from(rconfig);
+    ///     let pool = SubscanBrutePool::new(config, resolver);
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters("foo.com").await;
@@ -216,12 +252,21 @@ impl SubscanBrutePool {
     /// ```no_run
     /// use subscan::pools::brute::SubscanBrutePool;
     /// use subscan::types::config::resolver::ResolverConfig;
+    /// use subscan::types::config::pool::PoolConfig;
     /// use subscan::resolver::Resolver;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(1, resolver);
+    ///     let config = PoolConfig {
+    ///         concurrency: 1,
+    ///         ..Default::default()
+    ///     };
+    ///     let rconfig = ResolverConfig {
+    ///         concurrency: 1,
+    ///         ..Default::default()
+    ///     };
+    ///     let resolver = Resolver::boxed_from(rconfig);
+    ///     let pool = SubscanBrutePool::new(config, resolver);
     ///
     ///     // spawn bruters that listen async channel
     ///     pool.clone().spawn_bruters("foo.com").await;
@@ -258,12 +303,21 @@ impl SubscanBrutePool {
     /// ```no_run
     /// use subscan::pools::brute::SubscanBrutePool;
     /// use subscan::types::config::resolver::ResolverConfig;
+    /// use subscan::types::config::pool::PoolConfig;
     /// use subscan::resolver::Resolver;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
-    ///     let pool = SubscanBrutePool::new(1, resolver);
+    ///     let config = PoolConfig {
+    ///         concurrency: 1,
+    ///         ..Default::default()
+    ///     };
+    ///     let rconfig = ResolverConfig {
+    ///         concurrency: 1,
+    ///         ..Default::default()
+    ///     };
+    ///     let resolver = Resolver::boxed_from(rconfig);
+    ///     let pool = SubscanBrutePool::new(config, resolver);
     ///
     ///     pool.clone().spawn_bruters("foo.com").await;
     ///     // submit subdomain into pool

@@ -117,17 +117,15 @@ impl SubscanModulePool {
     /// #[tokio::main]
     /// async fn main() {
     ///     let config = PoolConfig {
-    ///         filter: NoFilter,
     ///         concurrency: 2,
-    ///         print: false,
-    ///         output: None
+    ///         ..Default::default()
     ///     };
     ///
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
     ///     let pool = SubscanModulePool::new(config, resolver);
     ///
     ///     // spawn runners that listen async channel
-    ///     pool.clone().spawn_runners("foo.com").await;
+    ///     pool.clone().spawn_runners("foo.com".into()).await;
     ///
     ///     assert_eq!(pool.clone().len().await, 2);
     ///
@@ -152,10 +150,8 @@ impl SubscanModulePool {
     /// #[tokio::main]
     /// async fn main() {
     ///     let config = PoolConfig {
-    ///         filter: NoFilter,
     ///         concurrency: 1,
-    ///         print: false,
-    ///         output: None
+    ///         ..Default::default()
     ///     };
     ///
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
@@ -164,7 +160,7 @@ impl SubscanModulePool {
     ///     assert!(pool.clone().is_empty().await);
     ///
     ///     // spawn runners that listen async channel
-    ///     pool.clone().spawn_runners("foo.com").await;
+    ///     pool.clone().spawn_runners("foo.com".into()).await;
     ///
     ///     assert!(!pool.clone().is_empty().await);
     ///
@@ -252,17 +248,15 @@ impl SubscanModulePool {
     /// #[tokio::main]
     /// async fn main() {
     ///     let config = PoolConfig {
-    ///         filter: NoFilter,
     ///         concurrency: 1,
-    ///         print: false,
-    ///         output: None
+    ///         ..Default::default()
     ///     };
     ///
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
     ///     let pool = SubscanModulePool::new(config, resolver);
     ///
     ///     // spawn runners that listen async channel
-    ///     pool.clone().spawn_runners("foo.com").await;
+    ///     pool.clone().spawn_runners("foo.com".into()).await;
     ///
     ///     assert!(!pool.clone().is_empty().await);
     ///
@@ -289,17 +283,15 @@ impl SubscanModulePool {
     /// #[tokio::main]
     /// async fn main() {
     ///     let config = PoolConfig {
-    ///         filter: NoFilter,
     ///         concurrency: 1,
-    ///         print: false,
-    ///         output: None
+    ///         ..Default::default()
     ///     };
     ///
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
     ///     let pool = SubscanModulePool::new(config, resolver);
     ///
     ///     // spawn runners that listen async channel
-    ///     pool.clone().spawn_runners("foo.com").await;
+    ///     pool.clone().spawn_runners("foo.com".into()).await;
     ///     pool.clone().kill_runners().await;
     ///     pool.clone().join_runners().await;
     ///
@@ -325,10 +317,8 @@ impl SubscanModulePool {
     /// #[tokio::main]
     /// async fn main() {
     ///     let config = PoolConfig {
-    ///         filter: NoFilter,
     ///         concurrency: 1,
-    ///         print: false,
-    ///         output: None
+    ///         ..Default::default()
     ///     };
     ///
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
@@ -362,10 +352,8 @@ impl SubscanModulePool {
     /// #[tokio::main]
     /// async fn main() {
     ///     let config = PoolConfig {
-    ///         filter: NoFilter,
     ///         concurrency: 1,
-    ///         print: false,
-    ///         output: None
+    ///         ..Default::default()
     ///     };
     ///
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
@@ -402,10 +390,8 @@ impl SubscanModulePool {
     /// async fn main() {
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
     ///     let config = PoolConfig {
-    ///         filter: NoFilter,
     ///         concurrency: 1,
-    ///         print: false,
-    ///         output: None
+    ///         ..Default::default()
     ///     };
     ///
     ///     let pool = SubscanModulePool::new(config, resolver);
@@ -446,10 +432,8 @@ impl SubscanModulePool {
     /// async fn main() {
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
     ///     let config = PoolConfig {
-    ///         filter: NoFilter,
     ///         concurrency: 1,
-    ///         print: false,
-    ///         output: None
+    ///         ..Default::default()
     ///     };
     ///
     ///     let pool = SubscanModulePool::new(config, resolver);
@@ -458,7 +442,7 @@ impl SubscanModulePool {
     ///     // spawn resolvers
     ///     pool.clone().spawn_resolvers().await;
     ///     // spawn runners that listen async channel
-    ///     pool.clone().spawn_runners("foo.com").await;
+    ///     pool.clone().spawn_runners("foo.com".into()).await;
     ///     // submit module into pool
     ///     pool.clone().submit(module).await;
     ///
@@ -521,10 +505,8 @@ impl SubscanModulePool {
     /// async fn main() {
     ///     let resolver = Resolver::boxed_from(ResolverConfig::default());
     ///     let config = PoolConfig {
-    ///         filter: NoFilter,
     ///         concurrency: 1,
-    ///         print: false,
-    ///         output: None
+    ///         ..Default::default()
     ///     };
     ///
     ///     let pool = SubscanModulePool::new(config, resolver);
