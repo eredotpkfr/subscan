@@ -4,7 +4,7 @@ use reqwest::Url;
 use serde_json::Value;
 use subscan::{
     enums::content::Content,
-    error::{ModuleErrorKind::JSONExtract, SubscanError::ModuleErrorWithResult},
+    error::ModuleErrorKind::JSONExtract,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::zoomeye::{ZoomEye, ZOOMEYE_URL},
 };
@@ -12,7 +12,7 @@ use subscan::{
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::funcs,
-    utils::read_stub,
+    utils,
 };
 
 #[tokio::test]
@@ -24,13 +24,10 @@ async fn run_test() {
     env::set_var(&env_name, "zoomeye-api-key");
     funcs::wrap_module_url(&mut zoomeye, &stubr.path("/zoomeye"));
 
-    let result = zoomeye.run(TEST_DOMAIN).await;
+    let (results, status) = utils::run_module(zoomeye, TEST_DOMAIN).await;
 
-    assert!(result.is_err());
-
-    if let ModuleErrorWithResult(result) = result.err().unwrap() {
-        assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
-    }
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(status, JSONExtract.into());
 
     env::remove_var(env_name);
 }
@@ -61,7 +58,8 @@ async fn get_next_url_test() {
 
 #[tokio::test]
 async fn extract_test() {
-    let json = read_stub("module/integrations/zoomeye.json")["response"]["jsonBody"].clone();
+    let stub = "module/integrations/zoomeye.json";
+    let json = utils::read_stub(stub)["response"]["jsonBody"].clone();
 
     let extracted = ZoomEye::extract(json, TEST_DOMAIN);
     let not_extracted = ZoomEye::extract(Value::Null, TEST_DOMAIN);

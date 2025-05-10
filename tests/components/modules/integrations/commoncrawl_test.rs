@@ -4,16 +4,16 @@ use std::collections::BTreeSet;
 use serde_json::{json, Value};
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher,
-    error::ModuleErrorKind::Custom,
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::integrations::commoncrawl::CommonCrawl,
-    types::config::requester::RequesterConfig,
+    types::{config::requester::RequesterConfig, result::status::SubscanModuleStatus},
 };
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::funcs,
     stub::StubTemplateManager,
+    utils,
 };
 
 #[tokio::test]
@@ -64,13 +64,15 @@ async fn run_test() {
         requester.configure(config).await;
     };
 
-    let results = commoncrawl.run(TEST_DOMAIN).await.unwrap();
+    let (results, status) = utils::run_module(commoncrawl, TEST_DOMAIN).await;
+
     let expected = BTreeSet::from([
         TEST_BAR_SUBDOMAIN.to_string(),
         TEST_BAZ_SUBDOMAIN.to_string(),
     ]);
 
-    assert_eq!(results.subdomains, expected);
+    assert_eq!(results, expected);
+    assert_eq!(status, SubscanModuleStatus::Finished);
 }
 
 #[tokio::test]
@@ -80,11 +82,8 @@ async fn run_failed_test() {
 
     funcs::wrap_module_url(&mut commoncrawl, &stubr.path("/commoncrawl/index-no-data"));
 
-    let results = commoncrawl.run(TEST_DOMAIN).await;
+    let (results, status) = utils::run_module(commoncrawl, TEST_DOMAIN).await;
 
-    assert!(results.is_err());
-    assert_eq!(
-        results.err().unwrap(),
-        Custom("not get cdx URLs".into()).into()
-    );
+    assert_eq!(results, BTreeSet::new());
+    assert_eq!(status, "not get cdx URLs".into());
 }

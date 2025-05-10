@@ -1,16 +1,41 @@
-use std::net::IpAddr;
+use std::{collections::BTreeSet, net::IpAddr};
 
+use colored::Colorize;
+use derive_more::From;
 use prettytable::{row, Row};
 use serde::Serialize;
 
-use crate::types::core::Subdomain;
+use super::status::SubscanModuleStatus;
+use crate::{error::ModuleErrorKind, types::core::Subdomain};
 
-/// Pool result item, alias for [`SubscanResultItem`]
-pub type PoolResultItem = SubscanResultItem;
+/// Subscan result items data type
+pub type SubscanResultItems = BTreeSet<SubscanResultItem>;
+
+#[derive(Clone, Debug, From, PartialEq)]
+#[from((&str, &Subdomain))]
+pub struct SubscanModuleResultItem {
+    pub module: String,
+    pub subdomain: Subdomain,
+}
+
+#[derive(Clone, Debug, From, PartialEq)]
+#[from((&str, ModuleErrorKind))]
+#[from((&str, SubscanModuleStatus))]
+#[from((&str, &str))]
+pub struct SubscanModuleStatusItem {
+    pub module: String,
+    pub status: SubscanModuleStatus,
+}
+
+impl SubscanModuleStatusItem {
+    pub async fn log(&self) {
+        self.status.log(&self.module);
+    }
+}
 
 /// Core scan result item, simply stores single discovered subdomain and
 /// its IP address
-#[derive(Clone, Default, Debug, Eq, Ord, PartialEq, PartialOrd, Serialize)]
+#[derive(Clone, Debug, Default, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct SubscanResultItem {
     pub subdomain: Subdomain,
     pub ip: Option<IpAddr>,
@@ -67,5 +92,9 @@ impl SubscanResultItem {
             self.subdomain,
             self.ip.map_or("".to_string(), |ip| ip.to_string())
         ]
+    }
+
+    pub async fn log(&self) {
+        log::info!("{}", self.as_txt().white());
     }
 }

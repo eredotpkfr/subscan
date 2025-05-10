@@ -7,9 +7,15 @@ use std::{
 use subscan::{
     enums::{cache::CacheFilter, dispatchers::SubscanModuleDispatcher},
     error::ModuleErrorKind::UrlParse,
-    modules::{engines::google::Google, integrations::alienvault::AlienVault},
+    modules::{
+        engines::google::Google,
+        integrations::alienvault::{AlienVault, ALIENVAULT_MODULE_NAME},
+    },
     pools::module::SubscanModulePool,
-    types::{core::SubscanModule, filters::ModuleNameFilter, result::item::PoolResultItem},
+    types::{
+        config::pool::PoolConfig, core::SubscanModule, filters::ModuleNameFilter,
+        result::item::SubscanResultItem,
+    },
 };
 
 use crate::common::{
@@ -21,22 +27,26 @@ use crate::common::{
 #[stubr::mock("module/engines/google.json")]
 async fn submit_test() {
     let resolver = MockResolver::default_boxed();
+    let config = PoolConfig {
+        concurrency: 1,
+        ..Default::default()
+    };
 
     let mut dispatcher = Google::dispatcher();
 
     funcs::wrap_module_url(&mut dispatcher, &stubr.path("/search"));
 
     let google = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), 1, resolver, CacheFilter::default());
+    let pool = SubscanModulePool::new(config, resolver);
 
-    let item = PoolResultItem {
+    let item = SubscanResultItem {
         subdomain: TEST_BAR_SUBDOMAIN.into(),
         ip: Some(IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap())),
     };
 
     assert!(pool.clone().is_empty().await);
 
-    pool.clone().start(&vec![google]).await;
+    pool.clone().start(TEST_DOMAIN, &vec![google]).await;
 
     assert_eq!(pool.clone().len().await, 0);
     assert_eq!(pool.result().await.items, [item].into());
@@ -46,15 +56,19 @@ async fn submit_test() {
 #[stubr::mock("module/engines/google.json")]
 async fn result_test() {
     let resolver = MockResolver::default_boxed();
+    let config = PoolConfig {
+        concurrency: 1,
+        ..Default::default()
+    };
 
     let mut dispatcher = Google::dispatcher();
 
     funcs::wrap_module_url(&mut dispatcher, &stubr.path("/search"));
 
     let google = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), 1, resolver, CacheFilter::NoFilter);
+    let pool = SubscanModulePool::new(config, resolver);
 
-    pool.clone().start(&vec![google]).await;
+    pool.clone().start(TEST_DOMAIN, &vec![google]).await;
 
     let binding = pool.result().await;
     let result = binding.items.first();
@@ -70,11 +84,15 @@ async fn result_test() {
 #[stubr::mock("module/engines/google.json")]
 async fn result_test_with_filter() {
     let resolver = MockResolver::default_boxed();
-
     let filter = CacheFilter::FilterByName(ModuleNameFilter {
-        valids: vec!["google".to_string()],
-        invalids: vec!["alienvault".to_string()],
+        modules: vec!["google".to_string()],
+        skips: vec!["alienvault".to_string()],
     });
+    let config = PoolConfig {
+        filter,
+        concurrency: 1,
+        ..Default::default()
+    };
 
     let mut google_dispatcher = Google::dispatcher();
     let mut alienvault_dispatcher = AlienVault::dispatcher();
@@ -84,10 +102,9 @@ async fn result_test_with_filter() {
 
     let google = SubscanModule::from(google_dispatcher);
     let alienvault = SubscanModule::from(alienvault_dispatcher);
+    let pool = SubscanModulePool::new(config, resolver);
 
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), 1, resolver, filter);
-
-    pool.clone().start(&vec![google, alienvault]).await;
+    pool.clone().start(TEST_DOMAIN, &vec![google, alienvault]).await;
 
     let binding = pool.result().await;
     let result = binding.items.first();
@@ -103,6 +120,10 @@ async fn result_test_with_filter() {
 #[tokio::test]
 async fn result_test_with_error() {
     let resolver = MockResolver::default_boxed();
+    let config = PoolConfig {
+        concurrency: 1,
+        ..Default::default()
+    };
 
     let mut dispatcher = AlienVault::dispatcher();
 
@@ -111,16 +132,16 @@ async fn result_test_with_error() {
     }
 
     let alienvault = SubscanModule::from(dispatcher);
-    let pool = SubscanModulePool::new(TEST_DOMAIN.into(), 1, resolver, CacheFilter::NoFilter);
+    let pool = SubscanModulePool::new(config, resolver);
 
-    pool.clone().start(&vec![alienvault]).await;
+    pool.clone().start(TEST_DOMAIN, &vec![alienvault]).await;
 
     let result = pool.result().await;
-    let stat = result.statistics.module.first();
+    let stat = result.statistics.get(ALIENVAULT_MODULE_NAME);
 
     assert!(stat.is_some());
 
-    assert_eq!(result.statistics.module.len(), 1);
+    assert_eq!(result.statistics.len(), 1);
     assert_eq!(stat.unwrap().status, UrlParse.into());
     assert_eq!(result.items, BTreeSet::new());
 }

@@ -13,21 +13,17 @@ async fn main() {
     let exe_name = exe.file_name().unwrap().to_str();
     let args: Vec<String> = env::args().collect();
 
-    env_logger::builder()
-        .filter_module(exe_name.unwrap(), Debug)
-        .init();
+    env_logger::builder().filter_module(exe_name.unwrap(), Debug).init();
 
     // filter modules by name, only runs google and alienvault modules
     let filter = ModuleNameFilter {
-        valids: vec!["google".into(), "alienvault".into()],
-        invalids: vec![],
+        modules: vec!["google".into(), "alienvault".into()],
+        skips: vec![],
     };
 
     // set module conccurrency to 1
-    // set HTTP timeout to 120
     let config = SubscanConfig {
         concurrency: 1,
-        timeout: 120,
         filter: FilterByName(filter),
         ..Default::default()
     };

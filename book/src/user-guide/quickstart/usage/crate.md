@@ -19,7 +19,10 @@ This chapter provides step-by-step guidance on how to integrate `Subscan` into y
        // set HTTP timeout to 120
        let config = SubscanConfig {
            concurrency: 1,
-           timeout: 120,
+           requester: RequesterConfig {
+            timeout: Duration::from_secs(120),
+            ..Default::default() 
+           },
            ..Default::default()
        };
 

@@ -1,16 +1,18 @@
 use std::collections::BTreeSet;
 
 use async_trait::async_trait;
+use flume::Sender;
 use reqwest::{
     header::{HeaderName, HeaderValue},
-    Url,
+    Response, Url,
 };
 use serde_json::{json, Value};
 use tokio::sync::Mutex;
 
 use crate::{
-    enums::dispatchers::{
-        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        result::OptionalSubscanModuleResult,
     },
     error::ModuleErrorKind::JSONExtract,
     extractors::json::JSONExtractor,
@@ -21,7 +23,7 @@ use crate::{
     requesters::client::HTTPClient,
     types::{
         core::{Result, Subdomain, SubscanModuleCoreComponents},
-        result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
+        result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Finished},
     },
 };
 
@@ -90,54 +92,81 @@ impl SubscanModuleInterface for Netlas {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
-        let mut url = self.url.clone();
+    async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>) {
+        let envs = self.envs().await;
 
         let requester = &mut *self.requester().await.unwrap().lock().await;
         let extractor = self.extractor().await.unwrap();
 
-        let apikey = self.envs().await.apikey.value.unwrap_or_default();
-        let query = format!("domain:*.{domain} AND NOT domain:{domain}");
+        match envs.apikey.value {
+            Some(apikey) => {
+                let mut url = self.url.clone();
+                let query = format!("domain:*.{domain} AND NOT domain:{domain}");
 
-        requester.config().await.add_header(
-            HeaderName::from_static("x-api-key"),
-            HeaderValue::from_str(&apikey).unwrap(),
-        );
+                requester.config().await.add_header(
+                    HeaderName::from_static("x-api-key"),
+                    HeaderValue::from_str(&apikey).unwrap(),
+                );
 
-        url.set_path("api/domains_count/");
-        url.set_query(Some(&format!("q={query}")));
+                url.set_path("api/domains_count/");
+                url.set_query(Some(&format!("q={query}")));
 
-        let json = requester.get_content(url.clone()).await?.as_json();
-        let count = json["count"].as_i64();
+                let content = requester.get_content(url.clone()).await;
 
-        if let (Some(count), RequesterDispatcher::HTTPClient(requester)) = (count, requester) {
-            url.set_query(None);
-            url.set_path("api/domains/download/");
+                match content {
+                    Ok(content) => match content.as_json()["count"].as_i64() {
+                        Some(count) => {
+                            if let RequesterDispatcher::HTTPClient(requester) = requester {
+                                url.set_query(None);
+                                url.set_path("api/domains/download/");
 
-            let body = json!({
-                "q": format!("domain:(domain:*.{domain} AND NOT domain:{domain})"),
-                "fields": ["*"],
-                "source_type": "include",
-                "size": count
-            });
+                                let body = json!({
+                                    "q": format!("domain:(domain:*.{domain} AND NOT domain:{domain})"),
+                                    "fields": ["*"],
+                                    "source_type": "include",
+                                    "size": count
+                                });
 
-            let request = requester
-                .client
-                .post(url)
-                .json(&body)
-                .timeout(requester.config.timeout)
-                .headers(requester.config.headers.clone())
-                .build()?;
+                                let rbuilder = requester
+                                    .client
+                                    .post(url)
+                                    .json(&body)
+                                    .timeout(requester.config.timeout)
+                                    .headers(requester.config.headers.clone());
 
-            let response = requester.client.execute(request).await?;
-            let content = response.text().await?;
+                                if let Ok(request) = rbuilder.build() {
+                                    let response: Result<Response> = requester
+                                        .client
+                                        .execute(request)
+                                        .await
+                                        .map_err(|err| err.into());
 
-            result.extend(extractor.extract(content.into(), domain).await?);
+                                    match response {
+                                        Ok(response) => {
+                                            let content = response.text().await.unwrap_or_default();
+                                            let subdomains =
+                                                extractor.extract(content.into(), domain).await;
 
-            return Ok(result.with_finished().await);
+                                            for subdomain in &subdomains.unwrap_or_default() {
+                                                results.send(self.item(subdomain).await).unwrap();
+                                            }
+                                        }
+                                        Err(err) => {
+                                            results.send(self.status(err.into()).await).unwrap()
+                                        }
+                                    }
+                                }
+                                results.send(self.status(Finished).await).unwrap();
+                            } else {
+                                results.send(self.error("misconfigured requester").await).unwrap();
+                            }
+                        }
+                        None => results.send(self.error("json parse error").await).unwrap(),
+                    },
+                    Err(err) => results.send(self.status(err.into()).await).unwrap(),
+                }
+            }
+            None => results.send(self.status(AuthenticationNotProvided.into()).await).unwrap(),
         }
-
-        Err(AuthenticationNotProvided.into())
     }
 }

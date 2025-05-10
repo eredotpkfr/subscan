@@ -1,13 +1,15 @@
+use std::collections::BTreeSet;
+
 use subscan::{
     enums::{content::Content, dispatchers::SubscanModuleDispatcher},
-    error::ModuleErrorKind::Custom,
-    interfaces::module::SubscanModuleInterface,
     modules::integrations::dnsdumpstercrawler::DNSDumpsterCrawler,
+    types::result::status::SubscanModuleStatus,
 };
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     mock::funcs,
+    utils,
 };
 
 #[tokio::test]
@@ -30,10 +32,10 @@ async fn run_test_no_token() {
         &stubr.path("/dnsdumpstercrawler-no-token"),
     );
 
-    let result = dnsdumpstercrawler.run(TEST_DOMAIN).await;
+    let (results, status) = utils::run_module(dnsdumpstercrawler, TEST_DOMAIN).await;
 
-    assert!(result.is_err());
-    assert_eq!(result.err().unwrap(), Custom("not get token".into()).into());
+    assert_eq!(results, BTreeSet::new());
+    assert_eq!(status, "not get token".into());
 }
 
 #[tokio::test]
@@ -46,7 +48,8 @@ async fn run_test_with_token() {
         &stubr.path("/dnsdumpstercrawler-with-token"),
     );
 
-    let results = dnsdumpstercrawler.run(TEST_DOMAIN).await.unwrap();
+    let (results, status) = utils::run_module(dnsdumpstercrawler, TEST_DOMAIN).await;
 
-    assert_eq!(results.subdomains, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(status, SubscanModuleStatus::Finished);
 }

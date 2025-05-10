@@ -1,8 +1,9 @@
-use subscan::{interfaces::module::SubscanModuleInterface, modules::engines::google::Google};
+use subscan::{modules::engines::google::Google, types::result::status::SubscanModuleStatus};
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     mock::funcs,
+    utils,
 };
 
 #[tokio::test]
@@ -12,7 +13,8 @@ async fn run_test() {
 
     funcs::wrap_module_url(&mut google, &stubr.path("/search"));
 
-    let result = google.run(TEST_DOMAIN).await.unwrap();
+    let (results, status) = utils::run_module(google, TEST_DOMAIN).await;
 
-    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(status, SubscanModuleStatus::Finished);
 }

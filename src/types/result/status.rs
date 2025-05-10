@@ -2,7 +2,7 @@ use colored::Colorize;
 use derive_more::{Display, From};
 use serde::Serialize;
 
-use crate::error::ModuleErrorKind;
+use crate::error::{ModuleErrorKind, SubscanError};
 
 /// Subscan module states
 #[derive(Clone, Debug, Default, Display, Eq, From, Ord, PartialEq, PartialOrd)]
@@ -15,11 +15,15 @@ pub enum SubscanModuleStatus {
     #[from]
     #[display("SKIPPED")]
     Skipped(SkipReason),
-    #[from]
+    #[from(ModuleErrorKind, &str)]
     #[display("FAILED")]
     Failed(ModuleErrorKind),
-    #[display("FAILED")]
-    FailedWithResult,
+}
+
+impl From<SubscanError> for SubscanModuleStatus {
+    fn from(err: SubscanError) -> Self {
+        err.status()
+    }
 }
 
 impl Serialize for SubscanModuleStatus {
@@ -84,7 +88,6 @@ impl SubscanModuleStatus {
             SubscanModuleStatus::Started => format!("[{self}]"),
             SubscanModuleStatus::Finished => format!("[{self}]"),
             SubscanModuleStatus::Failed(err) => format!("[{err} {self}]"),
-            SubscanModuleStatus::FailedWithResult => format!("[failed with result {self}]"),
             SubscanModuleStatus::Skipped(reason) => format!("[{reason} {self}]"),
         }
     }
@@ -92,21 +95,18 @@ impl SubscanModuleStatus {
     pub fn log(&self, module: &str) {
         match self {
             SubscanModuleStatus::Started | SubscanModuleStatus::Finished => {
-                log::info!("{:.<25}{:.>35}", module.white(), self.with_reason().white())
+                log::debug!("{:.<25}{:.>35}", module.white(), self.with_reason().white())
             }
-            SubscanModuleStatus::Skipped(_) => log::warn!(
-                "{:.<25}{:.>35}",
-                module.yellow(),
-                self.with_reason().yellow()
-            ),
+            SubscanModuleStatus::Skipped(_) => {
+                log::warn!(
+                    "{:.<25}{:.>35}",
+                    module.yellow(),
+                    self.with_reason().yellow()
+                )
+            }
             SubscanModuleStatus::Failed(err) => {
                 log::error!("{:.<25}{:.>35}", module.red(), err.with_msg().red())
             }
-            SubscanModuleStatus::FailedWithResult => log::warn!(
-                "{:.<25}{:.>35}",
-                module.yellow(),
-                self.with_reason().yellow()
-            ),
         }
     }
 }

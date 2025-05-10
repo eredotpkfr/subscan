@@ -7,12 +7,13 @@ use subscan::{
     error::ModuleErrorKind::JSONExtract,
     interfaces::module::SubscanModuleInterface,
     modules::integrations::virustotal::{VirusTotal, VIRUSTOTAL_URL},
+    types::result::status::SubscanModuleStatus,
 };
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::funcs,
-    utils::read_stub,
+    utils,
 };
 
 #[tokio::test]
@@ -24,9 +25,10 @@ async fn run_test() {
     env::set_var(&env_name, "virustotal-api-key");
     funcs::wrap_module_url(&mut virustotal, &stubr.path("/virustotal"));
 
-    let result = virustotal.run(TEST_DOMAIN).await.unwrap();
+    let (results, status) = utils::run_module(virustotal, TEST_DOMAIN).await;
 
-    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(status, SubscanModuleStatus::Finished);
 
     env::remove_var(env_name);
 }
@@ -56,7 +58,9 @@ async fn get_next_url_test() {
 
 #[tokio::test]
 async fn extract_test() {
-    let json = read_stub("module/integrations/virustotal.json")["response"]["jsonBody"].clone();
+    let stub = "module/integrations/virustotal.json";
+    let json = utils::read_stub(stub)["response"]["jsonBody"].clone();
+
     let extracted = VirusTotal::extract(json, TEST_DOMAIN);
     let not_extracted = VirusTotal::extract(Value::Null, TEST_DOMAIN);
 

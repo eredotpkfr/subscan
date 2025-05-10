@@ -113,6 +113,7 @@ static MODULE_CACHE: LazyLock<Vec<SubscanModule>> = LazyLock::new(|| {
         SubscanModule::from(yahoo::Yahoo::dispatcher()),
         // Integrations
         SubscanModule::from(alienvault::AlienVault::dispatcher()),
+        SubscanModule::from(example::ExampleModule::dispatcher()), // Add this line
     ]
 });
 ```

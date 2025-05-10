@@ -54,9 +54,12 @@ pub mod types;
 /// Utilities for the handle different stuff things
 pub mod utilities;
 
+use std::sync::Arc;
+
 use constants::LOG_TIME_FORMAT;
-use resolver::Resolver;
-use tokio::sync::OnceCell;
+use enums::dispatchers::SubscanModuleDispatcher;
+use tokio::sync::{Mutex, OnceCell};
+use types::config::requester::RequesterConfig;
 
 use crate::{
     cache::CacheManager,
@@ -103,15 +106,22 @@ impl Subscan {
         }
     }
 
-    async fn init(&self) {
-        let rconfig = self.config.clone().into();
-        let inner = || async { self.manager.configure(rconfig).await };
+    async fn init(&self, module: Option<&Arc<Mutex<SubscanModuleDispatcher>>>) {
+        let rconfig: RequesterConfig = self.config.clone().into();
 
-        INIT.get_or_init(inner).await;
+        if let Some(module) = module {
+            INIT.get_or_init(|| async { module.lock().await.configure(rconfig).await })
+                .await;
+        } else {
+            INIT.get_or_init(|| async { self.manager.configure(rconfig).await }).await;
+        }
     }
 
     pub async fn module(&self, name: &str) -> &SubscanModule {
-        self.manager.module(name).await.expect("Module not found!")
+        self.manager
+            .module(name)
+            .await
+            .unwrap_or_else(|| panic!("Module not found with {name}!"))
     }
 
     pub async fn modules(&self) -> &Vec<SubscanModule> {
@@ -119,61 +129,50 @@ impl Subscan {
     }
 
     pub async fn scan(&self, domain: &str) -> SubscanResult {
-        self.init().await;
+        self.init(None).await;
 
-        let mut result = SubscanResult::from(domain);
+        let mut result: SubscanResult = domain.into();
+        let pool: Arc<SubscanModulePool> = self.config.clone().into();
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
-        let pool = SubscanModulePool::from(domain, self.config.clone());
 
         log::info!("Started scan on {domain} ({time})");
 
-        pool.clone().start(self.modules().await).await;
+        pool.clone().start(domain, self.modules().await).await;
 
         result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await
     }
 
     pub async fn run(&self, name: &str, domain: &str) -> SubscanResult {
-        let mut result = SubscanResult::from(domain);
+        let mut result: SubscanResult = domain.into();
+        let pool: Arc<SubscanModulePool> = self.config.clone().into();
+
+        let module = self.module(name).await;
+
+        self.init(Some(module)).await;
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
-        let pool = SubscanModulePool::from(domain, self.config.clone());
-        let module = self.module(name).await;
-        let rconfig = self.config.clone().into();
 
-        module.lock().await.configure(rconfig).await;
+        log::debug!("Running {name} module on {domain} ({time})");
 
-        log::info!(
-            "Running {} module on {} ({})",
-            module.lock().await.name().await,
-            domain,
-            time
-        );
-
-        pool.clone().start(&vec![module.clone()]).await;
+        pool.clone().start(domain, &vec![module.clone()]).await;
 
         result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await
     }
 
     pub async fn brute(&self, domain: &str) -> SubscanResult {
-        let mut result = SubscanResult::from(domain);
+        let mut result: SubscanResult = domain.into();
+        let pool: Arc<SubscanBrutePool> = self.config.clone().into();
 
         let time = result.metadata.started_at.format(LOG_TIME_FORMAT);
-        let concurrency = self.config.resolver.concurrency;
 
-        let resolver = Resolver::boxed_from(self.config.resolver.clone());
-        let pool = SubscanBrutePool::new(domain.into(), concurrency, resolver);
-        let wordlist = self
-            .config
-            .wordlist
-            .clone()
-            .expect("Wordlist must be specified!");
+        let wordlist = self.config.wordlist.clone().expect("Wordlist must be specified!");
 
         log::info!("Started brute force attack on {domain} ({time})");
 
-        pool.clone().start(wordlist).await;
+        pool.clone().start(domain, wordlist).await;
 
         result.update_with_pool_result(pool.result().await).await;
         result.with_finished().await

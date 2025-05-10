@@ -10,9 +10,7 @@ async fn main() {
     let exe_name = exe.file_name().unwrap().to_str();
     let args: Vec<String> = env::args().collect();
 
-    env_logger::builder()
-        .filter_module(exe_name.unwrap(), Debug)
-        .init();
+    env_logger::builder().filter_module(exe_name.unwrap(), Debug).init();
 
     let mut wordlist = NamedTempFile::new().unwrap();
 

@@ -11,9 +11,7 @@ async fn main() {
     let args: Vec<String> = env::args().collect();
     let (module, target) = (&args[1], &args[2]);
 
-    env_logger::builder()
-        .filter_module(exe_name.unwrap(), Debug)
-        .init();
+    env_logger::builder().filter_module(exe_name.unwrap(), Debug).init();
 
     // use default configurations
     let config = SubscanConfig::default();

@@ -1,4 +1,5 @@
 use std::{
+    collections::BTreeSet,
     fs,
     net::TcpListener,
     path::{Path, PathBuf},
@@ -6,9 +7,65 @@ use std::{
 };
 
 use serde_json::Value;
-use subscan::enums::content::Content;
+use subscan::{
+    enums::{
+        content::Content,
+        dispatchers::SubscanModuleDispatcher,
+        result::{OptionalSubscanModuleResult, SubscanModuleResult},
+    },
+    interfaces::module::SubscanModuleInterface,
+    types::{
+        core::{Subdomain, UnboundedFlumeChannel},
+        result::status::SubscanModuleStatus,
+    },
+};
 
 use crate::common::constants::{LOCAL_HOST, READ_ERROR};
+
+pub async fn run_module(
+    mut module: SubscanModuleDispatcher,
+    domain: &str,
+) -> (BTreeSet<Subdomain>, SubscanModuleStatus) {
+    let mut results = BTreeSet::new();
+    let mut statuses = Vec::new();
+
+    let channel: UnboundedFlumeChannel<OptionalSubscanModuleResult> = flume::unbounded().into();
+
+    module.run(domain, channel.tx).await;
+
+    while let Ok(msg) = channel.rx.recv() {
+        if let Some(result) = msg.as_ref() {
+            match result {
+                SubscanModuleResult::SubscanModuleResultItem(item) => {
+                    assert_eq!(
+                        item.module,
+                        module.name().await,
+                        "SubscanModuleResultItem has incorrect module name"
+                    );
+                    results.insert(item.subdomain.clone());
+                }
+                SubscanModuleResult::SubscanModuleStatusItem(item) => {
+                    assert_eq!(
+                        item.module,
+                        module.name().await,
+                        "SubscanModuleResultItem has incorrect module name"
+                    );
+                    statuses.push(item.status.clone());
+                }
+            }
+        } else {
+            break;
+        }
+    }
+
+    assert_eq!(
+        statuses.len(),
+        1,
+        "The module only has to send one status update"
+    );
+
+    (results, statuses.first().unwrap().clone())
+}
 
 pub fn stubs_path() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/stubs")

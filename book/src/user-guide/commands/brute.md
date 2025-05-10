@@ -10,7 +10,7 @@ All arguments below can be used with the `brute` command, [see here](#common-use
 | :----------------------- | :---: | :----------------------------------------------: |
 | `--domain`               | `-d`  |           Target domain to be scanned            |
 | `--wordlist`             | `-w`  |      Wordlist file to be used during attack      |
-| `--print`                | `-p`  |     If sets, output will be logged on stdout     |
+| `--print`                |       |     If sets, output will be logged on stdout     |
 | `--output`               | `-o`  | Set output format (`txt`, `csv`, `json`, `html`) |
 | `--resolver-timeout`     |       |               IP resolver timeout                |
 | `--resolver-concurrency` |       |         IP resolver concurrency level            |

@@ -78,10 +78,8 @@ async fn save_json_test() {
             ip: Some(IpAddr::V4(Ipv4Addr::from_str("127.0.0.1").unwrap())),
         },
     ]);
-    let expected: Vec<Value> = subs
-        .iter()
-        .filter_map(|sub| serde_json::to_value(sub).ok())
-        .collect();
+    let expected: Vec<Value> =
+        subs.iter().filter_map(|sub| serde_json::to_value(sub).ok()).collect();
 
     result.extend(subs.clone());
     result = result.with_finished().await;

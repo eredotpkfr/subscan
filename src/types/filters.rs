@@ -5,9 +5,9 @@ use derive_more::From;
 #[from((Vec<String>, Vec<String>))]
 pub struct ModuleNameFilter {
     /// Valid [`SubscanModule`](crate::types::core::SubscanModule) names list
-    pub valids: Vec<String>,
+    pub modules: Vec<String>,
     /// Invalid [`SubscanModule`](crate::types::core::SubscanModule) names list
-    pub invalids: Vec<String>,
+    pub skips: Vec<String>,
 }
 
 impl ModuleNameFilter {
@@ -34,15 +34,15 @@ impl ModuleNameFilter {
     /// }
     /// ```
     pub async fn is_filtered(&self, name: &str) -> bool {
-        if self.valids.is_empty() && self.invalids.is_empty() {
+        if self.modules.is_empty() && self.skips.is_empty() {
             false
-        } else if self.valids.is_empty() && !self.invalids.is_empty() {
-            self.invalids.contains(&name.to_lowercase())
-        } else if !self.valids.is_empty() && self.invalids.is_empty() {
-            !self.valids.contains(&name.to_lowercase())
+        } else if self.modules.is_empty() && !self.skips.is_empty() {
+            self.skips.contains(&name.to_lowercase())
+        } else if !self.modules.is_empty() && self.skips.is_empty() {
+            !self.modules.contains(&name.to_lowercase())
         } else {
-            !self.valids.contains(&name.to_lowercase())
-                || self.invalids.contains(&name.to_lowercase())
+            !self.modules.contains(&name.to_lowercase())
+                || self.skips.contains(&name.to_lowercase())
         }
     }
 }

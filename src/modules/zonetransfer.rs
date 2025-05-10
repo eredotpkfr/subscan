@@ -1,6 +1,7 @@
 use std::{net::SocketAddr, str::FromStr};
 
 use async_trait::async_trait;
+use flume::Sender;
 use hickory_client::{
     client::{Client, ClientHandle},
     proto::{
@@ -13,14 +14,15 @@ use hickory_resolver::config::NameServerConfig;
 use tokio::sync::Mutex;
 
 use crate::{
-    enums::dispatchers::{
-        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        result::OptionalSubscanModuleResult,
     },
     error::ModuleErrorKind::Custom,
     interfaces::module::SubscanModuleInterface,
     types::{
         core::{Result, Subdomain},
-        result::module::SubscanModuleResult,
+        result::status::SubscanModuleStatus::Finished,
     },
     utilities::{net, regex},
 };
@@ -62,12 +64,10 @@ impl ZoneTransfer {
         let (stream, handler) = TcpClientStream::new(server, None, None, provider);
         let result = Client::new(stream, handler, None).await;
 
-        result
-            .map_err(|_| Custom("client error".into()))
-            .map(|(client, bg)| {
-                tokio::spawn(bg);
-                Ok(client)
-            })?
+        result.map_err(|_| Custom("client error".into())).map(|(client, bg)| {
+            tokio::spawn(bg);
+            Ok(client)
+        })?
     }
 
     pub async fn get_ns_as_ip(&self, server: SocketAddr, domain: &str) -> Option<Vec<SocketAddr>> {
@@ -84,14 +84,7 @@ impl ZoneTransfer {
             let with_port = |answer: &Record| Some(format!("{}:{}", answer.data(), server.port()));
             let as_ip = |with_port: String| SocketAddr::from_str(&with_port).ok();
 
-            ips.extend(
-                a_response
-                    .ok()?
-                    .answers()
-                    .iter()
-                    .filter_map(with_port)
-                    .filter_map(as_ip),
-            );
+            ips.extend(a_response.ok()?.answers().iter().filter_map(with_port).filter_map(as_ip));
         }
 
         Some(ips)
@@ -143,26 +136,26 @@ impl SubscanModuleInterface for ZoneTransfer {
         None
     }
 
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
+    async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>) {
+        match &self.ns {
+            Some(ns) => {
+                let err = Custom("connection error".into());
 
-        if let Some(ns) = &self.ns {
-            let ips = self
-                .get_ns_as_ip(ns.socket_addr, domain)
-                .await
-                .ok_or(Custom("connection error".into()))?;
+                match self.get_ns_as_ip(ns.socket_addr, domain).await.ok_or(err) {
+                    Ok(ips) => {
+                        for ip in ips {
+                            let subdomains = self.attempt_zone_transfer(ip, domain).await;
 
-            for ip in ips {
-                result.extend(
-                    self.attempt_zone_transfer(ip, domain)
-                        .await
-                        .unwrap_or_default(),
-                );
+                            for subdomain in &subdomains.unwrap_or_default() {
+                                results.send(self.item(subdomain).await).unwrap();
+                            }
+                        }
+                        results.send(self.status(Finished).await).unwrap();
+                    }
+                    Err(err) => results.send(self.status(err.into()).await).unwrap(),
+                }
             }
-
-            return Ok(result.with_finished().await);
-        }
-
-        Err(Custom("no default ns".into()).into())
+            None => results.send(self.error("no default ns").await).unwrap(),
+        };
     }
 }

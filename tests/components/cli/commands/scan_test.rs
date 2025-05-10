@@ -96,15 +96,15 @@ async fn scan_args_no_filter_test() {
 }
 
 #[tokio::test]
-async fn scan_args_with_module_name_filter_invalids_test() {
+async fn scan_args_with_module_name_filter_skips_test() {
     let args = vec!["subscan", "scan", "-d", "foo.com", "--skips", "foo"];
     let cli = Cli::try_parse_from(args).unwrap();
 
     match cli.command {
         subscan::cli::commands::Commands::Scan(args) => {
             let expected = ModuleNameFilter {
-                valids: vec![],
-                invalids: vec!["foo".into()],
+                modules: vec![],
+                skips: vec!["foo".into()],
             };
 
             assert_eq!(args.filter(), CacheFilter::FilterByName(expected));
@@ -114,7 +114,7 @@ async fn scan_args_with_module_name_filter_invalids_test() {
 }
 
 #[tokio::test]
-async fn scan_args_with_module_name_filter_valids_test() {
+async fn scan_args_with_module_name_filter_modules_test() {
     #[rustfmt::skip]
     let args = vec![
         "subscan",
@@ -128,8 +128,8 @@ async fn scan_args_with_module_name_filter_valids_test() {
     match cli.command {
         subscan::cli::commands::Commands::Scan(args) => {
             let expected = ModuleNameFilter {
-                valids: vec!["foo".into()],
-                invalids: vec!["bar".into()],
+                modules: vec!["foo".into()],
+                skips: vec!["bar".into()],
             };
 
             assert_eq!(args.filter(), CacheFilter::FilterByName(expected));

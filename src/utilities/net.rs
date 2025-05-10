@@ -27,10 +27,7 @@ pub fn get_default_ns() -> Option<NameServerConfig> {
         }
     }
 
-    NameServerConfigGroup::cloudflare()
-        .iter()
-        .find(tcp)
-        .cloned()
+    NameServerConfigGroup::cloudflare().iter().find(tcp).cloned()
 }
 
 /// Lookup IP address of any hostname

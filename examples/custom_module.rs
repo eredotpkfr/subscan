@@ -1,15 +1,16 @@
 use std::collections::BTreeSet;
 
 use async_trait::async_trait;
+use flume::Sender;
 use subscan::{
-    enums::dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
+        result::{OptionalSubscanModuleResult, SubscanModuleResult},
+    },
     extractors::regex::RegexExtractor,
     interfaces::module::SubscanModuleInterface,
     requesters::client::HTTPClient,
-    types::{
-        core::{Result, Subdomain},
-        result::{module::SubscanModuleResult, status::SubscanModuleStatus::Finished},
-    },
+    types::{core::Subdomain, result::item::SubscanModuleResultItem},
 };
 use tokio::sync::Mutex;
 
@@ -32,17 +33,12 @@ impl SubscanModuleInterface for CustomModule {
         Some(&self.extractor)
     }
 
-    async fn run(&mut self, _domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
+    async fn run(&mut self, _domain: &str, results: Sender<OptionalSubscanModuleResult>) {
+        let subdomains = BTreeSet::from_iter([Subdomain::from("bar.foo.com")]);
 
-        let subdomains = BTreeSet::from_iter([
-            Subdomain::from("bar.foo.com"),
-            Subdomain::from("baz.foo.com"),
-        ]);
-
-        result.extend(subdomains);
-
-        Ok(result.with_finished().await)
+        for subdomain in &subdomains {
+            results.send((self.name().await, subdomain).into()).unwrap();
+        }
     }
 }
 
@@ -50,6 +46,8 @@ impl SubscanModuleInterface for CustomModule {
 async fn main() {
     let requester: RequesterDispatcher = HTTPClient::default().into();
     let extracator: RegexExtractor = RegexExtractor::default();
+
+    let (tx, rx) = flume::unbounded::<OptionalSubscanModuleResult>();
 
     let mut module = CustomModule {
         requester: requester.into(),
@@ -61,12 +59,15 @@ async fn main() {
 
     assert_eq!(module.name().await, "name");
 
-    let result = module.run("foo.com").await.unwrap();
-    let expected = BTreeSet::from_iter([
-        Subdomain::from("bar.foo.com"),
-        Subdomain::from("baz.foo.com"),
-    ]);
+    module.run("foo.com", tx).await;
 
-    assert_eq!(result.subdomains, expected);
-    assert_eq!(result.status, Finished);
+    let result = rx.recv().unwrap();
+    let item = SubscanModuleResultItem {
+        module: "name".into(),
+        subdomain: Subdomain::from("bar.foo.com"),
+    };
+    let expected = &SubscanModuleResult::SubscanModuleResultItem(item);
+
+    assert!(result.is_some());
+    assert_eq!(result.as_ref().unwrap(), expected);
 }
