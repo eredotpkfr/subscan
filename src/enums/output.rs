@@ -1,4 +1,4 @@
-use std::{fs::File, sync::OnceLock};
+use std::fs::File;
 
 use chrono::Utc;
 use clap::ValueEnum;
@@ -20,18 +20,12 @@ pub enum OutputFormat {
     HTML,
 }
 
-static OUTPUT_FILE: OnceLock<OutputFile> = OnceLock::new();
-
 impl OutputFormat {
-    pub async fn get_output_file(&self, domain: &str) -> &OutputFile {
-        let inner = || {
-            let file_name = self.get_output_file_name(domain);
-            let file = File::create(&file_name).unwrap();
+    pub async fn get_output_file(&self, domain: &str) -> OutputFile {
+        let file_name = self.get_output_file_name(domain);
+        let file = File::create(&file_name).unwrap();
 
-            (file_name, file).into()
-        };
-
-        OUTPUT_FILE.get_or_init(inner)
+        (file_name, file).into()
     }
 
     fn get_output_file_name(&self, domain: &str) -> String {
