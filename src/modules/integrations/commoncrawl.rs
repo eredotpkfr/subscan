@@ -104,7 +104,7 @@ impl SubscanModuleInterface for CommonCrawl {
 
         if let RequesterDispatcher::HTTPClient(requester) = &*requester {
             let year = chrono::Utc::now().year().to_string();
-            let query = format!("*.{}", domain);
+            let query = format!("*.{domain}");
             let content = requester.get_content(self.url.clone()).await?;
 
             if let Some(cdxs) = self.extract_cdx_urls(content.as_json(), &year) {

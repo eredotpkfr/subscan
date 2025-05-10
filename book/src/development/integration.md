@@ -104,16 +104,17 @@ impl ExampleModule {
 The only thing left to do is add our module to the in-memory cache as a `SubscanModule` so that the [CacheManager](https://docs.rs/subscan/latest/subscan/cache/struct.CacheManager.html) component can use it. To do this, let's add our module to the in-memory cache called `MODULE_CACHE` in [`cache.rs`](https://docs.rs/subscan/latest/subscan/cache/index.html) file
 
 ```rust,ignore
-lazy_static! {
-    static ref MODULE_CACHE: Vec<SubscanModule> = vec![
+static MODULE_CACHE: LazyLock<Vec<SubscanModule>> = LazyLock::new(|| {
+    vec![
         // Search engines
         SubscanModule::from(bing::Bing::dispatcher()),
         SubscanModule::from(duckduckgo::DuckDuckGo::dispatcher()),
+        SubscanModule::from(google::Google::dispatcher()),
+        SubscanModule::from(yahoo::Yahoo::dispatcher()),
         // Integrations
         SubscanModule::from(alienvault::AlienVault::dispatcher()),
-        SubscanModule::from(example::ExampleModule::dispatcher()), // Add this line
     ]
-}
+});
 ```
 
 ## 4. Run Your Module

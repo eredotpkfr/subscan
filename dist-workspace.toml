@@ -24,3 +24,6 @@ install-updater = false
 pr-run-mode = "upload"
 # Ignore out-of-date contents
 allow-dirty = ["ci"]
+
+[dist.github-custom-runners]
+x86_64-unknown-linux-gnu = "ubuntu-22.04"

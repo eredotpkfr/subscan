@@ -463,7 +463,7 @@ impl SubscanModulePool {
 
         while let Some(result) = runners.join_next().await {
             if let Err(err) = result {
-                panic!("Runner encountered an error: {:?}", err);
+                panic!("Runner encountered an error: {err:?}");
             }
         }
     }
@@ -478,7 +478,7 @@ impl SubscanModulePool {
 
         while let Some(result) = resolvers.join_next().await {
             if let Err(err) = result {
-                panic!("Runner encountered an error: {:?}", err);
+                panic!("Runner encountered an error: {err:?}");
             }
         }
     }

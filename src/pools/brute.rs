@@ -233,7 +233,7 @@ impl SubscanBrutePool {
 
         while let Some(result) = bruters.join_next().await {
             if let Err(err) = result {
-                panic!("Runner encountered an error: {:?}", err);
+                panic!("Runner encountered an error: {err:?}");
             }
         }
     }

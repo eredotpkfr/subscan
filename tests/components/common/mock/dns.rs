@@ -35,7 +35,7 @@ pub struct MockDNSHandler {
 impl MockDNSServer {
     pub fn new(domain: &str) -> Self {
         let port = get_random_port();
-        let socket = SocketAddr::from_str(&format!("{LOCAL_HOST}:{}", port));
+        let socket = SocketAddr::from_str(&format!("{LOCAL_HOST}:{port}"));
         let zone = Name::from_str(domain).unwrap();
 
         Self {

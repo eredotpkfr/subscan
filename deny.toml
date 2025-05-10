@@ -17,6 +17,11 @@ allow = [
     "LGPL-3.0",
 ]
 
+# List of license exceptions
+exceptions = [
+    { allow = ["CDLA-Permissive-2.0"], crate = "webpki-roots" },
+]
+
 [[licenses.clarify]]
 crate = "ring"
 expression = "MIT AND ISC AND OpenSSL"
