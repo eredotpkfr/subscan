@@ -30,16 +30,14 @@ impl From<SubscanConfig> for PoolConfig {
 
 impl PoolConfig {
     pub async fn get_stream_file(&self) -> &Option<RwLock<File>> {
-        let inner = || {
-            if let Some(path) = &self.stream {
-                Some(RwLock::new(File::create(path).expect(&format!(
-                    "Cannot create {} file!",
-                    path.to_str().unwrap()
-                ))))
-            } else {
-                None
-            }
-        };
+        let inner =
+            || {
+                self.stream.as_ref().map(|path| {
+                    RwLock::new(File::create(path).unwrap_or_else(|_| {
+                        panic!("Cannot create {} file!", path.to_str().unwrap())
+                    }))
+                })
+            };
 
         STREAM_FILE.get_or_init(inner)
     }

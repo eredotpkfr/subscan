@@ -121,7 +121,7 @@ impl Subscan {
         self.manager
             .module(name)
             .await
-            .expect(&format!("Module not found with {name}!"))
+            .unwrap_or_else(|| panic!("Module not found with {name}!"))
     }
 
     pub async fn modules(&self) -> &Vec<SubscanModule> {

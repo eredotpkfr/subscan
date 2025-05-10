@@ -118,7 +118,7 @@ impl SubscanModuleInterface for GenericIntegrationModule {
     async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>) {
         let url = (self.funcs.url)(domain).parse();
 
-        match url.clone().map_err(|err| SubscanError::from(err)) {
+        match url.clone().map_err(SubscanError::from) {
             Ok(mut url) => {
                 if self.auth.is_set() && !self.authenticate(&mut url).await {
                     results.send(self.status(AuthenticationNotProvided.into()).await).unwrap();
