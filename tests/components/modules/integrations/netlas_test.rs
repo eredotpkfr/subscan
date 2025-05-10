@@ -3,7 +3,7 @@ use std::{collections::BTreeSet, env};
 use serde_json::Value;
 use subscan::{
     error::ModuleErrorKind::JSONExtract, interfaces::module::SubscanModuleInterface,
-    modules::integrations::netlas::Netlas, types::result::status::SubscanModuleStatus,
+    modules::integrations::netlas::Netlas, types::result::status::{SubscanModuleStatus, SkipReason::AuthenticationNotProvided},
 };
 
 use crate::common::{
@@ -39,7 +39,7 @@ async fn run_test_no_count() {
     let (results, status) = utils::run_module(netlas, TEST_DOMAIN).await;
 
     assert_eq!(results, BTreeSet::new());
-    assert_eq!(status, "json parse error".into());
+    assert_eq!(status, AuthenticationNotProvided.into());
 }
 
 #[tokio::test]
