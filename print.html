@@ -1013,16 +1013,17 @@ pub enum SubscanModuleDispatcher {
 }</code></pre>
 <h2 id="3-add-your-module-to-the-in-memory-cache"><a class="header" href="#3-add-your-module-to-the-in-memory-cache">3. Add Your Module to the In-Memory Cache</a></h2>
 <p>The only thing left to do is add our module to the in-memory cache as a <code>SubscanModule</code> so that the <a href="https://docs.rs/subscan/latest/subscan/cache/struct.CacheManager.html">CacheManager</a> component can use it. To do this, let's add our module to the in-memory cache called <code>MODULE_CACHE</code> in <a href="https://docs.rs/subscan/latest/subscan/cache/index.html"><code>cache.rs</code></a> file</p>
-<pre><code class="language-rust ignore">lazy_static! {
-    static ref MODULE_CACHE: Vec&lt;SubscanModule&gt; = vec![
+<pre><code class="language-rust ignore">static MODULE_CACHE: LazyLock&lt;Vec&lt;SubscanModule&gt;&gt; = LazyLock::new(|| {
+    vec![
         // Search engines
         SubscanModule::from(bing::Bing::dispatcher()),
         SubscanModule::from(duckduckgo::DuckDuckGo::dispatcher()),
+        SubscanModule::from(google::Google::dispatcher()),
+        SubscanModule::from(yahoo::Yahoo::dispatcher()),
         // Integrations
         SubscanModule::from(alienvault::AlienVault::dispatcher()),
-        SubscanModule::from(example::ExampleModule::dispatcher()), // Add this line
     ]
-}</code></pre>
+});</code></pre>
 <h2 id="4-run-your-module"><a class="header" href="#4-run-your-module">4. Run Your Module</a></h2>
 <pre><code class="language-bash">~$ cargo build &amp;&amp; target/debug/subscan module run example -d example.com
 </code></pre>
