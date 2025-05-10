@@ -27,7 +27,7 @@ pub struct SubscanResult {
 }
 
 impl SubscanResult {
-    pub async fn save(&self, output: &OutputFormat) {
+    pub async fn save(&self, output: &OutputFormat) -> String {
         let file = output.get_output_file(&self.metadata.target).await;
 
         match output {
@@ -38,6 +38,8 @@ impl SubscanResult {
         }
 
         log::debug!("Scan results saved to {} file", file.name);
+
+        file.name.clone()
     }
 
     async fn save_txt<W: Write>(&self, mut writer: W) {

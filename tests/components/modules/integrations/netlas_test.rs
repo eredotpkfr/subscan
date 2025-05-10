@@ -1,16 +1,15 @@
-use std::env;
+use std::{collections::BTreeSet, env};
 
 use serde_json::Value;
 use subscan::{
     error::ModuleErrorKind::JSONExtract, interfaces::module::SubscanModuleInterface,
-    modules::integrations::netlas::Netlas,
-    types::result::status::SkipReason::AuthenticationNotProvided,
+    modules::integrations::netlas::Netlas, types::result::status::SubscanModuleStatus,
 };
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
     mock::funcs,
-    utils::read_stub,
+    utils,
 };
 
 #[tokio::test]
@@ -22,9 +21,10 @@ async fn run_test() {
     env::set_var(&env_name, "netlas-api-key");
     funcs::wrap_module_url(&mut netlas, &stubr.uri());
 
-    let results = netlas.run(TEST_DOMAIN).await.unwrap();
+    let (results, status) = utils::run_module(netlas, TEST_DOMAIN).await;
 
-    assert_eq!(results.subdomains, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.to_string()].into());
+    assert_eq!(status, SubscanModuleStatus::Finished);
 
     env::remove_var(env_name);
 }
@@ -36,17 +36,16 @@ async fn run_test_no_count() {
 
     funcs::wrap_module_url(&mut netlas, &stubr.uri());
 
-    let results = netlas.run(TEST_DOMAIN).await;
+    let (results, status) = utils::run_module(netlas, TEST_DOMAIN).await;
 
-    // Test no count response
-    assert!(results.is_err());
-    assert_eq!(results.err().unwrap(), AuthenticationNotProvided.into());
+    assert_eq!(results, BTreeSet::new());
+    assert_eq!(status, "json parse error".into());
 }
 
 #[tokio::test]
 async fn extract_test() {
-    let stub = read_stub("module/integrations/netlas/netlas-domains-download.json");
-    let json = stub["response"]["jsonBody"].clone();
+    let stub = "module/integrations/netlas/netlas-domains-download.json";
+    let json = utils::read_stub(stub)["response"]["jsonBody"].clone();
 
     let extracted = Netlas::extract(json, TEST_DOMAIN);
     let not_extracted = Netlas::extract(Value::Null, TEST_DOMAIN);

@@ -1,12 +1,13 @@
 use subscan::{
     enums::content::Content,
-    interfaces::module::SubscanModuleInterface,
     modules::integrations::digitorus::{Digitorus, DIGITORUS_URL},
+    types::result::status::SubscanModuleStatus,
 };
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::funcs,
+    utils,
 };
 
 #[tokio::test]
@@ -16,9 +17,10 @@ async fn run_test() {
 
     funcs::wrap_module_url(&mut digitorus, &stubr.path("/digitorus"));
 
-    let result = digitorus.run(TEST_DOMAIN).await.unwrap();
+    let (results, status) = utils::run_module(digitorus, TEST_DOMAIN).await;
 
-    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(status, SubscanModuleStatus::Finished);
 }
 
 #[tokio::test]

@@ -1,15 +1,16 @@
 use reqwest::Url;
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher,
-    interfaces::module::SubscanModuleInterface,
     modules::integrations::netcraft::{Netcraft, NETCRAFT_URL},
     requesters::client::HTTPClient,
+    types::result::status::SubscanModuleStatus,
 };
 use tokio::sync::Mutex;
 
 use crate::common::{
     constants::{TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
     mock::funcs,
+    utils,
 };
 
 #[tokio::test]
@@ -24,9 +25,10 @@ async fn run_test() {
         netcraft.components.requester = Mutex::new(new_requester.into());
     }
 
-    let result = netcraft.run(TEST_DOMAIN).await.unwrap();
+    let (results, status) = utils::run_module(netcraft, TEST_DOMAIN).await;
 
-    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(status, SubscanModuleStatus::Finished);
 }
 
 #[tokio::test]

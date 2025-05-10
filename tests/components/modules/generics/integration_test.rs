@@ -1,4 +1,4 @@
-use std::env;
+use std::{collections::BTreeSet, env};
 
 use reqwest::{
     header::{HeaderValue, USER_AGENT},
@@ -10,19 +10,20 @@ use subscan::{
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     types::{
         env::{Credentials, Env},
-        result::status::SkipReason::AuthenticationNotProvided,
+        result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus},
     },
 };
 
 use crate::common::{
     constants::{TEST_API_KEY, TEST_BAR_SUBDOMAIN, TEST_DOMAIN, TEST_URL},
-    mock::modules::generic_integration,
+    mock::modules,
+    utils,
 };
 
 #[tokio::test]
 async fn attribute_test() {
     let auth = AuthenticationMethod::NoAuthentication;
-    let module = generic_integration(TEST_URL, auth);
+    let module = modules::generic_integration(TEST_URL, auth);
     let envs = module.envs().await;
     let expected = Url::parse(TEST_URL).unwrap();
 
@@ -45,7 +46,7 @@ async fn authenticate_test_no_auth() {
     let mut url = Url::parse(TEST_URL).unwrap();
 
     let auth = AuthenticationMethod::NoAuthentication;
-    let module = generic_integration(url.as_ref(), auth);
+    let module = modules::generic_integration(url.as_ref(), auth);
 
     assert!(module.authenticate(&mut url).await);
 
@@ -66,7 +67,7 @@ async fn authenticate_test_with_header_auth() {
     let mut url = Url::parse(TEST_URL).unwrap();
 
     let auth = AuthenticationMethod::APIKeyAsHeader("X-API-Key".to_string());
-    let module = generic_integration(url.as_ref(), auth);
+    let module = modules::generic_integration(url.as_ref(), auth);
 
     let envs = module.envs().await;
     let env_var = envs.apikey.name;
@@ -91,7 +92,7 @@ async fn authenticate_test_with_header_auth_no_apikey() {
     let mut url = Url::parse(TEST_URL).unwrap();
 
     let auth = AuthenticationMethod::APIKeyAsHeader("X-API-Key".to_string());
-    let module = generic_integration(url.as_ref(), auth);
+    let module = modules::generic_integration(url.as_ref(), auth);
 
     // There is no API key in environments, should be not authenticated
     assert!(!module.authenticate(&mut url).await);
@@ -103,7 +104,7 @@ async fn authenticate_test_with_query_auth() {
 
     let expected = Url::parse_with_params(TEST_URL, &[("apikey", TEST_API_KEY)]).unwrap();
     let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
-    let module = generic_integration(url.as_ref(), auth);
+    let module = modules::generic_integration(url.as_ref(), auth);
 
     let envs = module.envs().await;
     let env_var = envs.apikey.name;
@@ -125,7 +126,7 @@ async fn authenticate_test_with_query_auth_no_apikey() {
     let mut url = Url::parse(TEST_URL).unwrap();
 
     let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
-    let module = generic_integration(url.as_ref(), auth);
+    let module = modules::generic_integration(url.as_ref(), auth);
 
     // There is no API key in environments, should be not authenticated
     assert!(!module.authenticate(&mut url).await);
@@ -147,7 +148,7 @@ async fn authenticate_test_with_basic_http_auth_from_credentials() {
         },
     };
     let auth = AuthenticationMethod::BasicHTTPAuthentication(credentials.clone());
-    let module = generic_integration(url.as_ref(), auth);
+    let module = modules::generic_integration(url.as_ref(), auth);
 
     // Should be authenticated
     assert!(module.authenticate(&mut url).await);
@@ -166,7 +167,7 @@ async fn authenticate_test_with_basic_http_auth_from_envs() {
     // environment variables
     let credentials = Credentials::default();
     let auth = AuthenticationMethod::BasicHTTPAuthentication(credentials);
-    let module = generic_integration(url.as_ref(), auth);
+    let module = modules::generic_integration(url.as_ref(), auth);
     let envs = module.envs().await;
 
     // Set credentials as a environment
@@ -193,7 +194,7 @@ async fn authenticate_test_with_basic_http_auth_no_credentials() {
 
     let credentials = Credentials::default();
     let auth = AuthenticationMethod::BasicHTTPAuthentication(credentials);
-    let module = generic_integration(url.as_ref(), auth);
+    let module = modules::generic_integration(url.as_ref(), auth);
 
     // There is no credentials both startup and environments, should be not authenticated
     assert!(!module.authenticate(&mut url).await);
@@ -203,26 +204,28 @@ async fn authenticate_test_with_basic_http_auth_no_credentials() {
 #[stubr::mock("module/generics/integration-with-no-auth.json")]
 async fn run_test_no_auth() {
     let auth = AuthenticationMethod::NoAuthentication;
-    let mut module = generic_integration(&stubr.path("/subdomains"), auth);
+    let module = modules::generic_integration(&stubr.path("/subdomains"), auth);
 
-    let result = module.run(TEST_DOMAIN).await.unwrap();
+    let (results, status) = utils::run_module(module.into(), TEST_DOMAIN).await;
 
-    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(status, SubscanModuleStatus::Finished);
 }
 
 #[tokio::test]
 #[stubr::mock("module/generics/integration-with-header-auth.json")]
 async fn run_test_with_header_auth() {
     let auth = AuthenticationMethod::APIKeyAsHeader("X-API-Key".to_string());
-    let mut module = generic_integration(&stubr.path("/subdomains"), auth);
+    let module = modules::generic_integration(&stubr.path("/subdomains"), auth);
 
     let env_name = module.envs().await.apikey.name;
 
     env::set_var(env_name.clone(), TEST_API_KEY);
 
-    let result = module.run(TEST_DOMAIN).await.unwrap();
+    let (results, status) = utils::run_module(module.into(), TEST_DOMAIN).await;
 
-    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(status, SubscanModuleStatus::Finished);
 
     env::remove_var(env_name);
 }
@@ -231,15 +234,16 @@ async fn run_test_with_header_auth() {
 #[stubr::mock("module/generics/integration-with-query-auth.json")]
 async fn run_test_with_query_auth() {
     let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
-    let mut module = generic_integration(&stubr.path("/subdomains"), auth);
+    let module = modules::generic_integration(&stubr.path("/subdomains"), auth);
 
     let env_name = module.envs().await.apikey.name;
 
     env::set_var(env_name.clone(), TEST_API_KEY);
 
-    let result = module.run(TEST_DOMAIN).await.unwrap();
+    let (results, status) = utils::run_module(module.into(), TEST_DOMAIN).await;
 
-    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(status, SubscanModuleStatus::Finished);
 
     env::remove_var(env_name);
 }
@@ -259,19 +263,22 @@ async fn run_test_with_basic_http_auth() {
     };
 
     let auth = AuthenticationMethod::BasicHTTPAuthentication(credentials);
-    let mut module = generic_integration(&stubr.path("/subdomains"), auth);
-    let result = module.run(TEST_DOMAIN).await.unwrap();
+    let module = modules::generic_integration(&stubr.path("/subdomains"), auth);
 
-    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    let (results, status) = utils::run_module(module.into(), TEST_DOMAIN).await;
+
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(status, SubscanModuleStatus::Finished);
 }
 
 #[tokio::test]
 #[stubr::mock("module/generics/integration-with-query-auth.json")]
 async fn run_test_with_not_authenticated() {
     let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
-    let mut module = generic_integration(&stubr.path("/subdomains"), auth);
-    let result = module.run(TEST_DOMAIN).await;
+    let module = modules::generic_integration(&stubr.path("/subdomains"), auth);
 
-    assert!(result.is_err());
-    assert_eq!(result.err().unwrap(), AuthenticationNotProvided.into());
+    let (results, status) = utils::run_module(module.into(), TEST_DOMAIN).await;
+
+    assert_eq!(results, BTreeSet::new());
+    assert_eq!(status, AuthenticationNotProvided.into());
 }

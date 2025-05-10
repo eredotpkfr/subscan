@@ -28,10 +28,8 @@ use crate::common::{
 async fn submit_test() {
     let resolver = MockResolver::default_boxed();
     let config = PoolConfig {
-        filter: CacheFilter::NoFilter,
         concurrency: 1,
-        print: false,
-        output: None,
+        ..Default::default()
     };
 
     let mut dispatcher = Google::dispatcher();
@@ -59,10 +57,8 @@ async fn submit_test() {
 async fn result_test() {
     let resolver = MockResolver::default_boxed();
     let config = PoolConfig {
-        filter: CacheFilter::NoFilter,
         concurrency: 1,
-        print: false,
-        output: None,
+        ..Default::default()
     };
 
     let mut dispatcher = Google::dispatcher();
@@ -95,8 +91,7 @@ async fn result_test_with_filter() {
     let config = PoolConfig {
         filter,
         concurrency: 1,
-        print: false,
-        output: None,
+        ..Default::default()
     };
 
     let mut google_dispatcher = Google::dispatcher();
@@ -109,9 +104,7 @@ async fn result_test_with_filter() {
     let alienvault = SubscanModule::from(alienvault_dispatcher);
     let pool = SubscanModulePool::new(config, resolver);
 
-    pool.clone()
-        .start(TEST_DOMAIN, &vec![google, alienvault])
-        .await;
+    pool.clone().start(TEST_DOMAIN, &vec![google, alienvault]).await;
 
     let binding = pool.result().await;
     let result = binding.items.first();
@@ -128,10 +121,8 @@ async fn result_test_with_filter() {
 async fn result_test_with_error() {
     let resolver = MockResolver::default_boxed();
     let config = PoolConfig {
-        filter: CacheFilter::NoFilter,
         concurrency: 1,
-        print: false,
-        output: None,
+        ..Default::default()
     };
 
     let mut dispatcher = AlienVault::dispatcher();

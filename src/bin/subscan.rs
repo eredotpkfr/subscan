@@ -27,7 +27,7 @@ async fn main() {
                 get.as_table(subscan.module(&get.name).await, out).await;
             }
             ModuleSubCommands::Run(args) => {
-                subscan.run(&args.name, &args.domain).await.save(&args.output).await
+                subscan.run(&args.name, &args.domain).await.save(&args.output).await;
             }
         },
         Commands::Scan(args) => {

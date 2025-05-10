@@ -3,7 +3,13 @@ use std::{
     str::FromStr,
 };
 
-use subscan::{pools::brute::SubscanBrutePool, types::result::item::SubscanResultItem};
+use subscan::{
+    pools::brute::SubscanBrutePool,
+    types::{
+        config::{pool::PoolConfig, resolver::ResolverConfig},
+        result::item::SubscanResultItem,
+    },
+};
 
 use crate::common::{
     constants::{LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
@@ -13,9 +19,17 @@ use crate::common::{
 
 #[tokio::test]
 async fn submit_test() {
-    let resolver = MockResolver::default_boxed();
+    let rconfig = ResolverConfig {
+        concurrency: 1,
+        ..Default::default()
+    };
+    let resolver = MockResolver::boxed(rconfig);
+    let config = PoolConfig {
+        concurrency: 1,
+        ..Default::default()
+    };
 
-    let pool = SubscanBrutePool::new(1, resolver);
+    let pool = SubscanBrutePool::new(config, resolver);
     let item = SubscanResultItem {
         subdomain: TEST_BAR_SUBDOMAIN.into(),
         ip: Some(IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap())),
@@ -37,8 +51,12 @@ async fn submit_test() {
 #[tokio::test]
 async fn result_test() {
     let resolver = MockResolver::default_boxed();
+    let config = PoolConfig {
+        concurrency: 1,
+        ..Default::default()
+    };
 
-    let pool = SubscanBrutePool::new(1, resolver);
+    let pool = SubscanBrutePool::new(config, resolver);
 
     pool.clone().submit("bar".into()).await;
     pool.clone().spawn_bruters(TEST_DOMAIN).await;
@@ -58,8 +76,12 @@ async fn result_test() {
 #[tokio::test]
 async fn start_test() {
     let resolver = MockResolver::default_boxed();
+    let config = PoolConfig {
+        concurrency: 1,
+        ..Default::default()
+    };
 
-    let pool = SubscanBrutePool::new(1, resolver);
+    let pool = SubscanBrutePool::new(config, resolver);
     let wordlist = testdata_path().join("txt/wordlist.txt");
 
     pool.clone().start(TEST_DOMAIN, wordlist).await;

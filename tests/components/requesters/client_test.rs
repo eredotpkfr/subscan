@@ -69,13 +69,7 @@ async fn client_get_content_timeout_test() {
     let client = HTTPClient::with_config(config);
     let url = Url::parse(&stubr.path("/hello-delayed")).unwrap();
 
-    client
-        .get_content(url)
-        .await
-        .unwrap()
-        .as_json()
-        .as_str()
-        .unwrap();
+    client.get_content(url).await.unwrap().as_json().as_str().unwrap();
 }
 
 #[tokio::test]
