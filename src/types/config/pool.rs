@@ -64,7 +64,6 @@ impl PoolConfig {
                     .create(true)
                     .append(true)
                     .read(true)
-                    .write(true)
                     .truncate(false)
                     .open(path)
                     .unwrap_or_else(|_| panic!("Cannot create {} file!", path.to_str().unwrap())),

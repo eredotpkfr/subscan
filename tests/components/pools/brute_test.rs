@@ -117,7 +117,7 @@ async fn start_with_stream_test() {
     pool.clone().start(TEST_DOMAIN, wordlist).await;
 
     let local = IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap());
-    let expecteds = vec![
+    let expecteds = [
         SubscanResultItem {
             subdomain: TEST_FOO_SUBDOMAIN.into(),
             ip: Some(local),
