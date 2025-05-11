@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, str::FromStr};
 
 use clap::Parser;
 use subscan::{
@@ -45,7 +45,8 @@ async fn brute_args_test() {
         "--output", "csv",
         "--resolver-concurrency", "100",
         "--resolver-timeout", "10",
-        "--print"
+        "--print",
+        "--stream-to-txt", "stream.txt",
     ];
 
     let cli = Cli::try_parse_from(args).unwrap();
@@ -54,6 +55,10 @@ async fn brute_args_test() {
         subscan::cli::commands::Commands::Brute(args) => {
             assert!(args.print);
 
+            assert_eq!(
+                args.stream_to_txt.unwrap(),
+                PathBuf::from_str("stream.txt").unwrap()
+            );
             assert_eq!(args.domain, "foo.com");
             assert_eq!(args.wordlist, PathBuf::from("wordlist.txt"));
             assert_eq!(args.output, OutputFormat::CSV);

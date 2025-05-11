@@ -2,8 +2,10 @@ use std::{collections::BTreeSet, env};
 
 use serde_json::Value;
 use subscan::{
-    error::ModuleErrorKind::JSONExtract, interfaces::module::SubscanModuleInterface,
-    modules::integrations::netlas::Netlas, types::result::status::{SubscanModuleStatus, SkipReason::AuthenticationNotProvided},
+    error::ModuleErrorKind::JSONExtract,
+    interfaces::module::SubscanModuleInterface,
+    modules::integrations::netlas::Netlas,
+    types::result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus},
 };
 
 use crate::common::{

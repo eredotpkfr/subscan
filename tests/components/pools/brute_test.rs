@@ -1,4 +1,5 @@
 use std::{
+    fs::{self, remove_file},
     net::{IpAddr, Ipv4Addr},
     str::FromStr,
 };
@@ -12,9 +13,11 @@ use subscan::{
 };
 
 use crate::common::{
-    constants::{LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
+    constants::{
+        LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_BAZ_SUBDOMAIN, TEST_DOMAIN, TEST_FOO_SUBDOMAIN,
+    },
     mock::resolver::MockResolver,
-    utils::testdata_path,
+    utils::{self, testdata_path},
 };
 
 #[tokio::test]
@@ -95,4 +98,46 @@ async fn start_test() {
     assert_eq!(binding.items.len(), 3);
     assert_eq!(result.unwrap().subdomain, TEST_BAR_SUBDOMAIN);
     assert_eq!(result.unwrap().ip.unwrap().to_string(), LOCAL_HOST);
+}
+
+#[tokio::test]
+async fn start_with_stream_test() {
+    let stream = utils::testdata_path().join("stream.txt");
+    let resolver = MockResolver::default_boxed();
+
+    let config = PoolConfig {
+        concurrency: 1,
+        stream: Some(stream.clone()),
+        ..Default::default()
+    };
+
+    let pool = SubscanBrutePool::new(config.clone(), resolver);
+    let wordlist = testdata_path().join("txt/wordlist.txt");
+
+    pool.clone().start(TEST_DOMAIN, wordlist).await;
+
+    let local = IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap());
+    let expecteds = vec![
+        SubscanResultItem {
+            subdomain: TEST_FOO_SUBDOMAIN.into(),
+            ip: Some(local),
+        },
+        SubscanResultItem {
+            subdomain: TEST_BAR_SUBDOMAIN.into(),
+            ip: Some(local),
+        },
+        SubscanResultItem {
+            subdomain: TEST_BAZ_SUBDOMAIN.into(),
+            ip: Some(local),
+        },
+    ];
+
+    let binding = fs::read_to_string(stream.clone()).unwrap();
+    let lines: Vec<&str> = binding.lines().collect();
+
+    assert_eq!(lines[0], expecteds[0].as_txt());
+    assert_eq!(lines[1], expecteds[1].as_txt());
+    assert_eq!(lines[2], expecteds[2].as_txt());
+
+    remove_file(stream).unwrap();
 }

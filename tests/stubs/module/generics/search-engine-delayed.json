@@ -1,0 +1,22 @@
+{
+    "request": {
+        "method": "GET",
+        "queryParameters": {
+            "num": {
+                "equalTo": 100
+            },
+            "q": {
+                "equalTo": "site:foo.com"
+            }
+        },
+        "urlPath": "/search"
+    },
+    "response": {
+        "body": "bar.foo.com",
+        "fixedDelayMilliseconds": 1000,
+        "headers": {
+            "content-type": "text/html"
+        },
+        "status": 200
+    }
+}

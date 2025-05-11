@@ -1,4 +1,4 @@
-use std::{collections::BTreeSet, env};
+use std::{collections::BTreeSet, env, time::Duration};
 
 use reqwest::{
     header::{HeaderValue, USER_AGENT},
@@ -7,8 +7,10 @@ use reqwest::{
 use subscan::{
     constants::{DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT},
     enums::{auth::AuthenticationMethod, content::Content},
+    error::ModuleErrorKind::GetContent,
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     types::{
+        config::requester::RequesterConfig,
         env::{Credentials, Env},
         result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus},
     },
@@ -202,7 +204,7 @@ async fn authenticate_test_with_basic_http_auth_no_credentials() {
 
 #[tokio::test]
 #[stubr::mock("module/generics/integration-with-no-auth.json")]
-async fn run_test_no_auth() {
+async fn run_no_auth_test() {
     let auth = AuthenticationMethod::NoAuthentication;
     let module = modules::generic_integration(&stubr.path("/subdomains"), auth);
 
@@ -214,7 +216,7 @@ async fn run_test_no_auth() {
 
 #[tokio::test]
 #[stubr::mock("module/generics/integration-with-header-auth.json")]
-async fn run_test_with_header_auth() {
+async fn run_with_header_auth_test() {
     let auth = AuthenticationMethod::APIKeyAsHeader("X-API-Key".to_string());
     let module = modules::generic_integration(&stubr.path("/subdomains"), auth);
 
@@ -232,7 +234,7 @@ async fn run_test_with_header_auth() {
 
 #[tokio::test]
 #[stubr::mock("module/generics/integration-with-query-auth.json")]
-async fn run_test_with_query_auth() {
+async fn run_with_query_auth_test() {
     let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
     let module = modules::generic_integration(&stubr.path("/subdomains"), auth);
 
@@ -250,7 +252,7 @@ async fn run_test_with_query_auth() {
 
 #[tokio::test]
 #[stubr::mock("module/generics/integration-with-basic-http-auth.json")]
-async fn run_test_with_basic_http_auth() {
+async fn run_with_basic_http_auth_test() {
     let credentials = Credentials {
         username: Env {
             name: "USERNAME".into(),
@@ -273,7 +275,7 @@ async fn run_test_with_basic_http_auth() {
 
 #[tokio::test]
 #[stubr::mock("module/generics/integration-with-query-auth.json")]
-async fn run_test_with_not_authenticated() {
+async fn run_with_not_authenticated_test() {
     let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
     let module = modules::generic_integration(&stubr.path("/subdomains"), auth);
 
@@ -281,4 +283,22 @@ async fn run_test_with_not_authenticated() {
 
     assert_eq!(results, BTreeSet::new());
     assert_eq!(status, AuthenticationNotProvided.into());
+}
+
+#[tokio::test]
+#[stubr::mock("module/generics/integration-with-no-auth-delayed.json")]
+async fn run_fail_get_content_test() {
+    let rconfig = RequesterConfig {
+        timeout: Duration::from_millis(500),
+        ..Default::default()
+    };
+    let auth = AuthenticationMethod::NoAuthentication;
+    let module = modules::generic_integration(&stubr.path("/subdomains"), auth);
+
+    module.requester().await.unwrap().lock().await.configure(rconfig).await;
+
+    let (results, status) = utils::run_module(module.into(), TEST_DOMAIN).await;
+
+    assert_eq!(results, BTreeSet::new());
+    assert_eq!(status, GetContent.into());
 }
