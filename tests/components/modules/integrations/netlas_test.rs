@@ -19,7 +19,7 @@ use crate::common::{
 };
 
 #[tokio::test]
-#[stubr::mock("module/integrations/netlas")]
+#[stubr::mock("module/integrations/netlas/with-count")]
 async fn run_success_test() {
     let mut netlas = Netlas::dispatcher();
     let env_name = netlas.envs().await.apikey.name;
@@ -96,7 +96,7 @@ async fn run_no_auth_test() {
 
 #[tokio::test]
 async fn extract_test() {
-    let stub = "module/integrations/netlas/netlas-domains-download.json";
+    let stub = "module/integrations/netlas/with-count/netlas-domains-download.json";
     let json = utils::read_stub(stub)["response"]["jsonBody"].clone();
 
     let extracted = Netlas::extract(json, TEST_DOMAIN);
