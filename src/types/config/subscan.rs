@@ -191,6 +191,10 @@ impl From<Cli> for SubscanConfig {
     /// let args = vec!["subscan", "module", "get", "foo"];
     /// let cli = Cli::try_parse_from(args).unwrap();
     ///
+    /// // Module run command
+    /// let args = vec!["subscan", "module", "run", "foo", "-d", "foo.com"];
+    /// let cli = Cli::try_parse_from(args).unwrap();
+    ///
     /// let config = SubscanConfig::from(cli);
     /// assert_eq!(config.requester.timeout, DEFAULT_HTTP_TIMEOUT);
     /// ```

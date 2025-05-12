@@ -1,11 +1,15 @@
-use std::{collections::BTreeSet, env};
+use std::{collections::BTreeSet, env, time::Duration};
 
 use serde_json::Value;
 use subscan::{
-    error::ModuleErrorKind::JSONExtract,
-    interfaces::module::SubscanModuleInterface,
+    enums::dispatchers::SubscanModuleDispatcher,
+    error::ModuleErrorKind::{GetContent, JSONExtract},
+    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::integrations::netlas::Netlas,
-    types::result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus},
+    types::{
+        config::requester::RequesterConfig,
+        result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus},
+    },
 };
 
 use crate::common::{
@@ -16,7 +20,7 @@ use crate::common::{
 
 #[tokio::test]
 #[stubr::mock("module/integrations/netlas")]
-async fn run_test() {
+async fn run_success_test() {
     let mut netlas = Netlas::dispatcher();
     let env_name = netlas.envs().await.apikey.name;
 
@@ -33,7 +37,53 @@ async fn run_test() {
 
 #[tokio::test]
 #[stubr::mock("module/integrations/netlas/netlas-no-count.json")]
-async fn run_test_no_count() {
+async fn run_no_count_test() {
+    let mut netlas = Netlas::dispatcher();
+    let env_name = netlas.envs().await.apikey.name;
+
+    env::set_var(&env_name, "netlas-api-key");
+    funcs::wrap_module_url(&mut netlas, &stubr.uri());
+
+    let (results, status) = utils::run_module(netlas, TEST_DOMAIN).await;
+
+    assert_eq!(results, BTreeSet::new());
+    assert_eq!(status, "json parse error".into());
+
+    env::remove_var(env_name);
+}
+
+#[tokio::test]
+#[stubr::mock("module/integrations/netlas/netlas-delayed.json")]
+async fn run_timeout_test() {
+    let mut netlas = Netlas::dispatcher();
+    let env_name = netlas.envs().await.apikey.name;
+
+    env::set_var(&env_name, "netlas-api-key");
+    funcs::wrap_module_url(&mut netlas, &stubr.uri());
+
+    if let SubscanModuleDispatcher::Netlas(ref mut module) = netlas {
+        let requester = &mut *module.requester().await.unwrap().lock().await;
+
+        // Set timeout for testing did not get response case
+        let config = RequesterConfig {
+            timeout: Duration::from_millis(500),
+            ..Default::default()
+        };
+
+        requester.configure(config).await;
+    };
+
+    let (results, status) = utils::run_module(netlas, TEST_DOMAIN).await;
+
+    assert_eq!(results, BTreeSet::new());
+    assert_eq!(status, GetContent.into());
+
+    env::remove_var(env_name);
+}
+
+#[tokio::test]
+#[stubr::mock("module/integrations/netlas/netlas-no-count.json")]
+async fn run_no_auth_test() {
     let mut netlas = Netlas::dispatcher();
 
     funcs::wrap_module_url(&mut netlas, &stubr.uri());

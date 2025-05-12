@@ -4,6 +4,7 @@ use std::collections::BTreeSet;
 use serde_json::{json, Value};
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher,
+    error::ModuleErrorKind::GetContent,
     interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::integrations::commoncrawl::CommonCrawl,
     types::{config::requester::RequesterConfig, result::status::SubscanModuleStatus},
@@ -37,7 +38,7 @@ async fn extract_cdx_urls_test() {
 }
 
 #[tokio::test]
-async fn run_test() {
+async fn run_success_test() {
     let stubs = "module/integrations/commoncrawl";
     let templates = vec!["commoncrawl-index-template.json"];
     let manager: StubTemplateManager = (stubs, templates).into();
@@ -76,8 +77,33 @@ async fn run_test() {
 }
 
 #[tokio::test]
+#[stubr::mock("module/integrations/commoncrawl/commoncrawl-index-delayed.json")]
+async fn run_timeout_test() {
+    let mut commoncrawl = CommonCrawl::dispatcher();
+
+    funcs::wrap_module_url(&mut commoncrawl, &stubr.path("/commoncrawl/index-delayed"));
+
+    if let SubscanModuleDispatcher::CommonCrawl(ref mut module) = commoncrawl {
+        let requester = &mut *module.requester().await.unwrap().lock().await;
+
+        // Set timeout for testing did not get response case
+        let config = RequesterConfig {
+            timeout: Duration::from_millis(500),
+            ..Default::default()
+        };
+
+        requester.configure(config).await;
+    };
+
+    let (results, status) = utils::run_module(commoncrawl, TEST_DOMAIN).await;
+
+    assert_eq!(results, BTreeSet::new());
+    assert_eq!(status, GetContent.into());
+}
+
+#[tokio::test]
 #[stubr::mock("module/integrations/commoncrawl/commoncrawl-index-no-data.json")]
-async fn run_failed_test() {
+async fn run_no_cdx_urls_test() {
     let mut commoncrawl = CommonCrawl::dispatcher();
 
     funcs::wrap_module_url(&mut commoncrawl, &stubr.path("/commoncrawl/index-no-data"));

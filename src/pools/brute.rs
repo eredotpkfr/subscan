@@ -19,14 +19,31 @@ use crate::{
 
 /// Subscan brute pool to make brute force attack asynchronously
 pub struct SubscanBrutePool {
-    config: PoolConfig,
-    resolver: Box<dyn LookUpHostFuture>,
-    result: Mutex<PoolResult>,
-    channel: UnboundedFlumeChannel<Option<Subdomain>>,
-    workers: Mutex<JoinSet<()>>,
+    pub config: PoolConfig,
+    pub resolver: Box<dyn LookUpHostFuture>,
+    pub result: Mutex<PoolResult>,
+    pub channel: UnboundedFlumeChannel<Option<Subdomain>>,
+    pub workers: Mutex<JoinSet<()>>,
 }
 
 impl From<SubscanConfig> for Arc<SubscanBrutePool> {
+    /// Create [`Arc<SubscanBrutePool>`] from [`SubscanConfig`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::sync::Arc;
+    /// use subscan::types::config::subscan::SubscanConfig;
+    /// use subscan::pools::brute::SubscanBrutePool;
+    ///
+    /// let config = SubscanConfig::default();
+    /// let pool: Arc<SubscanBrutePool> = config.clone().into();
+    ///
+    /// assert_eq!(pool.config.concurrency, config.concurrency);
+    /// assert_eq!(pool.config.filter, config.filter);
+    /// assert_eq!(pool.config.stream, config.stream);
+    /// assert_eq!(pool.config.print, config.print);
+    /// ```
     fn from(config: SubscanConfig) -> Self {
         Arc::new(SubscanBrutePool {
             config: config.clone().into(),

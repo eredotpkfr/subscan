@@ -1,0 +1,36 @@
+{
+    "request": {
+        "headers": {
+            "Authorization": {
+                "equalTo": "token github-api-key"
+            }
+        },
+        "method": "GET",
+        "queryParameters": {
+            "order": {
+                "equalTo": "asc"
+            },
+            "per_page": {
+                "equalTo": "100"
+            },
+            "q": {
+                "equalTo": "foo.com"
+            },
+            "sort": {
+                "equalTo": "created"
+            }
+        },
+        "urlPath": "/github-code-search-delayed"
+    },
+    "response": {
+        "fixedDelayMilliseconds": 1000,
+        "headers": {
+            "content-type": "text/html"
+        },
+        "jsonBody": {},
+        "status": 200,
+        "transformers": [
+            "response-template"
+        ]
+    }
+}

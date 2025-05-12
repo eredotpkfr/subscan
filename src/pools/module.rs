@@ -13,7 +13,7 @@ use crate::{
     },
 };
 
-struct SubscanModulePoolChannels {
+pub struct SubscanModulePoolChannels {
     module: UnboundedFlumeChannel<Option<SubscanModule>>,
     results: UnboundedFlumeChannel<OptionalSubscanModuleResult>,
 }
@@ -64,14 +64,31 @@ impl SubscanModulePoolWorkers {
 
 /// Subscan module pool to run modules and resolve IPs
 pub struct SubscanModulePool {
-    config: PoolConfig,
-    resolver: Box<dyn LookUpHostFuture>,
-    result: Mutex<PoolResult>,
-    channels: SubscanModulePoolChannels,
-    workers: SubscanModulePoolWorkers,
+    pub config: PoolConfig,
+    pub resolver: Box<dyn LookUpHostFuture>,
+    pub result: Mutex<PoolResult>,
+    pub channels: SubscanModulePoolChannels,
+    pub workers: SubscanModulePoolWorkers,
 }
 
 impl From<SubscanConfig> for Arc<SubscanModulePool> {
+    /// Create [`Arc<SubscanModulePool>`] from [`SubscanConfig`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::sync::Arc;
+    /// use subscan::types::config::subscan::SubscanConfig;
+    /// use subscan::pools::module::SubscanModulePool;
+    ///
+    /// let config = SubscanConfig::default();
+    /// let pool: Arc<SubscanModulePool> = config.clone().into();
+    ///
+    /// assert_eq!(pool.config.concurrency, config.concurrency);
+    /// assert_eq!(pool.config.filter, config.filter);
+    /// assert_eq!(pool.config.stream, config.stream);
+    /// assert_eq!(pool.config.print, config.print);
+    /// ```
     fn from(config: SubscanConfig) -> Self {
         Arc::new(SubscanModulePool {
             config: config.clone().into(),

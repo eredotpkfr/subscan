@@ -1,9 +1,11 @@
-use std::collections::BTreeSet;
+use std::{collections::BTreeSet, time::Duration};
 
 use subscan::{
     enums::{content::Content, dispatchers::SubscanModuleDispatcher},
+    error::ModuleErrorKind::GetContent,
+    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::integrations::dnsdumpstercrawler::DNSDumpsterCrawler,
-    types::result::status::SubscanModuleStatus,
+    types::{config::requester::RequesterConfig, result::status::SubscanModuleStatus},
 };
 
 use crate::common::{
@@ -24,7 +26,7 @@ async fn get_auth_token_test() {
 
 #[tokio::test]
 #[stubr::mock("module/integrations/dnsdumpstercrawler")]
-async fn run_test_no_token() {
+async fn run_no_token_test() {
     let mut dnsdumpstercrawler = DNSDumpsterCrawler::dispatcher();
 
     funcs::wrap_module_url(
@@ -40,7 +42,7 @@ async fn run_test_no_token() {
 
 #[tokio::test]
 #[stubr::mock("module/integrations/dnsdumpstercrawler")]
-async fn run_test_with_token() {
+async fn run_with_token_test() {
     let mut dnsdumpstercrawler = DNSDumpsterCrawler::dispatcher();
 
     funcs::wrap_module_url(
@@ -52,4 +54,32 @@ async fn run_test_with_token() {
 
     assert_eq!(results, [TEST_BAR_SUBDOMAIN.to_string()].into());
     assert_eq!(status, SubscanModuleStatus::Finished);
+}
+
+#[tokio::test]
+#[stubr::mock("module/integrations/dnsdumpstercrawler")]
+async fn run_timeout_test() {
+    let mut dnsdumpstercrawler = DNSDumpsterCrawler::dispatcher();
+
+    funcs::wrap_module_url(
+        &mut dnsdumpstercrawler,
+        &stubr.path("/dnsdumpstercrawler-delayed"),
+    );
+
+    if let SubscanModuleDispatcher::DNSDumpsterCrawler(ref mut module) = dnsdumpstercrawler {
+        let requester = &mut *module.requester().await.unwrap().lock().await;
+
+        // Set timeout for testing did not get response case
+        let config = RequesterConfig {
+            timeout: Duration::from_millis(500),
+            ..Default::default()
+        };
+
+        requester.configure(config).await;
+    };
+
+    let (results, status) = utils::run_module(dnsdumpstercrawler, TEST_DOMAIN).await;
+
+    assert_eq!(results, BTreeSet::new());
+    assert_eq!(status, GetContent.into());
 }

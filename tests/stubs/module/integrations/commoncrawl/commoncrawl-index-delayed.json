@@ -1,0 +1,17 @@
+{
+    "request": {
+        "method": "GET",
+        "urlPath": "/commoncrawl/index-delayed"
+    },
+    "response": {
+        "fixedDelayMilliseconds": 1000,
+        "headers": {
+            "content-type": "application/json"
+        },
+        "jsonBody": {},
+        "status": 200,
+        "transformers": [
+            "response-template"
+        ]
+    }
+}
