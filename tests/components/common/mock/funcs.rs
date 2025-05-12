@@ -58,6 +58,7 @@ pub fn wrap_module_name(dispatcher: &mut SubscanModuleDispatcher, name: String) 
             module.name = current_thread_hex()
         }
         SubscanModuleDispatcher::GitHub(module) => module.name = name,
+        SubscanModuleDispatcher::Netlas(module) => module.name = name,
         _ => {}
     }
 }

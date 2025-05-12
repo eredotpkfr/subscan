@@ -22,6 +22,10 @@ use crate::common::{
 #[stubr::mock("module/integrations/netlas/with-count")]
 async fn run_success_test() {
     let mut netlas = Netlas::dispatcher();
+
+    // Izolate non-generic module environment variables
+    funcs::wrap_module_name(&mut netlas, utils::current_thread_hex());
+
     let env_name = netlas.envs().await.apikey.name;
 
     env::set_var(&env_name, "netlas-api-key");
@@ -39,6 +43,10 @@ async fn run_success_test() {
 #[stubr::mock("module/integrations/netlas/netlas-no-count.json")]
 async fn run_no_count_test() {
     let mut netlas = Netlas::dispatcher();
+
+    // Izolate non-generic module environment variables
+    funcs::wrap_module_name(&mut netlas, utils::current_thread_hex());
+
     let env_name = netlas.envs().await.apikey.name;
 
     env::set_var(&env_name, "netlas-api-key");
@@ -56,6 +64,10 @@ async fn run_no_count_test() {
 #[stubr::mock("module/integrations/netlas/netlas-delayed.json")]
 async fn run_timeout_test() {
     let mut netlas = Netlas::dispatcher();
+
+    // Izolate non-generic module environment variables
+    funcs::wrap_module_name(&mut netlas, utils::current_thread_hex());
+
     let env_name = netlas.envs().await.apikey.name;
 
     env::set_var(&env_name, "netlas-api-key");
@@ -86,6 +98,8 @@ async fn run_timeout_test() {
 async fn run_no_auth_test() {
     let mut netlas = Netlas::dispatcher();
 
+    // Izolate non-generic module environment variables
+    funcs::wrap_module_name(&mut netlas, utils::current_thread_hex());
     funcs::wrap_module_url(&mut netlas, &stubr.uri());
 
     let (results, status) = utils::run_module(netlas, TEST_DOMAIN).await;
