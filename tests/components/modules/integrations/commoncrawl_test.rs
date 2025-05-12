@@ -3,11 +3,8 @@ use std::collections::BTreeSet;
 
 use serde_json::{json, Value};
 use subscan::{
-    enums::dispatchers::SubscanModuleDispatcher,
-    error::ModuleErrorKind::GetContent,
-    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
-    modules::integrations::commoncrawl::CommonCrawl,
-    types::{config::requester::RequesterConfig, result::status::SubscanModuleStatus},
+    enums::dispatchers::SubscanModuleDispatcher, error::ModuleErrorKind::GetContent,
+    modules::integrations::commoncrawl::CommonCrawl, types::result::status::SubscanModuleStatus,
 };
 
 use crate::common::{
@@ -52,18 +49,7 @@ async fn run_success_test() {
     let mut commoncrawl = CommonCrawl::dispatcher();
 
     funcs::wrap_module_url(&mut commoncrawl, &stubr.path("/commoncrawl/index"));
-
-    if let SubscanModuleDispatcher::CommonCrawl(ref mut module) = commoncrawl {
-        let requester = &mut *module.requester().await.unwrap().lock().await;
-
-        // Set timeout for testing did not get response case
-        let config = RequesterConfig {
-            timeout: Duration::from_millis(10),
-            ..Default::default()
-        };
-
-        requester.configure(config).await;
-    };
+    funcs::set_requester_timeout(&mut commoncrawl, Duration::from_millis(500)).await;
 
     let (results, status) = utils::run_module(commoncrawl, TEST_DOMAIN).await;
 
@@ -82,18 +68,7 @@ async fn run_timeout_test() {
     let mut commoncrawl = CommonCrawl::dispatcher();
 
     funcs::wrap_module_url(&mut commoncrawl, &stubr.path("/commoncrawl/index-delayed"));
-
-    if let SubscanModuleDispatcher::CommonCrawl(ref mut module) = commoncrawl {
-        let requester = &mut *module.requester().await.unwrap().lock().await;
-
-        // Set timeout for testing did not get response case
-        let config = RequesterConfig {
-            timeout: Duration::from_millis(500),
-            ..Default::default()
-        };
-
-        requester.configure(config).await;
-    };
+    funcs::set_requester_timeout(&mut commoncrawl, Duration::from_millis(500)).await;
 
     let (results, status) = utils::run_module(commoncrawl, TEST_DOMAIN).await;
 

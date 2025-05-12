@@ -1,11 +1,8 @@
 use std::{collections::BTreeSet, time::Duration};
 
 use subscan::{
-    enums::dispatchers::SubscanModuleDispatcher,
-    error::ModuleErrorKind::GetContent,
-    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
-    modules::integrations::waybackarchive::WaybackArchive,
-    types::{config::requester::RequesterConfig, result::status::SubscanModuleStatus},
+    error::ModuleErrorKind::GetContent, modules::integrations::waybackarchive::WaybackArchive,
+    types::result::status::SubscanModuleStatus,
 };
 
 use crate::common::{
@@ -38,18 +35,7 @@ async fn run_timeout_test() {
     let mut waybackarchive = WaybackArchive::dispatcher();
 
     funcs::wrap_module_url(&mut waybackarchive, &stubr.path("/waybackarchive-delayed"));
-
-    if let SubscanModuleDispatcher::WaybackArchive(ref mut module) = waybackarchive {
-        let requester = &mut *module.requester().await.unwrap().lock().await;
-
-        // Set timeout for testing did not get response case
-        let config = RequesterConfig {
-            timeout: Duration::from_millis(500),
-            ..Default::default()
-        };
-
-        requester.configure(config).await;
-    };
+    funcs::set_requester_timeout(&mut waybackarchive, Duration::from_millis(500)).await;
 
     let (results, status) = utils::run_module(waybackarchive, TEST_DOMAIN).await;
 

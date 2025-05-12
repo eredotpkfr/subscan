@@ -3,9 +3,8 @@ use std::{collections::BTreeSet, time::Duration};
 use subscan::{
     enums::{content::Content, dispatchers::SubscanModuleDispatcher},
     error::ModuleErrorKind::GetContent,
-    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
     modules::integrations::dnsdumpstercrawler::DNSDumpsterCrawler,
-    types::{config::requester::RequesterConfig, result::status::SubscanModuleStatus},
+    types::result::status::SubscanModuleStatus,
 };
 
 use crate::common::{
@@ -65,18 +64,7 @@ async fn run_timeout_test() {
         &mut dnsdumpstercrawler,
         &stubr.path("/dnsdumpstercrawler-delayed"),
     );
-
-    if let SubscanModuleDispatcher::DNSDumpsterCrawler(ref mut module) = dnsdumpstercrawler {
-        let requester = &mut *module.requester().await.unwrap().lock().await;
-
-        // Set timeout for testing did not get response case
-        let config = RequesterConfig {
-            timeout: Duration::from_millis(500),
-            ..Default::default()
-        };
-
-        requester.configure(config).await;
-    };
+    funcs::set_requester_timeout(&mut dnsdumpstercrawler, Duration::from_millis(500)).await;
 
     let (results, status) = utils::run_module(dnsdumpstercrawler, TEST_DOMAIN).await;
 

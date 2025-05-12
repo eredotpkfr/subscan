@@ -2,14 +2,10 @@ use std::{collections::BTreeSet, env, time::Duration};
 
 use serde_json::Value;
 use subscan::{
-    enums::dispatchers::SubscanModuleDispatcher,
     error::ModuleErrorKind::{GetContent, JSONExtract},
-    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
+    interfaces::module::SubscanModuleInterface,
     modules::integrations::netlas::Netlas,
-    types::{
-        config::requester::RequesterConfig,
-        result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus},
-    },
+    types::result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus},
 };
 
 use crate::common::{
@@ -72,18 +68,7 @@ async fn run_timeout_test() {
 
     env::set_var(&env_name, "netlas-api-key");
     funcs::wrap_module_url(&mut netlas, &stubr.uri());
-
-    if let SubscanModuleDispatcher::Netlas(ref mut module) = netlas {
-        let requester = &mut *module.requester().await.unwrap().lock().await;
-
-        // Set timeout for testing did not get response case
-        let config = RequesterConfig {
-            timeout: Duration::from_millis(500),
-            ..Default::default()
-        };
-
-        requester.configure(config).await;
-    };
+    funcs::set_requester_timeout(&mut netlas, Duration::from_millis(500)).await;
 
     let (results, status) = utils::run_module(netlas, TEST_DOMAIN).await;
 
