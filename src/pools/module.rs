@@ -11,6 +11,7 @@ use crate::{
         core::{SubscanModule, UnboundedFlumeChannel},
         result::{item::SubscanResultItem, pool::PoolResult, statistics::SubscanModuleStatistic},
     },
+    utilities::regex,
 };
 
 pub struct SubscanModulePoolChannels {
@@ -190,13 +191,18 @@ impl SubscanModulePool {
     }
 
     /// [`SubscanModule`] resolver method, simply resolves given subdomain's IP address
-    pub async fn resolver(self: Arc<Self>) {
+    pub async fn resolver(self: Arc<Self>, domain: String) {
         let lookup_host = self.resolver.lookup_host_future().await;
+        let pattern = regex::generate_subdomain_regex(&domain).unwrap();
 
         while let Ok(msg) = self.channels.results.rx.recv_async().await {
             if let Some(result) = msg.as_ref() {
                 match result {
                     SubscanModuleResult::SubscanModuleResultItem(item) => {
+                        if !pattern.is_match(&item.subdomain) {
+                            continue;
+                        }
+
                         let sub = SubscanResultItem {
                             subdomain: item.subdomain.clone(),
                             ip: lookup_host(item.subdomain.clone()).await,
@@ -342,7 +348,7 @@ impl SubscanModulePool {
     ///     let pool = SubscanModulePool::new(config, resolver);
     ///
     ///     // spawn runners that listen async channel
-    ///     pool.clone().spawn_resolvers().await;
+    ///     pool.clone().spawn_resolvers("foo.com".into()).await;
     ///
     ///     assert!(!pool.clone().is_empty().await);
     ///
@@ -350,9 +356,9 @@ impl SubscanModulePool {
     ///     pool.join_resolvers().await;
     /// }
     /// ```
-    pub async fn spawn_resolvers(self: Arc<Self>) {
+    pub async fn spawn_resolvers(self: Arc<Self>, domain: String) {
         for _ in 0..self.resolver.config().await.concurrency {
-            self.workers.resolvers.lock().await.spawn(self.clone().resolver());
+            self.workers.resolvers.lock().await.spawn(self.clone().resolver(domain.clone()));
         }
     }
 
@@ -377,7 +383,7 @@ impl SubscanModulePool {
     ///     let pool = SubscanModulePool::new(config, resolver);
     ///
     ///     // spawn runners that listen async channel
-    ///     pool.clone().spawn_resolvers().await;
+    ///     pool.clone().spawn_resolvers("foo.com".into()).await;
     ///     pool.clone().kill_resolvers().await;
     ///     pool.clone().join_resolvers().await;
     ///
@@ -418,7 +424,7 @@ impl SubscanModulePool {
     /// }
     /// ```
     pub async fn start(self: Arc<Self>, domain: &str, modules: &Vec<SubscanModule>) {
-        self.clone().spawn_resolvers().await;
+        self.clone().spawn_resolvers(domain.to_string()).await;
         self.clone().spawn_runners(domain.to_string()).await;
 
         for module in modules {
@@ -457,7 +463,7 @@ impl SubscanModulePool {
     ///     let module = SubscanModule::from(Google::dispatcher());
     ///
     ///     // spawn resolvers
-    ///     pool.clone().spawn_resolvers().await;
+    ///     pool.clone().spawn_resolvers("foo.com".into()).await;
     ///     // spawn runners that listen async channel
     ///     pool.clone().spawn_runners("foo.com".into()).await;
     ///     // submit module into pool

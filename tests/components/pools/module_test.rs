@@ -5,22 +5,31 @@ use std::{
 };
 
 use subscan::{
-    enums::{cache::CacheFilter, dispatchers::SubscanModuleDispatcher},
+    enums::{
+        auth::AuthenticationMethod::NoAuthentication, cache::CacheFilter,
+        dispatchers::SubscanModuleDispatcher,
+    },
     error::ModuleErrorKind::UrlParse,
+    interfaces::module::SubscanModuleInterface,
     modules::{
-        engines::google::Google,
+        engines::google::{Google, GOOGLE_MODULE_NAME},
         integrations::alienvault::{AlienVault, ALIENVAULT_MODULE_NAME},
     },
     pools::module::SubscanModulePool,
     types::{
-        config::pool::PoolConfig, core::SubscanModule, filters::ModuleNameFilter,
-        result::item::SubscanResultItem,
+        config::pool::PoolConfig,
+        core::SubscanModule,
+        filters::ModuleNameFilter,
+        result::{
+            item::SubscanResultItem,
+            status::{SkipReason::SkippedByUser, SubscanModuleStatus::Finished},
+        },
     },
 };
 
 use crate::common::{
     constants::{LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mock::{funcs, resolver::MockResolver},
+    mock::{funcs, modules, resolver::MockResolver},
 };
 
 #[tokio::test]
@@ -39,17 +48,22 @@ async fn submit_test() {
     let google = SubscanModule::from(dispatcher);
     let pool = SubscanModulePool::new(config, resolver);
 
-    let item = SubscanResultItem {
+    let local = IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap());
+    let expecteds = [SubscanResultItem {
         subdomain: TEST_BAR_SUBDOMAIN.into(),
-        ip: Some(IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap())),
-    };
+        ip: Some(local),
+    }];
 
     assert!(pool.clone().is_empty().await);
 
     pool.clone().start(TEST_DOMAIN, &vec![google]).await;
 
     assert_eq!(pool.clone().len().await, 0);
-    assert_eq!(pool.result().await.items, [item].into());
+    assert_eq!(pool.result().await.items, expecteds.into());
+    assert_eq!(
+        pool.result().await.statistics.get(GOOGLE_MODULE_NAME).unwrap().status,
+        Finished
+    );
 }
 
 #[tokio::test]
@@ -70,26 +84,32 @@ async fn result_test() {
 
     pool.clone().start(TEST_DOMAIN, &vec![google]).await;
 
-    let binding = pool.result().await;
-    let result = binding.items.first();
+    let result = pool.result().await;
 
-    assert!(result.is_some());
-    assert!(result.unwrap().ip.is_some());
+    let local = IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap());
+    let expecteds = [SubscanResultItem {
+        subdomain: TEST_BAR_SUBDOMAIN.into(),
+        ip: Some(local),
+    }];
 
-    assert_eq!(result.unwrap().subdomain, TEST_BAR_SUBDOMAIN);
-    assert_eq!(result.unwrap().ip.unwrap().to_string(), LOCAL_HOST);
+    assert_eq!(result.items, expecteds.into());
+    assert_eq!(
+        result.statistics.get(GOOGLE_MODULE_NAME).unwrap().status,
+        Finished
+    );
 }
 
 #[tokio::test]
 #[stubr::mock("module/engines/google.json")]
 async fn result_test_with_filter() {
     let resolver = MockResolver::default_boxed();
-    let filter = CacheFilter::FilterByName(ModuleNameFilter {
+    let filter = ModuleNameFilter {
         modules: vec!["google".to_string()],
         skips: vec!["alienvault".to_string()],
-    });
+    };
+
     let config = PoolConfig {
-        filter,
+        filter: CacheFilter::FilterByName(filter),
         concurrency: 1,
         ..Default::default()
     };
@@ -106,15 +126,54 @@ async fn result_test_with_filter() {
 
     pool.clone().start(TEST_DOMAIN, &vec![google, alienvault]).await;
 
-    let binding = pool.result().await;
-    let result = binding.items.first();
+    let result = pool.result().await;
 
-    assert!(result.is_some());
-    assert!(result.unwrap().ip.is_some());
+    let local = IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap());
+    let expecteds = [SubscanResultItem {
+        subdomain: TEST_BAR_SUBDOMAIN.into(),
+        ip: Some(local),
+    }];
 
-    assert_eq!(binding.items.len(), 1);
-    assert_eq!(result.unwrap().subdomain, TEST_BAR_SUBDOMAIN);
-    assert_eq!(result.unwrap().ip.unwrap().to_string(), LOCAL_HOST);
+    assert_eq!(result.items, expecteds.into());
+    assert_eq!(
+        result.statistics.get(ALIENVAULT_MODULE_NAME).unwrap().status,
+        SkippedByUser.into()
+    );
+    assert_eq!(
+        result.statistics.get(GOOGLE_MODULE_NAME).unwrap().status,
+        Finished
+    );
+}
+
+#[tokio::test]
+#[stubr::mock("module/generics/integration-with-invalid-data.json")]
+async fn result_test_with_invalid_data() {
+    let resolver = MockResolver::default_boxed();
+    let config = PoolConfig {
+        filter: CacheFilter::NoFilter,
+        concurrency: 1,
+        ..Default::default()
+    };
+
+    let generic = modules::generic_integration(&stubr.path("/subdomains"), NoAuthentication);
+    let dispatcher = SubscanModuleDispatcher::from(generic);
+    let module = SubscanModule::from(dispatcher);
+    let pool = SubscanModulePool::new(config, resolver);
+
+    pool.clone().start(TEST_DOMAIN, &vec![module.clone()]).await;
+
+    let result = pool.result().await;
+
+    let binding = module.lock().await;
+    let name = binding.name().await;
+    let local = IpAddr::V4(Ipv4Addr::from_str(LOCAL_HOST).unwrap());
+    let expecteds = [SubscanResultItem {
+        subdomain: TEST_BAR_SUBDOMAIN.into(),
+        ip: Some(local),
+    }];
+
+    assert_eq!(result.items, expecteds.into());
+    assert_eq!(result.statistics.get(name).unwrap().status, Finished);
 }
 
 #[tokio::test]
@@ -137,11 +196,10 @@ async fn result_test_with_error() {
     pool.clone().start(TEST_DOMAIN, &vec![alienvault]).await;
 
     let result = pool.result().await;
-    let stat = result.statistics.get(ALIENVAULT_MODULE_NAME);
 
-    assert!(stat.is_some());
-
-    assert_eq!(result.statistics.len(), 1);
-    assert_eq!(stat.unwrap().status, UrlParse.into());
     assert_eq!(result.items, BTreeSet::new());
+    assert_eq!(
+        result.statistics.get(ALIENVAULT_MODULE_NAME).unwrap().status,
+        UrlParse.into()
+    );
 }
