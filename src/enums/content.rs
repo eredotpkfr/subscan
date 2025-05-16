@@ -2,7 +2,7 @@ use derive_more::From;
 use serde_json::Value;
 
 /// Content enumeration that stores all content types in a single storage
-#[derive(Clone, Default, From)]
+#[derive(Clone, Debug, Default, From)]
 pub enum Content {
     #[from(String, &str)]
     String(String),

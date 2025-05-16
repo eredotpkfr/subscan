@@ -27,15 +27,15 @@ async fn main() {
                 get.as_table(subscan.module(&get.name).await, out).await;
             }
             ModuleSubCommands::Run(args) => {
-                subscan.run(&args.name, &args.domain).await.log().await;
+                subscan.run(&args.name, &args.domain).await.save(&args.output).await;
             }
         },
         Commands::Scan(args) => {
             subscan.scan(&args.domain).await.save(&args.output).await;
         }
         Commands::Brute(args) => {
-            if args.print {
-                subscan.brute(&args.domain).await.log().await;
+            if args.stream_to_txt.is_some() {
+                subscan.brute(&args.domain).await;
             } else {
                 subscan.brute(&args.domain).await.save(&args.output).await;
             }

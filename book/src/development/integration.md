@@ -31,17 +31,15 @@ impl SubscanModuleInterface for ExampleModule {
         None
     }
 
-    async fn run(&mut self, _domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
-
+    async fn run(&mut self, _domain: &str, results: Sender<OptionalSubscanModuleResult>) {
         let subdomains = BTreeSet::from_iter([
             Subdomain::from("bar.foo.com"),
             Subdomain::from("baz.foo.com"),
         ]);
 
-        result.extend(subdomains);
-
-        Ok(result.with_finished().await)
+        for subdomain in subdomains {
+            results.send(self.item(&subdomain).await).unwrap()
+        }
     }
 }
 ```
@@ -51,7 +49,7 @@ impl SubscanModuleInterface for ExampleModule {
 To define this module as a `SubscanModule`, we need to wrap it with a [`SubscanModuleDispatcher`](https://docs.rs/subscan/latest/subscan/enums/dispatchers/enum.SubscanModuleDispatcher.html), as shown in the implementation of the `SubscanModule` type below
 
 ```rust,ignore
-// `SubscanModule` type wrapper
+/// `SubscanModule` type wrapper
 pub type SubscanModule = Arc<Mutex<SubscanModuleDispatcher>>;
 
 impl From<SubscanModuleDispatcher> for SubscanModule {
@@ -70,15 +68,15 @@ Now, let's add a dispatcher variant for our module. If we are using a generic im
 ```rust,ignore
 #[enum_dispatch(SubscanModuleInterface)]
 pub enum SubscanModuleDispatcher {
-    // Enum variant of generic API integrations. It can be used for all generic API modules
-    // at the same time, for this only requirement is the module should be implemented as
-    // a GenericIntegrationModule
+    /// Enum variant of generic API integrations. It can be used for all generic API modules
+    /// at the same time, for this only requirement is the module should be implemented as
+    /// a [`GenericIntegrationModule`]
     GenericIntegrationModule(GenericIntegrationModule),
-    // Also another generic variant for search engines, It can be used for all generic search
-    // engine modules at the same time. Just modules should be implemented as
-    // a GenericSearchEngineModule
+    /// Also another generic variant for search engines, It can be used for all generic search
+    /// engine modules at the same time. Just modules should be implemented as
+    /// a [`GenericSearchEngineModule`]
     GenericSearchEngineModule(GenericSearchEngineModule),
-    // Non-generic `ExampleModule` module variant
+    /// Non-generic `ExampleModule` module variant
     ExampleModule(ExampleModule), // Add this line
 }
 ```
@@ -104,6 +102,7 @@ impl ExampleModule {
 The only thing left to do is add our module to the in-memory cache as a `SubscanModule` so that the [CacheManager](https://docs.rs/subscan/latest/subscan/cache/struct.CacheManager.html) component can use it. To do this, let's add our module to the in-memory cache called `MODULE_CACHE` in [`cache.rs`](https://docs.rs/subscan/latest/subscan/cache/index.html) file
 
 ```rust,ignore
+/// All `Subscan` modules are stores in-memory [`Vec`] as a [`SubscanModule`](crate::types::core::SubscanModule)
 static MODULE_CACHE: LazyLock<Vec<SubscanModule>> = LazyLock::new(|| {
     vec![
         // Search engines
@@ -113,6 +112,7 @@ static MODULE_CACHE: LazyLock<Vec<SubscanModule>> = LazyLock::new(|| {
         SubscanModule::from(yahoo::Yahoo::dispatcher()),
         // Integrations
         SubscanModule::from(alienvault::AlienVault::dispatcher()),
+        SubscanModule::from(example::ExampleModule::dispatcher()), // Add this line
     ]
 });
 ```

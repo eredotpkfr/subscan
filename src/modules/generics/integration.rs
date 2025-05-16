@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use async_trait::async_trait;
+use flume::Sender;
 use reqwest::{
     header::{HeaderName, HeaderValue},
     Url,
@@ -11,16 +12,18 @@ use crate::{
     enums::{
         auth::AuthenticationMethod,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher},
+        result::OptionalSubscanModuleResult,
     },
+    error::SubscanError,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
         requester::RequesterInterface,
     },
     types::{
-        core::{Result, SubscanModuleCoreComponents},
+        core::SubscanModuleCoreComponents,
         env::{Credentials, Env},
         func::GenericIntegrationCoreFuncs,
-        result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
+        result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Finished},
     },
     utilities::http,
 };
@@ -112,37 +115,48 @@ impl SubscanModuleInterface for GenericIntegrationModule {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
-        let mut url: Url = (self.funcs.url)(domain).parse()?;
+    async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>) {
+        let url = (self.funcs.url)(domain).parse();
 
-        if self.auth.is_set() && !self.authenticate(&mut url).await {
-            return Err(AuthenticationNotProvided.into());
-        }
+        match url.clone().map_err(SubscanError::from) {
+            Ok(mut url) => {
+                if self.auth.is_set() && !self.authenticate(&mut url).await {
+                    results.send(self.status(AuthenticationNotProvided.into()).await).unwrap();
+                } else {
+                    let requester = self.components.requester.lock().await;
+                    let extractor = &self.components.extractor;
 
-        let requester = self.components.requester.lock().await;
-        let extractor = &self.components.extractor;
+                    loop {
+                        let content = requester.get_content(url.clone()).await;
 
-        loop {
-            let content = requester
-                .get_content(url.clone())
-                .await
-                .map_err(result.graceful_exit().await)?;
+                        match content {
+                            Ok(content) => match extractor.extract(content.clone(), domain).await {
+                                Ok(subdomains) => {
+                                    for subdomain in &subdomains {
+                                        results.send(self.item(subdomain).await).unwrap();
+                                    }
 
-            let subdomains = extractor
-                .extract(content.clone(), domain)
-                .await
-                .map_err(result.graceful_exit().await)?;
-
-            result.extend(subdomains);
-
-            if let Some(next) = (self.funcs.next)(url, content) {
-                url = next;
-            } else {
-                break;
+                                    if let Some(next) = (self.funcs.next)(url, content) {
+                                        url = next;
+                                    } else {
+                                        results.send(self.status(Finished).await).unwrap();
+                                        break;
+                                    }
+                                }
+                                Err(err) => {
+                                    results.send(self.status(err.into()).await).unwrap();
+                                    break;
+                                }
+                            },
+                            Err(err) => {
+                                results.send(self.status(err.into()).await).unwrap();
+                                break;
+                            }
+                        }
+                    }
+                }
             }
-        }
-
-        Ok(result.with_finished().await)
+            Err(err) => results.send(self.status(err.into()).await).unwrap(),
+        };
     }
 }

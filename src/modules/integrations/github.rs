@@ -1,6 +1,7 @@
 use std::collections::BTreeSet;
 
 use async_trait::async_trait;
+use flume::Sender;
 use reqwest::{
     header::{HeaderValue, AUTHORIZATION},
     Url,
@@ -12,8 +13,8 @@ use crate::{
     enums::{
         content::Content,
         dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        result::OptionalSubscanModuleResult,
     },
-    error::ModuleErrorKind::Custom,
     extractors::regex::RegexExtractor,
     interfaces::{
         extractor::SubdomainExtractorInterface, module::SubscanModuleInterface,
@@ -21,8 +22,8 @@ use crate::{
     },
     requesters::client::HTTPClient,
     types::{
-        core::{Result, SubscanModuleCoreComponents},
-        result::{module::SubscanModuleResult, status::SkipReason::AuthenticationNotProvided},
+        core::SubscanModuleCoreComponents,
+        result::status::{SkipReason::AuthenticationNotProvided, SubscanModuleStatus::Finished},
     },
 };
 
@@ -103,39 +104,51 @@ impl SubscanModuleInterface for GitHub {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
-        let mut result: SubscanModuleResult = self.name().await.into();
-
+    async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>) {
         let envs = self.envs().await;
 
-        if let Some(apikey) = envs.apikey.value {
-            let mut url = self.url.clone();
-            let query = format!("per_page=100&q={domain}&sort=created&order=asc");
+        match envs.apikey.value {
+            Some(apikey) => {
+                let mut url = self.url.clone();
+                let query = format!("per_page=100&q={domain}&sort=created&order=asc");
 
-            let requester = &mut self.requester().await.unwrap().lock().await;
-            let extractor = self.extractor().await.unwrap();
+                let requester = &mut self.requester().await.unwrap().lock().await;
+                let extractor = self.extractor().await.unwrap();
 
-            let rconfig = requester.config().await;
-            let auth = HeaderValue::from_str(&format!("token {apikey}"));
+                let rconfig = requester.config().await;
+                let auth = HeaderValue::from_str(&format!("token {apikey}"));
 
-            rconfig.add_header(AUTHORIZATION, auth.unwrap());
-            url.set_query(Some(&query));
+                rconfig.add_header(AUTHORIZATION, auth.unwrap());
+                url.set_query(Some(&query));
 
-            let content = requester.get_content(url).await?;
+                let content = requester.get_content(url).await;
 
-            if let Some(raws) = self.get_html_urls(content).await {
-                for raw_url in raws {
-                    let raw_content = requester.get_content(raw_url.clone()).await?;
+                match content {
+                    Ok(content) => match self.get_html_urls(content).await {
+                        Some(raws) => {
+                            for raw_url in raws {
+                                let raw_content = requester
+                                    .get_content(raw_url.clone())
+                                    .await
+                                    .unwrap_or_default();
 
-                    result.extend(extractor.extract(raw_content, domain).await?);
+                                let subdomains = extractor
+                                    .extract(raw_content, domain)
+                                    .await
+                                    .unwrap_or_default();
+
+                                for subdomain in &subdomains {
+                                    results.send(self.item(subdomain).await).unwrap();
+                                }
+                            }
+                            results.send(self.status(Finished).await).unwrap();
+                        }
+                        None => results.send(self.error("not get raw URLs").await).unwrap(),
+                    },
+                    Err(err) => results.send(self.status(err.into()).await).unwrap(),
                 }
-
-                return Ok(result.with_finished().await);
             }
-
-            return Err(Custom("not get raw URLs".into()).into());
+            None => results.send(self.status(AuthenticationNotProvided.into()).await).unwrap(),
         }
-
-        Err(AuthenticationNotProvided.into())
     }
 }

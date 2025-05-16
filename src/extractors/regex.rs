@@ -71,13 +71,17 @@ impl SubdomainExtractorInterface for RegexExtractor {
     ///     let content = Content::from("bar.foo.com\nbaz.foo.com");
     ///
     ///     let extractor = RegexExtractor::default();
-    ///     let result = extractor.extract(content, "foo.com").await.unwrap();
+    ///     let result = extractor.extract(content.clone(), "foo.com").await.unwrap();
     ///
     ///     assert_eq!(result.len(), 2);
     ///     assert_eq!(result, [
     ///         Subdomain::from("bar.foo.com"),
     ///         Subdomain::from("baz.foo.com"),
     ///     ].into());
+    ///
+    ///     let result = extractor.extract(content, "{}}").await;
+    ///
+    ///     assert!(result.is_err());
     /// }
     /// ```
     async fn extract(&self, content: Content, domain: &str) -> Result<BTreeSet<Subdomain>> {

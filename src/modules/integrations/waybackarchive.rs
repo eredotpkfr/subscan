@@ -1,21 +1,23 @@
 use std::io::Error;
 
 use async_trait::async_trait;
+use flume::Sender;
 use futures::TryStreamExt;
-use reqwest::Url;
+use reqwest::{Response, Url};
 use tokio::{io::AsyncBufReadExt, sync::Mutex};
 use tokio_util::io::StreamReader;
 
 use crate::{
-    enums::dispatchers::{
-        RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher,
+    enums::{
+        dispatchers::{RequesterDispatcher, SubdomainExtractorDispatcher, SubscanModuleDispatcher},
+        result::OptionalSubscanModuleResult,
     },
     extractors::regex::RegexExtractor,
     interfaces::{extractor::SubdomainExtractorInterface, module::SubscanModuleInterface},
     requesters::client::HTTPClient,
     types::{
         core::{Result, SubscanModuleCoreComponents},
-        result::module::SubscanModuleResult,
+        result::status::SubscanModuleStatus::Finished,
     },
 };
 
@@ -74,9 +76,8 @@ impl SubscanModuleInterface for WaybackArchive {
         Some(&self.components.extractor)
     }
 
-    async fn run(&mut self, domain: &str) -> Result<SubscanModuleResult> {
+    async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>) {
         let mut url = self.url.clone();
-        let mut result: SubscanModuleResult = self.name().await.into();
 
         let requester = &*self.requester().await.unwrap().lock().await;
         let extractor = self.extractor().await.unwrap();
@@ -86,28 +87,43 @@ impl SubscanModuleInterface for WaybackArchive {
 
             url.set_query(Some(&query));
 
-            let request = requester
+            let rbuilder = requester
                 .client
                 .get(url)
                 .timeout(requester.config.timeout)
-                .headers(requester.config.headers.clone())
-                .build()?;
+                .headers(requester.config.headers.clone());
 
-            let response = requester.client.execute(request).await?;
+            if let Ok(request) = rbuilder.build() {
+                let response: Result<Response> =
+                    requester.client.execute(request).await.map_err(|err| err.into());
 
-            let stream = response.bytes_stream().map_err(Error::other);
-            let reader = StreamReader::new(stream);
-            let mut lines = reader.lines();
+                match response {
+                    Ok(response) => {
+                        let stream = response.bytes_stream().map_err(Error::other);
+                        let reader = StreamReader::new(stream);
+                        let mut lines = reader.lines();
 
-            while let Ok(next_line) = lines.next_line().await {
-                if let Some(line) = next_line {
-                    result.extend(extractor.extract(line.into(), domain).await?);
-                } else {
-                    break;
-                }
+                        while let Ok(next_line) = lines.next_line().await {
+                            if let Some(line) = next_line {
+                                let subdomains = extractor
+                                    .extract(line.into(), domain)
+                                    .await
+                                    .unwrap_or_default();
+
+                                for subdomain in &subdomains {
+                                    results.send(self.item(subdomain).await).unwrap();
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+                        results.send(self.status(Finished).await).unwrap();
+                    }
+                    Err(err) => results.send(self.status(err.into()).await).unwrap(),
+                };
             }
+        } else {
+            results.send(self.error("misconfigured requester").await).unwrap();
         }
-
-        Ok(result.with_finished().await)
     }
 }

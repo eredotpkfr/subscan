@@ -13,21 +13,28 @@ This chapter provides step-by-step guidance on how to integrate `Subscan` into y
 2. Create a new instance and start to use it
 
    ```rust,ignore
-   #[tokio::main]
-   async fn main() {
-       // set module conccurrency to 1
-       // set HTTP timeout to 120
-       let config = SubscanConfig {
-           concurrency: 1,
-           timeout: 120,
-           ..Default::default()
-       };
+    #[tokio::main]
+    async fn main() {
+        // set module conccurrency to 1
+        // set HTTP timeout to 120
+        let config = SubscanConfig {
+            concurrency: 1,
+            filter: CacheFilter::FilterByName(ModuleNameFilter {
+                modules: vec!["alienvault".into()],
+                skips: vec![],
+            }),
+            requester: RequesterConfig {
+                timeout: Duration::from_secs(120),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
 
-       let subscan = Subscan::from(config);
-       let result = subscan.scan("example.com").await;
+        let subscan = Subscan::from(config);
+        let result = subscan.scan("domain.com").await;
 
-       for item in result.items {
-           // do something with item
-       }
-   }
+        for item in result.items {
+            // do something with item
+        }
+    }
    ```

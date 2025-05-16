@@ -1,20 +1,25 @@
-use std::{net::SocketAddr, str::FromStr};
+use std::{
+    collections::BTreeSet,
+    net::{SocketAddr, SocketAddrV4},
+    str::FromStr,
+};
 
 use hickory_client::proto::xfer::Protocol;
 use hickory_resolver::config::NameServerConfig;
 use subscan::{
-    enums::dispatchers::SubscanModuleDispatcher, error::ModuleErrorKind::Custom,
-    interfaces::module::SubscanModuleInterface, modules::zonetransfer::ZoneTransfer,
+    enums::dispatchers::SubscanModuleDispatcher, modules::zonetransfer::ZoneTransfer,
+    types::result::status::SubscanModuleStatus,
 };
 
 use crate::common::{
     constants::{LOCAL_HOST, TEST_BAR_SUBDOMAIN, TEST_DOMAIN},
-    mock::funcs::spawn_mock_dns_server,
+    mock::funcs,
+    utils,
 };
 
 #[tokio::test]
 async fn get_tcp_client_test() {
-    let server = spawn_mock_dns_server().await;
+    let server = funcs::spawn_mock_dns_server().await;
     let zonetransfer = ZoneTransfer::dispatcher();
 
     if let SubscanModuleDispatcher::ZoneTransfer(zonetransfer) = zonetransfer {
@@ -34,7 +39,7 @@ async fn get_tcp_client_fail_test() {
 
 #[tokio::test]
 async fn get_ns_as_ip_test() {
-    let server = spawn_mock_dns_server().await;
+    let server = funcs::spawn_mock_dns_server().await;
     let zonetransfer = ZoneTransfer::dispatcher();
 
     if let SubscanModuleDispatcher::ZoneTransfer(zonetransfer) = zonetransfer {
@@ -46,42 +51,56 @@ async fn get_ns_as_ip_test() {
 
 #[tokio::test]
 async fn attempt_zone_transfer_test() {
-    let server = spawn_mock_dns_server().await;
+    let server = funcs::spawn_mock_dns_server().await;
     let zonetransfer = ZoneTransfer::dispatcher();
 
     if let SubscanModuleDispatcher::ZoneTransfer(zonetransfer) = zonetransfer {
-        let subs = zonetransfer
-            .attempt_zone_transfer(server.socket, TEST_DOMAIN)
-            .await;
+        let subs = zonetransfer.attempt_zone_transfer(server.socket, TEST_DOMAIN).await;
 
         assert_eq!(subs.unwrap(), [TEST_BAR_SUBDOMAIN]);
     }
 }
 
 #[tokio::test]
-async fn run_failed_test() {
-    let mut zonetransfer = ZoneTransfer::dispatcher();
-
-    if let SubscanModuleDispatcher::ZoneTransfer(ref mut zonetransfer) = zonetransfer {
-        zonetransfer.ns = None;
-    }
-
-    let result = zonetransfer.run(TEST_DOMAIN).await;
-
-    assert!(result.is_err());
-    assert_eq!(result.err().unwrap(), Custom("no default ns".into()).into());
-}
-
-#[tokio::test]
-async fn run_test() {
-    let server = spawn_mock_dns_server().await;
+async fn run_success_test() {
+    let server = funcs::spawn_mock_dns_server().await;
     let mut zonetransfer = ZoneTransfer::dispatcher();
 
     if let SubscanModuleDispatcher::ZoneTransfer(ref mut zonetransfer) = zonetransfer {
         zonetransfer.ns = Some(NameServerConfig::new(server.socket, Protocol::Tcp));
     }
 
-    let result = zonetransfer.run(TEST_DOMAIN).await.unwrap();
+    let (results, status) = utils::run_module(zonetransfer, TEST_DOMAIN).await;
 
-    assert_eq!(result.subdomains, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(results, [TEST_BAR_SUBDOMAIN.into()].into());
+    assert_eq!(status, SubscanModuleStatus::Finished);
+}
+
+#[tokio::test]
+async fn run_no_default_ns_test() {
+    let mut zonetransfer = ZoneTransfer::dispatcher();
+
+    if let SubscanModuleDispatcher::ZoneTransfer(ref mut zonetransfer) = zonetransfer {
+        zonetransfer.ns = None;
+    }
+
+    let (results, status) = utils::run_module(zonetransfer, TEST_DOMAIN).await;
+
+    assert_eq!(results, BTreeSet::new());
+    assert_eq!(status, "no default ns".into())
+}
+
+#[tokio::test]
+async fn run_failed_test() {
+    let mut zonetransfer = ZoneTransfer::dispatcher();
+    let socketaddr = SocketAddr::V4(SocketAddrV4::from_str("0.0.0.0:0").unwrap());
+
+    if let SubscanModuleDispatcher::ZoneTransfer(ref mut zonetransfer) = zonetransfer {
+        zonetransfer.ns = Some(NameServerConfig::new(socketaddr, Protocol::Tcp));
+    }
+
+    let (results, status) = utils::run_module(zonetransfer, TEST_DOMAIN).await;
+
+    assert_eq!(results, BTreeSet::new());
+    assert_eq!(status, "connection error".into())
 }

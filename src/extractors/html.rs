@@ -69,9 +69,14 @@ impl SubdomainExtractorInterface for HTMLExtractor {
     ///     let selector = String::from("div > a");
     ///
     ///     let extractor = HTMLExtractor::new(selector, vec![]);
-    ///     let result = extractor.extract(html, "foo.com").await.unwrap();
+    ///     let result = extractor.extract(html.clone(), "foo.com").await.unwrap();
     ///
     ///     assert_eq!(result, [Subdomain::from("bar.foo.com")].into());
+    ///
+    ///     let extractor = HTMLExtractor::new(String::new(), vec![]);
+    ///     let result = extractor.extract(html, "foo.com").await;
+    ///
+    ///     assert!(result.is_err());
     /// }
     /// ```
     async fn extract(&self, content: Content, domain: &str) -> Result<BTreeSet<Subdomain>> {

@@ -18,7 +18,7 @@ pub const DEFAULT_RESOLVER_TIMEOUT: Duration = Duration::from_millis(10);
 pub const DEFAULT_USER_AGENT: &str = "\
     Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) \
     AppleWebKit/537.36 (KHTML, like Gecko) \
-    Chrome/129.0.0.0 Safari/537.36 \
+    Chrome/135.0.0.0 Safari/537.36\
 ";
 /// Asterisk character to indicate all modules
 pub const ASTERISK: &str = "*";

@@ -1,7 +1,11 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use reqwest::Url;
-use subscan::enums::dispatchers::SubscanModuleDispatcher;
+use subscan::{
+    enums::dispatchers::SubscanModuleDispatcher,
+    interfaces::{module::SubscanModuleInterface, requester::RequesterInterface},
+    types::config::requester::RequesterConfig,
+};
 use tokio::sync::Notify;
 
 use super::dns::MockDNSServer;
@@ -27,6 +31,32 @@ pub fn wrap_url_with_mock_func(url: &str) -> Box<dyn Fn(&str) -> String + Sync +
     let url: Url = url.parse().unwrap();
 
     Box::new(move |_| url.to_string().clone())
+}
+
+pub async fn set_requester_timeout(dispatcher: &mut SubscanModuleDispatcher, timeout: Duration) {
+    let rconfig = RequesterConfig {
+        timeout,
+        ..Default::default()
+    };
+
+    match dispatcher {
+        SubscanModuleDispatcher::CommonCrawl(module) => {
+            module.requester().await.unwrap().lock().await.configure(rconfig).await;
+        }
+        SubscanModuleDispatcher::DNSDumpsterCrawler(module) => {
+            module.requester().await.unwrap().lock().await.configure(rconfig).await;
+        }
+        SubscanModuleDispatcher::GitHub(module) => {
+            module.requester().await.unwrap().lock().await.configure(rconfig).await;
+        }
+        SubscanModuleDispatcher::Netlas(module) => {
+            module.requester().await.unwrap().lock().await.configure(rconfig).await;
+        }
+        SubscanModuleDispatcher::WaybackArchive(module) => {
+            module.requester().await.unwrap().lock().await.configure(rconfig).await;
+        }
+        _ => {}
+    }
 }
 
 pub fn wrap_module_url(dispatcher: &mut SubscanModuleDispatcher, url: &str) {
@@ -58,6 +88,7 @@ pub fn wrap_module_name(dispatcher: &mut SubscanModuleDispatcher, name: String) 
             module.name = current_thread_hex()
         }
         SubscanModuleDispatcher::GitHub(module) => module.name = name,
+        SubscanModuleDispatcher::Netlas(module) => module.name = name,
         _ => {}
     }
 }

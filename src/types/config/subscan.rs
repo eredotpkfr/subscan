@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use super::requester::RequesterConfig;
 use crate::{
     cli::{
         commands::{
@@ -10,7 +11,7 @@ use crate::{
         },
         Cli,
     },
-    constants::{DEFAULT_HTTP_TIMEOUT, DEFAULT_MODULE_CONCURRENCY, DEFAULT_USER_AGENT},
+    constants::DEFAULT_MODULE_CONCURRENCY,
     enums::cache::CacheFilter,
     types::config::resolver::ResolverConfig,
 };
@@ -19,11 +20,11 @@ use crate::{
 #[derive(Clone, Debug)]
 pub struct SubscanConfig {
     pub concurrency: u64,
-    pub user_agent: String,
-    pub timeout: u64,
-    pub proxy: Option<String>,
     pub filter: CacheFilter,
+    pub print: bool,
     pub resolver: ResolverConfig,
+    pub requester: RequesterConfig,
+    pub stream: Option<PathBuf>,
     pub wordlist: Option<PathBuf>,
 }
 
@@ -35,22 +36,26 @@ impl Default for SubscanConfig {
     /// ```
     /// use subscan::types::config::subscan::SubscanConfig;
     /// use subscan::constants::{DEFAULT_MODULE_CONCURRENCY, DEFAULT_HTTP_TIMEOUT, DEFAULT_USER_AGENT};
+    /// use reqwest::header::{USER_AGENT, HeaderValue};
     ///
     /// let config = SubscanConfig::default();
     ///
+    /// assert_eq!(
+    ///     config.requester.headers.get(USER_AGENT).unwrap(),
+    ///     HeaderValue::from_static(DEFAULT_USER_AGENT),
+    /// );
     /// assert_eq!(config.concurrency, DEFAULT_MODULE_CONCURRENCY);
-    /// assert_eq!(config.timeout, DEFAULT_HTTP_TIMEOUT.as_secs());
-    /// assert_eq!(config.user_agent, DEFAULT_USER_AGENT);
+    /// assert_eq!(config.requester.timeout, DEFAULT_HTTP_TIMEOUT);
     /// ```
     fn default() -> Self {
         Self {
             concurrency: DEFAULT_MODULE_CONCURRENCY,
-            timeout: DEFAULT_HTTP_TIMEOUT.as_secs(),
-            user_agent: DEFAULT_USER_AGENT.into(),
             filter: CacheFilter::default(),
+            print: false,
             resolver: ResolverConfig::default(),
+            requester: RequesterConfig::default(),
+            stream: None,
             wordlist: None,
-            proxy: None,
         }
     }
 }
@@ -71,13 +76,13 @@ impl From<ModuleRunSubCommandArgs> for SubscanConfig {
     /// };
     /// let config = SubscanConfig::from(args.clone());
     ///
-    /// assert_eq!(config.timeout, args.http_timeout);
+    /// assert_eq!(config.requester.timeout.as_secs(), args.http_timeout);
     /// ```
     fn from(args: ModuleRunSubCommandArgs) -> Self {
         Self {
-            user_agent: args.clone().user_agent,
-            timeout: args.http_timeout,
-            proxy: args.clone().proxy,
+            concurrency: 1,
+            print: args.print,
+            requester: args.clone().into(),
             resolver: args.into(),
             ..Default::default()
         }
@@ -99,16 +104,15 @@ impl From<ScanCommandArgs> for SubscanConfig {
     /// };
     /// let config = SubscanConfig::from(args.clone());
     ///
-    /// assert_eq!(config.timeout, args.http_timeout);
+    /// assert_eq!(config.requester.timeout.as_secs(), args.http_timeout);
     /// ```
     fn from(args: ScanCommandArgs) -> Self {
         Self {
-            user_agent: args.clone().user_agent,
-            timeout: args.http_timeout,
-            proxy: args.clone().proxy,
             concurrency: args.module_concurrency,
             filter: args.filter(),
-            resolver: args.into(),
+            print: args.print,
+            resolver: args.clone().into(),
+            requester: args.into(),
             ..Default::default()
         }
     }
@@ -136,8 +140,10 @@ impl From<BruteCommandArgs> for SubscanConfig {
     /// ```
     fn from(args: BruteCommandArgs) -> Self {
         Self {
-            wordlist: Some(args.clone().wordlist),
-            resolver: args.into(),
+            print: args.print,
+            resolver: args.clone().into(),
+            stream: args.stream_to_txt,
+            wordlist: Some(args.wordlist),
             ..Default::default()
         }
     }
@@ -159,7 +165,7 @@ impl From<Cli> for SubscanConfig {
     /// let cli = Cli::try_parse_from(args).unwrap();
     ///
     /// let config = SubscanConfig::from(cli);
-    /// assert_eq!(config.timeout, 120);
+    /// assert_eq!(config.requester.timeout.as_secs(), 120);
     ///
     /// // Brute command
     /// let args = vec![
@@ -179,14 +185,18 @@ impl From<Cli> for SubscanConfig {
     /// let cli = Cli::try_parse_from(args).unwrap();
     ///
     /// let config = SubscanConfig::from(cli);
-    /// assert_eq!(config.timeout, DEFAULT_HTTP_TIMEOUT.as_secs());
+    /// assert_eq!(config.requester.timeout, DEFAULT_HTTP_TIMEOUT);
     ///
     /// // Module get command
     /// let args = vec!["subscan", "module", "get", "foo"];
     /// let cli = Cli::try_parse_from(args).unwrap();
     ///
+    /// // Module run command
+    /// let args = vec!["subscan", "module", "run", "foo", "-d", "foo.com"];
+    /// let cli = Cli::try_parse_from(args).unwrap();
+    ///
     /// let config = SubscanConfig::from(cli);
-    /// assert_eq!(config.timeout, DEFAULT_HTTP_TIMEOUT.as_secs());
+    /// assert_eq!(config.requester.timeout, DEFAULT_HTTP_TIMEOUT);
     /// ```
     fn from(cli: Cli) -> Self {
         match cli.command {

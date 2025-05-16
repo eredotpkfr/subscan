@@ -130,9 +130,7 @@ impl RequesterInterface for HTTPClient {
         let mut builder = self.client.get(url);
 
         // Set basic configurations
-        builder = builder
-            .timeout(self.config.timeout)
-            .headers(self.config.headers.clone());
+        builder = builder.timeout(self.config.timeout).headers(self.config.headers.clone());
 
         // Set basic HTTP authentication if credentials provided
         if self.config.credentials.is_ok() {
