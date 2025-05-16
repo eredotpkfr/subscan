@@ -185,22 +185,20 @@ impl SubscanModuleInterface for ExampleModule {
         None
     }
 
-    async fn run(&amp;mut self, _domain: &amp;str) -&gt; Result&lt;SubscanModuleResult&gt; {
-        let mut result: SubscanModuleResult = self.name().await.into();
-
+    async fn run(&amp;mut self, _domain: &amp;str, results: Sender&lt;OptionalSubscanModuleResult&gt;) {
         let subdomains = BTreeSet::from_iter([
             Subdomain::from("bar.foo.com"),
             Subdomain::from("baz.foo.com"),
         ]);
 
-        result.extend(subdomains);
-
-        Ok(result.with_finished().await)
+        for subdomain in subdomains {
+            results.send(self.item(&amp;subdomain).await).unwrap()
+        }
     }
 }</code></pre>
 <h2 id="2-define-your-module-as-subscanmodule"><a class="header" href="#2-define-your-module-as-subscanmodule">2. Define Your Module as <code>SubscanModule</code></a></h2>
 <p>To define this module as a <code>SubscanModule</code>, we need to wrap it with a <a href="https://docs.rs/subscan/latest/subscan/enums/dispatchers/enum.SubscanModuleDispatcher.html"><code>SubscanModuleDispatcher</code></a>, as shown in the implementation of the <code>SubscanModule</code> type below</p>
-<pre><code class="language-rust ignore">// `SubscanModule` type wrapper
+<pre><code class="language-rust ignore">/// `SubscanModule` type wrapper
 pub type SubscanModule = Arc&lt;Mutex&lt;SubscanModuleDispatcher&gt;&gt;;
 
 impl From&lt;SubscanModuleDispatcher&gt; for SubscanModule {
@@ -213,15 +211,15 @@ impl From&lt;SubscanModuleDispatcher&gt; for SubscanModule {
 <p>Now, let's add a dispatcher variant for our module. If we are using a generic implementation, we don't need to do this, as a variant has already been created for generic implementations, as shown below</p>
 <pre><code class="language-rust ignore">#[enum_dispatch(SubscanModuleInterface)]
 pub enum SubscanModuleDispatcher {
-    // Enum variant of generic API integrations. It can be used for all generic API modules
-    // at the same time, for this only requirement is the module should be implemented as
-    // a GenericIntegrationModule
+    /// Enum variant of generic API integrations. It can be used for all generic API modules
+    /// at the same time, for this only requirement is the module should be implemented as
+    /// a [`GenericIntegrationModule`]
     GenericIntegrationModule(GenericIntegrationModule),
-    // Also another generic variant for search engines, It can be used for all generic search
-    // engine modules at the same time. Just modules should be implemented as
-    // a GenericSearchEngineModule
+    /// Also another generic variant for search engines, It can be used for all generic search
+    /// engine modules at the same time. Just modules should be implemented as
+    /// a [`GenericSearchEngineModule`]
     GenericSearchEngineModule(GenericSearchEngineModule),
-    // Non-generic `ExampleModule` module variant
+    /// Non-generic `ExampleModule` module variant
     ExampleModule(ExampleModule), // Add this line
 }</code></pre>
 <h3 id="22-implement-the-dispatcher-method-for-your-module"><a class="header" href="#22-implement-the-dispatcher-method-for-your-module">2.2. Implement the <code>dispatcher()</code> Method for Your Module</a></h3>
@@ -237,7 +235,8 @@ pub enum SubscanModuleDispatcher {
 }</code></pre>
 <h2 id="3-add-your-module-to-the-in-memory-cache"><a class="header" href="#3-add-your-module-to-the-in-memory-cache">3. Add Your Module to the In-Memory Cache</a></h2>
 <p>The only thing left to do is add our module to the in-memory cache as a <code>SubscanModule</code> so that the <a href="https://docs.rs/subscan/latest/subscan/cache/struct.CacheManager.html">CacheManager</a> component can use it. To do this, let's add our module to the in-memory cache called <code>MODULE_CACHE</code> in <a href="https://docs.rs/subscan/latest/subscan/cache/index.html"><code>cache.rs</code></a> file</p>
-<pre><code class="language-rust ignore">static MODULE_CACHE: LazyLock&lt;Vec&lt;SubscanModule&gt;&gt; = LazyLock::new(|| {
+<pre><code class="language-rust ignore">/// All `Subscan` modules are stores in-memory [`Vec`] as a [`SubscanModule`](crate::types::core::SubscanModule)
+static MODULE_CACHE: LazyLock&lt;Vec&lt;SubscanModule&gt;&gt; = LazyLock::new(|| {
     vec![
         // Search engines
         SubscanModule::from(bing::Bing::dispatcher()),
@@ -246,6 +245,7 @@ pub enum SubscanModuleDispatcher {
         SubscanModule::from(yahoo::Yahoo::dispatcher()),
         // Integrations
         SubscanModule::from(alienvault::AlienVault::dispatcher()),
+        SubscanModule::from(example::ExampleModule::dispatcher()), // Add this line
     ]
 });</code></pre>
 <h2 id="4-run-your-module"><a class="header" href="#4-run-your-module">4. Run Your Module</a></h2>

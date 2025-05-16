@@ -359,23 +359,30 @@ Options:
 </li>
 <li>
 <p>Create a new instance and start to use it</p>
-<pre><code class="language-rust ignore">#[tokio::main]
-async fn main() {
-    // set module conccurrency to 1
-    // set HTTP timeout to 120
-    let config = SubscanConfig {
-        concurrency: 1,
-        timeout: 120,
-        ..Default::default()
-    };
+<pre><code class="language-rust ignore"> #[tokio::main]
+ async fn main() {
+     // set module conccurrency to 1
+     // set HTTP timeout to 120
+     let config = SubscanConfig {
+         concurrency: 1,
+         filter: CacheFilter::FilterByName(ModuleNameFilter {
+             modules: vec!["alienvault".into()],
+             skips: vec![],
+         }),
+         requester: RequesterConfig {
+             timeout: Duration::from_secs(120),
+             ..Default::default()
+         },
+         ..Default::default()
+     };
 
-    let subscan = Subscan::from(config);
-    let result = subscan.scan("example.com").await;
+     let subscan = Subscan::from(config);
+     let result = subscan.scan("domain.com").await;
 
-    for item in result.items {
-        // do something with item
-    }
-}</code></pre>
+     for item in result.items {
+         // do something with item
+     }
+ }</code></pre>
 </li>
 </ol>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="commands"><a class="header" href="#commands">Commands</a></h1>
@@ -403,6 +410,7 @@ async fn main() {
 <tr><td style="text-align: left"><code>--http-timeout</code></td><td style="text-align: center"><code>-t</code></td><td style="text-align: center">HTTP timeout as seconds</td></tr>
 <tr><td style="text-align: left"><code>--proxy</code></td><td style="text-align: center"><code>-p</code></td><td style="text-align: center">Set HTTP proxy</td></tr>
 <tr><td style="text-align: left"><code>--output</code></td><td style="text-align: center"><code>-o</code></td><td style="text-align: center">Set output format (<code>txt</code>, <code>csv</code>, <code>json</code>, <code>html</code>)</td></tr>
+<tr><td style="text-align: left"><code>--print</code></td><td style="text-align: center"></td><td style="text-align: center">If sets, output will be logged on stdout</td></tr>
 <tr><td style="text-align: left"><code>--module-concurrency</code></td><td style="text-align: center"><code>-c</code></td><td style="text-align: center">Module runner concurrency level</td></tr>
 <tr><td style="text-align: left"><code>--resolver-timeout</code></td><td style="text-align: center"></td><td style="text-align: center">IP resolver timeout</td></tr>
 <tr><td style="text-align: left"><code>--resolver-concurrency</code></td><td style="text-align: center"></td><td style="text-align: center"> IP resolver concurrency level    </td></tr>
@@ -459,7 +467,8 @@ async fn main() {
 <div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: center">Short</th><th style="text-align: center">Description</th></tr></thead><tbody>
 <tr><td style="text-align: left"><code>--domain</code></td><td style="text-align: center"><code>-d</code></td><td style="text-align: center">Target domain to be scanned</td></tr>
 <tr><td style="text-align: left"><code>--wordlist</code></td><td style="text-align: center"><code>-w</code></td><td style="text-align: center">Wordlist file to be used during attack</td></tr>
-<tr><td style="text-align: left"><code>--print</code></td><td style="text-align: center"><code>-p</code></td><td style="text-align: center">If sets, output will be logged on stdout</td></tr>
+<tr><td style="text-align: left"><code>--print</code></td><td style="text-align: center"></td><td style="text-align: center">If sets, output will be logged on stdout</td></tr>
+<tr><td style="text-align: left"><code>--stream-to-txt</code></td><td style="text-align: center"><code>-s</code></td><td style="text-align: center">Optional <code>txt</code> file to create file stream for the subdomains that found. If sets the <code>--output</code> parameter will be disabled</td></tr>
 <tr><td style="text-align: left"><code>--output</code></td><td style="text-align: center"><code>-o</code></td><td style="text-align: center">Set output format (<code>txt</code>, <code>csv</code>, <code>json</code>, <code>html</code>)</td></tr>
 <tr><td style="text-align: left"><code>--resolver-timeout</code></td><td style="text-align: center"></td><td style="text-align: center">IP resolver timeout</td></tr>
 <tr><td style="text-align: left"><code>--resolver-concurrency</code></td><td style="text-align: center"></td><td style="text-align: center"> IP resolver concurrency level    </td></tr>
@@ -522,6 +531,8 @@ async fn main() {
 <h3 id="argument-list-2"><a class="header" href="#argument-list-2">Argument List</a></h3>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: left">Name</th><th style="text-align: center">Short</th><th style="text-align: center">Description</th></tr></thead><tbody>
 <tr><td style="text-align: left"><code>--domain</code></td><td style="text-align: center"><code>-d</code></td><td style="text-align: center">Target domain to be scanned</td></tr>
+<tr><td style="text-align: left"><code>--output</code></td><td style="text-align: center"><code>-o</code></td><td style="text-align: center">Set output format (<code>txt</code>, <code>csv</code>, <code>json</code>, <code>html</code>)</td></tr>
+<tr><td style="text-align: left"><code>--print</code></td><td style="text-align: center"></td><td style="text-align: center">If sets, output will be logged on stdout</td></tr>
 <tr><td style="text-align: left"><code>--user-agent</code></td><td style="text-align: center"><code>-u</code></td><td style="text-align: center">Set a <code>User-Agent</code> header</td></tr>
 <tr><td style="text-align: left"><code>--http-timeout</code></td><td style="text-align: center"><code>-t</code></td><td style="text-align: center">HTTP timeout as seconds</td></tr>
 <tr><td style="text-align: left"><code>--proxy</code></td><td style="text-align: center"><code>-p</code></td><td style="text-align: center">Set HTTP proxy</td></tr>
@@ -775,20 +786,42 @@ impl SubdomainExtractorInterface for CustomExtractor {
 <pre><code class="language-rust ignore">#[async_trait]
 #[enum_dispatch]
 pub trait SubscanModuleInterface: Sync + Send {
-    // Returns module name, name should clarify what does module
+    /// Returns module name, name should clarify what does module
     async fn name(&amp;self) -&gt; &amp;str;
-    // Loads `.env` file and fetches module environment variables with variable name.
-    // If system environment variable set with same name, `.env` file will be overrode
+    /// Loads `.env` file and fetches module environment variables with variable name.
+    /// If system environment variable set with same name, `.env` file will be overrode
+    /// See the [`SubscanModuleEnvs`](crate::types::env::SubscanModuleEnvs) for details
     async fn envs(&amp;self) -&gt; SubscanModuleEnvs {
         self.name().await.into()
     }
-    // Returns module requester address as a mutable reference if available
+    /// Returns module requester address as a mutable reference if available
     async fn requester(&amp;self) -&gt; Option&lt;&amp;Mutex&lt;RequesterDispatcher&gt;&gt;;
-    // Returns module extractor reference if available
+    /// Returns module extractor reference if available
     async fn extractor(&amp;self) -&gt; Option&lt;&amp;SubdomainExtractorDispatcher&gt;;
-    // Just like a `main` method, when the module run this `run` method will be called.
-    // So this method should do everything
-    async fn run(&amp;mut self, domain: &amp;str) -&gt; Result&lt;SubscanModuleResult&gt;;
+    /// Configure module requester instance
+    async fn configure(&amp;self, rconfig: RequesterConfig) {
+        if let Some(requester) = self.requester().await {
+            requester.lock().await.configure(rconfig).await;
+        }
+    }
+    /// Just like a `main` method, when the module run this `run` method will be called.
+    /// So this method should do everything
+    async fn run(&amp;mut self, domain: &amp;str, results: Sender&lt;OptionalSubscanModuleResult&gt;);
+    /// Builds [`OptionalSubscanModuleResult`](crate::enums::result::OptionalSubscanModuleResult)
+    /// with any [`Subdomain`](crate::types::core::Subdomain)
+    async fn item(&amp;self, sub: &amp;Subdomain) -&gt; OptionalSubscanModuleResult {
+        (self.name().await, sub).into()
+    }
+    /// Builds [`OptionalSubscanModuleResult`](crate::enums::result::OptionalSubscanModuleResult)
+    /// with any [`SubscanModuleStatus`](crate::types::result::status::SubscanModuleStatus)
+    async fn status(&amp;self, status: SubscanModuleStatus) -&gt; OptionalSubscanModuleResult {
+        (self.name().await, status).into()
+    }
+    /// Builds [`OptionalSubscanModuleResult`](crate::enums::result::OptionalSubscanModuleResult)
+    /// with custom error message
+    async fn error(&amp;self, msg: &amp;str) -&gt; OptionalSubscanModuleResult {
+        (self.name().await, msg).into()
+    }
 }</code></pre>
 <p>Below is a simple example of a custom module. For more examples, you can check the <a href="https://github.com/eredotpkfr/subscan/tree/main/examples">examples/</a> folder on the project's GitHub page. You can also refer to the source code of predefined requester implementations for a better understanding</p>
 <pre><code class="language-rust ignore">pub struct CustomModule {
@@ -810,17 +843,12 @@ impl SubscanModuleInterface for CustomModule {
         Some(&amp;self.extractor)
     }
 
-    async fn run(&amp;mut self, _domain: &amp;str) -&gt; Result&lt;SubscanModuleResult&gt; {
-        let mut result: SubscanModuleResult = self.name().await.into();
+    async fn run(&amp;mut self, _domain: &amp;str, results: Sender&lt;OptionalSubscanModuleResult&gt;) {
+        let subdomains = BTreeSet::from_iter([Subdomain::from("bar.foo.com")]);
 
-        let subdomains = BTreeSet::from_iter([
-            Subdomain::from("bar.foo.com"),
-            Subdomain::from("baz.foo.com"),
-        ]);
-
-        result.extend(subdomains);
-
-        Ok(result.with_finished().await)
+        for subdomain in &amp;subdomains {
+            results.send((self.name().await, subdomain).into()).unwrap();
+        }
     }
 }</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="generic-modules"><a class="header" href="#generic-modules">Generic Modules</a></h1>
@@ -961,22 +989,20 @@ impl SubscanModuleInterface for ExampleModule {
         None
     }
 
-    async fn run(&amp;mut self, _domain: &amp;str) -&gt; Result&lt;SubscanModuleResult&gt; {
-        let mut result: SubscanModuleResult = self.name().await.into();
-
+    async fn run(&amp;mut self, _domain: &amp;str, results: Sender&lt;OptionalSubscanModuleResult&gt;) {
         let subdomains = BTreeSet::from_iter([
             Subdomain::from("bar.foo.com"),
             Subdomain::from("baz.foo.com"),
         ]);
 
-        result.extend(subdomains);
-
-        Ok(result.with_finished().await)
+        for subdomain in subdomains {
+            results.send(self.item(&amp;subdomain).await).unwrap()
+        }
     }
 }</code></pre>
 <h2 id="2-define-your-module-as-subscanmodule"><a class="header" href="#2-define-your-module-as-subscanmodule">2. Define Your Module as <code>SubscanModule</code></a></h2>
 <p>To define this module as a <code>SubscanModule</code>, we need to wrap it with a <a href="https://docs.rs/subscan/latest/subscan/enums/dispatchers/enum.SubscanModuleDispatcher.html"><code>SubscanModuleDispatcher</code></a>, as shown in the implementation of the <code>SubscanModule</code> type below</p>
-<pre><code class="language-rust ignore">// `SubscanModule` type wrapper
+<pre><code class="language-rust ignore">/// `SubscanModule` type wrapper
 pub type SubscanModule = Arc&lt;Mutex&lt;SubscanModuleDispatcher&gt;&gt;;
 
 impl From&lt;SubscanModuleDispatcher&gt; for SubscanModule {
@@ -989,15 +1015,15 @@ impl From&lt;SubscanModuleDispatcher&gt; for SubscanModule {
 <p>Now, let's add a dispatcher variant for our module. If we are using a generic implementation, we don't need to do this, as a variant has already been created for generic implementations, as shown below</p>
 <pre><code class="language-rust ignore">#[enum_dispatch(SubscanModuleInterface)]
 pub enum SubscanModuleDispatcher {
-    // Enum variant of generic API integrations. It can be used for all generic API modules
-    // at the same time, for this only requirement is the module should be implemented as
-    // a GenericIntegrationModule
+    /// Enum variant of generic API integrations. It can be used for all generic API modules
+    /// at the same time, for this only requirement is the module should be implemented as
+    /// a [`GenericIntegrationModule`]
     GenericIntegrationModule(GenericIntegrationModule),
-    // Also another generic variant for search engines, It can be used for all generic search
-    // engine modules at the same time. Just modules should be implemented as
-    // a GenericSearchEngineModule
+    /// Also another generic variant for search engines, It can be used for all generic search
+    /// engine modules at the same time. Just modules should be implemented as
+    /// a [`GenericSearchEngineModule`]
     GenericSearchEngineModule(GenericSearchEngineModule),
-    // Non-generic `ExampleModule` module variant
+    /// Non-generic `ExampleModule` module variant
     ExampleModule(ExampleModule), // Add this line
 }</code></pre>
 <h3 id="22-implement-the-dispatcher-method-for-your-module"><a class="header" href="#22-implement-the-dispatcher-method-for-your-module">2.2. Implement the <code>dispatcher()</code> Method for Your Module</a></h3>
@@ -1013,7 +1039,8 @@ pub enum SubscanModuleDispatcher {
 }</code></pre>
 <h2 id="3-add-your-module-to-the-in-memory-cache"><a class="header" href="#3-add-your-module-to-the-in-memory-cache">3. Add Your Module to the In-Memory Cache</a></h2>
 <p>The only thing left to do is add our module to the in-memory cache as a <code>SubscanModule</code> so that the <a href="https://docs.rs/subscan/latest/subscan/cache/struct.CacheManager.html">CacheManager</a> component can use it. To do this, let's add our module to the in-memory cache called <code>MODULE_CACHE</code> in <a href="https://docs.rs/subscan/latest/subscan/cache/index.html"><code>cache.rs</code></a> file</p>
-<pre><code class="language-rust ignore">static MODULE_CACHE: LazyLock&lt;Vec&lt;SubscanModule&gt;&gt; = LazyLock::new(|| {
+<pre><code class="language-rust ignore">/// All `Subscan` modules are stores in-memory [`Vec`] as a [`SubscanModule`](crate::types::core::SubscanModule)
+static MODULE_CACHE: LazyLock&lt;Vec&lt;SubscanModule&gt;&gt; = LazyLock::new(|| {
     vec![
         // Search engines
         SubscanModule::from(bing::Bing::dispatcher()),
@@ -1022,6 +1049,7 @@ pub enum SubscanModuleDispatcher {
         SubscanModule::from(yahoo::Yahoo::dispatcher()),
         // Integrations
         SubscanModule::from(alienvault::AlienVault::dispatcher()),
+        SubscanModule::from(example::ExampleModule::dispatcher()), // Add this line
     ]
 });</code></pre>
 <h2 id="4-run-your-module"><a class="header" href="#4-run-your-module">4. Run Your Module</a></h2>

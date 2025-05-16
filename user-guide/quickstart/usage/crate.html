@@ -169,23 +169,30 @@
 </li>
 <li>
 <p>Create a new instance and start to use it</p>
-<pre><code class="language-rust ignore">#[tokio::main]
-async fn main() {
-    // set module conccurrency to 1
-    // set HTTP timeout to 120
-    let config = SubscanConfig {
-        concurrency: 1,
-        timeout: 120,
-        ..Default::default()
-    };
+<pre><code class="language-rust ignore"> #[tokio::main]
+ async fn main() {
+     // set module conccurrency to 1
+     // set HTTP timeout to 120
+     let config = SubscanConfig {
+         concurrency: 1,
+         filter: CacheFilter::FilterByName(ModuleNameFilter {
+             modules: vec!["alienvault".into()],
+             skips: vec![],
+         }),
+         requester: RequesterConfig {
+             timeout: Duration::from_secs(120),
+             ..Default::default()
+         },
+         ..Default::default()
+     };
 
-    let subscan = Subscan::from(config);
-    let result = subscan.scan("example.com").await;
+     let subscan = Subscan::from(config);
+     let result = subscan.scan("domain.com").await;
 
-    for item in result.items {
-        // do something with item
-    }
-}</code></pre>
+     for item in result.items {
+         // do something with item
+     }
+ }</code></pre>
 </li>
 </ol>
 
