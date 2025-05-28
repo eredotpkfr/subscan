@@ -34,7 +34,7 @@ pub trait SubscanModuleInterface: Sync + Send {
     async fn name(&self) -> &str;
     /// Loads `.env` file and fetches module environment variables with variable name.
     /// If system environment variable set with same name, `.env` file will be overrode
-    /// See the [`SubscanModuleEnvs`](crate::types::env::SubscanModuleEnvs) for details
+    /// See the [`SubscanModuleEnvs`] for details
     async fn envs(&self) -> SubscanModuleEnvs {
         self.name().await.into()
     }
@@ -51,18 +51,15 @@ pub trait SubscanModuleInterface: Sync + Send {
     /// Just like a `main` method, when the module run this `run` method will be called.
     /// So this method should do everything
     async fn run(&mut self, domain: &str, results: Sender<OptionalSubscanModuleResult>);
-    /// Builds [`OptionalSubscanModuleResult`](crate::enums::result::OptionalSubscanModuleResult)
-    /// with any [`Subdomain`](crate::types::core::Subdomain)
+    /// Builds [`OptionalSubscanModuleResult`] with any [`Subdomain`]
     async fn item(&self, sub: &Subdomain) -> OptionalSubscanModuleResult {
         (self.name().await, sub).into()
     }
-    /// Builds [`OptionalSubscanModuleResult`](crate::enums::result::OptionalSubscanModuleResult)
-    /// with any [`SubscanModuleStatus`](crate::types::result::status::SubscanModuleStatus)
+    /// Builds [`OptionalSubscanModuleResult`] with any [`SubscanModuleStatus`]
     async fn status(&self, status: SubscanModuleStatus) -> OptionalSubscanModuleResult {
         (self.name().await, status).into()
     }
-    /// Builds [`OptionalSubscanModuleResult`](crate::enums::result::OptionalSubscanModuleResult)
-    /// with custom error message
+    /// Builds [`OptionalSubscanModuleResult`] with custom error message
     async fn error(&self, msg: &str) -> OptionalSubscanModuleResult {
         (self.name().await, msg).into()
     }
