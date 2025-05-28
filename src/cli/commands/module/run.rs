@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use clap::Args;
 
 use crate::{
@@ -40,4 +42,8 @@ pub struct ModuleRunSubCommandArgs {
     /// Disable IP address resolve process
     #[arg(long = "disable-ip-resolve", default_value_t = false)]
     pub resolver_disabled: bool,
+    /// A text file containing list of resolvers to use for enumeration.
+    /// See `resolverlist.template`
+    #[arg(long, default_value = None)]
+    pub resolver_list: Option<PathBuf>,
 }

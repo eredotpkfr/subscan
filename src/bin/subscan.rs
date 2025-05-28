@@ -1,4 +1,4 @@
-use std::io;
+use std::{io, path::PathBuf, str::FromStr};
 
 use clap::Parser;
 use subscan::{
@@ -6,6 +6,7 @@ use subscan::{
         commands::{module::ModuleSubCommands, Commands},
         Cli,
     },
+    utilities::net::read_resolver_list_file,
     Subscan,
 };
 
@@ -22,6 +23,12 @@ async fn main() {
         Commands::Module(module) => match module.command {
             ModuleSubCommands::List(list) => {
                 list.as_table(subscan.modules().await, out).await;
+
+                for x in read_resolver_list_file(PathBuf::from_str("resolvers.txt").unwrap())
+                    .name_servers()
+                {
+                    println!("{:#?}", x)
+                }
             }
             ModuleSubCommands::Get(get) => {
                 get.as_table(subscan.module(&get.name).await, out).await;

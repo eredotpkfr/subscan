@@ -1,4 +1,10 @@
 use async_trait::async_trait;
+use hickory_client::proto::runtime::TokioRuntimeProvider;
+use hickory_resolver::{
+    name_server::{GenericConnector, TokioConnectionProvider},
+    Resolver as HickoryResolver,
+};
+use tokio::time;
 
 use crate::{
     interfaces::lookup::LookUpHostFuture,
@@ -6,22 +12,37 @@ use crate::{
 };
 
 /// IP address resolver component
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct Resolver {
     pub config: ResolverConfig,
+    pub inner: HickoryResolver<GenericConnector<TokioRuntimeProvider>>,
 }
 
-impl Resolver {
-    pub fn boxed_from(config: ResolverConfig) -> Box<Self> {
-        Box::new(Self { config })
+impl Default for Resolver {
+    fn default() -> Self {
+        let config = ResolverConfig::default();
+        let provider = TokioConnectionProvider::default();
+        let inner = HickoryResolver::builder_with_config(config.clone().inner, provider).build();
+
+        Self { inner, config }
     }
 }
 
 impl From<ResolverConfig> for Resolver {
-    fn from(rconfig: ResolverConfig) -> Self {
-        Self {
-            config: rconfig.clone(),
-        }
+    fn from(config: ResolverConfig) -> Self {
+        let provider = TokioConnectionProvider::default();
+        let inner = HickoryResolver::builder_with_config(config.clone().inner, provider).build();
+
+        Self { inner, config }
+    }
+}
+
+impl Resolver {
+    pub fn boxed_from(config: ResolverConfig) -> Box<Self> {
+        let provider = TokioConnectionProvider::default();
+        let inner = HickoryResolver::builder_with_config(config.clone().inner, provider).build();
+
+        Box::new(Self { inner, config })
     }
 }
 
@@ -31,7 +52,27 @@ impl LookUpHostFuture for Resolver {
     /// [`disabled`](crate::types::config::resolver::ResolverConfig::disabled)
     /// option sets to [`true`] returns a future object that returns [`None`]
     async fn lookup_host_future(&self) -> AsyncIPResolveFunc {
-        self.config.lookup_host_future().await
+        if !self.config.disabled {
+            let timeout = self.config.timeout.clone();
+            let inner = self.inner.clone();
+
+            Box::new(move |domain: String| {
+                let resolver = inner.clone();
+
+                Box::pin({
+                    async move {
+                        time::timeout(timeout, resolver.lookup_ip(&domain))
+                            .await
+                            .ok()?
+                            .ok()?
+                            .iter()
+                            .next()
+                    }
+                })
+            })
+        } else {
+            Box::new(|_: String| Box::pin(async move { None }))
+        }
     }
 
     /// Returns resolver config

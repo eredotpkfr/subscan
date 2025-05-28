@@ -912,18 +912,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dns-lookup"
-version = "2.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5766087c2235fec47fafa4cfecc81e494ee679d0fd4a59887ea0919bfb0e4fc"
-dependencies = [
- "cfg-if",
- "libc",
- "socket2",
- "windows-sys 0.48.0",
-]
-
-[[package]]
 name = "dotenvy"
 version = "0.15.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1548,6 +1536,7 @@ dependencies = [
  "resolv-conf",
  "smallvec",
  "thiserror 2.0.12",
+ "tokio",
  "tracing",
 ]
 
@@ -3593,7 +3582,6 @@ dependencies = [
  "colored 3.0.0",
  "csv",
  "derive_more 2.0.1",
- "dns-lookup",
  "dotenvy",
  "enum_dispatch",
  "env_logger",
