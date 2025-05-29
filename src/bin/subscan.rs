@@ -27,7 +27,7 @@ async fn main() {
                 for x in read_resolver_list_file(PathBuf::from_str("resolvers.txt").unwrap())
                     .name_servers()
                 {
-                    println!("{:#?}", x)
+                    println!("{x:#?}")
                 }
             }
             ModuleSubCommands::Get(get) => {

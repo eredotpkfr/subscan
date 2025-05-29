@@ -53,7 +53,7 @@ impl LookUpHostFuture for Resolver {
     /// option sets to [`true`] returns a future object that returns [`None`]
     async fn lookup_host_future(&self) -> AsyncIPResolveFunc {
         if !self.config.disabled {
-            let timeout = self.config.timeout.clone();
+            let timeout = self.config.timeout;
             let inner = self.inner.clone();
 
             Box::new(move |domain: String| {

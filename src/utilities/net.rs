@@ -42,8 +42,8 @@ pub fn get_default_ns() -> Option<NameServerConfig> {
 }
 
 pub fn read_resolver_list_file(path: PathBuf) -> HickoryResolverConfig {
-    let ipv4_pattern = Regex::new(&format!("{}:{}$", RL_IPV4_PATTERN, RL_PORT_PATTERN)).unwrap();
-    let ipv6_pattern = Regex::new(&format!("{}:{}$", RL_IPV6_PATTERN, RL_PORT_PATTERN)).unwrap();
+    let ipv4_pattern = Regex::new(&format!("{RL_IPV4_PATTERN}:{RL_PORT_PATTERN}$")).unwrap();
+    let ipv6_pattern = Regex::new(&format!("{RL_IPV6_PATTERN}:{RL_PORT_PATTERN}$")).unwrap();
 
     let content = read_to_string(path).expect(RESOLVER_LIST_FILE_READ_ERR_MSG);
     let mut config = HickoryResolverConfig::new();
