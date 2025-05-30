@@ -22,7 +22,7 @@ pub struct ResolverConfig {
 impl Default for ResolverConfig {
     fn default() -> Self {
         Self {
-            inner: HickoryResolverConfig::cloudflare(),
+            inner: net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
             timeout: DEFAULT_RESOLVER_TIMEOUT,
             concurrency: DEFAULT_RESOLVER_CONCURRENCY,
             disabled: false,
@@ -50,9 +50,10 @@ impl From<ModuleRunSubCommandArgs> for ResolverConfig {
     /// ```
     fn from(args: ModuleRunSubCommandArgs) -> Self {
         Self {
-            inner: args.resolver_list.map_or(HickoryResolverConfig::cloudflare(), |path| {
-                net::read_resolver_list_file(path)
-            }),
+            inner: args.resolver_list.map_or(
+                net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
+                |path| net::read_resolver_list_file(path),
+            ),
             timeout: Duration::from_millis(args.resolver_timeout),
             concurrency: args.resolver_concurrency,
             disabled: args.resolver_disabled,
@@ -80,9 +81,10 @@ impl From<BruteCommandArgs> for ResolverConfig {
     /// ```
     fn from(args: BruteCommandArgs) -> Self {
         Self {
-            inner: args.resolver_list.map_or(HickoryResolverConfig::cloudflare(), |path| {
-                net::read_resolver_list_file(path)
-            }),
+            inner: args.resolver_list.map_or(
+                net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
+                |path| net::read_resolver_list_file(path),
+            ),
             timeout: Duration::from_millis(args.resolver_timeout),
             concurrency: args.resolver_concurrency,
             disabled: false,
@@ -110,9 +112,10 @@ impl From<ScanCommandArgs> for ResolverConfig {
     /// ```
     fn from(args: ScanCommandArgs) -> Self {
         Self {
-            inner: args.resolver_list.map_or(HickoryResolverConfig::cloudflare(), |path| {
-                net::read_resolver_list_file(path)
-            }),
+            inner: args.resolver_list.map_or(
+                net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
+                |path| net::read_resolver_list_file(path),
+            ),
             timeout: Duration::from_millis(args.resolver_timeout),
             concurrency: args.resolver_concurrency,
             disabled: args.resolver_disabled,

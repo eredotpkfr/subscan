@@ -8,7 +8,7 @@ use std::{
 use hickory_client::proto::xfer::Protocol::Tcp;
 use hickory_resolver::{
     config::{NameServerConfig, NameServerConfigGroup, ResolverConfig as HickoryResolverConfig},
-    system_conf,
+    system_conf, ResolveError,
 };
 use regex::Regex;
 
@@ -29,16 +29,27 @@ const RESOLVER_LIST_FILE_READ_ERR_MSG: &str = "Cannot read resolver list file!";
 /// ```
 pub fn get_default_ns() -> Option<NameServerConfig> {
     let tcp = |ns: &&NameServerConfig| ns.protocol == Tcp;
+    let default = NameServerConfigGroup::cloudflare().iter().find(tcp).cloned();
 
-    if let Ok((config, _)) = system_conf::read_system_conf() {
-        let sys_ns = config.name_servers();
-
-        if !sys_ns.is_empty() {
-            return sys_ns.iter().find(tcp).cloned();
-        }
+    if let Ok(config) = read_system_ns_conf() {
+        config.name_servers().iter().find(tcp).or(default.as_ref()).cloned()
+    } else {
+        default
     }
+}
 
-    NameServerConfigGroup::cloudflare().iter().find(tcp).cloned()
+/// Try to read system name server configurations, mostly /etc/resolv.conf
+/// file on linux like systems
+///
+/// # Examples
+///
+/// ```no_run
+/// use subscan::utilities::net::read_system_ns_conf;
+///
+/// assert!(read_system_ns_conf().is_ok());
+/// ```
+pub fn read_system_ns_conf() -> Result<HickoryResolverConfig, ResolveError> {
+    Ok(system_conf::read_system_conf()?.0)
 }
 
 pub fn read_resolver_list_file(path: PathBuf) -> HickoryResolverConfig {

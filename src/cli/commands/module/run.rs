@@ -39,11 +39,11 @@ pub struct ModuleRunSubCommandArgs {
     /// IP resolver concurrency level, thread counts of resolver instances
     #[arg(long, default_value_t = DEFAULT_RESOLVER_CONCURRENCY)]
     pub resolver_concurrency: u64,
-    /// Disable IP address resolve process
-    #[arg(long = "disable-ip-resolve", default_value_t = false)]
-    pub resolver_disabled: bool,
     /// A text file containing list of resolvers to use for enumeration.
     /// See `resolverlist.template`
     #[arg(long, default_value = None)]
     pub resolver_list: Option<PathBuf>,
+    /// Disable IP address resolve process
+    #[arg(long = "disable-ip-resolve", default_value_t = false)]
+    pub resolver_disabled: bool,
 }

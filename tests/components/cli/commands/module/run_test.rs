@@ -1,3 +1,5 @@
+use std::{path::PathBuf, str::FromStr};
+
 use clap::Parser;
 use subscan::{
     cli::Cli,
@@ -54,6 +56,7 @@ async fn module_run_args_test() {
         "--disable-ip-resolve",
         "--resolver-concurrency", "100",
         "--resolver-timeout", "10",
+        "--resolver-list", "resolverlist.txt",
     ];
 
     let cli = Cli::try_parse_from(args).unwrap();
@@ -70,6 +73,10 @@ async fn module_run_args_test() {
                 assert_eq!(args.http_timeout, 120);
                 assert_eq!(args.resolver_concurrency, 100);
                 assert_eq!(args.resolver_timeout, 10);
+                assert_eq!(
+                    args.resolver_list,
+                    Some(PathBuf::from_str("resolverlist.txt").unwrap())
+                )
             }
             _ => panic!("Expected ModuleSubCommands::Run"),
         },
