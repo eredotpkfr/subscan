@@ -52,7 +52,7 @@ impl From<ModuleRunSubCommandArgs> for ResolverConfig {
         Self {
             inner: args.resolver_list.map_or(
                 net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
-                |path| net::read_resolver_list_file(path),
+                net::read_resolver_list_file,
             ),
             timeout: Duration::from_millis(args.resolver_timeout),
             concurrency: args.resolver_concurrency,
@@ -83,7 +83,7 @@ impl From<BruteCommandArgs> for ResolverConfig {
         Self {
             inner: args.resolver_list.map_or(
                 net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
-                |path| net::read_resolver_list_file(path),
+                net::read_resolver_list_file,
             ),
             timeout: Duration::from_millis(args.resolver_timeout),
             concurrency: args.resolver_concurrency,
@@ -114,7 +114,7 @@ impl From<ScanCommandArgs> for ResolverConfig {
         Self {
             inner: args.resolver_list.map_or(
                 net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
-                |path| net::read_resolver_list_file(path),
+                net::read_resolver_list_file,
             ),
             timeout: Duration::from_millis(args.resolver_timeout),
             concurrency: args.resolver_concurrency,
