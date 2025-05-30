@@ -1,66 +1,28 @@
 use std::time::Duration;
 
-use tokio::time::timeout;
+use hickory_resolver::config::ResolverConfig as HickoryResolverConfig;
 
 use crate::{
     cli::commands::{
         brute::BruteCommandArgs, module::run::ModuleRunSubCommandArgs, scan::ScanCommandArgs,
     },
     constants::{DEFAULT_RESOLVER_CONCURRENCY, DEFAULT_RESOLVER_TIMEOUT},
-    types::func::AsyncIPResolveFunc,
-    utilities::net::lookup_host,
+    utilities::net,
 };
 
 /// IP address resolver component configurations
 #[derive(Clone, Debug)]
 pub struct ResolverConfig {
-    pub timeout: Duration,
+    pub inner: HickoryResolverConfig,
     pub concurrency: u64,
     pub disabled: bool,
-}
-
-impl ResolverConfig {
-    /// Returns future object that resolves IP address of any domain, if the
-    /// [`disabled`](crate::types::config::resolver::ResolverConfig::disabled)
-    /// option sets to [`true`] returns a future object that returns [`None`]
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use subscan::types::config::resolver::ResolverConfig;
-    /// use subscan::resolver::Resolver;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let mut config = ResolverConfig::default();
-    ///     let lookup_ip = config.lookup_host_future().await;
-    ///
-    ///     config.disabled = true;
-    ///
-    ///     let lookup_ip = config.lookup_host_future().await;
-    ///     let resolver = Resolver::from(config.clone());
-    ///
-    ///     assert!(lookup_ip("foo.com".into()).await.is_none());
-    /// }
-    /// ```
-    pub async fn lookup_host_future(&self) -> AsyncIPResolveFunc {
-        let config = self.clone();
-
-        if self.disabled {
-            Box::new(|_: String| Box::pin(async move { None }))
-        } else {
-            Box::new(move |domain: String| {
-                Box::pin(async move {
-                    timeout(config.timeout, lookup_host(&domain)).await.unwrap_or(None)
-                })
-            })
-        }
-    }
+    pub timeout: Duration,
 }
 
 impl Default for ResolverConfig {
     fn default() -> Self {
         Self {
+            inner: net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
             timeout: DEFAULT_RESOLVER_TIMEOUT,
             concurrency: DEFAULT_RESOLVER_CONCURRENCY,
             disabled: false,
@@ -88,6 +50,10 @@ impl From<ModuleRunSubCommandArgs> for ResolverConfig {
     /// ```
     fn from(args: ModuleRunSubCommandArgs) -> Self {
         Self {
+            inner: args.resolver_list.map_or(
+                net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
+                net::read_resolver_list_file,
+            ),
             timeout: Duration::from_millis(args.resolver_timeout),
             concurrency: args.resolver_concurrency,
             disabled: args.resolver_disabled,
@@ -115,6 +81,10 @@ impl From<BruteCommandArgs> for ResolverConfig {
     /// ```
     fn from(args: BruteCommandArgs) -> Self {
         Self {
+            inner: args.resolver_list.map_or(
+                net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
+                net::read_resolver_list_file,
+            ),
             timeout: Duration::from_millis(args.resolver_timeout),
             concurrency: args.resolver_concurrency,
             disabled: false,
@@ -142,6 +112,10 @@ impl From<ScanCommandArgs> for ResolverConfig {
     /// ```
     fn from(args: ScanCommandArgs) -> Self {
         Self {
+            inner: args.resolver_list.map_or(
+                net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
+                net::read_resolver_list_file,
+            ),
             timeout: Duration::from_millis(args.resolver_timeout),
             concurrency: args.resolver_concurrency,
             disabled: args.resolver_disabled,
