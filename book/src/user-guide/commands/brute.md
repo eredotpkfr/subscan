@@ -15,6 +15,7 @@ All arguments below can be used with the `brute` command, [see here](#common-use
 | `--output`               | `-o`  | Set output format (`txt`, `csv`, `json`, `html`) |
 | `--resolver-timeout`     |       |               IP resolver timeout                |
 | `--resolver-concurrency` |       |         IP resolver concurrency level            |
+| `--resolver-list`        |       | A text file containing list of resolvers to use for enumeration. See `resolverlist.template` |
 | `--help`                 | `-h`  |                    Print help                    |
 
 ## Common Use Cases
