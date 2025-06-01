@@ -53,7 +53,7 @@ This command runs the specified module and is primarily used to quickly test a n
 | `--proxy`                | `-p`  |           Set HTTP proxy                         |
 | `--resolver-timeout`     |       |        IP resolver timeout                       |
 | `--resolver-concurrency` |       |  IP resolver concurrency level                   |
-| `--resolver-list`        |       | A text file containing list of resolvers to use for enumeration. See `resolverlist.template` |
+| `--resolver-list`        |       | A text file containing list of resolvers. See `resolverlist.template` |
 | `--disable-ip-resolve`   |       | Disable IP address resolve process               |
 | `--help`                 | `-h`  |             Print help                           |
 
