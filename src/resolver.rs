@@ -75,18 +75,18 @@ impl LookUpHostFuture for Resolver {
     /// ```
     /// use subscan::types::config::resolver::ResolverConfig;
     /// use subscan::resolver::Resolver;
+    /// use crate::subscan::interfaces::lookup::LookUpHostFuture;
     ///
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut config = ResolverConfig::default();
-    ///     let lookup_ip = config.lookup_host_future().await;
     ///
     ///     assert!(!config.disabled);
     ///
     ///     config.disabled = true;
     ///
-    ///     let lookup_ip = config.lookup_host_future().await;
     ///     let resolver = Resolver::from(config.clone());
+    ///     let lookup_ip = resolver.lookup_host_future().await;
     ///
     ///     assert!(lookup_ip("foo.com".into()).await.is_none());
     /// }
