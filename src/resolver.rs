@@ -19,6 +19,24 @@ pub struct Resolver {
 }
 
 impl Default for Resolver {
+    /// Create [`Resolver`] with defaults
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::resolver::Resolver;
+    /// use subscan::constants::{
+    ///     DEFAULT_RESOLVER_CONCURRENCY,
+    ///     DEFAULT_RESOLVER_TIMEOUT
+    /// };
+    ///
+    /// let resolver = Resolver::default();
+    ///
+    /// assert!(!resolver.config.disabled);
+    ///
+    /// assert_eq!(resolver.config.timeout, DEFAULT_RESOLVER_TIMEOUT);
+    /// assert_eq!(resolver.config.concurrency, DEFAULT_RESOLVER_CONCURRENCY);
+    /// ```
     fn default() -> Self {
         let config = ResolverConfig::default();
         let provider = TokioConnectionProvider::default();
@@ -51,6 +69,28 @@ impl LookUpHostFuture for Resolver {
     /// Returns future object that resolves IP address of any domain, if the
     /// [`disabled`](crate::types::config::resolver::ResolverConfig::disabled)
     /// option sets to [`true`] returns a future object that returns [`None`]
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use subscan::types::config::resolver::ResolverConfig;
+    /// use subscan::resolver::Resolver;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut config = ResolverConfig::default();
+    ///     let lookup_ip = config.lookup_host_future().await;
+    ///
+    ///     assert!(!config.disabled);
+    ///
+    ///     config.disabled = true;
+    ///
+    ///     let lookup_ip = config.lookup_host_future().await;
+    ///     let resolver = Resolver::from(config.clone());
+    ///
+    ///     assert!(lookup_ip("foo.com".into()).await.is_none());
+    /// }
+    /// ```
     async fn lookup_host_future(&self) -> AsyncIPResolveFunc {
         if !self.config.disabled {
             let timeout = self.config.timeout;
