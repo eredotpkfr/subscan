@@ -40,8 +40,7 @@ pub struct ScanCommandArgs {
     /// IP resolver concurrency level, thread counts of resolver instances
     #[arg(long, default_value_t = DEFAULT_RESOLVER_CONCURRENCY)]
     pub resolver_concurrency: u64,
-    /// A text file containing list of resolvers to use for enumeration.
-    /// See `resolverlist.template`
+    /// A text file containing list of resolvers. See `resolverlist.template`
     #[arg(long, default_value = None)]
     pub resolver_list: Option<PathBuf>,
     /// Disable IP address resolve process

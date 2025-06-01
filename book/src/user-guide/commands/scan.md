@@ -17,7 +17,7 @@ All arguments below can be used with the `scan` command and you can customize a 
 | `--module-concurrency`   | `-c`  |         Module runner concurrency level          |
 | `--resolver-timeout`     |       |               IP resolver timeout                |
 | `--resolver-concurrency` |       |         IP resolver concurrency level            |
-| `--resolver-list`        |       | A text file containing list of resolvers to use for enumeration. See `resolverlist.template` |
+| `--resolver-list`        |       | A text file containing list of resolvers. See `resolverlist.template` |
 | `--disable-ip-resolve`   |       |        Disable IP address resolve process        |
 | `--modules`              | `-m`  |      Comma separated list of modules to run      |
 | `--skips`                | `-s`  |     Comma separated list of modules to skip      |
