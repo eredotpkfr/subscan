@@ -31,11 +31,9 @@ pub fn get_default_ns() -> Option<NameServerConfig> {
     let tcp = |ns: &&NameServerConfig| ns.protocol == Tcp;
     let default = NameServerConfigGroup::cloudflare().iter().find(tcp).cloned();
 
-    if let Ok(config) = read_system_ns_conf() {
-        config.name_servers().iter().find(tcp).or(default.as_ref()).cloned()
-    } else {
-        default
-    }
+    read_system_ns_conf().map_or(default, |config| {
+        config.name_servers().iter().find(tcp).cloned()
+    })
 }
 
 /// Try to read system name server configurations, mostly /etc/resolv.conf
