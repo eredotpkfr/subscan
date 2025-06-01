@@ -20,7 +20,9 @@ async fn main() {
 
     match cli.command {
         Commands::Module(module) => match module.command {
-            ModuleSubCommands::List(list) => list.as_table(subscan.modules().await, out).await,
+            ModuleSubCommands::List(list) => {
+                list.as_table(subscan.modules().await, out).await;
+            }
             ModuleSubCommands::Get(get) => {
                 get.as_table(subscan.module(&get.name).await, out).await;
             }
