@@ -42,12 +42,12 @@ repos:
       - id: cargo-check
 
   - repo: https://github.com/est31/cargo-udeps
-    rev: v0.1.55
+    rev: v0.1.57
     hooks:
     - id: udeps
 
   - repo: https://github.com/EmbarkStudios/cargo-deny
-    rev: 0.18.2
+    rev: 0.18.3
     hooks:
       - id: cargo-deny
         name: cargo-deny
@@ -93,7 +93,7 @@ repos:
         name: hadolint
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.26.0
+    rev: v8.28.0
     hooks:
       - id: gitleaks
         name: gitleaks
