@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
-      - uses: bnjbvr/cargo-machete@v0.8.0
+      - uses: bnjbvr/cargo-machete@v0.9.1
 
   gitleaks-scan:
     permissions:
