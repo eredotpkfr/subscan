@@ -9,6 +9,7 @@ allow = [
     "Apache-2.0",
     "ISC",
     "BSD-3-Clause",
+    "GPL-3.0-only",
 ]
 
 # List of license exceptions
