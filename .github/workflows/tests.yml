@@ -27,7 +27,7 @@ jobs:
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
         with:
-          chrome-version: 120
+          chrome-version: latest
 
       - name: Run nextest
         run: make nextest
