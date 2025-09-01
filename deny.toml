@@ -36,4 +36,5 @@ ignore = [
     { id = "RUSTSEC-2025-0010", reason = "ring 0.16.20 was released over 4 years ago and isn't maintained" },
     { id = "RUSTSEC-2025-0009", reason = "ring::aead::quic::HeaderProtectionKey::new_mask() may panic when overflow checking is enabled" },
     { id = "RUSTSEC-2025-0014", reason = "Latest humantime crates.io release is four years old and GitHub repository has not seen commits in four years" },
+    { id = "RUSTSEC-2025-0052", reason = "unmaintained advisory detected" }
 ]
