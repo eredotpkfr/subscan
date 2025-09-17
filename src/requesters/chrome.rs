@@ -94,9 +94,13 @@ impl ChromeBrowser {
             enable_gpu: false,
             path: Env::from(SUBSCAN_CHROME_PATH_ENV).value.map(|path| path.into()),
             args: vec![
-                OsStr::new("--disable-dev-shm-usage"),
-                OsStr::new("--disable-software-rasterizer"),
                 OsStr::new("--single-process"),
+                OsStr::new("--headless=new"),
+                OsStr::new("--disable-dev-shm-usage"),
+                OsStr::new("--no-sandbox"),
+                OsStr::new("--disable-gpu"),
+                OsStr::new("--disable-software-rasterizer"),
+                OsStr::new("--remote-debugging-port=0"),
             ],
             ..Default::default()
         }
