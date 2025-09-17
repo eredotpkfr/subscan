@@ -95,10 +95,7 @@ impl ChromeBrowser {
             path: Env::from(SUBSCAN_CHROME_PATH_ENV).value.map(|path| path.into()),
             args: vec![
                 OsStr::new("--disable-dev-shm-usage"),
-                OsStr::new("--no-sandbox"),
-                OsStr::new("--remote-debugging-port=0"),
                 OsStr::new("--disable-software-rasterizer"),
-                OsStr::new("--disable-gpu"),
                 OsStr::new("--single-process"),
             ],
             ..Default::default()
