@@ -99,7 +99,7 @@ impl MockDNSHandler {
         let name = Name::from_utf8("ns.foo.com").unwrap();
         let rdata = RData::NS(NS(name));
 
-        let records = vec![Record::from_rdata(
+        let records = [Record::from_rdata(
             request.queries().first().unwrap().name().into(),
             60,
             rdata,
@@ -125,7 +125,7 @@ impl MockDNSHandler {
         let name_one = Name::from_utf8("bar.foo.com").unwrap();
         let name_two = Name::from_utf8("*.foo.com").unwrap();
 
-        let records = vec![
+        let records = [
             Record::from_rdata(name_one, 60, rdata.clone()),
             Record::from_rdata(name_two, 60, rdata),
         ];
@@ -147,7 +147,7 @@ impl MockDNSHandler {
             IpAddr::V6(ipv6) => RData::AAAA(AAAA(ipv6)),
         };
 
-        let records = vec![Record::from_rdata(
+        let records = [Record::from_rdata(
             request.queries().first().unwrap().name().into(),
             60,
             rdata,
