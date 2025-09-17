@@ -88,25 +88,19 @@ impl ChromeBrowser {
     /// }
     /// ```
     pub fn default_options<'a>() -> LaunchOptions<'a> {
-        let mut default_args = vec![
-            OsStr::new("--disable-dev-shm-usage"),
-            OsStr::new("--no-sandbox"),
-            OsStr::new("--disable-gpu"),
-            OsStr::new("--disable-software-rasterizer"),
-            OsStr::new("--remote-debugging-port=0"),
-        ];
-
-        #[cfg(target_os = "linux")]
-        {
-            default_args.push(OsStr::new("--single-process"));
-        }
-
         LaunchOptions {
             headless: true,
             sandbox: false,
             enable_gpu: false,
             path: Env::from(SUBSCAN_CHROME_PATH_ENV).value.map(|path| path.into()),
-            args: default_args,
+            args: vec![
+                OsStr::new("--disable-dev-shm-usage"),
+                OsStr::new("--no-sandbox"),
+                OsStr::new("--remote-debugging-port=0"),
+                OsStr::new("--disable-software-rasterizer"),
+                OsStr::new("--disable-gpu"),
+                OsStr::new("--single-process"),
+            ],
             ..Default::default()
         }
     }
