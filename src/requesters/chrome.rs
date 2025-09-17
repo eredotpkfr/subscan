@@ -96,7 +96,7 @@ impl ChromeBrowser {
             args: vec![
                 OsStr::new("--disable-dev-shm-usage"),
                 OsStr::new("--disable-software-rasterizer"),
-                OsStr::new("--single-process"),
+                // OsStr::new("--single-process"),
             ],
             ..Default::default()
         }
