@@ -10,7 +10,7 @@ allow = [
     "ISC",
     "BSD-3-Clause",
     "GPL-3.0-only",
-    "GPL-3.0",
+    "GPL-3.0"
 ]
 
 # List of license exceptions
