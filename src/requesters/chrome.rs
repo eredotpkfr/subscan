@@ -88,7 +88,7 @@ impl ChromeBrowser {
     /// }
     /// ```
     pub fn default_options<'a>() -> LaunchOptions<'a> {
-        let default_args = vec![
+        let mut default_args = vec![
             OsStr::new("--disable-dev-shm-usage"),
             OsStr::new("--no-sandbox"),
             OsStr::new("--disable-gpu"),
