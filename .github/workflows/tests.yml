@@ -29,9 +29,6 @@ jobs:
         with:
           chrome-version: latest
 
-      - name: Debug Chrome path
-        run: echo ${{ steps.setup-chrome.outputs.chrome-path }}
-
       - name: Run nextest
         run: make nextest
         env:
