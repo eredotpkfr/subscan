@@ -10,6 +10,7 @@ allow = [
     "ISC",
     "BSD-3-Clause",
     "GPL-3.0-only",
+    "GPL-3.0"
 ]
 
 # List of license exceptions
@@ -17,7 +18,11 @@ exceptions = [
     { allow = ["CDLA-Permissive-2.0"], crate = "webpki-roots" },
     { allow = ["LGPL-3.0"], crate = "colog" },
     { allow = ["Zlib"], crate = "nanorand" },
+    { allow = ["Zlib"], crate = "libz-rs-sys" },
+    { allow = ["Zlib"], crate = "zlib-rs" },
     { allow = ["GPL-3.0"], crate = "auto_generate_cdp" },
+    { allow = ["CC0-1.0"], crate = "ppmd-rust" },
+    { allow = ["bzip2-1.0.6"], crate = "libbz2-rs-sys" }
 ]
 
 [[licenses.clarify]]
