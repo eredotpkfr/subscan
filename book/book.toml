@@ -1,7 +1,6 @@
 [book]
 authors = ["Erdoğan Yoksul <erdoganyoksul3@gmail.com>"]
 language = "en"
-multilingual = false
 src = "src"
 title = "subscan"
 description = "A subdomain enumeration tool leveraging diverse techniques, designed for advanced pentesting operations"
