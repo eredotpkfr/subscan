@@ -2,40 +2,41 @@ SHELL=/bin/bash
 
 .PHONY: all
 
-all: install-pre-commit-mac \
-	install-pre-commit-linux \
-	install-pre-commit-hooks \
-	install-cargo-tools \
-	update-pre-commit-hooks \
-	install-nightly-toolchain \
-	install-cargo-clippy \
-	install-cargo-doc-rs \
-	install-cargo-mdbook \
-	install-cargo-deny \
-	install-cargo-udeps \
-	install-cargo-llvm-cov \
-	install-cargo-dist \
-	install-git-cliff \
-	install-cargo-nextest \
-	install-cargo-machete \
-	clean \
-	check \
-	fix \
-	book-build \
+all: book-build \
 	book-test \
-	live-book \
+	build \
+	check \
+	clean \
+	clippy \
+	deny \
 	doc \
 	doc-rs \
 	doc-test \
-	nextest \
-	test \
-	build \
-	rustfmt-check \
-	rustfmt \
-	clippy \
-	deny \
-	udeps \
+	fix \
+	install-cargo-clippy \
+	install-cargo-deny \
+	install-cargo-dist \
+	install-cargo-doc-rs \
+	install-cargo-llvm-cov \
+	install-cargo-machete \
+	install-cargo-mdbook \
+	install-cargo-nextest \
+	install-cargo-tools \
+	install-cargo-udeps \
+	install-git-cliff \
+	install-nightly-toolchain \
+	install-pre-commit-hooks \
+	install-pre-commit-linux \
+	install-pre-commit-mac \
+	live-book \
 	machete
+	nextest \
+	rustfmt \
+	rustfmt-check \
+	rustup \
+	test \
+	udeps \
+	update-pre-commit-hooks \
 
 install-pre-commit-mac:
 	@brew install pre-commit
@@ -114,6 +115,9 @@ coverage:
 		--open
 build:
 	@cargo build
+rustup:
+	@rustup self update
+	@rustup update
 rustfmt-check:
 	@cargo +nightly fmt --all -- --check
 rustfmt: fix
