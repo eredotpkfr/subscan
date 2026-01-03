@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -28,7 +28,7 @@ repos:
       - id: detect-private-key
 
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v4.2.0
+    rev: v4.5.1
     hooks:
       - id: validate_manifest
 
@@ -42,12 +42,12 @@ repos:
       - id: cargo-check
 
   - repo: https://github.com/est31/cargo-udeps
-    rev: v0.1.57
+    rev: v0.1.60
     hooks:
     - id: udeps
 
   - repo: https://github.com/EmbarkStudios/cargo-deny
-    rev: 0.18.3
+    rev: 0.18.9
     hooks:
       - id: cargo-deny
         name: cargo-deny
@@ -77,7 +77,7 @@ repos:
           )$
 
   - repo: https://github.com/markdownlint/markdownlint
-    rev: v0.12.0
+    rev: v0.15.0
     hooks:
       - id: markdownlint
         name: markdownlint
@@ -87,13 +87,13 @@ repos:
           )$
 
   - repo: https://github.com/hadolint/hadolint
-    rev: v2.13.1-beta
+    rev: v2.14.0
     hooks:
       - id: hadolint-docker
         name: hadolint
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.28.0
+    rev: v8.30.0
     hooks:
       - id: gitleaks
         name: gitleaks
