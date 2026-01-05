@@ -17,6 +17,8 @@ allow = [
 # List of license exceptions
 exceptions = [
     { allow = ["CDLA-Permissive-2.0"], crate = "webpki-roots" },
+    { allow = ["CDLA-Permissive-2.0"], crate = "webpki-root-certs" },
+    { allow = ["OpenSSL"], crate = "aws-lc-sys" },
     { allow = ["LGPL-3.0"], crate = "colog" },
     { allow = ["Zlib"], crate = "nanorand" },
     { allow = ["Zlib"], crate = "libz-rs-sys" },
