@@ -49,7 +49,7 @@ tokio-util = "0.7.18"
 url = "2.5.4"
 
 [dev-dependencies]
-automod = "1.0.15"
+automod = "1.0.16"
 hickory-server = "0.25.2"
 md5 = "0.8.0"
 stubr = "0.6.2"
