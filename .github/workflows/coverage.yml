@@ -40,7 +40,7 @@ jobs:
           --output-path lcov.info
 
       - name: Upload coverage report to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         if: ${{ !(startsWith(github.head_ref, 'release-plz') || startsWith(github.head_ref, 'dependabot')) }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
