@@ -47,14 +47,14 @@ repos:
     - id: udeps
 
   - repo: https://github.com/EmbarkStudios/cargo-deny
-    rev: 0.18.9
+    rev: 0.19.4
     hooks:
       - id: cargo-deny
         name: cargo-deny
         args: ["--all-features", "--log-level", "error", "check"]
 
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
-    rev: v9.22.0
+    rev: v9.24.0
     hooks:
       - id: commitlint
         stages: [commit-msg]
@@ -66,7 +66,7 @@ repos:
       - id: typos
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.2
     hooks:
       - id: codespell
         exclude: |
