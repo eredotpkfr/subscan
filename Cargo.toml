@@ -50,7 +50,7 @@ url = "2.5.8"
 
 [dev-dependencies]
 automod = "1.0.16"
-hickory-server = "0.25.2"
+hickory-server = "0.26.0"
 md5 = "0.8.0"
 stubr = "0.6.2"
 tempfile = "3.27.0"
