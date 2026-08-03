@@ -35,7 +35,7 @@ flume = "0.12.0"
 futures = "0.3.32"
 headless_chrome = { version = "1.0.21", default-features = false, features = ["fetch"] }
 hickory-client = { version = "0.25.2", default-features = false }
-hickory-resolver = { version = "0.25.2", default-features = false, features = ["system-config", "tokio"] }
+hickory-resolver = { version = "0.26.1", default-features = false, features = ["system-config", "tokio"] }
 itertools = "0.14.0"
 log = "0.4.28"
 prettytable-rs = "0.10.0"
@@ -50,7 +50,7 @@ url = "2.5.8"
 
 [dev-dependencies]
 automod = "1.0.16"
-hickory-server = "0.25.2"
+hickory-server = "0.26.1"
 md5 = "0.8.0"
 stubr = "0.6.2"
 tempfile = "3.27.0"

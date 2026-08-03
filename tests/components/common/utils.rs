@@ -1,11 +1,12 @@
 use std::{
     collections::BTreeSet,
     fs,
-    net::TcpListener,
+    net::{IpAddr, TcpListener},
     path::{Path, PathBuf},
     thread,
 };
 
+use hickory_resolver::config::NameServerConfig;
 use serde_json::Value;
 use subscan::{
     enums::{
@@ -104,4 +105,11 @@ pub fn current_thread_hex() -> String {
 
 pub fn fix_new_lines(input: &str) -> String {
     input.replace("\r\n", "\n")
+}
+
+pub fn tcp_ns(ip: IpAddr, port: u16) -> NameServerConfig {
+    let mut ns = NameServerConfig::tcp(ip);
+
+    ns.connections[0].port = port;
+    ns
 }

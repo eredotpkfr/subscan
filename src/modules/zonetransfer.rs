@@ -140,8 +140,12 @@ impl SubscanModuleInterface for ZoneTransfer {
         match &self.ns {
             Some(ns) => {
                 let err = Custom("connection error".into());
+                let ips = match net::ns_tcp_socket_addr(ns) {
+                    Some(server) => self.get_ns_as_ip(server, domain).await,
+                    None => None,
+                };
 
-                match self.get_ns_as_ip(ns.socket_addr, domain).await.ok_or(err) {
+                match ips.ok_or(err) {
                     Ok(ips) => {
                         for ip in ips {
                             let subdomains = self.attempt_zone_transfer(ip, domain).await;

@@ -4,18 +4,19 @@ use std::{
     time::Duration,
 };
 
-use hickory_client::proto::{
-    op::{Header, MessageType, OpCode, ResponseCode},
-    rr::{
-        rdata::{A, AAAA, NS},
-        LowerName, RData, Record, RecordType,
-    },
-};
-use hickory_resolver::Name;
 use hickory_server::{
-    authority::MessageResponseBuilder,
+    net::runtime::Time,
+    proto::{
+        op::{Header, HeaderCounts, MessageType, Metadata, OpCode, ResponseCode},
+        rr::{
+            domain::Name,
+            rdata::{A, AAAA, NS},
+            LowerName, RData, Record, RecordType,
+        },
+    },
     server::{Request, RequestHandler, ResponseHandler, ResponseInfo},
-    ServerFuture,
+    zone_handler::MessageResponseBuilder,
+    Server,
 };
 use tokio::net::TcpListener;
 
@@ -45,10 +46,10 @@ impl MockDNSServer {
     }
 
     pub async fn start(&self) {
-        let mut server = ServerFuture::new(self.handler.clone());
+        let mut server = Server::new(self.handler.clone());
         let listener = TcpListener::bind(self.socket).await.unwrap();
 
-        server.register_listener(listener, Duration::from_secs(10));
+        server.register_listener(listener, Duration::from_secs(10), 32);
         server.block_until_done().await.unwrap()
     }
 }
@@ -63,7 +64,7 @@ impl MockDNSHandler {
         request: &Request,
         responder: R,
     ) -> Option<ResponseInfo> {
-        match request.queries().first().unwrap().query_type() {
+        match request.queries.queries().first().unwrap().query_type() {
             RecordType::A | RecordType::AAAA => {
                 self.handle_a_and_aaaa_query(request, responder).await
             }
@@ -78,11 +79,13 @@ impl MockDNSHandler {
         request: &Request,
         response: R,
     ) -> Option<ResponseInfo> {
-        if request.op_code() != OpCode::Query || request.message_type() != MessageType::Query {
+        if request.metadata.op_code != OpCode::Query
+            || request.metadata.message_type != MessageType::Query
+        {
             return None;
         }
 
-        match request.queries().first().unwrap().name() {
+        match request.queries.queries().first().unwrap().name() {
             name if self.zone.zone_of(name) => self.handle_zone(request, response).await,
             _ => None,
         }
@@ -94,17 +97,17 @@ impl MockDNSHandler {
         mut responder: R,
     ) -> Option<ResponseInfo> {
         let builder = MessageResponseBuilder::from_message_request(request);
-        let header = Header::response_from_request(request.header());
+        let metadata = Metadata::response_from_request(&request.metadata);
 
         let name = Name::from_utf8("ns.foo.com").unwrap();
         let rdata = RData::NS(NS(name));
 
         let records = [Record::from_rdata(
-            request.queries().first().unwrap().name().into(),
+            request.queries.queries().first().unwrap().name().into(),
             60,
             rdata,
         )];
-        let response = builder.build(header, records.iter(), &[], &[], &[]);
+        let response = builder.build(metadata, records.iter(), &[], &[], &[]);
 
         responder.send_response(response).await.ok()
     }
@@ -115,7 +118,7 @@ impl MockDNSHandler {
         mut responder: R,
     ) -> Option<ResponseInfo> {
         let builder = MessageResponseBuilder::from_message_request(request);
-        let header = Header::response_from_request(request.header());
+        let metadata = Metadata::response_from_request(&request.metadata);
 
         let rdata = match request.src().ip() {
             IpAddr::V4(ipv4) => RData::A(A(ipv4)),
@@ -129,7 +132,7 @@ impl MockDNSHandler {
             Record::from_rdata(name_one, 60, rdata.clone()),
             Record::from_rdata(name_two, 60, rdata),
         ];
-        let response = builder.build(header, records.iter(), &[], &[], &[]);
+        let response = builder.build(metadata, records.iter(), &[], &[], &[]);
 
         responder.send_response(response).await.ok()
     }
@@ -140,7 +143,7 @@ impl MockDNSHandler {
         mut responder: R,
     ) -> Option<ResponseInfo> {
         let builder = MessageResponseBuilder::from_message_request(request);
-        let header = Header::response_from_request(request.header());
+        let metadata = Metadata::response_from_request(&request.metadata);
 
         let rdata = match request.src().ip() {
             IpAddr::V4(ipv4) => RData::A(A(ipv4)),
@@ -148,11 +151,11 @@ impl MockDNSHandler {
         };
 
         let records = [Record::from_rdata(
-            request.queries().first().unwrap().name().into(),
+            request.queries.queries().first().unwrap().name().into(),
             60,
             rdata,
         )];
-        let response = builder.build(header, records.iter(), &[], &[], &[]);
+        let response = builder.build(metadata, records.iter(), &[], &[], &[]);
 
         responder.send_response(response).await.ok()
     }
@@ -160,7 +163,7 @@ impl MockDNSHandler {
 
 #[async_trait::async_trait]
 impl RequestHandler for MockDNSHandler {
-    async fn handle_request<R: ResponseHandler>(
+    async fn handle_request<R: ResponseHandler, T: Time>(
         &self,
         request: &Request,
         response: R,
@@ -168,10 +171,15 @@ impl RequestHandler for MockDNSHandler {
         if let Some(info) = self.handle_request(request, response).await {
             info
         } else {
-            let mut header = Header::new();
+            let mut metadata = Metadata::new(0, MessageType::Query, OpCode::Query);
 
-            header.set_response_code(ResponseCode::ServFail);
-            header.into()
+            metadata.response_code = ResponseCode::ServFail;
+
+            Header {
+                metadata,
+                counts: HeaderCounts::default(),
+            }
+            .into()
         }
     }
 }
