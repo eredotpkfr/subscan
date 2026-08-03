@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use hickory_resolver::config::ResolverConfig as HickoryResolverConfig;
+use hickory_resolver::config::{ResolverConfig as HickoryResolverConfig, CLOUDFLARE};
 
 use crate::{
     cli::commands::{
@@ -22,7 +22,8 @@ pub struct ResolverConfig {
 impl Default for ResolverConfig {
     fn default() -> Self {
         Self {
-            inner: net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
+            inner: net::read_system_ns_conf()
+                .unwrap_or(HickoryResolverConfig::udp_and_tcp(&CLOUDFLARE)),
             timeout: DEFAULT_RESOLVER_TIMEOUT,
             concurrency: DEFAULT_RESOLVER_CONCURRENCY,
             disabled: false,
@@ -51,7 +52,8 @@ impl From<ModuleRunSubCommandArgs> for ResolverConfig {
     fn from(args: ModuleRunSubCommandArgs) -> Self {
         Self {
             inner: args.resolver_list.map_or(
-                net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
+                net::read_system_ns_conf()
+                    .unwrap_or(HickoryResolverConfig::udp_and_tcp(&CLOUDFLARE)),
                 net::read_resolver_list_file,
             ),
             timeout: Duration::from_millis(args.resolver_timeout),
@@ -82,7 +84,8 @@ impl From<BruteCommandArgs> for ResolverConfig {
     fn from(args: BruteCommandArgs) -> Self {
         Self {
             inner: args.resolver_list.map_or(
-                net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
+                net::read_system_ns_conf()
+                    .unwrap_or(HickoryResolverConfig::udp_and_tcp(&CLOUDFLARE)),
                 net::read_resolver_list_file,
             ),
             timeout: Duration::from_millis(args.resolver_timeout),
@@ -113,7 +116,8 @@ impl From<ScanCommandArgs> for ResolverConfig {
     fn from(args: ScanCommandArgs) -> Self {
         Self {
             inner: args.resolver_list.map_or(
-                net::read_system_ns_conf().unwrap_or(HickoryResolverConfig::cloudflare()),
+                net::read_system_ns_conf()
+                    .unwrap_or(HickoryResolverConfig::udp_and_tcp(&CLOUDFLARE)),
                 net::read_resolver_list_file,
             ),
             timeout: Duration::from_millis(args.resolver_timeout),
