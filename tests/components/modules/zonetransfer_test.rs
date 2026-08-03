@@ -4,8 +4,6 @@ use std::{
     str::FromStr,
 };
 
-use hickory_client::proto::xfer::Protocol;
-use hickory_resolver::config::NameServerConfig;
 use subscan::{
     enums::dispatchers::SubscanModuleDispatcher, modules::zonetransfer::ZoneTransfer,
     types::result::status::SubscanModuleStatus,
@@ -67,7 +65,7 @@ async fn run_success_test() {
     let mut zonetransfer = ZoneTransfer::dispatcher();
 
     if let SubscanModuleDispatcher::ZoneTransfer(ref mut zonetransfer) = zonetransfer {
-        zonetransfer.ns = Some(NameServerConfig::new(server.socket, Protocol::Tcp));
+        zonetransfer.ns = Some(utils::tcp_ns(server.socket.ip(), server.socket.port()));
     }
 
     let (results, status) = utils::run_module(zonetransfer, TEST_DOMAIN).await;
@@ -96,7 +94,7 @@ async fn run_failed_test() {
     let socketaddr = SocketAddr::V4(SocketAddrV4::from_str("0.0.0.0:0").unwrap());
 
     if let SubscanModuleDispatcher::ZoneTransfer(ref mut zonetransfer) = zonetransfer {
-        zonetransfer.ns = Some(NameServerConfig::new(socketaddr, Protocol::Tcp));
+        zonetransfer.ns = Some(utils::tcp_ns(socketaddr.ip(), socketaddr.port()));
     }
 
     let (results, status) = utils::run_module(zonetransfer, TEST_DOMAIN).await;
