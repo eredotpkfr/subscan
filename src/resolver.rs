@@ -1,9 +1,5 @@
 use async_trait::async_trait;
-use hickory_client::proto::runtime::TokioRuntimeProvider;
-use hickory_resolver::{
-    name_server::{GenericConnector, TokioConnectionProvider},
-    Resolver as HickoryResolver,
-};
+use hickory_resolver::{net::runtime::TokioRuntimeProvider, Resolver as HickoryResolver};
 use tokio::time;
 
 use crate::{
@@ -11,11 +7,13 @@ use crate::{
     types::{config::resolver::ResolverConfig, func::AsyncIPResolveFunc},
 };
 
+const RESOLVER_BUILD_ERR: &str = "Cannot create DNS resolver!";
+
 /// IP address resolver component
 #[derive(Clone)]
 pub struct Resolver {
     pub config: ResolverConfig,
-    pub inner: HickoryResolver<GenericConnector<TokioRuntimeProvider>>,
+    pub inner: HickoryResolver<TokioRuntimeProvider>,
 }
 
 impl Default for Resolver {
@@ -39,8 +37,10 @@ impl Default for Resolver {
     /// ```
     fn default() -> Self {
         let config = ResolverConfig::default();
-        let provider = TokioConnectionProvider::default();
-        let inner = HickoryResolver::builder_with_config(config.clone().inner, provider).build();
+        let provider = TokioRuntimeProvider::default();
+        let inner = HickoryResolver::builder_with_config(config.clone().inner, provider)
+            .build()
+            .expect(RESOLVER_BUILD_ERR);
 
         Self { inner, config }
     }
@@ -48,8 +48,10 @@ impl Default for Resolver {
 
 impl From<ResolverConfig> for Resolver {
     fn from(config: ResolverConfig) -> Self {
-        let provider = TokioConnectionProvider::default();
-        let inner = HickoryResolver::builder_with_config(config.clone().inner, provider).build();
+        let provider = TokioRuntimeProvider::default();
+        let inner = HickoryResolver::builder_with_config(config.clone().inner, provider)
+            .build()
+            .expect(RESOLVER_BUILD_ERR);
 
         Self { inner, config }
     }
@@ -57,8 +59,10 @@ impl From<ResolverConfig> for Resolver {
 
 impl Resolver {
     pub fn boxed_from(config: ResolverConfig) -> Box<Self> {
-        let provider = TokioConnectionProvider::default();
-        let inner = HickoryResolver::builder_with_config(config.clone().inner, provider).build();
+        let provider = TokioRuntimeProvider::default();
+        let inner = HickoryResolver::builder_with_config(config.clone().inner, provider)
+            .build()
+            .expect(RESOLVER_BUILD_ERR);
 
         Box::new(Self { inner, config })
     }
