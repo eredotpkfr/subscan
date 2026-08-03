@@ -20,9 +20,9 @@ use crate::{
 /// It allows to made static type dispatching instead of dynamic dispatch and speed up performance.
 /// For more technical details please follow up `enum_dispatch` package
 ///
-/// Each `Subscan` module that compatible with [`SubscanModuleInterface`](crate::interfaces::module::SubscanModuleInterface)
+/// Each `Subscan` module that compatible with [`SubscanModuleInterface`]
 /// must be appeared in this dispatcher as a any enum variant c/o `enum_dispatch`
-/// macro creates a sub method for [`SubscanModuleInterface`](crate::interfaces::module::SubscanModuleInterface)
+/// macro creates a sub method for [`SubscanModuleInterface`]
 /// methods and matches all of these variants with their methods
 ///
 /// When you call any method from [`SubscanModuleDispatcher`] object this mappings
