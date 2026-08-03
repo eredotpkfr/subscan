@@ -35,7 +35,6 @@ flume = "0.12.0"
 futures = "0.3.32"
 headless_chrome = { version = "1.0.21", default-features = false, features = ["fetch"] }
 hickory-client = { version = "0.25.2", default-features = false }
-hickory-net = "0.26.1"
 hickory-resolver = { version = "0.26.1", default-features = false, features = ["system-config", "tokio"] }
 itertools = "0.14.0"
 log = "0.4.28"

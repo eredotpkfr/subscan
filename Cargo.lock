@@ -3820,7 +3820,6 @@ dependencies = [
  "futures",
  "headless_chrome",
  "hickory-client",
- "hickory-net",
  "hickory-resolver",
  "hickory-server",
  "itertools 0.14.0",
