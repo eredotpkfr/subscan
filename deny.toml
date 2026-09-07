@@ -46,5 +46,6 @@ ignore = [
     { id = "RUSTSEC-2025-0052", reason = "unmaintained advisory detected" },
     { id = "RUSTSEC-2026-0174", reason = "No safe upgrade is available!" },
     { id = "RUSTSEC-2026-0119", reason = "No safe upgrade is available!" },
-    { id = "RUSTSEC-2026-0118", reason = "No safe upgrade is available!" }
+    { id = "RUSTSEC-2026-0118", reason = "No safe upgrade is available!" },
+    { id = "RUSTSEC-2026-0258", reason = "No safe upgrade is available!" }
 ]

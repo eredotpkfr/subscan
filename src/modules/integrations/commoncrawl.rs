@@ -107,7 +107,7 @@ impl SubscanModuleInterface for CommonCrawl {
                 Ok(content) => match self.extract_cdx_urls(content.as_json(), &year) {
                     Some(cdxs) => {
                         for cdx in cdxs {
-                            let parsed = Url::parse_with_params(&cdx, &[("url", &query)]);
+                            let parsed = Url::parse_with_params(&cdx, [("url", &query)]);
 
                             if let Ok(cdx_url) = parsed {
                                 let rbuilder = requester

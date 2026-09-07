@@ -104,7 +104,7 @@ async fn authenticate_test_with_header_auth_no_apikey() {
 async fn authenticate_test_with_query_auth() {
     let mut url = Url::parse(TEST_URL).unwrap();
 
-    let expected = Url::parse_with_params(TEST_URL, &[("apikey", TEST_API_KEY)]).unwrap();
+    let expected = Url::parse_with_params(TEST_URL, [("apikey", TEST_API_KEY)]).unwrap();
     let auth = AuthenticationMethod::APIKeyAsQueryParam("apikey".to_string());
     let module = modules::generic_integration(url.as_ref(), auth);
 
