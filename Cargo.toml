@@ -20,9 +20,9 @@ keywords = [
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-async-trait = "0.1.91"
+async-trait = "0.1.92"
 chrono = { version = "0.4.45", features = ["serde"] }
-clap = { version = "4.6.5", features = ["derive"] }
+clap = { version = "4.6.6", features = ["derive"] }
 clap-verbosity-flag = "3.0.4"
 colog = "1.4.0"
 colored = "3.1.1"
@@ -32,12 +32,12 @@ dotenvy = "0.15.7"
 enum_dispatch = "0.3.13"
 env_logger = "0.11.11"
 flume = "0.12.0"
-futures = "0.3.33"
+futures = "0.3.34"
 headless_chrome = { version = "1.0.22", default-features = false, features = ["fetch"] }
 hickory-client = { version = "0.25.2", default-features = false }
-hickory-resolver = { version = "0.26.1", default-features = false, features = ["system-config", "tokio"] }
+hickory-resolver = { version = "0.26.2", default-features = false, features = ["system-config", "tokio"] }
 itertools = "0.15.0"
-log = "0.4.33"
+log = "0.4.34"
 prettytable-rs = "0.10.0"
 regex = "1.13.1"
 reqwest = { version = "0.13.4", features = ["json", "stream", "form"] }
@@ -50,7 +50,7 @@ url = "2.5.8"
 
 [dev-dependencies]
 automod = "1.0.17"
-hickory-server = "0.26.1"
+hickory-server = "0.26.2"
 md5 = "0.8.1"
 stubr = "0.6.2"
 tempfile = "3.27.0"
