@@ -85,7 +85,7 @@ async fn client_get_content_extra_header_test() {
     let client = HTTPClient::with_config(config);
     let url = Url::parse_with_params(
         &stubr.path("/hello-with-headers"),
-        &[("search", "site:foo.com")],
+        [("search", "site:foo.com")],
     )
     .unwrap();
 
