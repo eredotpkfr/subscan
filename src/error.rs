@@ -11,7 +11,14 @@ use crate::types::result::{
 #[derive(Clone, Debug, Display, Eq, From, Ord, PartialEq, PartialOrd)]
 pub enum SubscanError {
     /// Module error, see [`ModuleErrorKind`] for generic error definitions
-    #[from(ModuleErrorKind, SkipReason, SelectorErrorKind<'_>, regex::Error, reqwest::Error, url::ParseError)]
+    #[from(
+        ModuleErrorKind,
+        SkipReason,
+        SelectorErrorKind,
+        regex::Error,
+        reqwest::Error,
+        url::ParseError
+    )]
     #[display("{_0}")]
     ModuleError(ModuleErrorKind),
 }
@@ -65,7 +72,7 @@ impl SubscanError {
 #[derive(Clone, Debug, Display, Eq, From, Ord, PartialEq, PartialOrd)]
 pub enum ModuleErrorKind {
     /// Indicates an error when extracting subdomains from any HTML content
-    #[from(SelectorErrorKind<'_>)]
+    #[from(SelectorErrorKind)]
     #[display("html extract error")]
     HTMLExtract,
     /// Indicates an error when extracting subdomains from any JSON content
